@@ -73,7 +73,7 @@ def cache_method_response(timeout=300, vary_on_user=True, vary_on_headers=None):
             if request.query_params:
                 params = sorted(request.query_params.items())
                 params_str = '&'.join(f'{k}={v}' for k, v in params)
-                cache_key_parts.append(f"params:{hashlib.md5(params_str.encode()).hexdigest()[:8]}")
+                cache_key_parts.append(f"params:{hashlib.md5(params_str.encode(), usedforsecurity=False).hexdigest()[:8]}")
             
             # Include specified headers
             if vary_on_headers:
@@ -213,12 +213,12 @@ def _generate_cache_key(prefix, args=None, kwargs=None, headers=None):
     if args:
         # Hash args for consistent key
         args_str = json.dumps([str(arg) for arg in args if not isinstance(arg, HttpRequest)])
-        key_parts.append(hashlib.md5(args_str.encode()).hexdigest()[:8])
+        key_parts.append(hashlib.md5(args_str.encode(), usedforsecurity=False).hexdigest()[:8])
     
     if kwargs:
         # Hash kwargs for consistent key
         kwargs_str = json.dumps(sorted(kwargs.items()))
-        key_parts.append(hashlib.md5(kwargs_str.encode()).hexdigest()[:8])
+        key_parts.append(hashlib.md5(kwargs_str.encode(), usedforsecurity=False).hexdigest()[:8])
     
     if headers:
         # Include headers in key

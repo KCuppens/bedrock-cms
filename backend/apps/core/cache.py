@@ -116,7 +116,7 @@ class CacheKeyBuilder:
         # Create a hash of the parameters for consistent key generation
         if params:
             param_str = '&'.join(f"{k}={v}" for k, v in sorted(params.items()))
-            param_hash = hashlib.md5(param_str.encode()).hexdigest()[:8]
+            param_hash = hashlib.md5(param_str.encode(), usedforsecurity=False).hexdigest()[:8]
             return self.build_key('api', endpoint, param_hash)
         else:
             return self.build_key('api', endpoint)
@@ -128,11 +128,11 @@ class CacheKeyBuilder:
         Format: cms:s:{query_hash}:{filter_hash}
         """
         # Hash the query for consistent keys
-        query_hash = hashlib.md5(query.encode()).hexdigest()[:8]
+        query_hash = hashlib.md5(query.encode(), usedforsecurity=False).hexdigest()[:8]
         
         if filters:
             filter_str = '&'.join(f"{k}={v}" for k, v in sorted(filters.items()) if v is not None)
-            filter_hash = hashlib.md5(filter_str.encode()).hexdigest()[:8]
+            filter_hash = hashlib.md5(filter_str.encode(), usedforsecurity=False).hexdigest()[:8]
             return self.build_key('search', query_hash, filter_hash)
         else:
             return self.build_key('search', query_hash)

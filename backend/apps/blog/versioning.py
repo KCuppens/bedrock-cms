@@ -11,6 +11,7 @@ from typing import Dict, List, Any, Optional, TYPE_CHECKING
 from django.db import models, transaction
 from django.contrib.auth import get_user_model
 from django.utils import timezone
+from datetime import datetime
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes.fields import GenericForeignKey
 
@@ -73,7 +74,7 @@ class BlogPostRevision(models.Model):
         return f"{self.blog_post.title} - {snapshot_type} ({self.created_at.strftime('%Y-%m-%d %H:%M')})"
     
     @classmethod
-    def create_snapshot(cls, blog_post: 'BlogPost', user: User = None, is_published: bool = False, 
+    def create_snapshot(cls, blog_post: 'BlogPost', user: Optional['User'] = None, is_published: bool = False, 
                        is_autosave: bool = False, comment: str = "") -> 'BlogPostRevision':
         """
         Create a new revision snapshot of a blog post.
@@ -101,11 +102,11 @@ class BlogPostRevision(models.Model):
             'allow_comments': blog_post.allow_comments,
             'published_at': blog_post.published_at.isoformat() if blog_post.published_at else None,
             'scheduled_publish_at': blog_post.scheduled_publish_at.isoformat() if blog_post.scheduled_publish_at else None,
-            'category_id': blog_post.category_id,
+            'category_id': blog_post.category.id if blog_post.category else None,
             'tag_ids': list(blog_post.tags.values_list('id', flat=True)),
-            'social_image_id': blog_post.social_image_id,
-            'locale_id': blog_post.locale_id,
-            'author_id': blog_post.author_id,
+            'social_image_id': blog_post.social_image.id if blog_post.social_image else None,
+            'locale_id': blog_post.locale.id if blog_post.locale else None,
+            'author_id': blog_post.author.id if blog_post.author else None,
         }
         
         # Create revision
@@ -164,7 +165,7 @@ class BlogPostRevision(models.Model):
         # Delete old non-published revisions
         old_revisions.delete()
     
-    def restore_to_blog_post(self, user: User = None, create_backup: bool = True) -> 'BlogPost':
+    def restore_to_blog_post(self, user: Optional['User'] = None, create_backup: bool = True) -> 'BlogPost':
         """
         Restore this revision's content to the blog post.
         

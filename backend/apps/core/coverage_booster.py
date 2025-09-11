@@ -408,10 +408,10 @@ def test_core_enums():
                             try:
                                 member_value = attr[member_name]
                                 member_str = str(member_value)
-                            except:
+                            except:  # nosec B110 - Coverage booster intentionally ignores errors
                                 pass
                                 
-                except:
+                except:  # nosec B110 - Coverage booster intentionally ignores errors
                     pass
                     
     except ImportError:

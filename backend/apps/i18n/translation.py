@@ -60,7 +60,7 @@ class TranslationResolver:
                 field=field
             ).first()
             
-            if unit and unit.source_text:
+            if unit is not None and unit.source_text:
                 return unit.source_text
         except TranslationUnit.DoesNotExist:
             pass
@@ -204,7 +204,7 @@ class TranslationManager:
         # Get all active target locales except source
         target_locales = Locale.objects.filter(
             is_active=True
-        ).exclude(id=source_locale.id)
+        ).exclude(pk=source_locale.pk)
         
         for field in translatable_fields:
             # Extract source text
@@ -298,8 +298,8 @@ class TranslationManager:
     def update_translation(
         self,
         unit: TranslationUnit,
-        target_text: str = None,
-        status: str = None,
+        target_text: Optional[str] = None,
+        status: Optional[str] = None,
         user=None
     ) -> TranslationUnit:
         """
@@ -326,8 +326,8 @@ class TranslationManager:
     def get_translations_for_object(
         self,
         obj,
-        target_locale: Locale = None
-    ) -> List[TranslationUnit]:
+        target_locale: Optional['Locale'] = None
+    ) -> 'QuerySet[TranslationUnit]':
         """
         Get all translations for an object.
         
@@ -501,7 +501,7 @@ class UiMessageResolver:
         except UiMessage.DoesNotExist:
             return default
     
-    def resolve(self, key: str, default: str = None, parameters: Dict[str, Any] = None) -> str:
+    def resolve(self, key: str, default: Optional[str] = None, parameters: Optional[Dict[str, Any]] = None) -> str:
         """
         Resolve a UI message with fallback and parameter substitution.
         Alias for resolve_message with parameter support.
@@ -530,7 +530,7 @@ class UiMessageResolver:
         
         return message
     
-    def get_message_bundle(self, namespace: str = None) -> Dict[str, str]:
+    def get_message_bundle(self, namespace: Optional[str] = None) -> Dict[str, str]:
         """
         Get all messages for a namespace as a dict.
         

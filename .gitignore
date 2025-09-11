@@ -151,7 +151,7 @@ local_settings.py
 
 # Static files
 staticfiles/
-media/
+/media/
 
 # Docker
 .dockerignore
