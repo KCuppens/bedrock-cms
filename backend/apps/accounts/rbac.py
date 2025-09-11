@@ -6,6 +6,7 @@ permissions only for specific locales and/or path sections.
 """
 
 from django.db import models
+from django.db.models import CharField, TextField, BooleanField, DateTimeField, ForeignKey, OneToOneField
 from django.contrib.auth.models import Group
 from django.core.exceptions import ValidationError
 from apps.i18n.models import Locale
@@ -19,19 +20,19 @@ class ScopedLocale(models.Model):
     in the specified locales.
     """
     
-    group = models.ForeignKey(
+    group: ForeignKey = models.ForeignKey(
         Group,
         on_delete=models.CASCADE,
         related_name='locale_scopes',
         help_text="Django group to scope"
     )
-    locale = models.ForeignKey(
+    locale: ForeignKey = models.ForeignKey(
         Locale,
         on_delete=models.CASCADE,
         related_name='group_scopes',
         help_text="Locale this group has access to"
     )
-    created_at = models.DateTimeField(auto_now_add=True)
+    created_at: DateTimeField = models.DateTimeField(auto_now_add=True)
     
     class Meta:
         unique_together = [('group', 'locale')]
@@ -53,25 +54,25 @@ class ScopedSection(models.Model):
     under the specified path prefixes.
     """
     
-    group = models.ForeignKey(
+    group: ForeignKey = models.ForeignKey(
         Group,
         on_delete=models.CASCADE,
         related_name='section_scopes',
         help_text="Django group to scope"
     )
-    path_prefix = models.CharField(
+    path_prefix: CharField = models.CharField(
         max_length=255,
         help_text="Path prefix (e.g., '/blog', '/products'). Use '/' for root access."
     )
-    name = models.CharField(
+    name: CharField = models.CharField(
         max_length=100,
         help_text="Human-readable name for this section (e.g., 'Blog', 'Products')"
     )
-    description = models.TextField(
+    description: TextField = models.TextField(
         blank=True,
         help_text="Optional description of what this section includes"
     )
-    created_at = models.DateTimeField(auto_now_add=True)
+    created_at: DateTimeField = models.DateTimeField(auto_now_add=True)
     
     class Meta:
         unique_together = [('group', 'path_prefix')]
@@ -111,8 +112,8 @@ class RBACMixin:
     
     Usage:
         class Page(models.Model, RBACMixin):
-            locale = models.ForeignKey(Locale, ...)
-            path = models.CharField(...)
+            locale: ForeignKey = models.ForeignKey(Locale, ...)
+            path: CharField = models.CharField(...)
     """
     
     def user_has_locale_access(self, user):

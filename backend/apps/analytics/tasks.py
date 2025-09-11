@@ -2,6 +2,7 @@
 Celery tasks for analytics data processing and aggregation.
 """
 
+import logging
 from datetime import date, datetime, timedelta
 from celery import shared_task
 from django.utils import timezone
@@ -12,6 +13,7 @@ from .models import PageView, UserActivity, AnalyticsSummary
 from .aggregation import AnalyticsAggregator
 
 User = get_user_model()
+logger = logging.getLogger(__name__)
 
 
 @shared_task
@@ -171,6 +173,7 @@ def calculate_content_performance_scores():
             updated_count += 1
         except Exception as e:
             # Log error but continue processing
+            logger.error(f"Failed to calculate performance score for {item['content_type']}:{item['object_id']}: {e}")
             continue
     
     return {

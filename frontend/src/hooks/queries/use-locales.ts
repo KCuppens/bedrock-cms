@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { api } from '@/lib/api';
+import { api } from '@/lib/api.ts';
 import { useToast } from '@/hooks/use-toast';
 
 export interface Locale {

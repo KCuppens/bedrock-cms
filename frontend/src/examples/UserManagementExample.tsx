@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { api } from '@/lib/api';
+import { api } from '@/lib/api.ts';
 import { Role, UserInviteRequest } from '@/types/api';
 import { useToast } from '@/hooks/use-toast';
 

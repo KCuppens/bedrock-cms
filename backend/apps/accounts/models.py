@@ -6,7 +6,7 @@ from django.db import models
 from django.utils import timezone
 from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
-from django.db.models import F
+from django.db.models import F, CharField, TextField, BooleanField, DateTimeField, ForeignKey, OneToOneField, URLField
 
 
 class CustomUserManager(BaseUserManager["User"]):
@@ -44,7 +44,7 @@ class User(AbstractUser):
 
     username = None  # type: ignore  # Remove username field
     email = models.EmailField(_("Email address"), unique=True)
-    name = models.CharField(_("Full name"), max_length=150, blank=True)
+    name: CharField = models.CharField(_("Full name"), max_length=150, blank=True)
     avatar = models.ImageField(
         _("Avatar"),
         upload_to="avatars/%Y/%m/%d/",
@@ -54,16 +54,16 @@ class User(AbstractUser):
             FileExtensionValidator(allowed_extensions=["jpg", "jpeg", "png", "gif", "webp"])
         ],
     )
-    last_seen = models.DateTimeField(_("Last seen"), default=timezone.now, db_index=True)
+    last_seen: DateTimeField = models.DateTimeField(_("Last seen"), default=timezone.now, db_index=True)
 
     # Additional fields for SaaS features
-    created_at = models.DateTimeField(_("Created"), auto_now_add=True)
-    updated_at = models.DateTimeField(_("Updated"), auto_now=True)
+    created_at: DateTimeField = models.DateTimeField(_("Created"), auto_now_add=True)
+    updated_at: DateTimeField = models.DateTimeField(_("Updated"), auto_now=True)
 
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS = []
 
-    objects = CustomUserManager()
+    objects = CustomUserManager()  # type: ignore
 
     class Meta:
         verbose_name = _("User")
@@ -123,25 +123,25 @@ class User(AbstractUser):
 class UserProfile(models.Model):
     """Extended user profile information"""
 
-    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="profile")
+    user: OneToOneField = models.OneToOneField(User, on_delete=models.CASCADE, related_name="profile")
 
     # Profile fields
-    bio = models.TextField(_("Biography"), max_length=500, blank=True)
-    location = models.CharField(_("Location"), max_length=100, blank=True)
-    website = models.URLField(_("Website"), blank=True)
-    phone = models.CharField(_("Phone number"), max_length=20, blank=True)
+    bio: TextField = models.TextField(_("Biography"), max_length=500, blank=True)
+    location: CharField = models.CharField(_("Location"), max_length=100, blank=True)
+    website: URLField = models.URLField(_("Website"), blank=True)
+    phone: CharField = models.CharField(_("Phone number"), max_length=20, blank=True)
 
     # Preferences
-    timezone = models.CharField(_("Timezone"), max_length=50, default="UTC")
-    language = models.CharField(_("Language"), max_length=10, default="en")
-    receive_notifications = models.BooleanField(_("Receive notifications"), default=True)
-    receive_marketing_emails = models.BooleanField(
+    timezone: CharField = models.CharField(_("Timezone"), max_length=50, default="UTC")
+    language: CharField = models.CharField(_("Language"), max_length=10, default="en")
+    receive_notifications: BooleanField = models.BooleanField(_("Receive notifications"), default=True)
+    receive_marketing_emails: BooleanField = models.BooleanField(
         _("Receive marketing emails"), default=False
     )
 
     # Timestamps
-    created_at = models.DateTimeField(_("Created"), auto_now_add=True)
-    updated_at = models.DateTimeField(_("Updated"), auto_now=True)
+    created_at: DateTimeField = models.DateTimeField(_("Created"), auto_now_add=True)
+    updated_at: DateTimeField = models.DateTimeField(_("Updated"), auto_now=True)
 
     class Meta:
         verbose_name = _("User Profile")

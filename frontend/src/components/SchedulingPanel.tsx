@@ -23,7 +23,7 @@ import {
   AlertDescription,
   Badge
 } from '@/components/ui';
-import { api } from '@/lib/api';
+import { api } from '@/lib/api.ts';
 import { toast } from '@/components/ui/use-toast';
 
 interface SchedulingPanelProps {

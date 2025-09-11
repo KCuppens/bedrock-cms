@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useLocation, Navigate } from 'react-router-dom';
-import { api } from '@/lib/api';
+import { api } from '@/lib/api.ts';
 
 interface RedirectHandlerProps {
   children: React.ReactNode;

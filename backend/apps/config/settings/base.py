@@ -205,7 +205,7 @@ LANGUAGES = [
     # Additional languages will be loaded dynamically from the database
     # via the I18nConfig.ready() method and DynamicLanguageMiddleware
 ]
-RTL_LANGUAGES = []
+RTL_LANGUAGES: list[str] = []
 
 # The i18n app will load actual languages from the database once Django is ready
 # This avoids circular dependency issues while still providing dynamic language support

@@ -64,3 +64,6 @@ django-ratelimit==4.1.0
 
 # Translation/Localization
 polib==1.2.0  # PO file manipulation for translation management
+
+# Data Validation
+pydantic>=2.0.0  # Data validation for block schemas

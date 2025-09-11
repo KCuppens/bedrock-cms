@@ -138,11 +138,19 @@ def validate_blocks(blocks: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
     
     # Import here to avoid circular imports
     from ..models import BlockType
+    from django.db import connection
     
-    # Get active block types from database
-    db_block_types = {
-        bt.type: bt for bt in BlockType.objects.filter(is_active=True)
-    }
+    # Check if database is available and BlockType table exists
+    db_block_types = {}
+    try:
+        if connection.introspection.table_names() and 'cms_blocktype' in connection.introspection.table_names():
+            # Get active block types from database
+            db_block_types = {
+                bt.type: bt for bt in BlockType.objects.filter(is_active=True)
+            }
+    except Exception:
+        # Database not ready or table doesn't exist, continue with static validation
+        pass
     
     # First pass: Sanitize HTML content in blocks
     sanitized_blocks = sanitize_blocks(blocks)

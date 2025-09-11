@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect, useRef, useCallback, useMemo } from 'react';
-import { api } from '@/lib/api';
+import { api } from '@/lib/api.ts';
 import { useLocale } from './LocaleContext';
 import type { TranslationBundle, TranslationContextType, TranslationKey, TranslationProviderProps } from '@/types/translations';
 

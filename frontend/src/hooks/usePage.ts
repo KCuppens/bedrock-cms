@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useQuery, UseQueryOptions } from '@tanstack/react-query';
-import { api } from '@/lib/api';
+import { api } from '@/lib/api.ts';
 import { useLocale } from '@/contexts/LocaleContext';
 
 interface ResolvedSEO {

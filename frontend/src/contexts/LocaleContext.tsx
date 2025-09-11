@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, useEffect, useMemo, useCallback, ReactNode } from 'react';
-import { api } from '@/lib/api';
+import { api } from '@/lib/api.ts';
 import { 
   getBrowserLanguages, 
   matchBrowserToLocale, 

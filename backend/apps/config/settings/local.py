@@ -82,8 +82,10 @@ if "django_extensions" in INSTALLED_APPS:
     INSTALLED_APPS += ["django_extensions"]
 
 # Development logging
-LOGGING["handlers"]["console"]["formatter"] = "simple"
-LOGGING["root"]["level"] = "DEBUG"
+from typing import Any
+LOGGING_DICT: dict[str, Any] = LOGGING
+LOGGING_DICT["handlers"]["console"]["formatter"] = "simple"
+LOGGING_DICT["root"]["level"] = "DEBUG"
 
 # Internal IPs for django-debug-toolbar (if added later)
 INTERNAL_IPS = [

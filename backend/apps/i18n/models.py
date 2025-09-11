@@ -3,7 +3,11 @@ from django.core.exceptions import ValidationError
 from django.contrib.auth import get_user_model
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes.fields import GenericForeignKey
-from typing import Dict, List, Optional, TYPE_CHECKING
+from typing import Dict, List, Optional, TYPE_CHECKING, Any, cast
+from django.db.models import (
+    CharField, TextField, BooleanField, PositiveIntegerField, DateTimeField, 
+    ForeignKey, OneToOneField, DecimalField
+)
 
 if TYPE_CHECKING:
     from django.db.models import QuerySet
@@ -12,45 +16,45 @@ if TYPE_CHECKING:
 class Locale(models.Model):
     """Locale model for multi-language support."""
     
-    code = models.CharField(
+    code: CharField = models.CharField(
         max_length=10, 
         unique=True, 
         help_text="Language code (e.g., 'en', 'es', 'fr')"
     )
-    name = models.CharField(
+    name: CharField = models.CharField(
         max_length=100, 
         help_text="Human-readable name in English (e.g., 'English', 'Spanish')"
     )
-    native_name = models.CharField(
+    native_name: CharField = models.CharField(
         max_length=100,
         default='',
         help_text="Native name in the language itself (e.g., 'English', 'Español', 'Français')"
     )
-    fallback = models.ForeignKey(
+    fallback: ForeignKey = models.ForeignKey(
         'self',
         null=True,
         blank=True,
         on_delete=models.SET_NULL,
         help_text="Fallback locale if content is not available in this locale"
     )
-    rtl = models.BooleanField(
+    rtl: BooleanField = models.BooleanField(
         default=False,
         help_text="True if this is a right-to-left language (e.g., Arabic, Hebrew)"
     )
-    sort_order = models.PositiveIntegerField(
+    sort_order: PositiveIntegerField = models.PositiveIntegerField(
         default=0,
         help_text="Sort order for locale lists (lower numbers first)"
     )
-    is_active = models.BooleanField(
+    is_active: BooleanField = models.BooleanField(
         default=True,
         help_text="Whether this locale is active and available for use"
     )
-    is_default = models.BooleanField(
+    is_default: BooleanField = models.BooleanField(
         default=False,
         help_text="Whether this is the default locale for the site"
     )
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True, null=True, blank=True)
+    created_at: DateTimeField = models.DateTimeField(auto_now_add=True)
+    updated_at: DateTimeField = models.DateTimeField(auto_now=True, null=True, blank=True)
 
     class Meta:
         ordering = ['sort_order', 'name']
@@ -112,7 +116,11 @@ class Locale(models.Model):
         super().save(*args, **kwargs)
 
 
-User = get_user_model()
+# Define User type properly for mypy
+if TYPE_CHECKING:
+    from django.contrib.auth.models import AbstractUser as User
+else:
+    User = get_user_model()
 
 
 class TranslationUnit(models.Model):
@@ -131,24 +139,24 @@ class TranslationUnit(models.Model):
     ]
     
     # Generic foreign key to any translatable object
-    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
-    object_id = models.PositiveIntegerField()
+    content_type: ForeignKey = models.ForeignKey(ContentType, on_delete=models.CASCADE)
+    object_id: PositiveIntegerField = models.PositiveIntegerField()
     content_object = GenericForeignKey('content_type', 'object_id')
     
     # Field being translated
-    field = models.CharField(
+    field: CharField = models.CharField(
         max_length=100,
         help_text="Name of the field being translated (e.g., 'title', 'blocks')"
     )
     
     # Translation details
-    source_locale = models.ForeignKey(
+    source_locale: ForeignKey = models.ForeignKey(
         Locale,
         on_delete=models.CASCADE,
         related_name='source_translations',
         help_text="Locale of the source content"
     )
-    target_locale = models.ForeignKey(
+    target_locale: ForeignKey = models.ForeignKey(
         Locale,
         on_delete=models.CASCADE,
         related_name='target_translations',
@@ -156,30 +164,30 @@ class TranslationUnit(models.Model):
     )
     
     # Content
-    source_text = models.TextField(
+    source_text: TextField = models.TextField(
         help_text="Original text in source locale"
     )
-    target_text = models.TextField(
+    target_text: TextField = models.TextField(
         blank=True,
         help_text="Translated text in target locale"
     )
     
     # Status and metadata
-    status = models.CharField(
+    status: CharField = models.CharField(
         max_length=20,
         choices=STATUS_CHOICES,
         default='missing',
         help_text="Translation status"
     )
-    updated_by = models.ForeignKey(
+    updated_by: ForeignKey = models.ForeignKey(
         User,
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
         help_text="User who last updated this translation"
     )
-    updated_at = models.DateTimeField(auto_now=True)
-    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at: DateTimeField = models.DateTimeField(auto_now=True)
+    created_at: DateTimeField = models.DateTimeField(auto_now_add=True)
     
     class Meta:
         unique_together = [
@@ -199,7 +207,9 @@ class TranslationUnit(models.Model):
     @property
     def model_label(self) -> str:
         """Get the model label for this translation unit."""
-        return f"{self.content_type.app_label}.{self.content_type.model}"
+        # Type cast to help mypy understand the content_type attributes
+        content_type = cast(ContentType, self.content_type)
+        return f"{content_type.app_label}.{content_type.model}"
     
     @property
     def is_complete(self) -> bool:
@@ -257,7 +267,7 @@ class TranslationUnit(models.Model):
         return unit
     
     @classmethod
-    def get_units_for_object(cls, obj, target_locale: Locale = None) -> 'QuerySet[TranslationUnit]':
+    def get_units_for_object(cls, obj, target_locale: Optional[Locale] = None) -> 'QuerySet[TranslationUnit]':
         """Get all translation units for an object."""
         content_type = ContentType.objects.get_for_model(obj)
         qs = cls.objects.filter(content_type=content_type, object_id=obj.pk)
@@ -273,25 +283,25 @@ class UiMessage(models.Model):
     UI messages that need to be translated for the frontend.
     """
     
-    key = models.CharField(
+    key: CharField = models.CharField(
         max_length=200,
         unique=True,
         help_text="Unique key for this message (e.g., 'auth.login.title')"
     )
-    namespace = models.CharField(
+    namespace: CharField = models.CharField(
         max_length=100,
         default='general',
         help_text="Namespace for organizing messages (e.g., 'auth', 'cms', 'general')"
     )
-    description = models.TextField(
+    description: TextField = models.TextField(
         blank=True,
         help_text="Description of when/where this message is used"
     )
-    default_value = models.TextField(
+    default_value: TextField = models.TextField(
         help_text="Default text in the default locale"
     )
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
+    created_at: DateTimeField = models.DateTimeField(auto_now_add=True)
+    updated_at: DateTimeField = models.DateTimeField(auto_now=True)
     
     class Meta:
         ordering = ['namespace', 'key']
@@ -316,34 +326,34 @@ class UiMessageTranslation(models.Model):
         ('approved', 'Approved'),
     ]
     
-    message = models.ForeignKey(
+    message: ForeignKey = models.ForeignKey(
         UiMessage,
         on_delete=models.CASCADE,
         related_name='translations'
     )
-    locale = models.ForeignKey(
+    locale: ForeignKey = models.ForeignKey(
         Locale,
         on_delete=models.CASCADE,
         related_name='ui_translations'
     )
-    value = models.TextField(
+    value: TextField = models.TextField(
         help_text="Translated message text"
     )
-    status = models.CharField(
+    status: CharField = models.CharField(
         max_length=20,
         choices=STATUS_CHOICES,
         default='draft',
         help_text="Translation status"
     )
-    updated_by = models.ForeignKey(
+    updated_by: ForeignKey = models.ForeignKey(
         User,
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
         help_text="User who last updated this translation"
     )
-    updated_at = models.DateTimeField(auto_now=True)
-    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at: DateTimeField = models.DateTimeField(auto_now=True)
+    created_at: DateTimeField = models.DateTimeField(auto_now_add=True)
     
     class Meta:
         unique_together = [('message', 'locale')]
@@ -361,55 +371,55 @@ class TranslationGlossary(models.Model):
     Translation glossary for consistent terminology across translations.
     """
     
-    term = models.CharField(
+    term: CharField = models.CharField(
         max_length=200,
         help_text="Original term or phrase"
     )
-    source_locale = models.ForeignKey(
+    source_locale: ForeignKey = models.ForeignKey(
         Locale,
         on_delete=models.CASCADE,
         related_name='glossary_source_terms',
         help_text="Source locale of the term"
     )
-    target_locale = models.ForeignKey(
+    target_locale: ForeignKey = models.ForeignKey(
         Locale,
         on_delete=models.CASCADE,
         related_name='glossary_target_terms',
         help_text="Target locale for translation"
     )
-    translation = models.CharField(
+    translation: CharField = models.CharField(
         max_length=200,
         help_text="Translated term or phrase"
     )
-    context = models.TextField(
+    context: TextField = models.TextField(
         blank=True,
         help_text="Context or usage notes for this translation"
     )
-    category = models.CharField(
+    category: CharField = models.CharField(
         max_length=100,
         default='general',
         help_text="Category for organizing terms (e.g., 'ui', 'technical', 'brand')"
     )
-    is_verified = models.BooleanField(
+    is_verified: BooleanField = models.BooleanField(
         default=False,
         help_text="Whether this translation has been verified by a linguist"
     )
-    created_by = models.ForeignKey(
+    created_by: ForeignKey = models.ForeignKey(
         User,
         on_delete=models.SET_NULL,
         null=True,
         related_name='glossary_created',
         help_text="User who created this glossary entry"
     )
-    updated_by = models.ForeignKey(
+    updated_by: ForeignKey = models.ForeignKey(
         User,
         on_delete=models.SET_NULL,
         null=True,
         related_name='glossary_updated',
         help_text="User who last updated this glossary entry"
     )
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
+    created_at: DateTimeField = models.DateTimeField(auto_now_add=True)
+    updated_at: DateTimeField = models.DateTimeField(auto_now=True)
     
     class Meta:
         unique_together = [('term', 'source_locale', 'target_locale')]
@@ -446,25 +456,25 @@ class TranslationQueue(models.Model):
         ('urgent', 'Urgent'),
     ]
     
-    translation_unit = models.OneToOneField(
+    translation_unit: OneToOneField = models.OneToOneField(
         TranslationUnit,
         on_delete=models.CASCADE,
         related_name='queue_item',
         help_text="Translation unit to be processed"
     )
-    status = models.CharField(
+    status: CharField = models.CharField(
         max_length=20,
         choices=STATUS_CHOICES,
         default='pending',
         help_text="Current status in the translation workflow"
     )
-    priority = models.CharField(
+    priority: CharField = models.CharField(
         max_length=10,
         choices=PRIORITY_CHOICES,
         default='medium',
         help_text="Priority level for this translation task"
     )
-    assigned_to = models.ForeignKey(
+    assigned_to: ForeignKey = models.ForeignKey(
         User,
         on_delete=models.SET_NULL,
         null=True,
@@ -472,44 +482,44 @@ class TranslationQueue(models.Model):
         related_name='assigned_translations',
         help_text="User assigned to translate this content"
     )
-    deadline = models.DateTimeField(
+    deadline: DateTimeField = models.DateTimeField(
         null=True,
         blank=True,
         help_text="Deadline for completing this translation"
     )
-    notes = models.TextField(
+    notes: TextField = models.TextField(
         blank=True,
         help_text="Internal notes about this translation task"
     )
-    machine_translation_suggestion = models.TextField(
+    machine_translation_suggestion: TextField = models.TextField(
         blank=True,
         help_text="Machine translation suggestion for reference"
     )
-    mt_service = models.CharField(
+    mt_service: CharField = models.CharField(
         max_length=50,
         blank=True,
         help_text="Machine translation service used (e.g., 'google', 'deepl', 'azure')"
     )
-    word_count = models.PositiveIntegerField(
+    word_count: PositiveIntegerField = models.PositiveIntegerField(
         default=0,
         help_text="Word count of source text for effort estimation"
     )
-    estimated_hours = models.DecimalField(
+    estimated_hours: DecimalField = models.DecimalField(
         max_digits=5,
         decimal_places=2,
         null=True,
         blank=True,
         help_text="Estimated hours to complete this translation"
     )
-    created_by = models.ForeignKey(
+    created_by: ForeignKey = models.ForeignKey(
         User,
         on_delete=models.SET_NULL,
         null=True,
         related_name='queued_translations',
         help_text="User who added this item to the queue"
     )
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
+    created_at: DateTimeField = models.DateTimeField(auto_now_add=True)
+    updated_at: DateTimeField = models.DateTimeField(auto_now=True)
     
     class Meta:
         indexes = [
@@ -561,46 +571,46 @@ class TranslationHistory(models.Model):
         ('assigned', 'Assigned'),
     ]
     
-    translation_unit = models.ForeignKey(
+    translation_unit: ForeignKey = models.ForeignKey(
         TranslationUnit,
         on_delete=models.CASCADE,
         related_name='history',
         help_text="Translation unit this history entry belongs to"
     )
-    action = models.CharField(
+    action: CharField = models.CharField(
         max_length=20,
         choices=ACTION_CHOICES,
         help_text="Type of action performed"
     )
-    previous_status = models.CharField(
+    previous_status: CharField = models.CharField(
         max_length=20,
         blank=True,
         help_text="Previous status before the change"
     )
-    new_status = models.CharField(
+    new_status: CharField = models.CharField(
         max_length=20,
         blank=True,
         help_text="New status after the change"
     )
-    previous_target_text = models.TextField(
+    previous_target_text: TextField = models.TextField(
         blank=True,
         help_text="Previous target text before the change"
     )
-    new_target_text = models.TextField(
+    new_target_text: TextField = models.TextField(
         blank=True,
         help_text="New target text after the change"
     )
-    comment = models.TextField(
+    comment: TextField = models.TextField(
         blank=True,
         help_text="Optional comment explaining the change"
     )
-    performed_by = models.ForeignKey(
+    performed_by: ForeignKey = models.ForeignKey(
         User,
         on_delete=models.SET_NULL,
         null=True,
         help_text="User who performed this action"
     )
-    created_at = models.DateTimeField(auto_now_add=True)
+    created_at: DateTimeField = models.DateTimeField(auto_now_add=True)
     
     class Meta:
         indexes = [
