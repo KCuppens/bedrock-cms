@@ -1,13 +1,16 @@
-from typing import Dict, List, Optional, Any
+from typing import Any
+
 from django.conf import settings
+
 from apps.i18n.models import Locale
+
 from .models import Page
 from .seo import SeoSettings
 
 
 def deep_merge_dicts(
-    base: Dict[str, Any], *overrides: Dict[str, Any]
-) -> Dict[str, Any]:
+    base: dict[str, Any], *overrides: dict[str, Any]
+) -> dict[str, Any]:
     """Deep merge multiple dictionaries with later ones taking precedence."""
     result = base.copy()
 
@@ -28,16 +31,14 @@ def deep_merge_dicts(
     return result
 
 
-def get_best_matching_seo_default(
-    path: str, locale: Locale
-) -> Optional[Dict[str, Any]]:
+def get_best_matching_seo_default(path: str, locale: Locale) -> dict[str, Any] | None:
     """Find the best matching SEO default for a path. Now returns None since section-based defaults were removed."""
     # Section-based SEO defaults were removed for simplicity
     # All SEO configuration is now handled at the global (per-locale) level
     return None
 
 
-def resolve_seo(page: Page) -> Dict[str, Any]:
+def resolve_seo(page: Page) -> dict[str, Any]:
     """
     Resolve final SEO for a page by merging: Global → Section → Page
     Drafts get forced noindex.
@@ -92,7 +93,7 @@ def resolve_seo(page: Page) -> Dict[str, Any]:
     return resolved_seo
 
 
-def generate_canonical_url(page: Page, base_url: Optional[str] = None) -> str:
+def generate_canonical_url(page: Page, base_url: str | None = None) -> str:
     """Generate canonical URL for a page."""
     if not base_url:
         base_url = getattr(settings, "CMS_SITEMAP_BASE_URL", "http://localhost:8000")
@@ -101,8 +102,8 @@ def generate_canonical_url(page: Page, base_url: Optional[str] = None) -> str:
 
 
 def generate_hreflang_alternates(
-    page: Page, base_url: Optional[str] = None
-) -> List[Dict[str, str]]:
+    page: Page, base_url: str | None = None
+) -> list[dict[str, str]]:
     """Generate hreflang alternates for all locales of this page."""
     if not base_url:
         base_url = getattr(settings, "CMS_SITEMAP_BASE_URL", "http://localhost:8000")
@@ -116,17 +117,19 @@ def generate_hreflang_alternates(
     ).select_related("locale")
 
     for related_page in related_pages:
-        alternates.append(
-            {
-                "hreflang": related_page.locale.code,
-                "href": f"{base_url.rstrip('/')}{related_page.path}",
-            }
-        )
+        # Safety check for locale
+        if related_page.locale:
+            alternates.append(
+                {
+                    "hreflang": related_page.locale.code,  # type: ignore[attr-defined]
+                    "href": f"{base_url.rstrip('/')}{related_page.path}",
+                }
+            )
 
     return alternates
 
 
-def generate_seo_links(page: Page, base_url: Optional[str] = None) -> Dict[str, Any]:
+def generate_seo_links(page: Page, base_url: str | None = None) -> dict[str, Any]:
     """Generate canonical and hreflang data for a page."""
     return {
         "canonical": generate_canonical_url(page, base_url),
