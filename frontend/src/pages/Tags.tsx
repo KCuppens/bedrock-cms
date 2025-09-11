@@ -233,12 +233,13 @@ const Tags = memo(() => {
   const currentTags = useMemo(() => getCurrentTags(), [getCurrentTags]);
 
   return (
-    <div className="flex min-h-screen bg-background">
-      <Sidebar />
-      <div className="flex-1 ml-72">
-        <TopNavbar />
-        
-        <div className="p-6 space-y-6">
+    <div className="min-h-screen">
+      <div className="flex">
+        <Sidebar />
+        <div className="flex-1 flex flex-col ml-72">
+          <TopNavbar />
+          <main className="flex-1 p-8">
+            <div className="max-w-7xl mx-auto space-y-6">
           <div className="flex items-center justify-between">
             <div>
               <h1 className="text-3xl font-bold text-foreground">Tags</h1>
@@ -387,6 +388,8 @@ const Tags = memo(() => {
             onConfirm={handleConfirmDelete}
             warningMessage={tagToDelete?.post_count ? `This tag is used in ${tagToDelete.post_count} posts.` : undefined}
           />
+            </div>
+          </main>
         </div>
       </div>
     </div>

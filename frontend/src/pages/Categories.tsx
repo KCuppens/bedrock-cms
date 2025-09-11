@@ -151,12 +151,13 @@ const Categories = memo(() => {
   );
 
   return (
-    <div className="flex min-h-screen bg-background">
-      <Sidebar />
-      <div className="flex-1 ml-72">
-        <TopNavbar />
-        
-        <div className="p-6 space-y-6">
+    <div className="min-h-screen">
+      <div className="flex">
+        <Sidebar />
+        <div className="flex-1 flex flex-col ml-72">
+          <TopNavbar />
+          <main className="flex-1 p-8">
+            <div className="max-w-7xl mx-auto space-y-6">
           <div className="flex items-center justify-between">
             <div>
               <h1 className="text-3xl font-bold text-foreground">Categories</h1>
@@ -204,6 +205,8 @@ const Categories = memo(() => {
             onConfirm={handleConfirmDelete}
             warningMessage={categoryToDelete?.post_count ? `This category has ${categoryToDelete.post_count} posts. They will be uncategorized.` : undefined}
           />
+            </div>
+          </main>
         </div>
       </div>
     </div>

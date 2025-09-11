@@ -27,12 +27,12 @@ urlpatterns = [
     # API endpoints
     path("api/v1/", include("apps.api.urls")),
     path("api/v1/analytics/", include("apps.analytics.urls")),
+    path("api/v1/blog/", include("apps.blog.urls")),
     path("api/v1/cms/", include("apps.cms.urls")),
     path("api/v1/redirects/", include("apps.cms.redirect_urls")),  # Direct redirects endpoint
     path("api/v1/i18n/", include("apps.i18n.urls")),
     path("api/v1/", include("apps.registry.urls")),
     path("api/v1/reports/", include("apps.reports.urls")),
-    path("", include("apps.blog.urls")),
     # Authentication
     path("auth/", include("apps.accounts.urls")),
     # Note: Allauth password reset URLs are handled by the frontend React app

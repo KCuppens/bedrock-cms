@@ -1,6 +1,5 @@
 from datetime import datetime
 
-print("=== VIEWS PAGES.PY IS LOADING ===")  # Debug: Confirm this file is being loaded
 from django.conf import settings
 from django.db import transaction
 from django.shortcuts import get_object_or_404
@@ -229,10 +228,7 @@ class PagesViewSet(VersioningMixin, viewsets.ModelViewSet):
     )
     def retrieve(self, request, *args, **kwargs):
         """Get a single page by ID with optional SEO data."""
-        print(f"DEBUG: PagesViewSet.retrieve called for page {kwargs.get('pk')}")
-        print(f"DEBUG: Serializer class: {self.get_serializer_class()}")
         result = super().retrieve(request, *args, **kwargs)
-        print(f"DEBUG: Response data keys: {list(result.data.keys())}")
         return result
 
     def update(self, request, *args, **kwargs):

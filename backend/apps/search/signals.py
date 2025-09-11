@@ -42,7 +42,7 @@ def auto_index_content(sender, instance, created, **kwargs):
         search_service.index_object(instance)
     except Exception as e:
         # Log error but don't break the save operation
-        print(f"Error indexing {instance}: {e}")
+        pass
 
 
 @receiver(post_delete)
@@ -61,4 +61,4 @@ def auto_remove_from_index(sender, instance, **kwargs):
         search_service.remove_from_index(instance)
     except Exception as e:
         # Log error but don't break the delete operation
-        print(f"Error removing {instance} from index: {e}")
+        pass

@@ -198,7 +198,7 @@ const Media = memo(() => {
       try {
         const user = await api.request({
           method: 'GET',
-          url: '/auth/user/',
+          url: '/auth/users/me/',
           signal: abortControllerRef.current.signal
         });
         
@@ -599,7 +599,7 @@ const Media = memo(() => {
       try {
         const user = await api.request({
           method: 'GET',
-          url: '/auth/user/',
+          url: '/auth/users/me/',
           signal: abortControllerRef.current.signal
         });
         

@@ -6,6 +6,10 @@ This module provides blog functionality including posts, categories, and tags.
 
 import uuid
 from django.db import models
+from django.db.models import (
+    CharField, TextField, BooleanField, DateTimeField, ForeignKey, 
+    ManyToManyField, ImageField, PositiveIntegerField, UUIDField, SlugField, AutoField, OneToOneField
+)
 from django.contrib.auth import get_user_model
 from django.urls import reverse
 from django.utils.text import slugify
@@ -22,16 +26,16 @@ User = get_user_model()
 class Category(models.Model, RBACMixin):
     """Blog category model."""
     
-    id = models.AutoField(primary_key=True)
-    name = models.CharField(max_length=100, unique=True)
-    slug = models.SlugField(max_length=120, unique=True)
-    description = models.TextField(blank=True)
-    color = models.CharField(
+    id: AutoField = models.AutoField(primary_key=True)
+    name: CharField = models.CharField(max_length=100, unique=True)
+    slug: SlugField = models.SlugField(max_length=120, unique=True)
+    description: TextField = models.TextField(blank=True)
+    color: CharField = models.CharField(
         max_length=7, 
         default='#6366f1',
         help_text=_("Hex color code for the category")
     )
-    presentation_page = models.ForeignKey(
+    presentation_page: ForeignKey = models.ForeignKey(
         'cms.Page',
         on_delete=models.SET_NULL,
         null=True,
@@ -39,9 +43,9 @@ class Category(models.Model, RBACMixin):
         related_name='category_presentations',
         help_text=_("Optional presentation page override for this category")
     )
-    is_active = models.BooleanField(default=True, db_index=True)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
+    is_active: BooleanField = models.BooleanField(default=True, db_index=True)
+    created_at: DateTimeField = models.DateTimeField(auto_now_add=True)
+    updated_at: DateTimeField = models.DateTimeField(auto_now=True)
     
     class Meta:
         verbose_name = _('Category')
@@ -63,13 +67,13 @@ class Category(models.Model, RBACMixin):
 class Tag(models.Model, RBACMixin):
     """Blog tag model."""
     
-    id = models.AutoField(primary_key=True)
-    name = models.CharField(max_length=50, unique=True)
-    slug = models.SlugField(max_length=60, unique=True)
-    description = models.TextField(blank=True)
-    is_active = models.BooleanField(default=True, db_index=True)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
+    id: AutoField = models.AutoField(primary_key=True)
+    name: CharField = models.CharField(max_length=50, unique=True)
+    slug: SlugField = models.SlugField(max_length=60, unique=True)
+    description: TextField = models.TextField(blank=True)
+    is_active: BooleanField = models.BooleanField(default=True, db_index=True)
+    created_at: DateTimeField = models.DateTimeField(auto_now_add=True)
+    updated_at: DateTimeField = models.DateTimeField(auto_now=True)
     
     class Meta:
         verbose_name = _('Tag')
@@ -98,19 +102,19 @@ class BlogPost(models.Model, RBACMixin):
         ('archived', _('Archived')),
     ]
     
-    id = models.AutoField(primary_key=True)
-    group_id = models.UUIDField(default=uuid.uuid4, db_index=True)
-    locale = models.ForeignKey('i18n.Locale', on_delete=models.PROTECT)
+    id: AutoField = models.AutoField(primary_key=True)
+    group_id: UUIDField = models.UUIDField(default=uuid.uuid4, db_index=True)
+    locale: ForeignKey = models.ForeignKey('i18n.Locale', on_delete=models.PROTECT)
     
     # Content fields
-    title = models.CharField(max_length=200)
-    slug = models.SlugField(max_length=250)
-    excerpt = models.TextField(
+    title: CharField = models.CharField(max_length=200)
+    slug: SlugField = models.SlugField(max_length=250)
+    excerpt: TextField = models.TextField(
         max_length=500,
         blank=True,
         help_text=_("Short description of the post")
     )
-    content = models.TextField(help_text=_("Main content of the blog post"))
+    content: TextField = models.TextField(help_text=_("Main content of the blog post"))
     blocks = models.JSONField(
         default=list,
         help_text=_("Structured content blocks"),
@@ -118,19 +122,19 @@ class BlogPost(models.Model, RBACMixin):
     )
     
     # Metadata
-    author = models.ForeignKey(
+    author: ForeignKey = models.ForeignKey(
         User,
         on_delete=models.PROTECT,
         related_name='blog_posts'
     )
-    category = models.ForeignKey(
+    category: ForeignKey = models.ForeignKey(
         Category,
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
         related_name='posts'
     )
-    tags = models.ManyToManyField(
+    tags: ManyToManyField = models.ManyToManyField(
         Tag,
         blank=True,
         related_name='posts'
@@ -144,42 +148,42 @@ class BlogPost(models.Model, RBACMixin):
     )
     
     # Publishing fields
-    status = models.CharField(
+    status: CharField = models.CharField(
         max_length=12,
         choices=STATUS_CHOICES,
         default='draft'
     )
-    featured = models.BooleanField(
+    featured: BooleanField = models.BooleanField(
         default=False,
         help_text=_("Mark as featured post")
     )
-    allow_comments = models.BooleanField(default=True)
+    allow_comments: BooleanField = models.BooleanField(default=True)
     
     # Timestamps
-    published_at = models.DateTimeField(
+    published_at: DateTimeField = models.DateTimeField(
         null=True, 
         blank=True,
         help_text=_("When this post was actually published")
     )
     
     # Scheduling fields (replacing scheduled_for)
-    scheduled_publish_at = models.DateTimeField(
+    scheduled_publish_at: DateTimeField = models.DateTimeField(
         null=True, 
         blank=True,
         db_index=True,
         help_text=_("When to automatically publish this post")
     )
-    scheduled_unpublish_at = models.DateTimeField(
+    scheduled_unpublish_at: DateTimeField = models.DateTimeField(
         null=True, 
         blank=True,
         db_index=True,
         help_text=_("When to automatically unpublish this post")
     )
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
+    created_at: DateTimeField = models.DateTimeField(auto_now_add=True)
+    updated_at: DateTimeField = models.DateTimeField(auto_now=True)
     
     # Social sharing
-    social_image = models.ForeignKey(
+    social_image: ForeignKey = models.ForeignKey(
         'files.FileUpload',
         on_delete=models.SET_NULL,
         null=True,
@@ -345,21 +349,21 @@ class BlogPost(models.Model, RBACMixin):
 class BlogSettings(models.Model):
     """Global blog settings and presentation configuration."""
     
-    locale = models.OneToOneField(
+    locale: OneToOneField = models.OneToOneField(
         'i18n.Locale',
         on_delete=models.CASCADE,
         related_name='blog_settings'
     )
     
     # Base configuration
-    base_path = models.CharField(
+    base_path: CharField = models.CharField(
         max_length=100,
         default='blog',
         help_text=_("Base path for blog URLs (without leading/trailing slashes)")
     )
     
     # Presentation page configuration
-    default_presentation_page = models.ForeignKey(
+    default_presentation_page: ForeignKey = models.ForeignKey(
         'cms.Page',
         on_delete=models.SET_NULL,
         null=True,
@@ -372,11 +376,11 @@ class BlogSettings(models.Model):
     design_tokens = models.JSONField(default=dict, blank=True, help_text=_("Design configuration, e.g.: {\"content_width\": \"prose\", \"typography_scale\": \"md\", \"accent_color\": \"#3b82f6\"}"))
     
     # Display toggles
-    show_toc = models.BooleanField(default=True, help_text=_("Show table of contents by default"))
-    show_author = models.BooleanField(default=True, help_text=_("Show author information by default"))  
-    show_dates = models.BooleanField(default=True, help_text=_("Show publication dates by default"))
-    show_share = models.BooleanField(default=True, help_text=_("Show social sharing buttons by default"))
-    show_reading_time = models.BooleanField(default=True, help_text=_("Show estimated reading time by default"))
+    show_toc: BooleanField = models.BooleanField(default=True, help_text=_("Show table of contents by default"))
+    show_author: BooleanField = models.BooleanField(default=True, help_text=_("Show author information by default"))  
+    show_dates: BooleanField = models.BooleanField(default=True, help_text=_("Show publication dates by default"))
+    show_share: BooleanField = models.BooleanField(default=True, help_text=_("Show social sharing buttons by default"))
+    show_reading_time: BooleanField = models.BooleanField(default=True, help_text=_("Show estimated reading time by default"))
     
     # Feed configuration
     feeds_config = models.JSONField(default=dict, blank=True, help_text=_("RSS/Atom feed configuration, e.g.: {\"title\": \"My Blog\", \"description\": \"Latest posts from my blog\", \"items_per_feed\": 20}"))
@@ -384,8 +388,8 @@ class BlogSettings(models.Model):
     # SEO defaults
     seo_defaults = models.JSONField(default=dict, blank=True, help_text=_("Default SEO settings for blog posts, e.g.: {\"title_template\": \"{title} - Blog\", \"meta_description_template\": \"Read about {title} on our blog\"}"))
     
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
+    created_at: DateTimeField = models.DateTimeField(auto_now_add=True)
+    updated_at: DateTimeField = models.DateTimeField(auto_now=True)
     
     class Meta:
         verbose_name = _('Blog Settings')

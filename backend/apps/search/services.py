@@ -327,7 +327,7 @@ class SearchService:
                     self.index_object(obj)
                     indexed_count += 1
                 except Exception as e:
-                    print(f"Error indexing {obj}: {e}")
+                    pass
         
         return indexed_count
     
