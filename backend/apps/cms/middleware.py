@@ -1,8 +1,8 @@
-from django.http import HttpResponseRedirect, HttpResponsePermanentRedirect
 from django.core.cache import cache
+from django.http import HttpResponsePermanentRedirect, HttpResponseRedirect
 from django.utils.deprecation import MiddlewareMixin
+
 from .models import Redirect
-import re
 
 
 class RedirectMiddleware(MiddlewareMixin):

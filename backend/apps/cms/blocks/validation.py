@@ -1,7 +1,9 @@
 # mypy: ignore-errors
-from typing import List, Dict, Any, Literal, Union, Optional
-from pydantic import BaseModel, ValidationError, Field, HttpUrl
+from typing import Any, Literal
+
+from pydantic import BaseModel, Field, ValidationError
 from rest_framework.exceptions import ValidationError as DRFValidationError
+
 from ..security import sanitize_blocks
 
 
@@ -16,7 +18,7 @@ class HeroBlockModel(BaseBlockModel):
     """Hero section block."""
 
     type: Literal["hero"]
-    props: Dict[str, Any] = Field(default_factory=dict)
+    props: dict[str, Any] = Field(default_factory=dict)
 
     class Config:
         extra = "allow"
@@ -26,14 +28,14 @@ class RichTextBlockModel(BaseBlockModel):
     """Rich text content block."""
 
     type: Literal["richtext", "rich_text"]  # Accept both
-    props: Dict[str, Any] = Field(default_factory=lambda: {"content": ""})
+    props: dict[str, Any] = Field(default_factory=lambda: {"content": ""})
 
 
 class ImageBlockModel(BaseBlockModel):
     """Single image block."""
 
     type: Literal["image"]
-    props: Dict[str, Any] = Field(
+    props: dict[str, Any] = Field(
         default_factory=lambda: {"src": "", "alt": "", "caption": ""}
     )
 
@@ -42,22 +44,22 @@ class GalleryBlockModel(BaseBlockModel):
     """Image gallery block."""
 
     type: Literal["gallery"]
-    props: Dict[str, Any] = Field(default_factory=lambda: {"images": []})
+    props: dict[str, Any] = Field(default_factory=lambda: {"images": []})
 
 
 class ColumnsBlockModel(BaseBlockModel):
     """Multi-column layout block with nested blocks."""
 
     type: Literal["columns"]
-    props: Dict[str, Any] = Field(default_factory=lambda: {"columns": [], "gap": "md"})
-    blocks: List[Dict[str, Any]] = Field(default_factory=list)
+    props: dict[str, Any] = Field(default_factory=lambda: {"columns": [], "gap": "md"})
+    blocks: list[dict[str, Any]] = Field(default_factory=list)
 
 
 class CTABandBlockModel(BaseBlockModel):
     """Call-to-action band block."""
 
     type: Literal["cta", "cta_band"]  # Accept both
-    props: Dict[str, Any] = Field(
+    props: dict[str, Any] = Field(
         default_factory=lambda: {
             "title": "",
             "subtitle": "",
@@ -72,13 +74,13 @@ class FAQBlockModel(BaseBlockModel):
     """Frequently Asked Questions block."""
 
     type: Literal["faq"]
-    props: Dict[str, Any] = Field(default_factory=lambda: {"items": []})
+    props: dict[str, Any] = Field(default_factory=lambda: {"items": []})
 
 
 class ContentDetailSource(BaseModel):
     """Source configuration for content_detail block."""
 
-    id: Optional[int] = None
+    id: int | None = None
 
 
 class ContentDetailOptions(BaseModel):
@@ -95,7 +97,7 @@ class ContentDetailBlockModel(BaseBlockModel):
     """Content detail block for rendering registered model details."""
 
     type: Literal["content_detail"]
-    props: Dict[str, Any] = Field(
+    props: dict[str, Any] = Field(
         default_factory=lambda: {
             "label": "",  # e.g., "blog.blogpost"
             "source": "route",  # "route" or {"id": int}
@@ -114,7 +116,7 @@ class CollectionListBlockModel(BaseBlockModel):
     """Collection list block for displaying lists of content."""
 
     type: Literal["collection_list"]
-    props: Dict[str, Any] = Field(
+    props: dict[str, Any] = Field(
         default_factory=lambda: {
             "source": "blog.blogpost",
             "mode": "query",
@@ -127,7 +129,7 @@ class CollectionListBlockModel(BaseBlockModel):
 
 
 # Registry of all block models
-BLOCK_MODELS: Dict[str, type[BaseBlockModel]] = {
+BLOCK_MODELS: dict[str, type[BaseBlockModel]] = {
     "hero": HeroBlockModel,
     "richtext": RichTextBlockModel,  # Match API response
     "rich_text": RichTextBlockModel,  # Keep for backwards compatibility
@@ -142,7 +144,7 @@ BLOCK_MODELS: Dict[str, type[BaseBlockModel]] = {
 }
 
 
-def validate_blocks(blocks: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+def validate_blocks(blocks: list[dict[str, Any]]) -> list[dict[str, Any]]:
     """
     Validate a list of blocks using database-driven block types and Pydantic models.
     Returns validated and sanitized blocks or raises DRF ValidationError.
@@ -153,8 +155,9 @@ def validate_blocks(blocks: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
         )
 
     # Import here to avoid circular imports
-    from ..models import BlockType
     from django.db import connection
+
+    from ..models import BlockType
 
     # Check if database is available and BlockType table exists
     db_block_types = {}

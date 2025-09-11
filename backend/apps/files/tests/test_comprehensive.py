@@ -2,22 +2,22 @@
 Comprehensive Files app tests targeting high coverage with real database operations.
 """
 
-import os
 import tempfile
 from io import BytesIO
-from PIL import Image
-from django.test import TestCase, override_settings
+
 from django.contrib.auth import get_user_model
 from django.core.files.uploadedfile import SimpleUploadedFile
+from django.test import TestCase, override_settings
 from django.urls import reverse
-from rest_framework.test import APITestCase, APIClient
+
+from PIL import Image
 from rest_framework import status
+from rest_framework.test import APIClient, APITestCase
 
-from apps.files.models import File, FileVersion, FileCategory, FileTag
-from apps.files.serializers import FileSerializer, FileUploadSerializer
 from apps.files import services
+from apps.files.models import File, FileCategory, FileTag, FileVersion
+from apps.files.serializers import FileSerializer, FileUploadSerializer
 from apps.files.views import FileViewSet
-
 
 User = get_user_model()
 

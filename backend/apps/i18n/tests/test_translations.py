@@ -3,12 +3,11 @@ Tests for translation functionality.
 """
 
 import json
-from django.test import TestCase, TransactionTestCase
-from django.test import override_settings
+
 from django.contrib.auth import get_user_model
-from rest_framework.test import APITestCase
+from django.test import TestCase, TransactionTestCase
+
 from rest_framework import status
-from django.db import transaction
 
 from apps.cms.models import Page
 from apps.i18n.models import Locale, TranslationUnit, UiMessage, UiMessageTranslation
@@ -17,7 +16,6 @@ from apps.i18n.translation import (
     TranslationResolver,
     UiMessageResolver,
 )
-
 
 User = get_user_model()
 
@@ -462,7 +460,6 @@ class TranslationAPITests(TransactionTestCase):
         """Set up test data."""
         # Ensure clean state for each test - delete in proper order
         from django.contrib.auth import get_user_model
-        from django.contrib.contenttypes.models import ContentType
 
         TranslationUnit.objects.all().delete()
         Page.objects.all().delete()  # Delete pages before locales

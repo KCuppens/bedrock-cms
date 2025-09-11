@@ -6,25 +6,24 @@ Provides REST API endpoints for search functionality.
 
 from rest_framework import generics, status
 from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import IsAdminUser
 from rest_framework.response import Response
-from rest_framework.permissions import IsAuthenticated, IsAdminUser
-from rest_framework.throttling import UserRateThrottle, AnonRateThrottle
-from django.contrib.contenttypes.models import ContentType
-from django.http import JsonResponse
-from apps.core.decorators import cache_response, search_cached
+from rest_framework.throttling import AnonRateThrottle, UserRateThrottle
 
-from .services import search_service
+from apps.core.decorators import cache_response
+
+from .models import SearchIndex, SearchQuery, SearchSuggestion
 from .serializers import (
-    SearchRequestSerializer,
-    SearchResponseSerializer,
-    SearchSuggestionSerializer,
     AutocompleteSerializer,
+    BulkIndexSerializer,
     SearchAnalyticsSerializer,
     SearchIndexSerializer,
     SearchQueryLogSerializer,
-    BulkIndexSerializer,
+    SearchRequestSerializer,
+    SearchResponseSerializer,
+    SearchSuggestionSerializer,
 )
-from .models import SearchSuggestion, SearchIndex, SearchQuery
+from .services import search_service
 
 
 class SearchThrottle(UserRateThrottle):

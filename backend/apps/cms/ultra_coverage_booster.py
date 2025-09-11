@@ -3,9 +3,9 @@ Ultra-targeted coverage booster - targets specific missing lines identified from
 """
 
 import os
-import sys
+from unittest.mock import Mock, patch
+
 import django
-from unittest.mock import Mock, patch, MagicMock
 
 # Configure minimal Django
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "apps.config.settings.base")
@@ -20,8 +20,9 @@ def test_pages_view_specific_lines():
     """Target specific missing lines in pages.py (367 lines, 264 missing)."""
 
     try:
-        from apps.cms.views.pages import PagesViewSet
         from rest_framework.response import Response
+
+        from apps.cms.views.pages import PagesViewSet
 
         # Create viewset with mocked request
         viewset = PagesViewSet()
@@ -35,7 +36,7 @@ def test_pages_view_specific_lines():
             viewset.request.query_params = {"path": "/test/", "locale": "invalid"}
             with patch("apps.cms.views.pages.Locale.objects") as mock_locale:
                 mock_locale.get.side_effect = Exception("DoesNotExist")
-                response = viewset.get_by_path(viewset.request)
+                viewset.get_by_path(viewset.request)
         except:
             pass
 
@@ -46,7 +47,7 @@ def test_pages_view_specific_lines():
                 with patch("apps.cms.views.pages.Page.objects") as mock_page:
                     mock_locale.get.return_value = Mock(code="en")
                     mock_page.get.side_effect = Exception("DoesNotExist")
-                    response = viewset.get_by_path(viewset.request)
+                    viewset.get_by_path(viewset.request)
         except:
             pass
 
@@ -61,7 +62,7 @@ def test_pages_view_specific_lines():
             viewset.request.query_params = {"locale": "es", "depth": "2"}
             with patch("apps.cms.views.pages.Locale.objects") as mock_locale:
                 mock_locale.get.return_value = Mock(code="es")
-                response = viewset.children(viewset.request, pk=1)
+                viewset.children(viewset.request, pk=1)
         except:
             pass
 
@@ -72,7 +73,7 @@ def test_pages_view_specific_lines():
                 with patch("apps.cms.views.pages.Page.objects") as mock_page:
                     mock_locale.get.return_value = Mock(code="en")
                     mock_page.get.side_effect = Exception("DoesNotExist")
-                    response = viewset.tree(viewset.request)
+                    viewset.tree(viewset.request)
         except:
             pass
 
@@ -94,7 +95,7 @@ def test_pages_view_specific_lines():
                 with patch.object(
                     viewset, "get_serializer", return_value=mock_serializer
                 ):
-                    response = viewset.create(viewset.request)
+                    viewset.create(viewset.request)
         except:
             pass
 
@@ -114,7 +115,7 @@ def test_pages_view_specific_lines():
                     mock_page.select_related.return_value.get.return_value = (
                         mock_instance
                     )
-                    response = viewset.update(viewset.request)
+                    viewset.update(viewset.request)
         except:
             pass
 
@@ -130,7 +131,7 @@ def test_pages_view_specific_lines():
                     "apps.cms.views.pages.PageReadSerializer"
                 ) as mock_serializer:
                     mock_serializer.return_value.data = {}
-                    response = viewset.publish(viewset.request, pk=1)
+                    viewset.publish(viewset.request, pk=1)
         except:
             pass
 
@@ -150,7 +151,7 @@ def test_pages_view_specific_lines():
             with patch("apps.cms.views.pages.transaction"):
                 with patch("apps.cms.versioning.AuditEntry") as mock_audit:
                     mock_audit.objects.create = Mock()
-                    response = viewset.destroy(viewset.request)
+                    viewset.destroy(viewset.request)
         except:
             pass
 
@@ -174,9 +175,8 @@ def test_views_py_full_import():
                     if callable(attr):
                         try:
                             # Try to get doc string
-                            doc = attr.__doc__
                             # Try to get module
-                            module = getattr(attr, "__module__", None)
+                            getattr(attr, "__module__", None)
                         except:
                             pass
                 except:
@@ -195,7 +195,7 @@ def test_views_py_full_import():
                     mock_page.filter.return_value.order_by.return_value.__getitem__.return_value.iterator.return_value = (
                         []
                     )
-                    response = sitemap_view(mock_request, "en")
+                    sitemap_view(mock_request, "en")
         except:
             pass
 
@@ -207,7 +207,7 @@ def test_models_specific_methods():
     """Target specific model methods and properties."""
 
     try:
-        from apps.cms.models import Page, Category, SeoSettings
+        from apps.cms.models import Category, Page, SeoSettings
 
         # Test Page model methods (targeting lines 114-121, 125-147)
         try:
@@ -215,12 +215,12 @@ def test_models_specific_methods():
             if hasattr(Page, "get_homepage"):
                 with patch("apps.cms.models.Page.objects") as mock_objects:
                     mock_objects.filter.return_value.first.return_value = Mock()
-                    result = Page.get_homepage()
+                    Page.get_homepage()
 
             if hasattr(Page, "get_by_path"):
                 with patch("apps.cms.models.Page.objects") as mock_objects:
                     mock_objects.filter.return_value.first.return_value = Mock()
-                    result = Page.get_by_path("/test/", "en")
+                    Page.get_by_path("/test/", "en")
         except:
             pass
 
@@ -230,7 +230,7 @@ def test_models_specific_methods():
                 mock_category = Mock(spec=Category)
                 mock_category.name = "Test Category"
                 try:
-                    result = Category.__str__(mock_category)
+                    Category.__str__(mock_category)
                 except:
                     pass
         except:
@@ -244,8 +244,8 @@ def test_serializers_instantiation():
     """Target serializer instantiation and methods."""
 
     try:
-        from apps.cms.serializers.pages import PageReadSerializer, PageWriteSerializer
         from apps.cms.serializers.category import CategorySerializer
+        from apps.cms.serializers.pages import PageReadSerializer, PageWriteSerializer
 
         # Try to instantiate serializers with mock data
         mock_data = {"title": "Test", "slug": "test", "locale": 1, "blocks": []}
@@ -255,7 +255,6 @@ def test_serializers_instantiation():
             # Try validation
             try:
                 serializer.is_valid()
-                fields = serializer.fields
             except:
                 pass
         except:
@@ -265,7 +264,6 @@ def test_serializers_instantiation():
             serializer = PageWriteSerializer(data=mock_data)
             try:
                 serializer.is_valid()
-                fields = serializer.fields
             except:
                 pass
         except:
@@ -289,8 +287,8 @@ def test_signals_and_tasks():
                     attr = getattr(signals, attr_name)
                     if callable(attr):
                         # Try to access the function's properties
-                        doc = getattr(attr, "__doc__", None)
-                        code = getattr(attr, "__code__", None)
+                        getattr(attr, "__doc__", None)
+                        getattr(attr, "__code__", None)
                 except:
                     pass
 
@@ -303,7 +301,7 @@ def test_signals_and_tasks():
                 try:
                     attr = getattr(tasks, attr_name)
                     if callable(attr):
-                        doc = getattr(attr, "__doc__", None)
+                        getattr(attr, "__doc__", None)
                 except:
                     pass
 
@@ -331,11 +329,11 @@ def test_management_commands():
                     if not attr_name.startswith("_"):
                         try:
                             attr = getattr(module, attr_name)
-                            if hasattr(attr, "__call__"):
+                            if callable(attr):
                                 # Try to access class/function properties
-                                doc = getattr(attr, "__doc__", None)
+                                getattr(attr, "__doc__", None)
                                 if hasattr(attr, "__name__"):
-                                    name = attr.__name__
+                                    pass
                         except:
                             pass
             except:
@@ -349,7 +347,7 @@ def test_versioning_coverage():
     """Target versioning modules."""
 
     try:
-        from apps.cms import versioning, versioning_views, versioning_serializers
+        from apps.cms import versioning, versioning_serializers, versioning_views
 
         modules = [versioning, versioning_views, versioning_serializers]
 
@@ -360,8 +358,8 @@ def test_versioning_coverage():
                         try:
                             attr = getattr(module, attr_name)
                             # Try to access different types of attributes
-                            if hasattr(attr, "__call__"):
-                                doc = getattr(attr, "__doc__", None)
+                            if callable(attr):
+                                getattr(attr, "__doc__", None)
                                 if hasattr(attr, "__init__"):
                                     # Try to create instance with mocked dependencies
                                     try:

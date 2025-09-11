@@ -2,11 +2,12 @@
 Async tasks for heavy operations using Celery.
 """
 
-from celery import shared_task
-from django.core.cache import cache
-from django.db import transaction
-from django.utils import timezone
 import logging
+
+from django.core.cache import cache
+from django.utils import timezone
+
+from celery import shared_task
 
 logger = logging.getLogger(__name__)
 
@@ -178,9 +179,11 @@ def generate_thumbnails_async(image_id):
         image_id: ID of the image to process
     """
     try:
-        from apps.files.models import File
-        from PIL import Image
         import io
+
+        from PIL import Image
+
+        from apps.files.models import File
 
         file_obj = File.objects.get(id=image_id)
 
@@ -219,9 +222,10 @@ def cleanup_old_revisions():
     Keeps only the last 50 revisions per content item.
     """
     try:
-        from apps.cms.versioning import PageRevision
-        from apps.blog.versioning import BlogPostRevision
         from django.db.models import Count
+
+        from apps.blog.versioning import BlogPostRevision
+        from apps.cms.versioning import PageRevision
 
         # Clean up page revisions
         pages_with_many_revisions = (
@@ -296,8 +300,8 @@ def optimize_database_async():
                 # Update table statistics
                 cursor.execute(
                     """
-                    SELECT schemaname, tablename 
-                    FROM pg_tables 
+                    SELECT schemaname, tablename
+                    FROM pg_tables
                     WHERE schemaname = 'public'
                 """
                 )

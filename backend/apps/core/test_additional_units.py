@@ -3,8 +3,7 @@ Additional unit tests for core app to boost coverage.
 """
 
 import unittest
-from unittest.mock import Mock, patch, MagicMock
-from datetime import datetime, timedelta
+from unittest.mock import Mock
 
 
 class TestCoreUtilityFunctions(unittest.TestCase):
@@ -99,7 +98,7 @@ class TestCoreUtilityFunctions(unittest.TestCase):
             for attr_name in dir(permissions):
                 if not attr_name.startswith("_"):
                     attr = getattr(permissions, attr_name)
-                    if hasattr(attr, "__call__"):
+                    if callable(attr):
                         try:
                             # Try to instantiate permission class
                             perm = attr()
@@ -134,20 +133,20 @@ class TestCoreMiddleware(unittest.TestCase):
             for attr_name in dir(middleware):
                 if not attr_name.startswith("_") and "Middleware" in attr_name:
                     attr = getattr(middleware, attr_name)
-                    if hasattr(attr, "__call__"):
+                    if callable(attr):
                         try:
                             # Test middleware instantiation
                             get_response = Mock()
                             middleware_instance = attr(get_response)
 
                             # Test middleware call
-                            if hasattr(middleware_instance, "__call__"):
+                            if callable(middleware_instance):
                                 mock_request = Mock()
                                 mock_request.path = "/test/"
                                 mock_request.method = "GET"
                                 mock_request.META = {}
                                 try:
-                                    response = middleware_instance(mock_request)
+                                    middleware_instance(mock_request)
                                 except:
                                     pass  # Middleware may require specific setup
 
@@ -197,7 +196,7 @@ class TestCoreThrottling(unittest.TestCase):
             for attr_name in dir(throttling):
                 if not attr_name.startswith("_") and "Throttle" in attr_name:
                     attr = getattr(throttling, attr_name)
-                    if hasattr(attr, "__call__"):
+                    if callable(attr):
                         try:
                             throttle = attr()
 
@@ -217,7 +216,7 @@ class TestCoreThrottling(unittest.TestCase):
 
                             if hasattr(throttle, "get_rate"):
                                 try:
-                                    rate = throttle.get_rate()
+                                    throttle.get_rate()
                                 except:
                                     pass
 
@@ -247,7 +246,7 @@ class TestCoreDecorators(unittest.TestCase):
 
                             # Try calling decorated function
                             try:
-                                result = test_function()
+                                test_function()
                             except:
                                 pass  # Decorator may require specific parameters
 
@@ -275,7 +274,7 @@ class TestCoreCircuitBreaker(unittest.TestCase):
             for attr_name in dir(circuit_breaker):
                 if not attr_name.startswith("_"):
                     attr = getattr(circuit_breaker, attr_name)
-                    if hasattr(attr, "__call__"):
+                    if callable(attr):
                         try:
                             if "CircuitBreaker" in attr_name:
                                 # Test circuit breaker class

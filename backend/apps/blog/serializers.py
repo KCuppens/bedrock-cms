@@ -2,12 +2,15 @@
 Blog serializers for API endpoints.
 """
 
-from rest_framework import serializers
 from django.contrib.auth import get_user_model
 from django.utils import timezone
-from .models import BlogPost, Category, Tag, BlogSettings
-from apps.i18n.models import Locale
+
+from rest_framework import serializers
+
 from apps.files.models import FileUpload
+from apps.i18n.models import Locale
+
+from .models import BlogPost, BlogSettings, Category, Tag
 
 User = get_user_model()
 

@@ -2,18 +2,16 @@
 Tests for versioning and audit functionality.
 """
 
-import json
-from datetime import timedelta
-from django.test import TestCase
 from django.contrib.auth import get_user_model
+from django.test import TestCase
 from django.utils import timezone
-from rest_framework.test import APITestCase
+
 from rest_framework import status
+from rest_framework.test import APITestCase
 
-from apps.i18n.models import Locale
 from apps.cms.models import Page
-from apps.cms.versioning import PageRevision, AuditEntry, RevisionDiffer
-
+from apps.cms.versioning import AuditEntry, PageRevision, RevisionDiffer
+from apps.i18n.models import Locale
 
 User = get_user_model()
 

@@ -2,10 +2,11 @@
 API views for CMS blocks registry.
 """
 
-from rest_framework import views, status
-from rest_framework.response import Response
+from drf_spectacular.utils import extend_schema
+from rest_framework import status, views
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
-from drf_spectacular.utils import extend_schema, extend_schema_view
+from rest_framework.response import Response
+
 from ..blocks.validation import BLOCK_MODELS
 from ..models import BlockType
 

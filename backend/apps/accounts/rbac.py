@@ -5,17 +5,16 @@ This module provides scoped permissions that allow users to be granted
 permissions only for specific locales and/or path sections.
 """
 
+from django.contrib.auth.models import Group
+from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models import (
     CharField,
-    TextField,
-    BooleanField,
     DateTimeField,
     ForeignKey,
-    OneToOneField,
+    TextField,
 )
-from django.contrib.auth.models import Group
-from django.core.exceptions import ValidationError
+
 from apps.i18n.models import Locale
 
 

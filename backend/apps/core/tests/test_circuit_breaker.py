@@ -3,9 +3,9 @@ Test cases for circuit breaker functionality.
 """
 
 import time
-from unittest.mock import patch, MagicMock
-from django.test import TestCase
+
 from django.core.cache import cache
+from django.test import TestCase
 
 from apps.core.circuit_breaker import CircuitOpenException, circuit_breaker
 

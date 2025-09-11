@@ -184,8 +184,8 @@ class EmailLogListView(TemplateView):
 # Webhook endpoints for email tracking (if using external email service)
 def verify_webhook_signature(request):
     """Verify webhook signature for security"""
-    import hmac
     import hashlib
+    import hmac
 
     webhook_secret = getattr(settings, "EMAIL_WEBHOOK_SECRET", None)
     if not webhook_secret:

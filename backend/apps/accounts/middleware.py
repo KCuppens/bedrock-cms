@@ -1,8 +1,9 @@
 import logging
-from django.core.cache import cache
-from django.utils.deprecation import MiddlewareMixin
+
 from django.conf import settings
+from django.core.cache import cache
 from django.utils import timezone
+from django.utils.deprecation import MiddlewareMixin
 
 logger = logging.getLogger(__name__)
 
@@ -46,7 +47,7 @@ class LastSeenMiddleware(MiddlewareMixin):
                             logger.debug(
                                 "Queued last_seen update for user %s", request.user.id
                             )
-                        except Exception as celery_error:
+                        except Exception:
                             # If Celery fails, update directly as fallback
                             from django.contrib.auth import get_user_model
 

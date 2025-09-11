@@ -8,12 +8,13 @@ This module provides content versioning, autosave, and audit trail functionality
 
 import uuid
 from datetime import timedelta
-from typing import Dict, List, Any, Optional, TYPE_CHECKING
-from django.db import models, transaction
+from typing import TYPE_CHECKING, Any
+
 from django.contrib.auth import get_user_model
-from django.utils import timezone
-from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes.fields import GenericForeignKey
+from django.contrib.contenttypes.models import ContentType
+from django.db import models
+from django.utils import timezone
 
 if TYPE_CHECKING:
     from .models import Page
@@ -257,7 +258,7 @@ class AuditEntry(models.Model):
         actor: User,
         action: str,
         obj: models.Model,
-        meta: Dict[str, Any] = None,
+        meta: dict[str, Any] = None,
         request=None,
     ) -> "AuditEntry":
         """
@@ -316,7 +317,7 @@ class RevisionDiffer:
     @staticmethod
     def diff_revisions(
         old_revision: PageRevision, new_revision: PageRevision
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """
         Compare two revisions and return a diff.
 
@@ -363,7 +364,7 @@ class RevisionDiffer:
         return diff
 
     @staticmethod
-    def _diff_blocks(old_blocks: List[Dict], new_blocks: List[Dict]) -> Dict[str, Any]:
+    def _diff_blocks(old_blocks: list[dict], new_blocks: list[dict]) -> dict[str, Any]:
         """
         Compare block arrays and return detailed diff.
 
@@ -413,7 +414,7 @@ class RevisionDiffer:
         return diff
 
     @staticmethod
-    def diff_current_page(page: "Page", revision: PageRevision) -> Dict[str, Any]:
+    def diff_current_page(page: "Page", revision: PageRevision) -> dict[str, Any]:
         """
         Compare current page state with a revision.
 

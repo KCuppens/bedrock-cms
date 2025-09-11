@@ -83,7 +83,6 @@ export function useCreatePage() {
       toast.success('Page created successfully');
     },
     onError: (error: any) => {
-      console.error('Failed to create page:', error);
       toast.error(error?.response?.data?.error || 'Failed to create page');
     },
   });
@@ -101,7 +100,6 @@ export function useUpdatePage() {
       toast.success('Page updated successfully');
     },
     onError: (error: any) => {
-      console.error('Failed to update page:', error);
       toast.error(error?.response?.data?.error || 'Failed to update page');
     },
   });
@@ -118,7 +116,6 @@ export function useDeletePage() {
       toast.success('Page deleted successfully');
     },
     onError: (error: any) => {
-      console.error('Failed to delete page:', error);
       toast.error(error?.response?.data?.error || 'Failed to delete page');
     },
   });
@@ -140,7 +137,6 @@ export function useDuplicatePage() {
       return duplicatedPage;
     },
     onError: (error: any) => {
-      console.error('Failed to duplicate page:', error);
       toast.error('Failed to duplicate page');
     },
   });
@@ -157,7 +153,6 @@ export function usePublishPage() {
       toast.success('Page published successfully');
     },
     onError: (error: any) => {
-      console.error('Failed to publish page:', error);
       toast.error('Failed to publish page');
     },
   });
@@ -174,7 +169,6 @@ export function useUnpublishPage() {
       toast.success('Page unpublished successfully');
     },
     onError: (error: any) => {
-      console.error('Failed to unpublish page:', error);
       toast.error('Failed to unpublish page');
     },
   });
@@ -191,7 +185,6 @@ export function useReorderPages() {
       toast.success('Page order updated');
     },
     onError: (error: any) => {
-      console.error('Failed to reorder pages:', error);
       toast.error('Failed to update page order');
     },
   });

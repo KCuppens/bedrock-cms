@@ -2,7 +2,8 @@
 Dynamic URL routing for registered content models.
 """
 
-from django.urls import path, include
+from django.urls import include, path
+
 from rest_framework.routers import DefaultRouter
 
 from .registry import content_registry
@@ -32,7 +33,7 @@ def create_dynamic_router():
 
             router.register(route_pattern, viewset_class, basename=basename)
 
-        except Exception as e:
+        except Exception:
             # Log error but don't fail the entire routing
             import logging
 

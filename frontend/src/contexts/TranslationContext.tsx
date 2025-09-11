@@ -50,7 +50,6 @@ export const TranslationProvider: React.FC<TranslationProviderProps> = ({
       
       // Use cache if less than 1 hour old
       if (cached && cacheTimestamp && (Date.now() - parseInt(cacheTimestamp)) < 3600000) {
-        console.log(`[Translation] Using cached translations for ${activeLocale}`);
         const cachedTranslations = JSON.parse(cached);
         setTranslations(cachedTranslations);
         setIsLoading(false);
@@ -73,7 +72,6 @@ export const TranslationProvider: React.FC<TranslationProviderProps> = ({
       };
       setTranslations(basicTranslations);
       
-      console.log(`[Translation] Fetching translations for ${activeLocale}...`);
       const response = await api.request<TranslationBundle>({
         method: 'GET',
         url: `/api/v1/i18n/ui-messages/bundle/${activeLocale}/`,
@@ -110,9 +108,8 @@ export const TranslationProvider: React.FC<TranslationProviderProps> = ({
         
         localStorage.setItem(cacheKey, JSON.stringify(response));
         localStorage.setItem(`${cacheKey}_timestamp`, Date.now().toString());
-        console.log(`[Translation] Cached translations for ${activeLocale}`);
       } catch (cacheError) {
-        console.warn('[Translation] Failed to cache translations:', cacheError);
+        // Cache error - continue without caching
       }
       
       // Merge fetched translations with basic ones
@@ -123,7 +120,6 @@ export const TranslationProvider: React.FC<TranslationProviderProps> = ({
     } catch (error: any) {
       // Don't show error if request was aborted
       if (error.name === 'AbortError' || abortController.signal.aborted) {
-        console.log(`[Translation] Request aborted for ${activeLocale}`);
         return;
       }
       
@@ -183,7 +179,6 @@ export const TranslationProvider: React.FC<TranslationProviderProps> = ({
         },
         signal: AbortSignal.timeout(3000) // 3 second timeout
       });
-      console.log(`[Translation] Synced ${keysToSync.length} keys`);
     } catch (error: any) {
       if (error.name !== 'AbortError') {
         console.error('Failed to sync translation keys:', error);
@@ -258,9 +253,7 @@ export const TranslationProvider: React.FC<TranslationProviderProps> = ({
         
         missingKeys.add(key);
         
-        if (import.meta.env.DEV) {
-          console.warn(`Missing translation: ${key}`);
-        }
+        // Missing translation detected in dev mode
         
         // Auto-register if not already registered
         if (enableAutoSync && !TRANSLATION_REGISTRY.has(key)) {

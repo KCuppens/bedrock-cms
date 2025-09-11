@@ -1,14 +1,15 @@
-from rest_framework import serializers
 from django.contrib.auth import get_user_model
-from django.contrib.contenttypes.models import ContentType
+
+from rest_framework import serializers
+
 from .models import (
-    PageView,
-    UserActivity,
-    ContentMetrics,
+    AnalyticsSummary,
     Assessment,
+    ContentMetrics,
+    PageView,
     Risk,
     Threat,
-    AnalyticsSummary,
+    UserActivity,
 )
 
 User = get_user_model()

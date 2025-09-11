@@ -7,6 +7,5 @@ class CmsConfig(AppConfig):
     verbose_name = "Content Management System"
 
     def ready(self):
-        import apps.cms.signals
 
         pass

@@ -2,22 +2,22 @@
 Test cases for i18n views and API endpoints.
 """
 
-import json
-from django.test import TestCase
 from django.contrib.auth import get_user_model
+from django.contrib.contenttypes.models import ContentType
+from django.test import TestCase
 from django.urls import reverse
+
 from rest_framework import status
 from rest_framework.test import APIClient
+
 from apps.i18n.models import (
     Locale,
+    TranslationGlossary,
+    TranslationHistory,
+    TranslationUnit,
     UiMessage,
     UiMessageTranslation,
-    TranslationUnit,
-    TranslationGlossary,
-    TranslationQueue,
-    TranslationHistory,
 )
-from django.contrib.contenttypes.models import ContentType
 
 User = get_user_model()
 

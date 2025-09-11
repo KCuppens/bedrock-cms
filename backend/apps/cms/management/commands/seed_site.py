@@ -3,14 +3,15 @@ Management command to seed the site with demo data.
 """
 
 import uuid
-from django.core.management.base import BaseCommand
-from django.contrib.auth.models import User
-from django.utils import timezone
 from datetime import timedelta
 
-from apps.i18n.models import Locale
-from apps.cms.models import Page, Redirect
+from django.contrib.auth.models import User
+from django.core.management.base import BaseCommand
+from django.utils import timezone
+
 from apps.blog.models import BlogPost, Category, Tag
+from apps.cms.models import Page, Redirect
+from apps.i18n.models import Locale
 from apps.media.models import Asset
 
 
@@ -50,7 +51,7 @@ class Command(BaseCommand):
         # Create redirects
         self.create_sample_redirects(en_locale)
 
-        self.stdout.write(self.style.SUCCESS(f"Demo data seeded successfully!"))
+        self.stdout.write(self.style.SUCCESS("Demo data seeded successfully!"))
         self.show_summary(locales, pages, blog_data, assets)
 
     def clear_data(self):
@@ -240,7 +241,7 @@ class Command(BaseCommand):
                     "type": "image",
                     "schema_version": 1,
                     "props": {
-                        "src": f"/media/demo/about-team.jpg",
+                        "src": "/media/demo/about-team.jpg",
                         "alt": "Our amazing team",
                         "caption": "Meet our dedicated team members",
                     },
@@ -578,11 +579,11 @@ class Command(BaseCommand):
         self.stdout.write("=" * 50)
 
         self.stdout.write(f"Locales: {len(locales)}")
-        for code, locale in locales.items():
+        for _code, locale in locales.items():
             self.stdout.write(f"  - {locale.name} ({locale.code})")
 
         self.stdout.write(f"\nPages: {len(pages)}")
-        for key, page in pages.items():
+        for _key, page in pages.items():
             self.stdout.write(f"  - {page.title} ({page.locale.code}) - {page.path}")
 
         self.stdout.write(f'\nBlog Posts: {len(blog_data["posts"])}')

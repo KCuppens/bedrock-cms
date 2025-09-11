@@ -2,25 +2,28 @@
 Global search functionality for the dashboard search bar.
 """
 
-from django.db.models import Q, Count
+from typing import Any
+
 from django.contrib.auth import get_user_model
-from rest_framework import status
+from django.db.models import Count, Q
+
+from drf_spectacular.utils import OpenApiParameter, extend_schema
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
-from drf_spectacular.utils import extend_schema, OpenApiParameter
-from typing import List, Dict, Any
 
-from apps.cms.models import Page, Redirect
+from apps.blog.models import BlogPost
+from apps.blog.models import Category as BlogCategory
+from apps.blog.models import Tag as BlogTag
 from apps.cms.model_parts.category import Collection
-from apps.blog.models import BlogPost, Category as BlogCategory, Tag as BlogTag
+from apps.cms.models import Page, Redirect
 from apps.files.models import FileUpload
 from apps.i18n.models import TranslationUnit
 
 User = get_user_model()
 
 
-def search_pages(query: str, limit: int = 5) -> List[Dict[str, Any]]:
+def search_pages(query: str, limit: int = 5) -> list[dict[str, Any]]:
     """Search CMS pages"""
     pages = Page.objects.filter(
         Q(title__icontains=query) | Q(path__icontains=query) | Q(slug__icontains=query)
@@ -41,7 +44,7 @@ def search_pages(query: str, limit: int = 5) -> List[Dict[str, Any]]:
     ]
 
 
-def search_blog_posts(query: str, limit: int = 5) -> List[Dict[str, Any]]:
+def search_blog_posts(query: str, limit: int = 5) -> list[dict[str, Any]]:
     """Search blog posts"""
     posts = BlogPost.objects.filter(
         Q(title__icontains=query)
@@ -64,7 +67,7 @@ def search_blog_posts(query: str, limit: int = 5) -> List[Dict[str, Any]]:
     ]
 
 
-def search_media(query: str, limit: int = 5) -> List[Dict[str, Any]]:
+def search_media(query: str, limit: int = 5) -> list[dict[str, Any]]:
     """Search media files"""
     files = FileUpload.objects.filter(
         Q(original_filename__icontains=query) | Q(description__icontains=query)
@@ -85,7 +88,7 @@ def search_media(query: str, limit: int = 5) -> List[Dict[str, Any]]:
     ]
 
 
-def search_collections(query: str, limit: int = 5) -> List[Dict[str, Any]]:
+def search_collections(query: str, limit: int = 5) -> list[dict[str, Any]]:
     """Search collections"""
     collections = Collection.objects.filter(
         Q(name__icontains=query) | Q(description__icontains=query)
@@ -108,7 +111,7 @@ def search_collections(query: str, limit: int = 5) -> List[Dict[str, Any]]:
     ]
 
 
-def search_categories(query: str, limit: int = 5) -> List[Dict[str, Any]]:
+def search_categories(query: str, limit: int = 5) -> list[dict[str, Any]]:
     """Search categories"""
     categories = BlogCategory.objects.filter(
         Q(name__icontains=query) | Q(description__icontains=query)
@@ -128,7 +131,7 @@ def search_categories(query: str, limit: int = 5) -> List[Dict[str, Any]]:
     ]
 
 
-def search_tags(query: str, limit: int = 5) -> List[Dict[str, Any]]:
+def search_tags(query: str, limit: int = 5) -> list[dict[str, Any]]:
     """Search tags"""
     tags = BlogTag.objects.filter(
         Q(name__icontains=query) | Q(description__icontains=query)
@@ -148,7 +151,7 @@ def search_tags(query: str, limit: int = 5) -> List[Dict[str, Any]]:
     ]
 
 
-def search_translations(query: str, limit: int = 5) -> List[Dict[str, Any]]:
+def search_translations(query: str, limit: int = 5) -> list[dict[str, Any]]:
     """Search translations"""
     translations = TranslationUnit.objects.filter(
         Q(key__icontains=query)
@@ -175,7 +178,7 @@ def search_translations(query: str, limit: int = 5) -> List[Dict[str, Any]]:
     ]
 
 
-def search_users(query: str, limit: int = 5) -> List[Dict[str, Any]]:
+def search_users(query: str, limit: int = 5) -> list[dict[str, Any]]:
     """Search users (admin only)"""
     users = User.objects.filter(
         Q(email__icontains=query)
@@ -197,7 +200,7 @@ def search_users(query: str, limit: int = 5) -> List[Dict[str, Any]]:
     ]
 
 
-def search_redirects(query: str, limit: int = 5) -> List[Dict[str, Any]]:
+def search_redirects(query: str, limit: int = 5) -> list[dict[str, Any]]:
     """Search redirects"""
     redirects = Redirect.objects.filter(
         Q(from_path__icontains=query) | Q(to_path__icontains=query)
@@ -296,7 +299,7 @@ def global_search(request):
             if type_results:
                 results[search_type] = type_results
                 total += len(type_results)
-        except Exception as e:
+        except Exception:
             # Log error but continue with other searches
             pass
             continue

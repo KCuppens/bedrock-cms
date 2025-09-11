@@ -6,6 +6,7 @@ reducing the amount of data transferred and processed.
 """
 
 from rest_framework import serializers
+
 from .models import Note
 
 

@@ -3,17 +3,16 @@ Real comprehensive CMS tests using actual models and targeting high coverage.
 """
 
 from datetime import datetime, timedelta
-from django.test import TestCase, TransactionTestCase
+
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
-from rest_framework.test import APITestCase, APIClient
-from rest_framework import status
-from unittest.mock import patch, Mock
+from django.test import TestCase, TransactionTestCase
+
+from rest_framework.test import APIClient, APITestCase
 
 # Import actual models
 from apps.cms.models import Page, Redirect
 from apps.i18n.models import Locale
-
 
 User = get_user_model()
 
@@ -284,9 +283,7 @@ class CMSRealAPITests(APITestCase):
         self.assertEqual(page.title, "Updated API Test Page")
 
         # Test page filtering
-        draft_page = Page.objects.create(
-            title="Draft Page", locale=self.locale, status="draft"
-        )
+        Page.objects.create(title="Draft Page", locale=self.locale, status="draft")
 
         published_pages = Page.objects.filter(status="published")
         draft_pages = Page.objects.filter(status="draft")
@@ -431,7 +428,7 @@ class CMSRealIntegrationTests(TransactionTestCase):
     def test_redirect_management_workflow(self):
         """Test redirect creation and management."""
         # Create original page
-        original_page = Page.objects.create(
+        Page.objects.create(
             title="Original Page", slug="original", path="/original", locale=self.locale
         )
 

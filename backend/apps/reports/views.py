@@ -2,19 +2,19 @@
 Reports API views for CMS background jobs and analytics.
 """
 
-from rest_framework import status
-from rest_framework.decorators import api_view, permission_classes
-from rest_framework.permissions import IsAuthenticated, IsAdminUser
-from rest_framework.response import Response
 from django.db.models import Count, Q
 from django.utils import timezone
-from datetime import timedelta
+
 from celery import current_app
 from celery.result import AsyncResult
+from rest_framework import status
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import IsAdminUser, IsAuthenticated
+from rest_framework.response import Response
 
 from apps.cms.models import Page
 from apps.cms.tasks import check_internal_links, check_single_page_links
-from apps.i18n.models import TranslationUnit, Locale
+from apps.i18n.models import Locale, TranslationUnit
 from apps.i18n.tasks import seed_locale_translation_units
 
 

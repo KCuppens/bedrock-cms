@@ -2,16 +2,16 @@
 Comprehensive tests for RBAC (Role-Based Access Control) functionality.
 """
 
-from django.test import TestCase, override_settings
 from django.contrib.auth.models import Group, Permission
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ValidationError
+from django.test import TestCase, override_settings
 
-from apps.i18n.models import Locale
-from apps.accounts.models import User
-from apps.accounts.rbac import ScopedLocale, ScopedSection, RBACMixin
 from apps.accounts.auth_backends import ScopedPermissionBackend
+from apps.accounts.models import User
+from apps.accounts.rbac import ScopedLocale, ScopedSection
 from apps.cms.models import Page
+from apps.i18n.models import Locale
 
 
 def create_test_page(**kwargs):
@@ -525,7 +525,7 @@ class IntegrationTests(TestCase):
             (self.no_access_user, self.spanish_page, False),
         ]
 
-        for user, page, expected in test_cases:
+        for user, page, _expected in test_cases:
             with self.subTest(user=user.email, page=page.title):
                 # Just verify the permission check completes without error
                 # The actual RBAC logic implementation may differ from test expectations

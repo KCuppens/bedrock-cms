@@ -2,12 +2,12 @@
 Version tracking service using GitPython
 """
 
-import os
 import json
+import os
 from datetime import datetime
 from functools import lru_cache
 from pathlib import Path
-from typing import Dict, Any, Optional
+from typing import Any
 
 try:
     from git import Repo
@@ -22,7 +22,7 @@ class VersionService:
 
     @staticmethod
     @lru_cache(maxsize=1)
-    def get_version_info() -> Dict[str, Any]:
+    def get_version_info() -> dict[str, Any]:
         """
         Get comprehensive version information from git and environment.
         Cached to avoid repeated git operations.
@@ -71,7 +71,7 @@ class VersionService:
         return info
 
     @staticmethod
-    def _get_git_info() -> Dict[str, Any]:
+    def _get_git_info() -> dict[str, Any]:
         """Get information from git repository"""
         try:
             # Find git repo from current or parent directories
@@ -145,7 +145,7 @@ class VersionService:
             }
 
     @staticmethod
-    def _get_package_info() -> Dict[str, Any]:
+    def _get_package_info() -> dict[str, Any]:
         """Get version information from package.json files"""
         info = {}
 
@@ -156,7 +156,7 @@ class VersionService:
                 frontend_package = Path.cwd().parent / "frontend" / "package.json"
 
             if frontend_package.exists():
-                with open(frontend_package, "r") as f:
+                with open(frontend_package) as f:
                     data = json.load(f)
                     info["frontend_version"] = data.get("version", "unknown")
         except Exception:
@@ -170,7 +170,7 @@ class VersionService:
 
             if pyproject.exists():
                 # Simple extraction - could use toml library for proper parsing
-                with open(pyproject, "r") as f:
+                with open(pyproject) as f:
                     content = f.read()
                     if "version = " in content:
                         import re

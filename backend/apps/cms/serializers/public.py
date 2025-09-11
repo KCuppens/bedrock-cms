@@ -4,10 +4,9 @@ Includes resolved SEO data and minimal field exposure.
 """
 
 from rest_framework import serializers
+
 from apps.cms.models import Page
-from apps.cms.seo_utils import resolve_seo, generate_seo_links
-from apps.cms.models import BlockType
-from apps.i18n.models import Locale
+from apps.cms.seo_utils import generate_seo_links, resolve_seo
 
 
 class PublicPageSerializer(serializers.ModelSerializer):
@@ -62,7 +61,7 @@ class PublicPageSerializer(serializers.ModelSerializer):
                 "page_url": canonical_url,
                 "locale_code": obj.locale.code,
             }
-        except Exception as e:
+        except Exception:
             # Fallback to basic SEO if resolution fails
             return {
                 "title": obj.title,

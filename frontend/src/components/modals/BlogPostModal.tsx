@@ -11,7 +11,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { format } from "date-fns";
 import { Calendar as CalendarIcon, X, Plus, Image as ImageIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { api } from "@/lib/api";
+import { api } from "@/lib/api.ts";
 import RichTextEditor from "@/components/ui/rich-text-editor";
 import { MediaPicker } from "@/components/ui/media-picker";
 

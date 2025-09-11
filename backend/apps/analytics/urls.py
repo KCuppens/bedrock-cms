@@ -1,15 +1,16 @@
-from django.urls import path, include
+from django.urls import include, path
+
 from rest_framework.routers import DefaultRouter
 
 from .views import (
-    PageViewViewSet,
-    UserActivityViewSet,
-    ContentMetricsViewSet,
+    AnalyticsAPIViewSet,
+    AnalyticsSummaryViewSet,
     AssessmentViewSet,
+    ContentMetricsViewSet,
+    PageViewViewSet,
     RiskViewSet,
     ThreatViewSet,
-    AnalyticsSummaryViewSet,
-    AnalyticsAPIViewSet,
+    UserActivityViewSet,
 )
 
 # Create router and register viewsets

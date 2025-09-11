@@ -1,8 +1,8 @@
 import logging
-from typing import Optional
+
+from django.conf import settings
 
 from celery import shared_task
-from django.conf import settings
 
 from .models import EmailMessageLog
 
@@ -106,7 +106,7 @@ def cleanup_old_email_logs(days_to_keep: int = 30):
 
 @shared_task(name="apps.emails.tasks.send_bulk_email_task")
 def send_bulk_email_task(
-    template_key: str, recipient_emails: list, context: Optional[dict] = None
+    template_key: str, recipient_emails: list, context: dict | None = None
 ):
     """
     Celery task to send bulk emails with batch processing
@@ -121,8 +121,9 @@ def send_bulk_email_task(
     """
     try:
         from django.db import transaction
-        from .services import EmailService
+
         from .models import EmailMessageLog, EmailTemplate
+        from .services import EmailService
 
         # Get template once and cache it
         template = EmailTemplate.get_template(template_key, "en")
@@ -217,9 +218,11 @@ def retry_failed_emails(max_retries: int = 3):
     """
     try:
         from datetime import timedelta
-        from django.utils import timezone
+
         from django.db import transaction
         from django.db.models import F, Q
+        from django.utils import timezone
+
         from apps.core.enums import EmailStatus
 
         # Get failed emails from the last 24 hours that haven't exceeded retry limit
@@ -266,7 +269,7 @@ def retry_failed_emails(max_retries: int = 3):
                 tasks.append((email_id, task.id))
                 retried_count += 1
 
-            except Exception as e:
+            except Exception:
                 logger.error(
                     "Failed to schedule retry for email %s: {str(e)}", email_id
                 )

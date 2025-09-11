@@ -3,6 +3,7 @@ Core application URLs
 """
 
 from django.urls import path
+
 from .views import version_info, version_simple
 
 app_name = "core"

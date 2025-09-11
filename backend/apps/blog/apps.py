@@ -9,4 +9,3 @@ class BlogConfig(AppConfig):
     def ready(self):
         """Initialize the blog app when ready."""
         # Import signals to register them
-        from . import models  # This will register the signals

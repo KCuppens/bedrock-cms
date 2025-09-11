@@ -1,8 +1,10 @@
-from rest_framework import serializers
-from apps.cms.seo import SeoSettings
-from apps.i18n.models import Locale
-from apps.files.models import FileUpload
 import uuid
+
+from rest_framework import serializers
+
+from apps.cms.seo import SeoSettings
+from apps.files.models import FileUpload
+from apps.i18n.models import Locale
 
 
 class SeoSettingsSerializer(serializers.ModelSerializer):

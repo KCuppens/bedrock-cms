@@ -1,26 +1,28 @@
 from datetime import datetime
+
 from django.conf import settings
 from django.db import transaction
-from django.shortcuts import get_object_or_404
 from django.http import HttpResponse
-from rest_framework import viewsets, status, permissions
+
+from drf_spectacular.utils import OpenApiParameter, extend_schema
+from rest_framework import permissions, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.throttling import UserRateThrottle
+
+from apps.core.decorators import cache_method_response
 from apps.core.throttling import (
-    WriteOperationThrottle,
     BurstWriteThrottle,
     PublishOperationThrottle,
+    WriteOperationThrottle,
 )
-from apps.core.decorators import cache_method_response, invalidate_cache
-from drf_spectacular.utils import extend_schema, OpenApiParameter
 from apps.i18n.models import Locale
-from .models import Page, Redirect
+
+from .models import Page
 from .serializers import (
     PageReadSerializer,
-    PageWriteSerializer,
     PageTreeItemSerializer,
-    RedirectSerializer,
+    PageWriteSerializer,
 )
 from .versioning_views import VersioningMixin
 
@@ -293,7 +295,7 @@ class PagesViewSet(VersioningMixin, viewsets.ModelViewSet):
                 )
 
             # Bulk update using CASE statement for efficiency
-            from django.db.models import Case, When, Value, IntegerField
+            from django.db.models import Case, IntegerField, Value, When
 
             cases = [
                 When(id=child_id, then=Value(position))
@@ -368,6 +370,7 @@ class PagesViewSet(VersioningMixin, viewsets.ModelViewSet):
     def schedule(self, request, pk=None):
         """Schedule a page for future publishing."""
         from django.utils.dateparse import parse_datetime
+
         from .services.scheduling import SchedulingService
 
         page = self.get_object()
@@ -454,6 +457,7 @@ class PagesViewSet(VersioningMixin, viewsets.ModelViewSet):
     def schedule_unpublish(self, request, pk=None):
         """Schedule a published page to be unpublished at a future time."""
         from django.utils.dateparse import parse_datetime
+
         from .services.scheduling import SchedulingService
 
         page = self.get_object()
@@ -503,7 +507,6 @@ class PagesViewSet(VersioningMixin, viewsets.ModelViewSet):
     @action(detail=False, methods=["get"])
     def scheduled_content(self, request):
         """Get all scheduled content."""
-        from django.utils import timezone
 
         scheduled_pages = (
             self.get_queryset()
@@ -541,9 +544,9 @@ class PagesViewSet(VersioningMixin, viewsets.ModelViewSet):
     @action(detail=False, methods=["get"], url_path="scheduled-tasks")
     def scheduled_tasks(self, request):
         """Get all scheduled tasks for pages."""
-        from .services.scheduling import SchedulingService
-        from .scheduling import ScheduledTask
         from django.contrib.contenttypes.models import ContentType
+
+        from .services.scheduling import SchedulingService
 
         # Get query parameters
         status = request.query_params.get("status", "pending")
@@ -724,8 +727,9 @@ class PagesViewSet(VersioningMixin, viewsets.ModelViewSet):
         }
 
         # Top reviewers this month
-        from django.utils import timezone
         from datetime import timedelta
+
+        from django.utils import timezone
 
         last_month = timezone.now() - timedelta(days=30)
         reviewer_stats = (
@@ -1015,6 +1019,7 @@ class PagesViewSet(VersioningMixin, viewsets.ModelViewSet):
 
 
 from django.views.decorators.cache import cache_page
+
 from django_ratelimit.decorators import ratelimit
 
 

@@ -1,19 +1,20 @@
-from rest_framework import viewsets, status, filters
-from rest_framework.decorators import action
-from rest_framework.response import Response
-from rest_framework.permissions import IsAuthenticated
-from django_filters.rest_framework import DjangoFilterBackend
-from drf_spectacular.utils import extend_schema, extend_schema_view
 from django.core.cache import cache
 from django.db.models import Count, Q
 
+from django_filters.rest_framework import DjangoFilterBackend
+from drf_spectacular.utils import extend_schema, extend_schema_view
+from rest_framework import filters, status, viewsets
+from rest_framework.decorators import action
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
+
 from apps.cms.models import BlockType, BlockTypeCategory
 from apps.cms.serializers.block_types import (
-    BlockTypeSerializer,
-    BlockTypeListSerializer,
-    BlockTypeCreateSerializer,
-    BlockTypeUpdateSerializer,
     BlockTypeCategorySerializer,
+    BlockTypeCreateSerializer,
+    BlockTypeListSerializer,
+    BlockTypeSerializer,
+    BlockTypeUpdateSerializer,
 )
 from apps.core.permissions import RBACPermission
 
@@ -305,6 +306,7 @@ class BlockTypeViewSet(viewsets.ModelViewSet):
     def fetch_data(self, request):
         """Fetch dynamic data for a block based on its model configuration."""
         import json
+
         from django.db.models import Q
 
         block_type_str = request.query_params.get("block_type")

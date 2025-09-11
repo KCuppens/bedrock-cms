@@ -3,9 +3,9 @@ Accounts app coverage booster - targets auth, views, and models.
 """
 
 import os
-import sys
+from unittest.mock import Mock, patch
+
 import django
-from unittest.mock import Mock, patch, MagicMock
 
 # Configure minimal Django
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "apps.config.settings.base")
@@ -29,7 +29,7 @@ def test_accounts_auth_backends():
             # Test authenticate method
             try:
                 mock_request = Mock()
-                result = backend.authenticate(
+                backend.authenticate(
                     mock_request, email="test@example.com", password="test123"
                 )
             except:
@@ -39,7 +39,7 @@ def test_accounts_auth_backends():
             try:
                 with patch("apps.accounts.models.User.objects") as mock_user:
                     mock_user.get.return_value = Mock()
-                    result = backend.get_user(1)
+                    backend.get_user(1)
             except:
                 pass
 
@@ -56,8 +56,8 @@ def test_accounts_auth_backends():
                 mock_user.is_active = True
                 mock_user.is_superuser = False
 
-                result = backend.has_perm(mock_user, "accounts.view_user")
-                result = backend.has_perm(mock_user, "accounts.change_user")
+                backend.has_perm(mock_user, "accounts.view_user")
+                backend.has_perm(mock_user, "accounts.change_user")
             except:
                 pass
 
@@ -89,7 +89,7 @@ def test_accounts_auth_views():
             try:
                 with patch("apps.accounts.auth_views.reverse") as mock_reverse:
                     mock_reverse.return_value = "/dashboard/"
-                    url = view.get_success_url()
+                    view.get_success_url()
             except:
                 pass
 
@@ -97,7 +97,7 @@ def test_accounts_auth_views():
             try:
                 mock_form = Mock()
                 mock_form.get_user.return_value = Mock()
-                response = view.form_valid(mock_form)
+                view.form_valid(mock_form)
             except:
                 pass
 
@@ -111,7 +111,7 @@ def test_accounts_auth_views():
 
             # Test get_next_page
             try:
-                next_page = view.get_next_page()
+                view.get_next_page()
             except:
                 pass
 
@@ -128,7 +128,7 @@ def test_accounts_auth_views():
             try:
                 mock_form = Mock()
                 mock_form.save.return_value = None
-                response = view.form_valid(mock_form)
+                view.form_valid(mock_form)
             except:
                 pass
 
@@ -157,12 +157,12 @@ def test_accounts_role_views():
                 viewset.action = action
 
                 try:
-                    serializer_class = viewset.get_serializer_class()
+                    viewset.get_serializer_class()
                 except:
                     pass
 
                 try:
-                    permissions = viewset.get_permissions()
+                    viewset.get_permissions()
                 except:
                     pass
 
@@ -170,7 +170,7 @@ def test_accounts_role_views():
             try:
                 with patch("apps.accounts.models.Role.objects") as mock_objects:
                     mock_objects.all.return_value = []
-                    queryset = viewset.get_queryset()
+                    viewset.get_queryset()
             except:
                 pass
 
@@ -191,7 +191,7 @@ def test_accounts_role_views():
                     with patch("apps.accounts.models.Role.objects") as mock_role:
                         mock_user.get.return_value = Mock()
                         mock_role.get.return_value = Mock()
-                        response = viewset.assign_role(viewset.request)
+                        viewset.assign_role(viewset.request)
             except:
                 pass
 
@@ -206,7 +206,7 @@ def test_accounts_models():
     """Target models.py methods (82 lines, 28 missing)."""
 
     try:
-        from apps.accounts.models import User, Role, UserProfile
+        from apps.accounts.models import Role, User, UserProfile
 
         # Test User model methods
         try:
@@ -218,21 +218,21 @@ def test_accounts_models():
 
             # Test __str__ method
             try:
-                result = User.__str__(mock_user)
+                User.__str__(mock_user)
             except:
                 pass
 
             # Test get_full_name method
             try:
                 if hasattr(User, "get_full_name"):
-                    result = User.get_full_name(mock_user)
+                    User.get_full_name(mock_user)
             except:
                 pass
 
             # Test get_short_name method
             try:
                 if hasattr(User, "get_short_name"):
-                    result = User.get_short_name(mock_user)
+                    User.get_short_name(mock_user)
             except:
                 pass
 
@@ -247,7 +247,7 @@ def test_accounts_models():
 
             # Test __str__ method
             try:
-                result = Role.__str__(mock_role)
+                Role.__str__(mock_role)
             except:
                 pass
 
@@ -262,7 +262,7 @@ def test_accounts_serializers():
     """Target serializers.py (96 lines, 54 missing)."""
 
     try:
-        from apps.accounts.serializers import UserSerializer, RoleSerializer
+        from apps.accounts.serializers import RoleSerializer, UserSerializer
 
         # Test UserSerializer
         try:
@@ -275,7 +275,6 @@ def test_accounts_serializers():
             serializer = UserSerializer(data=mock_data)
             try:
                 serializer.is_valid()
-                fields = serializer.fields
             except:
                 pass
 
@@ -289,7 +288,6 @@ def test_accounts_serializers():
             serializer = RoleSerializer(data=mock_data)
             try:
                 serializer.is_valid()
-                fields = serializer.fields
             except:
                 pass
 
@@ -315,8 +313,8 @@ def test_accounts_rbac():
                 mock_user = Mock()
                 mock_user.roles.all.return_value = []
 
-                result = rbac.user_has_permission(mock_user, "view_user")
-                result = rbac.user_has_permission(mock_user, "change_user")
+                rbac.user_has_permission(mock_user, "view_user")
+                rbac.user_has_permission(mock_user, "change_user")
             except:
                 pass
 
@@ -325,7 +323,7 @@ def test_accounts_rbac():
                 mock_user = Mock()
                 mock_user.roles.all.return_value = []
 
-                permissions = rbac.get_user_permissions(mock_user)
+                rbac.get_user_permissions(mock_user)
             except:
                 pass
 
@@ -339,7 +337,7 @@ def test_accounts_rbac():
 
             with patch("apps.accounts.rbac.RoleBasedAccessControl") as mock_rbac:
                 mock_rbac.return_value.user_has_permission.return_value = True
-                result = has_permission(mock_user, "view_user")
+                has_permission(mock_user, "view_user")
         except:
             pass
 
@@ -360,8 +358,8 @@ def test_accounts_signals():
                     attr = getattr(signals, attr_name)
                     if callable(attr):
                         # Try to access function properties
-                        doc = getattr(attr, "__doc__", None)
-                        name = getattr(attr, "__name__", None)
+                        getattr(attr, "__doc__", None)
+                        getattr(attr, "__name__", None)
                 except:
                     pass
 
@@ -383,11 +381,11 @@ def test_accounts_management_commands():
                     if not attr_name.startswith("_"):
                         try:
                             attr = getattr(module, attr_name)
-                            if hasattr(attr, "__call__"):
+                            if callable(attr):
                                 # Try to access class/function properties
-                                doc = getattr(attr, "__doc__", None)
+                                getattr(attr, "__doc__", None)
                                 if hasattr(attr, "__name__"):
-                                    name = attr.__name__
+                                    pass
                         except:
                             pass
             except:

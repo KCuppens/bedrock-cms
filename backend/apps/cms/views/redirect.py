@@ -1,13 +1,14 @@
 import csv
 import io
-from rest_framework import viewsets, status
-from rest_framework.permissions import IsAuthenticated
-from rest_framework.decorators import action
-from rest_framework.response import Response
+
 from django.db.models import Q
 from django.http import HttpResponse
-from django.utils import timezone
-from drf_spectacular.utils import extend_schema, extend_schema_view, OpenApiParameter
+
+from drf_spectacular.utils import extend_schema, extend_schema_view
+from rest_framework import status, viewsets
+from rest_framework.decorators import action
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
 
 from apps.cms.models import Redirect
 from apps.cms.serializers.redirect import RedirectSerializer
@@ -105,7 +106,7 @@ class RedirectViewSet(viewsets.ModelViewSet):
                 )
 
             # Track import statistics
-            total_rows = sum(1 for row in csv.DictReader(io.StringIO(content)))
+            sum(1 for row in csv.DictReader(io.StringIO(content)))
 
             # Process rows
             successful_imports = 0

@@ -5,40 +5,34 @@ This module provides search functionality including indexing, analytics, and que
 """
 
 import uuid
+
+from django.contrib.contenttypes.fields import GenericForeignKey
+from django.contrib.contenttypes.models import ContentType
 from django.db import models
 from django.db.models import (
-    CharField,
-    TextField,
     BooleanField,
+    CharField,
     DateTimeField,
     ForeignKey,
-    ManyToManyField,
-    ImageField,
-    PositiveIntegerField,
-    UUIDField,
-    SlugField,
-    AutoField,
-    OneToOneField,
-    URLField,
     GenericIPAddressField,
-    IntegerField,
+    PositiveIntegerField,
+    TextField,
+    URLField,
+    UUIDField,
 )
-from django.contrib.contenttypes.models import ContentType
-from django.contrib.contenttypes.fields import GenericForeignKey
 
 # PostgreSQL search functionality (optional)
 try:
-    from django.contrib.postgres.search import SearchVector, SearchQuery, SearchRank
     from django.contrib.postgres.indexes import GinIndex
+    from django.contrib.postgres.search import SearchQuery, SearchRank, SearchVector
 
     HAS_POSTGRES_SEARCH = True
 except ImportError:
     HAS_POSTGRES_SEARCH = False
     GinIndex = None
 from django.contrib.auth import get_user_model
-from django.utils import timezone
 from django.core.exceptions import ValidationError
-
+from django.utils import timezone
 
 User = get_user_model()
 

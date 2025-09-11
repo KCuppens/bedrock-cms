@@ -3,6 +3,7 @@ URL patterns for search functionality.
 """
 
 from django.urls import path
+
 from . import views
 from .global_search import global_search, search_suggestions
 

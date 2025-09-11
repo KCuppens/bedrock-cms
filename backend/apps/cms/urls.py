@@ -1,15 +1,17 @@
-from django.urls import path, include
+from django.urls import include, path
+
 from rest_framework.routers import DefaultRouter
-from .views.pages import PagesViewSet
+
+from .versioning_views import AuditEntryViewSet, PageRevisionViewSet
 from .views import sitemap_view
-from .versioning_views import PageRevisionViewSet, AuditEntryViewSet
-from .views.category import CategoryViewSet, TagViewSet, CollectionViewSet
+from .views.block_types import BlockTypeViewSet
+from .views.blocks import BlockSchemaView, BlockTypesView
+from .views.category import CategoryViewSet, CollectionViewSet, TagViewSet
+from .views.mock_revisions import MockRevisionsView
+from .views.navigation import FooterView, NavigationView, SiteSettingsView
+from .views.pages import PagesViewSet
 from .views.redirect import RedirectViewSet
 from .views.seo import SeoSettingsViewSet
-from .views.blocks import BlockTypesView, BlockSchemaView
-from .views.block_types import BlockTypeViewSet
-from .views.navigation import NavigationView, FooterView, SiteSettingsView
-from .views.mock_revisions import MockRevisionsView
 
 router = DefaultRouter()
 router.register(r"pages", PagesViewSet, basename="pages")

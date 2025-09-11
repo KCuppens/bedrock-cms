@@ -3,12 +3,14 @@ Signal handlers for automatic translation unit creation and locale synchronizati
 """
 
 import logging
-from django.db.models.signals import post_save, pre_save, post_delete
-from django.dispatch import receiver
+
 from django.contrib.contenttypes.models import ContentType
+from django.db.models.signals import post_delete, post_save, pre_save
+from django.dispatch import receiver
 
 from apps.cms.models import Page
-from .models import Locale, TranslationUnit
+
+from .models import Locale
 from .translation import TranslationManager
 
 logger = logging.getLogger(__name__)

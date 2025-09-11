@@ -3,10 +3,10 @@ CMS tasks coverage booster - targeting background tasks and celery tasks.
 """
 
 import os
-import sys
+from datetime import datetime
+from unittest.mock import Mock, patch
+
 import django
-from unittest.mock import Mock, patch, MagicMock
-from datetime import datetime, timedelta
 
 # Configure minimal Django
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "apps.config.settings.base")
@@ -32,8 +32,8 @@ def test_cms_tasks():
                         # Check if it's a Celery task
                         if hasattr(attr, "delay"):
                             # Test task properties
-                            task_name = getattr(attr, "name", None)
-                            task_queue = getattr(attr, "queue", None)
+                            getattr(attr, "name", None)
+                            getattr(attr, "queue", None)
 
                             # Mock task execution based on name
                             if "publish" in attr_name.lower():
@@ -137,20 +137,20 @@ def test_cms_tasks():
                                 or "fetch" in attr_name.lower()
                             ):
                                 try:
-                                    result = attr()
+                                    attr()
                                 except TypeError:
                                     try:
-                                        result = attr(1)
+                                        attr(1)
                                     except:
                                         pass
                             elif "validate" in attr_name.lower():
                                 try:
-                                    result = attr({"key": "value"})
+                                    attr({"key": "value"})
                                 except:
                                     pass
                             elif "process" in attr_name.lower():
                                 try:
-                                    result = attr(Mock())
+                                    attr(Mock())
                                 except:
                                     pass
 
@@ -166,10 +166,10 @@ def test_cms_scheduled_tasks():
 
     try:
         from apps.cms.tasks import (
-            publish_scheduled_pages,
-            unpublish_expired_pages,
             cleanup_old_versions,
             generate_sitemap,
+            publish_scheduled_pages,
+            unpublish_expired_pages,
         )
 
         # Test publish_scheduled_pages
@@ -199,7 +199,7 @@ def test_cms_scheduled_tasks():
         # Test cleanup_old_versions
         try:
             with patch("apps.cms.models.PageVersion.objects.filter") as mock_filter:
-                mock_version = Mock()
+                Mock()
                 mock_filter.return_value.delete.return_value = (5, {"PageVersion": 5})
 
                 cleanup_old_versions()
@@ -215,7 +215,7 @@ def test_cms_scheduled_tasks():
                 mock_page.updated_at = datetime.now()
                 mock_filter.return_value = [mock_page]
 
-                with patch("builtins.open", create=True) as mock_open:
+                with patch("builtins.open", create=True):
                     generate_sitemap()
 
         except:
@@ -261,7 +261,7 @@ def test_cms_async_tasks():
         try:
             # Test retry logic
             if hasattr(tasks, "retry_failed_publish"):
-                with patch.object(tasks.retry_failed_publish, "retry") as mock_retry:
+                with patch.object(tasks.retry_failed_publish, "retry"):
                     try:
                         tasks.retry_failed_publish(page_id=1)
                     except:
@@ -337,14 +337,14 @@ def test_cms_task_utilities():
                         elif "queue" in attr_name.lower():
                             try:
                                 # Test queue management
-                                result = attr("default")
+                                attr("default")
                             except:
                                 pass
 
                         elif "monitor" in attr_name.lower():
                             try:
                                 # Test task monitoring
-                                result = attr("task_id_123")
+                                attr("task_id_123")
                             except:
                                 pass
 

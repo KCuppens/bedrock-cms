@@ -3,13 +3,11 @@ Import Django's built-in translation strings into the database.
 This includes admin interface strings, form validation messages, etc.
 """
 
-import os
-from pathlib import Path
 from django.core.management.base import BaseCommand
-from django.conf import settings
-from django.utils.translation import gettext_lazy as _
 from django.utils import translation
-from apps.i18n.models import UiMessage, UiMessageTranslation, Locale
+from django.utils.translation import gettext_lazy as _
+
+from apps.i18n.models import Locale, UiMessage, UiMessageTranslation
 
 
 class Command(BaseCommand):

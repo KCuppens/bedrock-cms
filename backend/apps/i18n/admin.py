@@ -1,14 +1,15 @@
 from django.contrib import admin
-from django.utils.html import format_html
 from django.db import transaction
+from django.utils.html import format_html
+
 from .models import (
     Locale,
+    TranslationGlossary,
+    TranslationHistory,
+    TranslationQueue,
     TranslationUnit,
     UiMessage,
     UiMessageTranslation,
-    TranslationGlossary,
-    TranslationQueue,
-    TranslationHistory,
 )
 
 

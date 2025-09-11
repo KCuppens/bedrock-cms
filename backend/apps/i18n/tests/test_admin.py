@@ -2,17 +2,18 @@
 Test cases for i18n admin interface.
 """
 
-from django.test import TestCase
 from django.contrib.admin.sites import AdminSite
 from django.contrib.auth import get_user_model
-from apps.i18n.models import Locale, UiMessage, UiMessageTranslation, TranslationUnit
+from django.contrib.contenttypes.models import ContentType
+from django.test import TestCase
+
 from apps.i18n.admin import (
     LocaleAdmin,
+    TranslationUnitAdmin,
     UiMessageAdmin,
     UiMessageTranslationAdmin,
-    TranslationUnitAdmin,
 )
-from django.contrib.contenttypes.models import ContentType
+from apps.i18n.models import Locale, TranslationUnit, UiMessage, UiMessageTranslation
 
 User = get_user_model()
 

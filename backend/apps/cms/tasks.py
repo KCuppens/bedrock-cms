@@ -4,13 +4,14 @@ Background tasks for CMS operations.
 
 import logging
 import re
-import requests
-from typing import List, Dict, Any, Optional
-from urllib.parse import urljoin, urlparse
-from celery import shared_task
+from typing import Any
+from urllib.parse import urljoin
+
 from django.db import transaction
-from django.contrib.contenttypes.models import ContentType
 from django.utils import timezone
+
+import requests
+from celery import shared_task
 
 from .models import Page
 from .scheduling import ScheduledTask
@@ -36,8 +37,8 @@ class LinkExtractor:
         self.session.headers.update({"User-Agent": "Bedrock-CMS-LinkChecker/1.0"})
 
     def extract_links_from_blocks(
-        self, blocks: List[Dict[str, Any]]
-    ) -> List[Dict[str, Any]]:
+        self, blocks: list[dict[str, Any]]
+    ) -> list[dict[str, Any]]:
         """Extract all links from page blocks."""
         links = []
 
@@ -51,8 +52,8 @@ class LinkExtractor:
         return links
 
     def _extract_links_from_block(
-        self, block: Dict[str, Any], block_index: int, parent_path: str = ""
-    ) -> List[Dict[str, Any]]:
+        self, block: dict[str, Any], block_index: int, parent_path: str = ""
+    ) -> list[dict[str, Any]]:
         """Extract links from a single block recursively."""
         links = []
 
@@ -91,7 +92,7 @@ class LinkExtractor:
 
         return links
 
-    def _find_urls_in_text(self, text: str) -> List[str]:
+    def _find_urls_in_text(self, text: str) -> list[str]:
         """Find URLs in text using regex patterns."""
         urls = set()
 
@@ -122,7 +123,7 @@ class LinkExtractor:
 
         return True
 
-    def _get_link_context(self, block: Dict[str, Any], url: str) -> str:
+    def _get_link_context(self, block: dict[str, Any], url: str) -> str:
         """Get context information about where the link appears."""
         props = block.get("props", {})
 
@@ -140,7 +141,7 @@ class LinkExtractor:
 
         return f"Found in {block.get('type', 'unknown')} block"
 
-    def check_link_status(self, url: str, timeout: int = 10) -> Dict[str, Any]:
+    def check_link_status(self, url: str, timeout: int = 10) -> dict[str, Any]:
         """Check if a link is accessible."""
         # Convert relative URLs to absolute
         if not url.startswith(("http://", "https://")):
@@ -181,7 +182,7 @@ class LinkExtractor:
 
 
 @shared_task(bind=True)
-def check_internal_links(self, page_ids: Optional[List[int]] = None) -> Dict[str, Any]:
+def check_internal_links(self, page_ids: list[int] | None = None) -> dict[str, Any]:
     """
     Check internal links in pages and report broken ones.
 
@@ -251,7 +252,7 @@ def check_internal_links(self, page_ids: Optional[List[int]] = None) -> Dict[str
 
                 # Update progress
                 if page_index % 10 == 0 or page_index == total_pages - 1:
-                    progress = int((page_index + 1) / total_pages * 100)
+                    int((page_index + 1) / total_pages * 100)
                     self.update_state(
                         state="PROGRESS",
                         meta={
@@ -300,7 +301,7 @@ def nightly_link_check():
 
 
 @shared_task(bind=True)
-def check_single_page_links(self, page_id: int) -> Dict[str, Any]:
+def check_single_page_links(self, page_id: int) -> dict[str, Any]:
     """Check links for a single page."""
     return check_internal_links(self, page_ids=[page_id])
 

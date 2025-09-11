@@ -2,14 +2,14 @@ import hashlib
 import logging
 import os
 import uuid
-from typing import Any, Optional, Dict
+from typing import Any
 
 from django.conf import settings
 from django.core.files.base import ContentFile
 from django.core.files.storage import default_storage
 
-from apps.core.enums import FileType
 from apps.core.circuit_breaker import storage_circuit_breaker
+from apps.core.enums import FileType
 
 from .models import FileUpload
 
@@ -149,9 +149,9 @@ class FileService:
         cls,
         storage_path: str,
         expires_in: int = 3600,
-        content_type: Optional[str] = None,
-        max_size: Optional[int] = None,
-    ) -> Dict[str, Any]:
+        content_type: str | None = None,
+        max_size: int | None = None,
+    ) -> dict[str, Any]:
         """Get signed upload URL and required fields"""
 
         if hasattr(default_storage, "generate_presigned_post"):
@@ -192,12 +192,12 @@ class FileService:
             logger.info("File deleted: %s", file_upload.storage_path)
             return True
 
-        except Exception as e:
+        except Exception:
             logger.error("Failed to delete file %s: {str(e)}", file_upload.storage_path)
             return False
 
     @classmethod
-    def validate_file(cls, file, max_size_mb: int = 10) -> Dict[str, Any]:
+    def validate_file(cls, file, max_size_mb: int = 10) -> dict[str, Any]:
         """Validate uploaded file"""
 
         errors = []
@@ -269,8 +269,8 @@ class FileService:
     def cleanup_expired_files(cls) -> dict[str, int]:
         """Clean up expired files with batch processing"""
 
-        from django.utils import timezone
         from django.db import transaction
+        from django.utils import timezone
 
         expired_files = FileUpload.objects.filter(expires_at__lt=timezone.now())
 

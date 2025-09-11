@@ -1,38 +1,28 @@
 import uuid
-from django.db import models, transaction
+
+from django.core.exceptions import ValidationError
+from django.db import models
 from django.db.models import (
-    CharField,
-    TextField,
+    AutoField,
     BooleanField,
+    CharField,
     DateTimeField,
     ForeignKey,
-    ManyToManyField,
-    ImageField,
     PositiveIntegerField,
-    UUIDField,
-    SlugField,
-    AutoField,
-    OneToOneField,
-    URLField,
-    GenericIPAddressField,
-    IntegerField,
     PositiveSmallIntegerField,
+    SlugField,
+    TextField,
+    UUIDField,
 )
-from django.core.exceptions import ValidationError
-from django.db.models import F
-from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
+
 from apps.accounts.rbac import RBACMixin
 from apps.core.validators import JSONSizeValidator, validate_json_structure
 
-# Import SEO models
-from .seo import SeoSettings
-
-# Import versioning models
-from .versioning import PageRevision, AuditEntry
-
 # Import scheduling models
-from .scheduling import ScheduledTask
+# Import SEO models
+# Import versioning models
+from .versioning import AuditEntry
 
 
 class Page(models.Model, RBACMixin):
@@ -150,9 +140,9 @@ class Page(models.Model, RBACMixin):
 
     def clean(self):
         """Validate the page, including blocks validation."""
-        from .blocks.validation import validate_blocks
-        from .presentation import presentation_resolver
         from django.utils import timezone
+
+        from .blocks.validation import validate_blocks
 
         errors = {}
 
@@ -465,7 +455,6 @@ class Redirect(models.Model):
 RedirectImport = None
 
 # Import models from model_parts
-from .model_parts.category import Category, Tag, Collection
 
 
 class BlockTypeCategory(models.TextChoices):

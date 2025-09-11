@@ -1,28 +1,27 @@
-from datetime import datetime
-
 from django.conf import settings
 from django.db import transaction
-from django.shortcuts import get_object_or_404
 from django.http import HttpResponse
-from rest_framework import viewsets, status, permissions
+
+from drf_spectacular.utils import OpenApiParameter, extend_schema
+from rest_framework import permissions, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.throttling import UserRateThrottle
-from apps.core.throttling import (
-    WriteOperationThrottle,
-    BurstWriteThrottle,
-    PublishOperationThrottle,
-)
-from drf_spectacular.utils import extend_schema, OpenApiParameter
-from apps.i18n.models import Locale
-from ..models import Page, Redirect
+
 from apps.cms.serializers import (
     PageReadSerializer,
-    PageWriteSerializer,
     PageTreeItemSerializer,
-    RedirectSerializer,
+    PageWriteSerializer,
 )
 from apps.cms.serializers.public import PublicPageSerializer
+from apps.core.throttling import (
+    BurstWriteThrottle,
+    PublishOperationThrottle,
+    WriteOperationThrottle,
+)
+from apps.i18n.models import Locale
+
+from ..models import Page
 from ..versioning_views import VersioningMixin
 
 
@@ -306,7 +305,6 @@ class PagesViewSet(VersioningMixin, viewsets.ModelViewSet):
 
         with transaction.atomic():
             # Store old parent for resequencing
-            old_parent = page.parent
 
             # Update parent
             if new_parent_id:
@@ -446,7 +444,7 @@ class PagesViewSet(VersioningMixin, viewsets.ModelViewSet):
                 )
 
             # Bulk update positions using CASE statement for efficiency
-            from django.db.models import Case, When, Value, IntegerField
+            from django.db.models import Case, IntegerField, Value, When
 
             cases = [
                 When(id=page_id, then=Value(position))
@@ -712,7 +710,6 @@ class PagesViewSet(VersioningMixin, viewsets.ModelViewSet):
         """Duplicate a page with all its content."""
         import copy
         import uuid
-        from django.utils.text import slugify
 
         page = self.get_object()
 
@@ -798,7 +795,6 @@ class PagesViewSet(VersioningMixin, viewsets.ModelViewSet):
         # Store page info for audit log before deletion
         page_title = page.title
         page_path = page.path
-        page_id = page.id
 
         try:
             with transaction.atomic():
@@ -828,9 +824,10 @@ class PagesViewSet(VersioningMixin, viewsets.ModelViewSet):
             )
 
 
-from django.views.decorators.cache import cache_page
-from django_ratelimit.decorators import ratelimit
 from django.shortcuts import redirect
+from django.views.decorators.cache import cache_page
+
+from django_ratelimit.decorators import ratelimit
 
 
 def default_sitemap_view(request):

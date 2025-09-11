@@ -159,3 +159,6 @@ staticfiles/
 # Backup files
 *.backup
 backups/
+
+# Temporary CI/CD files
+=*

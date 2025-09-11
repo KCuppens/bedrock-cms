@@ -84,7 +84,6 @@ const SchedulingDashboard: React.FC = () => {
         allContent = [...allContent, ...(postsResponse || [])];
       } catch (error) {
         // Blog posts might not be available or endpoint doesn't exist
-        console.log('Blog posts not available:', error);
       }
       
       setScheduledContent(allContent);

@@ -5,9 +5,9 @@ Automatically invalidates relevant cache entries when content changes.
 """
 
 import logging
-from django.db.models.signals import post_save, post_delete, m2m_changed
+
+from django.db.models.signals import m2m_changed, post_delete, post_save
 from django.dispatch import receiver
-from django.contrib.contenttypes.models import ContentType
 
 from .cache import cache_manager
 
@@ -45,7 +45,7 @@ def invalidate_cache_on_save(sender, instance, created, **kwargs):
 
         logger.debug("Cache invalidated for %s {instance.id}", model_label)
 
-    except Exception as e:
+    except Exception:
         logger.warning("Error invalidating cache for %s: {e}", instance)
 
 
@@ -75,7 +75,7 @@ def invalidate_cache_on_delete(sender, instance, **kwargs):
 
         logger.debug("Cache invalidated for deleted %s {instance.id}", model_label)
 
-    except Exception as e:
+    except Exception:
         logger.warning("Error invalidating cache for deleted %s: {e}", instance)
 
 
@@ -104,7 +104,7 @@ def invalidate_page_cache(page):
         # Invalidate SEO cache
         cache_manager.invalidate_seo(model_label="cms.page", object_id=page.id)
 
-    except Exception as e:
+    except Exception:
         logger.warning("Error invalidating page cache for %s: {e}", page)
 
 
@@ -142,7 +142,7 @@ def invalidate_blog_cache(blog_post):
         # If this affects feeds, invalidate those too
         # (RSS/Atom feeds would be handled by view-level caching)
 
-    except Exception as e:
+    except Exception:
         logger.warning("Error invalidating blog cache for %s: {e}", blog_post)
 
 
@@ -184,7 +184,7 @@ def invalidate_content_cache(instance, model_label):
         # Invalidate SEO cache
         cache_manager.invalidate_seo(model_label=model_label, object_id=instance.id)
 
-    except Exception as e:
+    except Exception:
         logger.warning("Error invalidating content cache for %s: {e}", instance)
 
 
@@ -214,7 +214,7 @@ def invalidate_cache_on_m2m_change(sender, instance, action, pk_set, **kwargs):
                 "Cache invalidated for M2M change on %s {instance.id}", model_label
             )
 
-        except Exception as e:
+        except Exception:
             logger.warning(
                 "Error invalidating cache for M2M change on %s: {e}", instance
             )
@@ -248,7 +248,7 @@ def invalidate_cache_on_asset_change(sender, instance, created, **kwargs):
             # you'd scan the AssetUsage table to find affected content
             pass
 
-    except Exception as e:
+    except Exception:
         logger.warning("Error invalidating cache for asset change %s: {e}", instance)
 
 
@@ -262,8 +262,9 @@ def send_cdn_purge_webhook(keys: list, tags: list = None):
         tags: List of cache tags to purge (if CDN supports tag-based purging)
     """
     try:
-        import requests
         from django.conf import settings
+
+        import requests
 
         # Check if CDN webhook is configured
         webhook_url = getattr(settings, "CDN_PURGE_WEBHOOK_URL", None)
@@ -331,7 +332,7 @@ def invalidate_content_type_cache(model_label: str):
 
         logger.info("Cache invalidated for all %s objects", model_label)
 
-    except Exception as e:
+    except Exception:
         logger.error("Error invalidating cache for %s: {e}", model_label)
 
 

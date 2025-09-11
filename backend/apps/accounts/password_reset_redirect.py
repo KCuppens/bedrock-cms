@@ -2,11 +2,11 @@
 Handle password reset URL redirects from Allauth to frontend.
 """
 
-from django.shortcuts import redirect
-from django.views.decorators.http import require_GET
 from django.conf import settings
-from django.utils.http import urlsafe_base64_encode
+from django.shortcuts import redirect
 from django.utils.encoding import force_bytes
+from django.utils.http import urlsafe_base64_encode
+from django.views.decorators.http import require_GET
 
 
 @require_GET

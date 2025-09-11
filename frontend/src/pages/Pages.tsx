@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import Sidebar from "@/components/Sidebar";
 import TopNavbar from "@/components/TopNavbar";
 import { PagesEmptyState } from "@/components/EmptyStates";
-import { api } from "@/lib/api";
+import { api } from "@/lib/api.ts";
 import { Page as ApiPage, PageCreateRequest, Locale, PageRevision } from "@/types/api";
 import { toast } from "sonner";
 import { useTranslation } from "@/contexts/TranslationContext";

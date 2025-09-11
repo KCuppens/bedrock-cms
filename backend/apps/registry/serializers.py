@@ -2,9 +2,9 @@
 Auto-generated serializers for registered content models.
 """
 
-from typing import Type, Dict, Any, List
+from typing import Any
+
 from rest_framework import serializers
-from django.db import models
 
 from .config import ContentConfig
 from .registry import content_registry
@@ -18,7 +18,7 @@ class ContentSerializerFactory:
     @classmethod
     def create_serializer(
         cls, config: ContentConfig
-    ) -> Type[serializers.ModelSerializer]:
+    ) -> type[serializers.ModelSerializer]:
         """
         Create a serializer class for a content configuration.
 
@@ -59,7 +59,7 @@ class ContentSerializerFactory:
         return serializer_class
 
     @classmethod
-    def _get_custom_fields(cls, config: ContentConfig) -> Dict[str, Any]:
+    def _get_custom_fields(cls, config: ContentConfig) -> dict[str, Any]:
         """Get custom fields for the serializer."""
         custom_fields = {}
 
@@ -116,7 +116,7 @@ class ContentSerializerFactory:
         return custom_fields
 
     @classmethod
-    def _get_custom_methods(cls, config: ContentConfig) -> Dict[str, Any]:
+    def _get_custom_methods(cls, config: ContentConfig) -> dict[str, Any]:
         """Get custom methods for the serializer."""
         methods = {}
 
@@ -162,7 +162,7 @@ class RegistrySummarySerializer(serializers.Serializer):
     configs = serializers.DictField()
 
 
-def get_serializer_for_model(model_label: str) -> Type[serializers.ModelSerializer]:
+def get_serializer_for_model(model_label: str) -> type[serializers.ModelSerializer]:
     """
     Get or create a serializer for a registered model.
 
@@ -184,7 +184,7 @@ def get_serializer_for_model(model_label: str) -> Type[serializers.ModelSerializ
 
 def get_serializer_for_config(
     config: ContentConfig,
-) -> Type[serializers.ModelSerializer]:
+) -> type[serializers.ModelSerializer]:
     """
     Get or create a serializer for a content configuration.
 

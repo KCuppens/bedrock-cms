@@ -4,11 +4,10 @@ Scheduling service for CMS content.
 This module provides services for scheduling content publishing and unpublishing.
 """
 
-from django.db import transaction
-from django.core.exceptions import ValidationError
-from django.utils import timezone
 from django.contrib.contenttypes.models import ContentType
-from typing import Optional, Tuple
+from django.core.exceptions import ValidationError
+from django.db import transaction
+from django.utils import timezone
 
 from ..scheduling import ScheduledTask
 
@@ -19,7 +18,7 @@ class SchedulingService:
     @staticmethod
     def schedule_publish(
         content_object, publish_at, unpublish_at=None, user=None
-    ) -> Tuple[ScheduledTask, Optional[ScheduledTask]]:
+    ) -> tuple[ScheduledTask, ScheduledTask | None]:
         """
         Schedule content for publishing.
 

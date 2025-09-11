@@ -3,16 +3,16 @@ Utility functions for analytics functionality.
 """
 
 import re
-from typing import Dict, Optional, Tuple
-from datetime import datetime, date, timedelta
+from datetime import date, datetime, timedelta
+
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.gis.geoip2 import GeoIP2
-from django.core.exceptions import ObjectDoesNotExist
 from django.utils import timezone
+
 from user_agents import parse
 
 
-def parse_user_agent(user_agent_string: str) -> Dict[str, str]:
+def parse_user_agent(user_agent_string: str) -> dict[str, str]:
     """
     Parse user agent string to extract browser and OS information.
 
@@ -59,7 +59,7 @@ def get_client_ip(request) -> str:
     return ip
 
 
-def get_geo_data(ip_address: str) -> Dict[str, Optional[str]]:
+def get_geo_data(ip_address: str) -> dict[str, str | None]:
     """
     Get geographic data from IP address.
 
@@ -104,7 +104,7 @@ def sanitize_url(url: str, max_length: int = 1024) -> str:
     sensitive_params = ["password", "token", "key", "secret", "auth"]
 
     try:
-        from urllib.parse import urlparse, parse_qs, urlencode, urlunparse
+        from urllib.parse import parse_qs, urlencode, urlparse, urlunparse
 
         parsed = urlparse(url)
         query_params = parse_qs(parsed.query)
@@ -172,7 +172,7 @@ def calculate_session_duration(session_id: str, end_time: datetime = None) -> in
         return 0
 
 
-def get_content_type_and_id(obj) -> Tuple[int, int]:
+def get_content_type_and_id(obj) -> tuple[int, int]:
     """
     Get ContentType ID and object ID for any Django model instance.
 
@@ -208,7 +208,7 @@ def format_duration(seconds: int) -> str:
         return f"{hours}h {remaining_minutes}m"
 
 
-def get_date_range(period: str, date_param: str = None) -> Tuple[date, date]:
+def get_date_range(period: str, date_param: str = None) -> tuple[date, date]:
     """
     Get date range for analytics queries.
 
@@ -344,7 +344,7 @@ def clean_referrer(referrer: str) -> str:
         return referrer
 
 
-def get_analytics_context(request) -> Dict:
+def get_analytics_context(request) -> dict:
     """
     Extract analytics context from Django request.
 

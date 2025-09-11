@@ -2,20 +2,15 @@
 Tests for search functionality.
 """
 
-from django.test import TestCase, override_settings
 from django.contrib.auth import get_user_model
 from django.contrib.contenttypes.models import ContentType
-from django.urls import reverse
-from django.db.models.signals import post_save, post_delete
-from rest_framework.test import APITestCase
-from rest_framework import status
+from django.db.models.signals import post_delete, post_save
+from django.test import TestCase
 
-from apps.i18n.models import Locale
 from apps.blog.models import BlogPost, Category
-from apps.registry.registry import content_registry
-from .models import SearchIndex, SearchQuery, SearchSuggestion
-from .services import search_service
+from apps.i18n.models import Locale
 
+from .models import SearchIndex, SearchQuery, SearchSuggestion
 
 User = get_user_model()
 

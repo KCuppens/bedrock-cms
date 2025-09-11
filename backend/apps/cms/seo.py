@@ -1,6 +1,5 @@
-from typing import List, Dict, Any
 from django.db import models
-from django.core.exceptions import ValidationError
+
 from apps.i18n.models import Locale
 
 

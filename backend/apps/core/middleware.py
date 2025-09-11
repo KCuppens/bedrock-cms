@@ -190,7 +190,6 @@ class DemoModeMiddleware(MiddlewareMixin):
 
         # Add demo banner to HTML content
         if hasattr(response, "content"):
-            from django.utils.html import escape
 
             # Use escaped content for security
             demo_banner = """

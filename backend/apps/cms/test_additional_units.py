@@ -3,9 +3,7 @@ Additional unit tests for CMS app to boost coverage.
 """
 
 import unittest
-from unittest.mock import Mock, patch, MagicMock
-from datetime import datetime, timedelta
-import uuid
+from unittest.mock import Mock
 
 
 class TestCMSModelUtilities(unittest.TestCase):
@@ -249,7 +247,7 @@ class TestCMSSerializers(unittest.TestCase):
                                 serializer.is_valid()
                             if hasattr(serializer, "validated_data"):
                                 try:
-                                    data = serializer.validated_data
+                                    pass
                                 except:
                                     pass
                         except:
@@ -281,7 +279,7 @@ class TestCMSSerializers(unittest.TestCase):
 
                             # Test validation
                             if hasattr(serializer, "is_valid"):
-                                is_valid = serializer.is_valid()
+                                serializer.is_valid()
 
                             # Test field access
                             if hasattr(serializer, "fields"):
@@ -316,13 +314,13 @@ class TestCMSViews(unittest.TestCase):
                             # Test common view methods
                             if hasattr(view, "get_queryset"):
                                 try:
-                                    qs = view.get_queryset()
+                                    view.get_queryset()
                                 except:
                                     pass
 
                             if hasattr(view, "get_serializer_class"):
                                 try:
-                                    serializer_class = view.get_serializer_class()
+                                    view.get_serializer_class()
                                 except:
                                     pass
 
@@ -359,7 +357,7 @@ class TestCMSViews(unittest.TestCase):
                             # Test page-specific methods
                             if hasattr(view, "get_object"):
                                 try:
-                                    obj = view.get_object()
+                                    view.get_object()
                                 except:
                                     pass
 
@@ -460,7 +458,7 @@ class TestCMSMiddleware(unittest.TestCase):
                             middleware_instance = attr(get_response)
 
                             # Test middleware call
-                            if hasattr(middleware_instance, "__call__"):
+                            if callable(middleware_instance):
                                 mock_request = Mock()
                                 mock_request.path = "/cms/test/"
                                 mock_request.method = "GET"
@@ -468,7 +466,7 @@ class TestCMSMiddleware(unittest.TestCase):
                                 mock_request.META = {"HTTP_HOST": "example.com"}
 
                                 try:
-                                    response = middleware_instance(mock_request)
+                                    middleware_instance(mock_request)
                                 except:
                                     pass
 

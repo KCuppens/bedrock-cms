@@ -4,6 +4,7 @@ Custom authentication backends for RBAC scope enforcement.
 
 from django.contrib.auth.backends import BaseBackend
 from django.contrib.auth.models import Permission
+
 from .rbac import ScopedLocale, ScopedSection
 
 

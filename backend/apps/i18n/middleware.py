@@ -6,9 +6,10 @@ up-to-date with the database configuration.
 """
 
 import logging
+
 from django.conf import settings
-from django.utils.deprecation import MiddlewareMixin
 from django.core.cache import cache
+from django.utils.deprecation import MiddlewareMixin
 
 logger = logging.getLogger(__name__)
 

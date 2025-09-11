@@ -7,10 +7,11 @@ Prevents cascading failures by failing fast when services are unavailable.
 import functools
 import logging
 import time
+from collections.abc import Callable
 from enum import Enum
-from typing import Callable, Optional, Any, Union, Type, Tuple, Dict
+from typing import Any
+
 from django.core.cache import cache
-from django.conf import settings
 
 logger = logging.getLogger(__name__)
 
@@ -38,9 +39,7 @@ class CircuitBreaker:
         name: str,
         failure_threshold: int = 5,
         recovery_timeout: int = 60,
-        expected_exception: Union[
-            Type[Exception], Tuple[Type[Exception], ...]
-        ] = Exception,
+        expected_exception: type[Exception] | tuple[type[Exception], ...] = Exception,
         success_threshold: int = 2,
     ):
         """
@@ -203,12 +202,12 @@ class CircuitOpenException(Exception):
 
 
 def circuit_breaker(
-    name: Optional[str] = None,
+    name: str | None = None,
     failure_threshold: int = 5,
     recovery_timeout: int = 60,
-    expected_exception: Union[Type[Exception], Tuple[Type[Exception], ...]] = Exception,
+    expected_exception: type[Exception] | tuple[type[Exception], ...] = Exception,
     success_threshold: int = 2,
-    fallback: Optional[Callable] = None,
+    fallback: Callable | None = None,
 ):
     """
     Decorator to add circuit breaker to functions.
@@ -295,7 +294,7 @@ external_api_circuit_breaker = functools.partial(
 class CircuitBreakerManager:
     """Manager for all circuit breakers in the system"""
 
-    _breakers: Dict[str, CircuitBreaker] = {}
+    _breakers: dict[str, CircuitBreaker] = {}
 
     @classmethod
     def register(cls, breaker: CircuitBreaker):
@@ -303,7 +302,7 @@ class CircuitBreakerManager:
         cls._breakers[breaker.name] = breaker
 
     @classmethod
-    def get(cls, name: str) -> Optional[CircuitBreaker]:
+    def get(cls, name: str) -> CircuitBreaker | None:
         """Get a circuit breaker by name"""
         return cls._breakers.get(name)
 

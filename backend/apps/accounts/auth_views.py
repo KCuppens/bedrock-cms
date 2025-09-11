@@ -1,8 +1,7 @@
-from django.contrib.auth import authenticate, login, logout
-from django.contrib.auth import get_user_model
+from django.contrib.auth import authenticate, get_user_model, login, logout
 from django.core.exceptions import ValidationError
 from django.core.validators import validate_email
-from allauth.account.models import EmailAddress
+
 from allauth.account.forms import ResetPasswordForm
 from drf_spectacular.utils import extend_schema
 from rest_framework import status
@@ -194,8 +193,8 @@ def _parse_token_from_formats(uid_param, token_param):
     1. Standard Django format: separate uid and token
     2. Allauth format: combined token like "4-cvtit9-cc6628ec2531c2cc114f2d6d8f06d72d"
     """
-    from django.utils.http import urlsafe_base64_decode
     from django.utils.encoding import force_str
+    from django.utils.http import urlsafe_base64_decode
 
     if uid_param and token_param:
         # Standard format: /password-reset/uid/token
@@ -256,7 +255,6 @@ def password_reset_verify_token(request):
         )
 
     # Check if token is valid using allauth's token generator
-    from allauth.account.utils import user_pk_to_url_str
     from allauth.account.forms import default_token_generator
 
     # Try allauth token generator first

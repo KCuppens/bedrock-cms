@@ -2,21 +2,21 @@
 Test cases for i18n signal handlers.
 """
 
-from unittest.mock import patch, MagicMock
-from django.test import TestCase
+from unittest.mock import MagicMock, patch
+
 from django.contrib.auth import get_user_model
 from django.contrib.contenttypes.models import ContentType
+from django.test import TestCase
 
 from apps.cms.models import Page
 from apps.i18n.models import Locale, TranslationUnit
 from apps.i18n.signals import (
     create_page_translation_units,
-    store_old_page_data,
     create_translation_units_handler,
     register_model_for_translation,
+    store_old_page_data,
 )
 from apps.i18n.translation import TranslationManager
-
 
 User = get_user_model()
 

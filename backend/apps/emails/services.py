@@ -1,11 +1,12 @@
 import logging
-from typing import Any, Optional, Union
+from typing import Any
 
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.core.mail import EmailMultiAlternatives
 
 from apps.core.circuit_breaker import email_circuit_breaker
+
 from .models import EmailMessageLog, EmailTemplate
 from .tasks import send_email_task
 
@@ -19,13 +20,13 @@ class EmailService:
     @staticmethod
     def send_email(
         template_key: str,
-        to_email: Union[str, list[str]],
-        context: Optional[dict[str, Any]] = None,
-        from_email: Optional[str] = None,
-        cc: Optional[list[str]] = None,
-        bcc: Optional[list[str]] = None,
+        to_email: str | list[str],
+        context: dict[str, Any] | None = None,
+        from_email: str | None = None,
+        cc: list[str] | None = None,
+        bcc: list[str] | None = None,
         language: str = "en",
-        user: Optional[User] = None,
+        user: User | None = None,
         async_send: bool = True,
         **kwargs,
     ) -> EmailMessageLog:
@@ -145,7 +146,7 @@ class EmailService:
     def send_template_email(
         template_key: str,
         to_email: str,
-        context: Optional[dict[str, Any]] = None,
+        context: dict[str, Any] | None = None,
         **kwargs,
     ) -> EmailMessageLog:
         """Convenience method for sending template emails"""
@@ -157,7 +158,7 @@ class EmailService:
     def send_bulk_email(
         template_key: str,
         recipients: list[str],
-        context: Optional[dict[str, Any]] = None,
+        context: dict[str, Any] | None = None,
         **kwargs,
     ) -> list[EmailMessageLog]:
         """Send email to multiple recipients"""
@@ -172,7 +173,7 @@ class EmailService:
                     **kwargs,
                 )
                 email_logs.append(email_log)
-            except Exception as e:
+            except Exception:
                 logger.error("Failed to send email to %s: {str(e)}", recipient)
 
         return email_logs
@@ -180,7 +181,7 @@ class EmailService:
     @staticmethod
     def preview_email(
         template_key: str,
-        context: Optional[dict[str, Any]] = None,
+        context: dict[str, Any] | None = None,
         language: str = "en",
     ) -> dict[str, str]:
         """Preview email content without sending"""
@@ -193,7 +194,7 @@ class EmailService:
 
 # Convenience functions for common email types
 def send_welcome_email(
-    user: User, context: Optional[dict[str, Any]] = None
+    user: User, context: dict[str, Any] | None = None
 ) -> EmailMessageLog:
     """Send welcome email to new user"""
     email_context = {
@@ -211,7 +212,7 @@ def send_welcome_email(
 
 
 def send_password_reset_email(
-    user: User, reset_link: str, context: Optional[dict[str, Any]] = None
+    user: User, reset_link: str, context: dict[str, Any] | None = None
 ) -> EmailMessageLog:
     """Send password reset email"""
     email_context = {
@@ -233,8 +234,8 @@ def send_notification_email(
     user: User,
     title: str,
     message: str,
-    action_url: Optional[str] = None,
-    context: Optional[dict[str, Any]] = None,
+    action_url: str | None = None,
+    context: dict[str, Any] | None = None,
 ) -> EmailMessageLog:
     """Send notification email"""
     email_context = {

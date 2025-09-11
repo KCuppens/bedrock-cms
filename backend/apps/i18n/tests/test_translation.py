@@ -2,13 +2,14 @@
 Test cases for translation utilities.
 """
 
-from django.test import TestCase
 from django.contrib.auth import get_user_model
 from django.contrib.contenttypes.models import ContentType
+from django.test import TestCase
+
 from apps.i18n.models import Locale, TranslationUnit, UiMessage, UiMessageTranslation
 from apps.i18n.translation import (
-    TranslationResolver,
     TranslationManager,
+    TranslationResolver,
     UiMessageResolver,
 )
 
@@ -347,7 +348,7 @@ class UiMessageResolverTest(TestCase):
 
     def test_resolve_with_parameters(self):
         """Test resolving message with parameters."""
-        message = UiMessage.objects.create(
+        UiMessage.objects.create(
             namespace="validation",
             key="min_length",
             default_value="Minimum {min} characters required",

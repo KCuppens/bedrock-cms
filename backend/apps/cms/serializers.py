@@ -1,8 +1,7 @@
 from rest_framework import serializers
+
 from .models import Page
 from .seo import SeoSettings
-from .versioning import PageRevision
-from .versioning_serializers import PageRevisionSerializer
 
 
 class PageReadSerializer(serializers.ModelSerializer):

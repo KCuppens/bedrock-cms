@@ -2,11 +2,10 @@
 Management command to scaffold new block types.
 """
 
-import os
 from pathlib import Path
+
 from django.core.management.base import BaseCommand, CommandError
-from django.template import Template, Context
-from django.utils.text import slugify
+from django.template import Context, Template
 
 
 class Command(BaseCommand):
@@ -153,13 +152,13 @@ class Command(BaseCommand):
     def _show_dry_run(self, context):
         """Show what would be created in dry run mode."""
         self.stdout.write("\nFiles that would be created/modified:")
-        self.stdout.write(f"  * apps/cms/blocks/validation.py (updated)")
+        self.stdout.write("  * apps/cms/blocks/validation.py (updated)")
         self.stdout.write(
             f'  * tests/unit/test_blocks_{context["block_type"]}.py (new)'
         )
         self.stdout.write(f'  * docs/blocks/{context["block_type"]}.md (new)')
 
-        self.stdout.write(f"\nBlock schema preview:")
+        self.stdout.write("\nBlock schema preview:")
         schema_content = self._generate_block_schema(context)
         self.stdout.write(schema_content)
 
@@ -171,7 +170,7 @@ class Command(BaseCommand):
             raise CommandError("validation.py file not found")
 
         # Read current content
-        with open(validation_file, "r") as f:
+        with open(validation_file) as f:
             content = f.read()
 
         # Generate new block model
@@ -215,7 +214,7 @@ class Command(BaseCommand):
         with open(validation_file, "w") as f:
             f.write(new_content)
 
-        self.stdout.write(f"  * Updated apps/cms/blocks/validation.py")
+        self.stdout.write("  * Updated apps/cms/blocks/validation.py")
 
     def _generate_block_schema(self, context):
         """Generate Pydantic block model."""
@@ -252,7 +251,7 @@ from rest_framework.exceptions import ValidationError
 
 class Test{{ block_class }}Block:
     """Tests for {{ block_type }} block validation."""
-    
+
     def test_valid_{{ block_type }}_block(self):
         """Test valid {{ block_type }} block validates successfully."""
         blocks = [{
@@ -263,26 +262,26 @@ class Test{{ block_class }}Block:
                 {% endif %}{% endfor %}
             }
         }]
-        
+
         validated = validate_blocks(blocks)
         assert len(validated) == 1
         assert validated[0]["type"] == "{{ block_type }}"
         assert validated[0]["schema_version"] == 1
-    
+
     def test_{{ block_type }}_block_defaults(self):
         """Test {{ block_type }} block applies default values."""
         blocks = [{
             "type": "{{ block_type }}"
         }]
-        
+
         validated = validate_blocks(blocks)
         block = validated[0]
-        
+
         assert block["schema_version"] == 1
         assert "props" in block
         {% for prop in props %}assert "{{ prop.name }}" in block["props"]
         {% endfor %}
-    
+
     def test_{{ block_type }}_block_pydantic_model(self):
         """Test {{ block_type }} block Pydantic model directly."""
         data = {
@@ -293,26 +292,26 @@ class Test{{ block_class }}Block:
                 {% endif %}{% endfor %}
             }
         }
-        
+
         model = {{ block_class }}BlockModel(**data)
         assert model.type == "{{ block_type }}"
         assert model.schema_version == 1
         {% for prop in props %}assert model.props["{{ prop.name }}"] == {{ prop.default }}
         {% endfor %}
-    
+
     def test_invalid_{{ block_type }}_block_type(self):
         """Test invalid block type is rejected."""
         blocks = [{
             "type": "wrong_type",
             "props": {}
         }]
-        
+
         with pytest.raises(ValidationError) as exc_info:
             validate_blocks(blocks)
-        
+
         errors = exc_info.value.detail["errors"]
         assert any("Unknown block type" in error["msg"] for error in errors)
-    
+
     {% if props %}def test_{{ block_type }}_block_type_validation(self):
         """Test property type validation."""
         # This test should be customized based on your specific property types
@@ -324,7 +323,7 @@ class Test{{ block_class }}Block:
                 {% endfor %}
             }
         }]
-        
+
         # Uncomment and customize based on your validation needs
         # with pytest.raises(ValidationError):
         #     validate_blocks(blocks)
@@ -408,7 +407,7 @@ To render this block in your frontend, handle the `{{ block_type }}` type in you
 // React example
 function {{ block_class }}Block({ props }) {
   const { {% for prop in props %}{{ prop.name }}{% if not forloop.last %}, {% endif %}{% endfor %} } = props;
-  
+
   return (
     <div className="{{ block_type }}-block">
       {/* Implement your {{ block_type }} rendering logic here */}

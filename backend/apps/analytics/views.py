@@ -1,41 +1,42 @@
-from datetime import datetime, timedelta
-from django.db.models import Count, Avg, Sum, Q, F
-from django.db.models.functions import TruncDate, TruncWeek, TruncMonth
-from django.utils import timezone
+from datetime import timedelta
+
 from django.contrib.auth import get_user_model
-from django.contrib.contenttypes.models import ContentType
-from drf_spectacular.utils import extend_schema, extend_schema_view, OpenApiParameter
-from rest_framework import viewsets, permissions, status
+from django.db.models import Avg, Count
+from django.db.models.functions import TruncDate, TruncMonth, TruncWeek
+from django.utils import timezone
+
+from drf_spectacular.utils import OpenApiParameter, extend_schema, extend_schema_view
+from rest_framework import permissions, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.throttling import UserRateThrottle
 
 from .models import (
-    PageView,
-    UserActivity,
-    ContentMetrics,
+    AnalyticsSummary,
     Assessment,
+    ContentMetrics,
+    PageView,
     Risk,
     Threat,
-    AnalyticsSummary,
+    UserActivity,
 )
 from .serializers import (
-    PageViewSerializer,
-    PageViewCreateSerializer,
-    UserActivitySerializer,
-    UserActivityCreateSerializer,
-    ContentMetricsSerializer,
-    AssessmentSerializer,
-    AssessmentCreateSerializer,
-    RiskSerializer,
-    ThreatSerializer,
-    ThreatCreateSerializer,
     AnalyticsSummarySerializer,
-    TrafficStatsSerializer,
-    TopContentSerializer,
+    AssessmentCreateSerializer,
+    AssessmentSerializer,
+    ContentMetricsSerializer,
     DashboardStatsSerializer,
+    PageViewCreateSerializer,
+    PageViewSerializer,
+    RiskSerializer,
     RiskTimelineSerializer,
+    ThreatCreateSerializer,
+    ThreatSerializer,
     ThreatStatsSerializer,
+    TopContentSerializer,
+    TrafficStatsSerializer,
+    UserActivityCreateSerializer,
+    UserActivitySerializer,
 )
 
 User = get_user_model()

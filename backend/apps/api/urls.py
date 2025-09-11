@@ -1,9 +1,11 @@
 from django.urls import include, path
+
 from rest_framework.routers import DefaultRouter
 
-from .views import HealthCheckViewSet, NoteViewSet
-from .blocks import BlockTypesAPIView, BlockSchemaAPIView
 from apps.cms.views.redirect import RedirectViewSet
+
+from .blocks import BlockSchemaAPIView, BlockTypesAPIView
+from .views import HealthCheckViewSet, NoteViewSet
 
 # Create router and register viewsets
 router = DefaultRouter()

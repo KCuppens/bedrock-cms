@@ -5,10 +5,9 @@ This module provides utilities to keep Django's LANGUAGE_CODE and LANGUAGES
 settings in sync with the database Locale model.
 """
 
-import os
 import logging
-from typing import List, Tuple, Optional, Dict, Any
 from pathlib import Path
+from typing import Any
 
 from django.conf import settings
 from django.core.cache import cache
@@ -25,7 +24,7 @@ class DjangoSettingsSync:
     CACHE_TIMEOUT = 300  # 5 minutes
 
     @classmethod
-    def get_active_languages(cls) -> List[Tuple[str, str]]:
+    def get_active_languages(cls) -> list[tuple[str, str]]:
         """
         Generate LANGUAGES tuple from active database locales.
 
@@ -99,7 +98,7 @@ class DjangoSettingsSync:
             return "en"
 
     @classmethod
-    def get_locale_settings(cls) -> Dict[str, Any]:
+    def get_locale_settings(cls) -> dict[str, Any]:
         """
         Get all locale-related settings from database.
 
@@ -174,7 +173,7 @@ class DjangoSettingsSync:
             # This is not a critical failure - the system will work without cache
 
     @classmethod
-    def update_settings_file(cls, settings_path: Optional[str] = None) -> bool:
+    def update_settings_file(cls, settings_path: str | None = None) -> bool:
         """
         Update the Django settings file with current database locale settings.
 
@@ -223,7 +222,7 @@ class DjangoSettingsSync:
             locale_settings = cls.get_locale_settings()
 
             # Read current settings file
-            with open(settings_path, "r", encoding="utf-8") as f:
+            with open(settings_path, encoding="utf-8") as f:
                 content = f.read()
 
             # Update LANGUAGE_CODE
@@ -270,7 +269,7 @@ class DjangoSettingsSync:
             return False
 
     @classmethod
-    def validate_consistency(cls) -> Dict[str, Any]:
+    def validate_consistency(cls) -> dict[str, Any]:
         """
         Validate consistency between database locales and Django settings.
 
@@ -371,12 +370,12 @@ def get_dynamic_language_code() -> str:
     return DjangoSettingsSync.get_default_language()
 
 
-def get_dynamic_languages() -> List[Tuple[str, str]]:
+def get_dynamic_languages() -> list[tuple[str, str]]:
     """Get dynamic LANGUAGES from database."""
     return DjangoSettingsSync.get_active_languages()
 
 
-def get_rtl_languages() -> List[str]:
+def get_rtl_languages() -> list[str]:
     """Get list of RTL language codes from database."""
     locale_settings = DjangoSettingsSync.get_locale_settings()
     return locale_settings.get("RTL_LANGUAGES", [])

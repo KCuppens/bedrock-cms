@@ -2,11 +2,11 @@
 Serializers for versioning and audit functionality.
 """
 
-from rest_framework import serializers
 from django.contrib.auth import get_user_model
-from .versioning import PageRevision, AuditEntry, RevisionDiffer
-from .models import Page
 
+from rest_framework import serializers
+
+from .versioning import AuditEntry, PageRevision
 
 User = get_user_model()
 

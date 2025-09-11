@@ -5,30 +5,27 @@ This module provides blog functionality including posts, categories, and tags.
 """
 
 import uuid
+
+from django.contrib.auth import get_user_model
+from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models import (
-    CharField,
-    TextField,
+    AutoField,
     BooleanField,
+    CharField,
     DateTimeField,
     ForeignKey,
     ManyToManyField,
-    ImageField,
-    PositiveIntegerField,
-    UUIDField,
-    SlugField,
-    AutoField,
     OneToOneField,
+    SlugField,
+    TextField,
+    UUIDField,
 )
-from django.contrib.auth import get_user_model
-from django.urls import reverse
 from django.utils.text import slugify
-from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
-from apps.core.validators import JSONSizeValidator, validate_json_structure
 
 from apps.accounts.rbac import RBACMixin
-
+from apps.core.validators import JSONSizeValidator, validate_json_structure
 
 User = get_user_model()
 
@@ -277,6 +274,7 @@ class BlogPost(models.Model, RBACMixin):
     def get_reading_time(self):
         """Calculate estimated reading time in minutes."""
         import re
+
         from django.utils.html import strip_tags
 
         # Combine content and blocks for word count using list for efficiency
@@ -469,4 +467,4 @@ class BlogSettings(models.Model):
 
 
 # Import versioning models to ensure they are registered
-from .versioning import BlogPostRevision, BlogPostViewTracker
+from .versioning import BlogPostRevision, BlogPostViewTracker  # noqa: F401

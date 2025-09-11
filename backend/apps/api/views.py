@@ -1,14 +1,14 @@
 from django.db.models import Q
 from django.utils import timezone
-from django.utils.decorators import method_decorator
+
 from drf_spectacular.types import OpenApiTypes
 from drf_spectacular.utils import OpenApiParameter, extend_schema, extend_schema_view
 from rest_framework import permissions, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
+from apps.core.decorators import cache_method_response
 from apps.core.permissions import IsOwnerOrAdmin
-from apps.core.decorators import cache_response, cache_method_response
 
 from .models import Note
 from .serializers import (
@@ -16,7 +16,7 @@ from .serializers import (
     NoteCreateUpdateSerializer,
     NoteSerializer,
 )
-from .serializers_optimized import NoteListSerializer, NoteDetailSerializer
+from .serializers_optimized import NoteDetailSerializer, NoteListSerializer
 
 
 @extend_schema_view(

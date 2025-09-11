@@ -1,6 +1,7 @@
-from django.db.models.signals import post_save, pre_save, post_delete
+from django.db.models.signals import post_delete, post_save, pre_save
 from django.dispatch import receiver
 from django.utils import timezone
+
 from .models import Page
 
 
@@ -59,8 +60,9 @@ def cleanup_asset_usage(sender, instance, **kwargs):
 def create_page_revision(sender, instance, created, **kwargs):
     """Create revision snapshots when pages are saved."""
     try:
-        from .versioning import PageRevision, AuditEntry
         from django.conf import settings
+
+        from .versioning import AuditEntry, PageRevision
 
         # Skip if this is being called during revision restoration
         if getattr(instance, "_skip_revision_creation", False):

@@ -2,14 +2,13 @@
 Tests for blog functionality.
 """
 
-from django.test import TestCase
 from django.contrib.auth import get_user_model
-from django.utils import timezone
 from django.core.exceptions import ValidationError
+from django.test import TestCase
 
 from apps.i18n.models import Locale
-from .models import BlogPost, Category, Tag
 
+from .models import BlogPost, Category, Tag
 
 User = get_user_model()
 
@@ -186,7 +185,7 @@ class BlogModelTests(TestCase):
 
     def test_unique_slug_per_locale(self):
         """Test that slugs are unique per locale."""
-        post1 = BlogPost.objects.create(
+        BlogPost.objects.create(
             title="Same Title",
             content="Content 1",
             author=self.user,

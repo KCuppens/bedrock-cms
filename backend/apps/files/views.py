@@ -3,14 +3,14 @@ import logging
 from django.core.files.storage import default_storage
 from django.http import FileResponse, Http404
 from django.shortcuts import get_object_or_404
+
 from drf_spectacular.utils import extend_schema, extend_schema_view
 from rest_framework import permissions, status, viewsets
 from rest_framework.decorators import action
-from rest_framework.parsers import FormParser, MultiPartParser, JSONParser
+from rest_framework.parsers import FormParser, JSONParser, MultiPartParser
 from rest_framework.response import Response
 
 from apps.core.permissions import IsOwnerOrAdmin
-from apps.featureflags.helpers import require_feature_flag
 
 from .models import FileUpload
 from .serializers import (
@@ -200,7 +200,7 @@ class FileUploadViewSet(viewsets.ModelViewSet):
 
             return response
 
-        except Exception as e:
+        except Exception:
             logger.error("Error serving file %s: {str(e)}", file_upload.id)
             raise Http404("Error accessing file")
 
@@ -304,6 +304,6 @@ def file_download_view(request, file_id):
 
         return response
 
-    except Exception as e:
+    except Exception:
         logger.error("Error serving file %s: {str(e)}", file_upload.id)
         raise Http404("Error accessing file")

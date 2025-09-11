@@ -1,18 +1,19 @@
-from django.db import models
-from django.core.exceptions import ValidationError
+from typing import TYPE_CHECKING, cast
+
 from django.contrib.auth import get_user_model
-from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes.fields import GenericForeignKey
-from typing import Dict, List, Optional, TYPE_CHECKING, Any, cast
+from django.contrib.contenttypes.models import ContentType
+from django.core.exceptions import ValidationError
+from django.db import models
 from django.db.models import (
-    CharField,
-    TextField,
     BooleanField,
-    PositiveIntegerField,
+    CharField,
     DateTimeField,
+    DecimalField,
     ForeignKey,
     OneToOneField,
-    DecimalField,
+    PositiveIntegerField,
+    TextField,
 )
 
 if TYPE_CHECKING:
@@ -96,7 +97,7 @@ class Locale(models.Model):
         """Get the complete fallback chain for this locale."""
         chain = [self]
         current = self.fallback
-        visited = set([self.id])
+        visited = {self.id}
 
         while current and current.id not in visited:
             chain.append(current)
@@ -232,7 +233,7 @@ class TranslationUnit(models.Model):
         source_locale: Locale,
         target_locale: Locale,
         source_text: str,
-        user: Optional[User] = None,
+        user: User | None = None,
     ) -> "TranslationUnit":
         """
         Create or update a translation unit.
@@ -276,7 +277,7 @@ class TranslationUnit(models.Model):
 
     @classmethod
     def get_units_for_object(
-        cls, obj, target_locale: Optional[Locale] = None
+        cls, obj, target_locale: Locale | None = None
     ) -> "QuerySet[TranslationUnit]":
         """Get all translation units for an object."""
         content_type = ContentType.objects.get_for_model(obj)

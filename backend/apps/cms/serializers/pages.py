@@ -1,4 +1,5 @@
 from rest_framework import serializers
+
 from apps.cms.models import Page
 from apps.i18n.serializers import LocaleSerializer
 

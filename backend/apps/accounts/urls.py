@@ -1,27 +1,25 @@
 from django.urls import include, path
+
 from rest_framework.routers import DefaultRouter
 
-from .views import UserViewSet
+from apps.core.csrf_views import get_csrf_token
+
 from .auth_views import (
+    SessionCheckView,
+    current_user_view,
     login_view,
     logout_view,
-    current_user_view,
-    password_reset_view,
     password_reset_confirm_view,
     password_reset_verify_token,
-    SessionCheckView,
+    password_reset_view,
 )
 from .role_views import (
-    UserManagementViewSet,
-    RoleViewSet,
     PermissionViewSet,
+    RoleViewSet,
+    UserManagementViewSet,
     get_scopes,
 )
-from apps.core.csrf_views import get_csrf_token
-from .password_reset_redirect import (
-    password_reset_redirect,
-    email_verification_redirect,
-)
+from .views import UserViewSet
 
 router = DefaultRouter()
 router.register(r"users", UserViewSet, basename="user")

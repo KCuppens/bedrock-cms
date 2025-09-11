@@ -2,12 +2,14 @@
 Management command to scaffold CRUD API endpoints for registered models.
 """
 
-import os
-import inflection
 from pathlib import Path
-from django.core.management.base import BaseCommand, CommandError
-from django.template import Template, Context
+
 from django.apps import apps
+from django.core.management.base import BaseCommand, CommandError
+from django.template import Context, Template
+
+import inflection
+
 from apps.registry.registry import content_registry
 
 
@@ -149,7 +151,7 @@ class Command(BaseCommand):
             file_path = output_dir / file_name
             self.stdout.write(f"  * {file_path}")
 
-        self.stdout.write(f"\nAPI endpoints that would be available:")
+        self.stdout.write("\nAPI endpoints that would be available:")
         self.stdout.write(
             f'  GET    /api/content/{context["model_label"]}/           - List {context["model_verbose_plural"]}'
         )
@@ -195,7 +197,7 @@ from {{ app_label }}.models import {{ model_class }}
 
 class {{ model_class }}ListSerializer(serializers.ModelSerializer):
     """Serializer for {{ model_class }} list view."""
-    
+
     class Meta:
         model = {{ model_class }}
         fields = [
@@ -207,7 +209,7 @@ class {{ model_class }}ListSerializer(serializers.ModelSerializer):
 
 class {{ model_class }}DetailSerializer(serializers.ModelSerializer):
     """Serializer for {{ model_class }} detail view."""
-    
+
     class Meta:
         model = {{ model_class }}
         fields = '__all__'
@@ -216,14 +218,14 @@ class {{ model_class }}DetailSerializer(serializers.ModelSerializer):
 
 class {{ model_class }}WriteSerializer(serializers.ModelSerializer):
     """Serializer for creating/updating {{ model_class }}."""
-    
+
     class Meta:
         model = {{ model_class }}
         fields = [
             {% for field in fields %}{% if not field.name in 'id,created_at,updated_at' %}'{{ field.name }}',{% if not forloop.last %}
             {% endif %}{% endif %}{% endfor %}
         ]
-    
+
     def validate(self, attrs):
         """Custom validation for {{ model_class }}."""
         # Add your custom validation logic here
@@ -232,10 +234,10 @@ class {{ model_class }}WriteSerializer(serializers.ModelSerializer):
 
 {% if config.can_publish %}class {{ model_class }}PublishSerializer(serializers.Serializer):
     """Serializer for publish/unpublish actions."""
-    
+
     published_at = serializers.DateTimeField(read_only=True)
     status = serializers.CharField(read_only=True)
-    
+
     class Meta:
         fields = ['published_at', 'status']
 {% endif %}
@@ -272,20 +274,20 @@ from .{{ snake_name }}_serializers import (
 class {{ model_class }}ViewSet(viewsets.ModelViewSet):
     """
     ViewSet for {{ model_class }} model.
-    
+
     Provides standard CRUD operations{% if config.can_publish %} plus publish/unpublish{% endif %}.
     """
-    
+
     queryset = {{ model_class }}.objects.all()
     permission_classes = [IsAuthenticated]
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
-    
+
     # Configure filtering
     filterset_fields = [{% for field in fields %}{% if field.type in 'CharField,BooleanField,IntegerField' %}'{{ field.name }}', {% endif %}{% endfor %}]
     search_fields = [{% for field in config.searchable_fields %}'{{ field }}', {% endfor %}]
     ordering_fields = ['created_at', 'updated_at'{% if config.slug_field %}, '{{ config.slug_field }}'{% endif %}]
     ordering = ['-updated_at']
-    
+
     def get_serializer_class(self):
         """Return appropriate serializer based on action."""
         if self.action == 'list':
@@ -295,19 +297,19 @@ class {{ model_class }}ViewSet(viewsets.ModelViewSet):
         elif self.action in ['publish', 'unpublish']:
             return {{ model_class }}PublishSerializer{% endif %}
         return {{ model_class }}DetailSerializer
-    
+
     def get_queryset(self):
         """Filter queryset based on user permissions and locale."""
         queryset = super().get_queryset()
-        
+
         {% if config.locale_field %}# Filter by locale if specified
         locale = self.request.query_params.get('locale')
         if locale:
             queryset = queryset.filter({{ config.locale_field }}__code=locale)
         {% endif %}
-        
+
         return queryset{% if config.locale_field %}.select_related('{{ config.locale_field }}'){% endif %}
-    
+
     {% if config.slug_field %}@extend_schema(
         parameters=[
             OpenApiParameter('slug', str, description='{{ model_class }} slug'),
@@ -320,50 +322,50 @@ class {{ model_class }}ViewSet(viewsets.ModelViewSet):
         slug = request.query_params.get('slug')
         if not slug:
             return Response(
-                {'error': 'slug parameter is required'}, 
+                {'error': 'slug parameter is required'},
                 status=status.HTTP_400_BAD_REQUEST
             )
-        
+
         try:
             filters = {'{{ config.slug_field }}': slug}
             {% if config.locale_field %}locale = request.query_params.get('locale')
             if locale:
                 filters['{{ config.locale_field }}__code'] = locale
             {% endif %}
-            
+
             instance = self.get_queryset().get(**filters)
             serializer = self.get_serializer(instance)
             return Response(serializer.data)
         except {{ model_class }}.DoesNotExist:
             return Response(
-                {'error': '{{ model_class }} not found'}, 
+                {'error': '{{ model_class }} not found'},
                 status=status.HTTP_404_NOT_FOUND
             )
     {% endif %}
-    
+
     {% if config.can_publish %}@action(detail=True, methods=['post'])
     def publish(self, request, pk=None):
         """Publish {{ model_class }}."""
         instance = self.get_object()
-        
+
         # Implement your publish logic here
         instance.status = 'published'
         instance.published_at = timezone.now()
         instance.save()
-        
+
         serializer = {{ model_class }}PublishSerializer(instance)
         return Response(serializer.data)
-    
+
     @action(detail=True, methods=['post'])
     def unpublish(self, request, pk=None):
         """Unpublish {{ model_class }}."""
         instance = self.get_object()
-        
+
         # Implement your unpublish logic here
         instance.status = 'draft'
         instance.published_at = None
         instance.save()
-        
+
         serializer = {{ model_class }}PublishSerializer(instance)
         return Response(serializer.data)
     {% endif %}
@@ -410,27 +412,27 @@ from {{ app_label }}.models import {{ model_class }}
 @admin.register({{ model_class }})
 class {{ model_class }}Admin(admin.ModelAdmin):
     """Admin interface for {{ model_class }}."""
-    
+
     list_display = [{% for field in fields %}{% if forloop.counter0 < 6 %}'{{ field.name }}', {% endif %}{% endfor %}]
     list_filter = [{% for field in fields %}{% if field.type in 'BooleanField,CharField' and forloop.counter0 < 4 %}'{{ field.name }}', {% endif %}{% endfor %}]
     search_fields = [{% for field in config.searchable_fields %}'{{ field }}', {% endfor %}]
     {% if config.slug_field %}prepopulated_fields = {'{{ config.slug_field }}': ('title',)}  # Adjust based on your title field
     {% endif %}
     {% if config.can_publish %}actions = ['make_published', 'make_draft']
-    
+
     def make_published(self, request, queryset):
         """Bulk publish action."""
         updated = queryset.update(status='published')
         self.message_user(request, f'{updated} {{ model_verbose_plural }} were successfully published.')
     make_published.short_description = "Mark selected {{ model_verbose_plural }} as published"
-    
+
     def make_draft(self, request, queryset):
         """Bulk draft action."""
         updated = queryset.update(status='draft')
         self.message_user(request, f'{updated} {{ model_verbose_plural }} were marked as draft.')
     make_draft.short_description = "Mark selected {{ model_verbose_plural }} as draft"
     {% endif %}
-    
+
     # Customize fieldsets as needed
     fieldsets = (
         ('Basic Information', {
@@ -602,7 +604,7 @@ curl "/api/content/{{ model_label }}/?search=example{% if config.locale_field %}
         self.stdout.write("=" * 60)
 
         self.stdout.write("\n1. Add the URLs to your main URL configuration:")
-        self.stdout.write(f"   # In your main urls.py")
+        self.stdout.write("   # In your main urls.py")
         self.stdout.write(
             f'   path("api/content/{{ model_label }}/", include("path.to.{context["snake_name"]}_urls")),'
         )
@@ -613,8 +615,8 @@ curl "/api/content/{{ model_label }}/?search=example{% if config.locale_field %}
         self.stdout.write("   - Customize admin interface")
 
         self.stdout.write("\n3. Test the API endpoints:")
-        self.stdout.write(f"   python manage.py test  # Run your tests")
-        self.stdout.write(f"   # Or test manually:")
+        self.stdout.write("   python manage.py test  # Run your tests")
+        self.stdout.write("   # Or test manually:")
         self.stdout.write(f'   curl /api/content/{context["model_label"]}/')
 
         self.stdout.write("\n4. Update API documentation as needed")

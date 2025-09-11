@@ -3,10 +3,10 @@ CMS views deep coverage booster - targeting untested view methods.
 """
 
 import os
-import sys
+from datetime import datetime
+from unittest.mock import Mock, patch
+
 import django
-from unittest.mock import Mock, patch, MagicMock, PropertyMock
-from datetime import datetime, timedelta
 
 # Configure minimal Django
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "apps.config.settings.base")
@@ -21,7 +21,7 @@ def test_cms_views_deep():
     """Deep test of CMS views focusing on uncovered areas."""
 
     try:
-        from apps.cms.views import pages, blocks, registry
+        from apps.cms.views import blocks, pages, registry
 
         # Test PageViewSet deeply
         try:
@@ -49,7 +49,7 @@ def test_cms_views_deep():
 
                 # Test serializer selection
                 try:
-                    serializer = viewset.get_serializer_class()
+                    viewset.get_serializer_class()
                 except:
                     pass
 
@@ -80,14 +80,14 @@ def test_cms_views_deep():
                     "search": "test",
                 }
                 try:
-                    qs = viewset.get_queryset()
+                    viewset.get_queryset()
                 except:
                     pass
 
                 # Test with draft status
                 viewset.request.query_params = {"status": "draft"}
                 try:
-                    qs = viewset.get_queryset()
+                    viewset.get_queryset()
                 except:
                     pass
 
@@ -97,7 +97,7 @@ def test_cms_views_deep():
                 mock_page.publish = Mock()
                 viewset.get_object = Mock(return_value=mock_page)
                 try:
-                    response = viewset.publish(viewset.request, pk=1)
+                    viewset.publish(viewset.request, pk=1)
                 except:
                     pass
 
@@ -106,7 +106,7 @@ def test_cms_views_deep():
                 mock_page.unpublish = Mock()
                 viewset.get_object = Mock(return_value=mock_page)
                 try:
-                    response = viewset.unpublish(viewset.request, pk=1)
+                    viewset.unpublish(viewset.request, pk=1)
                 except:
                     pass
 
@@ -119,7 +119,7 @@ def test_cms_views_deep():
                 mock_page.schedule = Mock()
                 viewset.get_object = Mock(return_value=mock_page)
                 try:
-                    response = viewset.schedule(viewset.request, pk=1)
+                    viewset.schedule(viewset.request, pk=1)
                 except:
                     pass
 
@@ -128,7 +128,7 @@ def test_cms_views_deep():
                 mock_page.duplicate = Mock(return_value=Mock(id=2))
                 viewset.get_object = Mock(return_value=mock_page)
                 try:
-                    response = viewset.duplicate(viewset.request, pk=1)
+                    viewset.duplicate(viewset.request, pk=1)
                 except:
                     pass
 
@@ -137,7 +137,7 @@ def test_cms_views_deep():
                 mock_page.get_preview_url = Mock(return_value="http://preview.url")
                 viewset.get_object = Mock(return_value=mock_page)
                 try:
-                    response = viewset.preview(viewset.request, pk=1)
+                    viewset.preview(viewset.request, pk=1)
                 except:
                     pass
 
@@ -149,7 +149,7 @@ def test_cms_views_deep():
                 mock_page.versions.all = Mock(return_value=[mock_version])
                 viewset.get_object = Mock(return_value=mock_page)
                 try:
-                    response = viewset.versions(viewset.request, pk=1)
+                    viewset.versions(viewset.request, pk=1)
                 except:
                     pass
 
@@ -159,11 +159,11 @@ def test_cms_views_deep():
                 mock_page.revert_to_version = Mock()
                 viewset.get_object = Mock(return_value=mock_page)
                 try:
-                    response = viewset.revert(viewset.request, pk=1)
+                    viewset.revert(viewset.request, pk=1)
                 except:
                     pass
 
-        except Exception as e:
+        except Exception:
             pass
 
         # Test BlockViewSet deeply
@@ -181,7 +181,7 @@ def test_cms_views_deep():
             for block_type in block_types:
                 viewset.request.data["type"] = block_type
                 try:
-                    serializer = viewset.get_serializer_class()
+                    viewset.get_serializer_class()
                 except:
                     pass
 
@@ -190,7 +190,7 @@ def test_cms_views_deep():
                 mock_qs = Mock()
                 MockBlock.objects.all.return_value = mock_qs
                 try:
-                    qs = viewset.get_queryset()
+                    viewset.get_queryset()
                 except:
                     pass
 
@@ -200,7 +200,7 @@ def test_cms_views_deep():
                     "blocks": [{"id": 1, "order": 0}, {"id": 2, "order": 1}]
                 }
                 try:
-                    response = viewset.reorder(viewset.request)
+                    viewset.reorder(viewset.request)
                 except:
                     pass
 
@@ -217,13 +217,13 @@ def test_cms_views_deep():
 
             # Test list action
             try:
-                response = viewset.list(viewset.request)
+                viewset.list(viewset.request)
             except:
                 pass
 
             # Test retrieve action
             try:
-                response = viewset.retrieve(viewset.request, pk="text-block")
+                viewset.retrieve(viewset.request, pk="text-block")
             except:
                 pass
 
@@ -255,7 +255,7 @@ def test_cms_view_permissions():
 
                     # Test has_permission
                     try:
-                        result = perm.has_permission(mock_request, mock_view)
+                        perm.has_permission(mock_request, mock_view)
                     except:
                         pass
 
@@ -263,9 +263,7 @@ def test_cms_view_permissions():
                     mock_obj = Mock()
                     mock_obj.author = mock_request.user
                     try:
-                        result = perm.has_object_permission(
-                            mock_request, mock_view, mock_obj
-                        )
+                        perm.has_object_permission(mock_request, mock_view, mock_obj)
                     except:
                         pass
 
@@ -341,7 +339,7 @@ def test_cms_view_filters():
                         mock_request.query_params = {"status": "published"}
                         mock_queryset = Mock()
                         try:
-                            result = filter_instance.filter_queryset(
+                            filter_instance.filter_queryset(
                                 mock_request, mock_queryset, None
                             )
                         except:
@@ -374,7 +372,7 @@ def test_cms_view_pagination():
                     mock_view = Mock()
 
                     try:
-                        result = paginator.paginate_queryset(
+                        paginator.paginate_queryset(
                             mock_queryset, mock_request, mock_view
                         )
                     except:
@@ -383,7 +381,7 @@ def test_cms_view_pagination():
                     # Test get_paginated_response
                     mock_data = [{"id": i} for i in range(20)]
                     try:
-                        response = paginator.get_paginated_response(mock_data)
+                        paginator.get_paginated_response(mock_data)
                     except:  # nosec B110 - Coverage booster intentionally ignores errors
                         pass
 

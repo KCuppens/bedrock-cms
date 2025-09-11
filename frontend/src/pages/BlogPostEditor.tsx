@@ -34,7 +34,7 @@ import {
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import Sidebar from "@/components/Sidebar";
 import TopNavbar from "@/components/TopNavbar";
-import { api } from "@/lib/api";
+import { api } from "@/lib/api.ts";
 import { useToast } from "@/components/ui/use-toast";
 
 const BlogPostEditor = () => {
@@ -91,7 +91,6 @@ const BlogPostEditor = () => {
           });
           setLastSaved("Just now");
         } catch (error) {
-          console.error('Auto-save failed:', error);
           // Don't show toast for auto-save failures to avoid spam
           setLastSaved("Auto-save failed");
         }
@@ -134,7 +133,6 @@ const BlogPostEditor = () => {
       });
       setWordCount(postData.content ? postData.content.split(/\s+/).length : 0);
     } catch (error: any) {
-      console.error('Failed to load blog post:', error);
       toast({
         title: "Error",
         description: error?.response?.data?.message || "Failed to load blog post. The blog feature may not be available.",
@@ -156,7 +154,6 @@ const BlogPostEditor = () => {
       setCategories(categoriesResponse.results || categoriesResponse.data || []);
       setTags(tagsResponse.results || tagsResponse.data || []);
     } catch (error: any) {
-      console.error('Failed to load options:', error);
       // Don't fail the entire component if categories/tags fail to load
     }
   };
@@ -195,7 +192,6 @@ const BlogPostEditor = () => {
       }
       setLastSaved("Just now");
     } catch (error: any) {
-      console.error('Failed to save blog post:', error);
       toast({
         title: "Error",
         description: error?.response?.data?.error || "Failed to save blog post.",
@@ -225,7 +221,6 @@ const BlogPostEditor = () => {
         }
       }
     } catch (error: any) {
-      console.error('Failed to publish blog post:', error);
       toast({
         title: "Error",
         description: "Failed to publish blog post.",

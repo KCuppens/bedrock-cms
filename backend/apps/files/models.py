@@ -3,13 +3,13 @@ import uuid
 from django.contrib.auth import get_user_model
 from django.db import models
 from django.db.models import (
-    F,
-    UUIDField,
-    CharField,
-    TextField,
     BooleanField,
-    PositiveIntegerField,
+    CharField,
     DateTimeField,
+    F,
+    PositiveIntegerField,
+    TextField,
+    UUIDField,
 )
 
 from apps.core.enums import FileType

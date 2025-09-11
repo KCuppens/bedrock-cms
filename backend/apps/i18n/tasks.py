@@ -3,15 +3,17 @@ Background tasks for internationalization and localization.
 """
 
 import logging
-from typing import List, Dict, Any, Optional
-from celery import shared_task
-from django.db import transaction
-from django.apps import apps
+from typing import Any
+
 from django.contrib.contenttypes.models import ContentType
+from django.db import transaction
+
+from celery import shared_task
+
+from apps.registry.registry import content_registry
 
 from .models import Locale, TranslationUnit, UiMessage, UiMessageTranslation
 from .services import DeepLTranslationService
-from apps.registry.registry import content_registry
 
 logger = logging.getLogger(__name__)
 
@@ -32,7 +34,7 @@ def get_translation_service(service_name: str = None):
 @shared_task(bind=True)
 def seed_locale_translation_units(
     self, locale_code: str, force_reseed: bool = False
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     """
     Seed TranslationUnits for a new locale.
 
@@ -158,7 +160,7 @@ def seed_locale_translation_units(
 
 def _seed_page_translation_units(
     locale: Locale, force_reseed: bool = False
-) -> Dict[str, int]:
+) -> dict[str, int]:
     """Seed translation units for pages."""
     from apps.cms.models import Page
 
@@ -213,10 +215,10 @@ def _seed_page_translation_units(
 
 def _seed_model_translation_units(
     model_class,
-    translatable_fields: List[str],
+    translatable_fields: list[str],
     locale: Locale,
     force_reseed: bool = False,
-) -> Dict[str, int]:
+) -> dict[str, int]:
     """Seed translation units for a registered model."""
     created_count = 0
     skipped_count = 0
@@ -274,7 +276,7 @@ def _seed_model_translation_units(
 
 
 @shared_task(bind=True)
-def cleanup_orphaned_translation_units(self) -> Dict[str, Any]:
+def cleanup_orphaned_translation_units(self) -> dict[str, Any]:
     """
     Clean up orphaned translation units.
 
@@ -340,7 +342,7 @@ def cleanup_orphaned_translation_units(self) -> Dict[str, Any]:
 
 
 @shared_task
-def process_translation_queue() -> Dict[str, Any]:
+def process_translation_queue() -> dict[str, Any]:
     """
     Process translation queue items.
 
@@ -399,7 +401,7 @@ def auto_translate_content(
     field: str,
     target_locale_code: str,
     service: str = None,
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     """
     Auto translate content using machine translation service.
     """
@@ -414,10 +416,10 @@ def auto_translate_content(
                 raise ValueError(f"Invalid content type: {content_type_id}")
 
             # Check if object exists
-            obj = model_class.objects.get(id=object_id)
+            model_class.objects.get(id=object_id)
 
             # Check if locale exists
-            target_locale = Locale.objects.get(code=target_locale_code)
+            Locale.objects.get(code=target_locale_code)
 
         except (ContentType.DoesNotExist, Locale.DoesNotExist) as e:
             error_msg = f"Invalid parameters for auto translation: {str(e)}"
@@ -451,7 +453,7 @@ def generate_translation_report(
     locale_codes: list = None,
     date_from: str = None,
     date_to: str = None,
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     """
     Generate translation completion report.
     """
@@ -492,7 +494,7 @@ def generate_translation_report(
 
 
 @shared_task
-def sync_locale_fallbacks(locale_code: str = None) -> Dict[str, Any]:
+def sync_locale_fallbacks(locale_code: str = None) -> dict[str, Any]:
     """
     Sync locale fallback configurations.
     """
@@ -501,7 +503,7 @@ def sync_locale_fallbacks(locale_code: str = None) -> Dict[str, Any]:
 
         # Mock implementation
         locales = Locale.objects.filter(is_active=True)
-        for locale in locales:
+        for _locale in locales:
             # Update fallback logic here
             results["locales_synced"] += 1
 
@@ -517,7 +519,7 @@ def sync_locale_fallbacks(locale_code: str = None) -> Dict[str, Any]:
 
 
 @shared_task
-def cleanup_old_translations(days_old: int = 90, days: int = None) -> Dict[str, Any]:
+def cleanup_old_translations(days_old: int = 90, days: int = None) -> dict[str, Any]:
     """
     Cleanup old translation records.
     """
@@ -563,7 +565,7 @@ def bulk_auto_translate_ui_messages(
     source_locale_code: str = "en",
     namespace: str = None,
     max_translations: int = None,
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     """
     Auto-translate all missing UI messages for a locale using DeepL.
 

@@ -2,41 +2,40 @@
 Blog API views and viewsets.
 """
 
-from datetime import datetime
-from django.conf import settings
 from django.db import transaction
-from django.db.models import Count, Q, F
+from django.db.models import Count, Q
 from django.shortcuts import get_object_or_404
-from django.http import HttpResponse
 from django.utils import timezone
 from django.utils.text import slugify
-from rest_framework import viewsets, status, permissions, filters
-from rest_framework.decorators import action
-from rest_framework.response import Response
-from rest_framework.permissions import IsAuthenticated, IsAdminUser, AllowAny
-from rest_framework.throttling import UserRateThrottle
+
 from django_filters.rest_framework import DjangoFilterBackend
-from drf_spectacular.utils import extend_schema, OpenApiParameter, extend_schema_view
+from drf_spectacular.utils import OpenApiParameter, extend_schema, extend_schema_view
+from rest_framework import filters, permissions, status, viewsets
+from rest_framework.decorators import action
+from rest_framework.permissions import AllowAny, IsAdminUser, IsAuthenticated
+from rest_framework.response import Response
+from rest_framework.throttling import UserRateThrottle
 
 from apps.core.throttling import (
-    WriteOperationThrottle,
     BurstWriteThrottle,
     PublishOperationThrottle,
+    WriteOperationThrottle,
 )
 from apps.i18n.models import Locale
-from .models import BlogPost, Category, Tag, BlogSettings
+
+from .models import BlogPost, BlogSettings, Category, Tag
 from .serializers import (
-    BlogPostSerializer,
-    BlogPostListSerializer,
-    BlogPostWriteSerializer,
-    BlogPostRevisionSerializer,
     BlogPostAutosaveSerializer,
     BlogPostDuplicateSerializer,
+    BlogPostListSerializer,
+    BlogPostRevisionSerializer,
+    BlogPostSerializer,
+    BlogPostWriteSerializer,
+    BlogSettingsSerializer,
     CategorySerializer,
     TagSerializer,
-    BlogSettingsSerializer,
 )
-from .versioning import BlogPostRevision, BlogPostViewTracker
+from .versioning import BlogPostRevision
 
 
 @extend_schema_view(

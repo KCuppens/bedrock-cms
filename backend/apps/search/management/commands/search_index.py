@@ -8,12 +8,11 @@ Usage:
 """
 
 from django.core.management.base import BaseCommand, CommandError
-from django.contrib.contenttypes.models import ContentType
-from django.db import transaction, models
+from django.db import models, transaction
 
 from apps.registry.registry import content_registry
-from apps.search.services import search_service
 from apps.search.models import SearchIndex
+from apps.search.services import search_service
 
 
 class Command(BaseCommand):

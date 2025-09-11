@@ -2,10 +2,11 @@
 Custom throttling classes for enhanced API security.
 """
 
-from rest_framework.throttling import UserRateThrottle, AnonRateThrottle
-from django.core.cache import cache
-import hashlib
 import time
+
+from django.core.cache import cache
+
+from rest_framework.throttling import AnonRateThrottle, UserRateThrottle
 
 
 class WriteOperationThrottle(UserRateThrottle):
@@ -159,7 +160,7 @@ class SecurityScanThrottle(AnonRateThrottle):
         Check if the request contains suspicious patterns.
         """
         # Check query parameters
-        for key, value in request.GET.items():
+        for _key, value in request.GET.items():
             if isinstance(value, str):
                 for pattern in self.SUSPICIOUS_PATTERNS:
                     if pattern.lower() in value.lower():
@@ -167,7 +168,7 @@ class SecurityScanThrottle(AnonRateThrottle):
 
         # Check POST data if available
         if hasattr(request, "data") and request.data:
-            for key, value in request.data.items():
+            for _key, value in request.data.items():
                 if isinstance(value, str):
                     for pattern in self.SUSPICIOUS_PATTERNS:
                         if pattern.lower() in value.lower():

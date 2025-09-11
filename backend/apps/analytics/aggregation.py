@@ -2,22 +2,21 @@
 Analytics aggregation functions for calculating metrics and summaries.
 """
 
-from datetime import datetime, timedelta, date
-from typing import Dict, List, Optional, Tuple
-from django.db.models import Count, Avg, Sum, Q, F, Min, Max
-from django.db.models.functions import TruncDate, TruncWeek, TruncMonth, TruncHour
-from django.utils import timezone
+from datetime import date, datetime, timedelta
+
 from django.contrib.auth import get_user_model
-from django.contrib.contenttypes.models import ContentType
+from django.db.models import Avg, Count, Sum
+from django.db.models.functions import TruncDate, TruncHour, TruncMonth, TruncWeek
+from django.utils import timezone
 
 from .models import (
-    PageView,
-    UserActivity,
-    ContentMetrics,
+    AnalyticsSummary,
     Assessment,
+    ContentMetrics,
+    PageView,
     Risk,
     Threat,
-    AnalyticsSummary,
+    UserActivity,
 )
 
 User = get_user_model()
@@ -27,7 +26,7 @@ class AnalyticsAggregator:
     """Main aggregation class for analytics calculations"""
 
     @staticmethod
-    def get_traffic_trends(days: int = 30, period: str = "daily") -> List[Dict]:
+    def get_traffic_trends(days: int = 30, period: str = "daily") -> list[dict]:
         """
         Calculate traffic trends over a specified period.
 
@@ -70,7 +69,7 @@ class AnalyticsAggregator:
 
     @staticmethod
     def calculate_bounce_rate(
-        start_date: datetime, end_date: datetime, page_id: Optional[int] = None
+        start_date: datetime, end_date: datetime, page_id: int | None = None
     ) -> float:
         """
         Calculate bounce rate for a given period.
@@ -106,8 +105,8 @@ class AnalyticsAggregator:
 
     @staticmethod
     def get_top_content(
-        days: int = 30, limit: int = 20, content_type: Optional[str] = None
-    ) -> List[Dict]:
+        days: int = 30, limit: int = 20, content_type: str | None = None
+    ) -> list[dict]:
         """
         Get top performing content by views and engagement.
 
@@ -140,9 +139,7 @@ class AnalyticsAggregator:
         return list(top_content)
 
     @staticmethod
-    def get_user_engagement_metrics(
-        user_id: Optional[int] = None, days: int = 30
-    ) -> Dict:
+    def get_user_engagement_metrics(user_id: int | None = None, days: int = 30) -> dict:
         """
         Calculate user engagement metrics.
 
@@ -192,7 +189,7 @@ class AnalyticsAggregator:
     @staticmethod
     def calculate_content_performance_score(
         content_type_id: int, object_id: int, days: int = 30
-    ) -> Dict:
+    ) -> dict:
         """
         Calculate a comprehensive performance score for content.
 
@@ -265,7 +262,7 @@ class AnalyticsAggregator:
         }
 
     @staticmethod
-    def get_security_overview(days: int = 30) -> Dict:
+    def get_security_overview(days: int = 30) -> dict:
         """
         Get security overview including threats, risks, and assessments.
 
@@ -348,7 +345,7 @@ class AnalyticsAggregator:
 
     @staticmethod
     def _calculate_security_score(
-        threat_stats: Dict, risk_stats: Dict, assessment_stats: Dict
+        threat_stats: dict, risk_stats: dict, assessment_stats: dict
     ) -> float:
         """
         Calculate an overall security score based on various metrics.

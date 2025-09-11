@@ -3,7 +3,8 @@ Debug command to check UI messages that need translation.
 """
 
 from django.core.management.base import BaseCommand
-from apps.i18n.models import UiMessage, UiMessageTranslation, Locale
+
+from apps.i18n.models import Locale, UiMessage, UiMessageTranslation
 
 
 class Command(BaseCommand):

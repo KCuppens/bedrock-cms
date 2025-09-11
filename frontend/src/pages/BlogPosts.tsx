@@ -15,7 +15,7 @@ import Sidebar from "@/components/Sidebar";
 import TopNavbar from "@/components/TopNavbar";
 import BlogPostModal from "@/components/modals/BlogPostModal";
 import DeleteConfirmModal from "@/components/modals/DeleteConfirmModal";
-import { api } from "@/lib/api";
+import { api } from "@/lib/api.ts";
 import { useToast } from "@/components/ui/use-toast";
 
 interface BlogPost {

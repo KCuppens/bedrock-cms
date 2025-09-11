@@ -2,12 +2,11 @@
 Basic CMS Views tests - simplified approach for quick coverage gains.
 """
 
-import pytest
-from django.test import TestCase
 from django.contrib.auth import get_user_model
-from django.urls import reverse
+from django.test import TestCase
+
 from rest_framework import status
-from rest_framework.test import APITestCase, APIClient
+from rest_framework.test import APIClient, APITestCase
 
 from apps.cms.models import Page
 from apps.cms.views import PagesViewSet

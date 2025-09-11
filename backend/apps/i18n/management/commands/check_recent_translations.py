@@ -2,10 +2,12 @@
 Check recently created translations.
 """
 
-from django.core.management.base import BaseCommand
-from apps.i18n.models import UiMessageTranslation, Locale
-from django.utils import timezone
 from datetime import timedelta
+
+from django.core.management.base import BaseCommand
+from django.utils import timezone
+
+from apps.i18n.models import Locale, UiMessageTranslation
 
 
 class Command(BaseCommand):

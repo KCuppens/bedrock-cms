@@ -2,14 +2,14 @@
 Test cases for i18n management commands.
 """
 
-import os
 import tempfile
-from pathlib import Path
-from unittest.mock import patch, MagicMock
-from django.test import TestCase
-from django.core.management import call_command
-from django.core.management.base import CommandError
 from io import StringIO
+from pathlib import Path
+from unittest.mock import MagicMock, patch
+
+from django.core.management import call_command
+from django.test import TestCase
+
 from apps.i18n.models import Locale, UiMessage, UiMessageTranslation
 
 
@@ -115,7 +115,7 @@ class ImportDjangoTranslationsCommandTest(TestCase):
     def test_import_django_strings_update_existing(self):
         """Test updating existing Django strings."""
         # Create an existing message
-        message = UiMessage.objects.create(
+        UiMessage.objects.create(
             namespace="django", key="admin.save", default_value="Old Save"
         )
 
@@ -236,7 +236,7 @@ class SyncPoFilesCommandTest(TestCase):
     def test_sync_with_specific_locale(self):
         """Test sync with specific locale."""
         # Create French locale
-        locale_fr = Locale.objects.create(
+        Locale.objects.create(
             code="fr",
             name="French",
             native_name="Français",

@@ -3,9 +3,9 @@ Files app coverage booster - targets views, services, and models.
 """
 
 import os
-import sys
+from unittest.mock import Mock, patch
+
 import django
-from unittest.mock import Mock, patch, MagicMock
 
 # Configure minimal Django
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "apps.config.settings.base")
@@ -36,13 +36,13 @@ def test_files_views_comprehensive():
 
             # Test get_serializer_class
             try:
-                serializer_class = viewset.get_serializer_class()
+                viewset.get_serializer_class()
             except:
                 pass
 
             # Test get_permissions
             try:
-                permissions = viewset.get_permissions()
+                viewset.get_permissions()
             except:
                 pass
 
@@ -52,7 +52,7 @@ def test_files_views_comprehensive():
                 mock_qs = Mock()
                 mock_objects.select_related.return_value = mock_qs
                 mock_qs.all.return_value = mock_qs
-                queryset = viewset.get_queryset()
+                viewset.get_queryset()
         except:
             pass
 
@@ -63,7 +63,7 @@ def test_files_views_comprehensive():
 
             with patch("apps.files.services.FileUploadService") as mock_service:
                 mock_service.return_value.upload.return_value = Mock()
-                response = viewset.upload(viewset.request)
+                viewset.upload(viewset.request)
         except:
             pass
 
@@ -73,7 +73,7 @@ def test_files_views_comprehensive():
 
             with patch("apps.files.services.FileUploadService") as mock_service:
                 mock_service.return_value.bulk_upload.return_value = []
-                response = viewset.bulk_upload(viewset.request)
+                viewset.bulk_upload(viewset.request)
         except:
             pass
 
@@ -84,8 +84,8 @@ def test_files_views_comprehensive():
             mock_file.name = "test.jpg"
             viewset.get_object = Mock(return_value=mock_file)
 
-            with patch("apps.files.views.FileResponse") as mock_response:
-                response = viewset.download(viewset.request, pk=1)
+            with patch("apps.files.views.FileResponse"):
+                viewset.download(viewset.request, pk=1)
         except:
             pass
 
@@ -106,8 +106,8 @@ def test_files_simple_views():
                     attr = getattr(simple_views, attr_name)
                     if callable(attr):
                         # Try to get function properties
-                        doc = getattr(attr, "__doc__", None)
-                        name = getattr(attr, "__name__", None)
+                        getattr(attr, "__doc__", None)
+                        getattr(attr, "__name__", None)
 
                         # Try to call simple functions with mock data
                         if "upload" in attr_name.lower():
@@ -147,7 +147,7 @@ def test_files_services():
                 mock_file.name = "test.jpg"
                 mock_file.content_type = "image/jpeg"
 
-                result = service.validate_file(mock_file)
+                service.validate_file(mock_file)
             except:
                 pass
 
@@ -159,7 +159,7 @@ def test_files_services():
                 with patch("apps.files.models.File.objects") as mock_objects:
                     mock_instance = Mock()
                     mock_objects.create.return_value = mock_instance
-                    result = service.upload(mock_file, folder_id=1)
+                    service.upload(mock_file, folder_id=1)
             except:
                 pass
 
@@ -169,7 +169,7 @@ def test_files_services():
                 for f in mock_files:
                     f.name = "test.jpg"
 
-                result = service.bulk_upload(mock_files)
+                service.bulk_upload(mock_files)
             except:
                 pass
 
@@ -182,9 +182,9 @@ def test_files_services():
 
             # Test validate_file_type method
             try:
-                result = service.validate_file_type("test.jpg")
-                result = service.validate_file_type("test.pdf")
-                result = service.validate_file_type("test.exe")
+                service.validate_file_type("test.jpg")
+                service.validate_file_type("test.pdf")
+                service.validate_file_type("test.exe")
             except:
                 pass
 
@@ -192,10 +192,10 @@ def test_files_services():
             try:
                 mock_file = Mock()
                 mock_file.size = 1024
-                result = service.validate_file_size(mock_file)
+                service.validate_file_size(mock_file)
 
                 mock_file.size = 1024 * 1024 * 100  # 100MB
-                result = service.validate_file_size(mock_file)
+                service.validate_file_size(mock_file)
             except:
                 pass
 
@@ -218,7 +218,7 @@ def test_files_models():
             if hasattr(File, "get_by_path"):
                 with patch("apps.files.models.File.objects") as mock_objects:
                     mock_objects.filter.return_value.first.return_value = Mock()
-                    result = File.get_by_path("/test/file.jpg")
+                    File.get_by_path("/test/file.jpg")
 
             # Test instance methods with mock
             mock_file = Mock(spec=File)
@@ -229,21 +229,21 @@ def test_files_models():
 
             # Test __str__ method
             try:
-                result = File.__str__(mock_file)
+                File.__str__(mock_file)
             except:
                 pass
 
             # Test get_absolute_url method
             try:
                 if hasattr(File, "get_absolute_url"):
-                    result = File.get_absolute_url(mock_file)
+                    File.get_absolute_url(mock_file)
             except:
                 pass
 
             # Test file_extension property
             try:
                 if hasattr(File, "file_extension"):
-                    result = File.file_extension.fget(mock_file)
+                    File.file_extension.fget(mock_file)
             except:
                 pass
 
@@ -258,7 +258,7 @@ def test_files_models():
 
             # Test __str__ method
             try:
-                result = Folder.__str__(mock_folder)
+                Folder.__str__(mock_folder)
             except:
                 pass
 
@@ -287,7 +287,6 @@ def test_files_serializers():
             serializer = FileSerializer(data=mock_data)
             try:
                 serializer.is_valid()
-                fields = serializer.fields
             except:
                 pass
 
@@ -301,7 +300,6 @@ def test_files_serializers():
             serializer = FolderSerializer(data=mock_data)
             try:
                 serializer.is_valid()
-                fields = serializer.fields
             except:
                 pass
 
@@ -325,7 +323,7 @@ def test_files_admin():
                     attr = getattr(admin, attr_name)
                     if hasattr(attr, "_meta"):
                         # Try to access admin class properties
-                        meta = attr._meta
+                        pass
                 except:
                     pass
 

@@ -1,10 +1,11 @@
-from functools import wraps
-from django.core.cache import cache
-from django.utils.decorators import method_decorator
-from django.http import HttpRequest
-from rest_framework.response import Response
 import hashlib
 import json
+from functools import wraps
+
+from django.core.cache import cache
+from django.http import HttpRequest
+
+from rest_framework.response import Response
 
 
 def cache_response(

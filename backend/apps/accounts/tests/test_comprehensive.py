@@ -2,21 +2,19 @@
 Comprehensive Accounts app tests targeting high coverage with real database operations.
 """
 
-from django.test import TestCase, TransactionTestCase
-from django.contrib.auth import get_user_model, authenticate
+from django.contrib.auth import authenticate, get_user_model
 from django.contrib.auth.models import Group, Permission
-from django.urls import reverse
 from django.core.exceptions import ValidationError
-from rest_framework.test import APITestCase, APIClient
+from django.test import TestCase, TransactionTestCase
+from django.urls import reverse
+
 from rest_framework import status
+from rest_framework.test import APIClient, APITestCase
 
-from apps.accounts.models import UserProfile, Role, UserRole
-from apps.accounts.serializers import UserSerializer, UserProfileSerializer
-from apps.accounts.auth_backends import CustomAuthBackend
 from apps.accounts import rbac
-from apps.accounts.auth_views import CustomLoginView, CustomRegisterView
-from apps.accounts.role_views import RoleViewSet, UserRoleViewSet
-
+from apps.accounts.auth_backends import CustomAuthBackend
+from apps.accounts.models import Role, UserProfile, UserRole
+from apps.accounts.serializers import UserProfileSerializer, UserSerializer
 
 User = get_user_model()
 
@@ -52,9 +50,6 @@ class AccountsModelTests(TestCase):
 
     def test_user_str_representation(self):
         """Test user string representation."""
-        expected = (
-            f"{self.user.first_name} {self.user.last_name} ({self.user.username})"
-        )
         if hasattr(self.user, "__str__"):
             self.assertIn(self.user.username, str(self.user))
 
@@ -435,7 +430,7 @@ class AccountsRBACTests(TestCase):
             admin_role = Role.objects.create(
                 name="Admin", description="Administrator role"
             )
-            editor_role = Role.objects.create(name="Editor", description="Editor role")
+            Role.objects.create(name="Editor", description="Editor role")
 
             # Test role hierarchy if implemented
             if hasattr(rbac, "get_user_roles"):

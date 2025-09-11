@@ -12,7 +12,7 @@ import {
   LayoutGrid,
   Columns,
 } from "lucide-react";
-import { api } from "@/lib/api";
+import { api } from "@/lib/api.ts";
 
 interface BlockSelectorProps {
   onAddBlock: (type: string) => void;

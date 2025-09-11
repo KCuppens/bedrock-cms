@@ -1,5 +1,6 @@
 from django.core.management.base import BaseCommand
 from django.utils import timezone
+
 from apps.cms.tasks import publish_scheduled_content
 
 

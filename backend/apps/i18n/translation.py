@@ -3,8 +3,10 @@ Translation utilities for content fallback and resolution.
 """
 
 import json
-from typing import Dict, Any, Optional, List, Union
+from typing import Any, Optional
+
 from django.contrib.contenttypes.models import ContentType
+
 from .models import Locale, TranslationUnit
 
 
@@ -68,7 +70,7 @@ class TranslationResolver:
         except AttributeError:
             return default_value
 
-    def resolve_object(self, obj, fields: List[str]) -> Dict[str, str]:
+    def resolve_object(self, obj, fields: list[str]) -> dict[str, str]:
         """
         Resolve multiple fields for an object.
 
@@ -85,8 +87,8 @@ class TranslationResolver:
         return result
 
     def get_translation_status(
-        self, obj, fields: List[str]
-    ) -> Dict[str, Dict[str, Any]]:
+        self, obj, fields: list[str]
+    ) -> dict[str, dict[str, Any]]:
         """
         Get translation status for multiple fields.
 
@@ -158,12 +160,12 @@ class TranslationManager:
         pass
 
     @classmethod
-    def register_translatable_fields(cls, model_label: str, fields: List[str]):
+    def register_translatable_fields(cls, model_label: str, fields: list[str]):
         """Register translatable fields for a model."""
         cls.TRANSLATABLE_FIELDS[model_label] = fields
 
     @classmethod
-    def get_translatable_fields(cls, obj) -> List[str]:
+    def get_translatable_fields(cls, obj) -> list[str]:
         """Get list of translatable fields for an object."""
         content_type = ContentType.objects.get_for_model(obj)
         model_label = f"{content_type.app_label}.{content_type.model}"
@@ -280,8 +282,8 @@ class TranslationManager:
     def update_translation(
         self,
         unit: TranslationUnit,
-        target_text: Optional[str] = None,
-        status: Optional[str] = None,
+        target_text: str | None = None,
+        status: str | None = None,
         user=None,
     ) -> TranslationUnit:
         """
@@ -331,11 +333,11 @@ class TranslationManager:
 
     def bulk_create_translations(
         self,
-        translations_data: List[Dict[str, Any]],
+        translations_data: list[dict[str, Any]],
         source_locale: Locale,
         target_locale: Locale,
         user=None,
-    ) -> List[TranslationUnit]:
+    ) -> list[TranslationUnit]:
         """
         Bulk create multiple translations.
 
@@ -364,8 +366,8 @@ class TranslationManager:
         return units
 
     def get_translation_progress(
-        self, obj, target_locale: Locale, fields: List[str]
-    ) -> Dict[str, Any]:
+        self, obj, target_locale: Locale, fields: list[str]
+    ) -> dict[str, Any]:
         """
         Get translation progress for an object.
 
@@ -480,8 +482,8 @@ class UiMessageResolver:
     def resolve(
         self,
         key: str,
-        default: Optional[str] = None,
-        parameters: Optional[Dict[str, Any]] = None,
+        default: str | None = None,
+        parameters: dict[str, Any] | None = None,
     ) -> str:
         """
         Resolve a UI message with fallback and parameter substitution.
@@ -511,7 +513,7 @@ class UiMessageResolver:
 
         return message
 
-    def get_message_bundle(self, namespace: Optional[str] = None) -> Dict[str, str]:
+    def get_message_bundle(self, namespace: str | None = None) -> dict[str, str]:
         """
         Get all messages for a namespace as a dict.
 
@@ -521,7 +523,7 @@ class UiMessageResolver:
         Returns:
             Dict mapping message keys to translated values
         """
-        from .models import UiMessage, UiMessageTranslation
+        from .models import UiMessage
 
         messages = UiMessage.objects.all()
         if namespace:
@@ -533,7 +535,7 @@ class UiMessageResolver:
 
         return result
 
-    def get_namespaced_bundle(self) -> Dict[str, Dict[str, str]]:
+    def get_namespaced_bundle(self) -> dict[str, dict[str, str]]:
         """
         Get all messages organized by namespace.
 
@@ -551,7 +553,7 @@ class UiMessageResolver:
 
         return result
 
-    def get_all_messages(self) -> Dict[str, str]:
+    def get_all_messages(self) -> dict[str, str]:
         """
         Get all messages as a flat dictionary.
         Alias for get_message_bundle with no namespace filter.
@@ -561,7 +563,7 @@ class UiMessageResolver:
         """
         return self.get_message_bundle()
 
-    def get_namespace_messages(self, namespace: str) -> Dict[str, str]:
+    def get_namespace_messages(self, namespace: str) -> dict[str, str]:
         """
         Get all messages for a specific namespace.
         Alias for get_message_bundle with namespace filter.

@@ -3,25 +3,25 @@ Comprehensive Blog app tests targeting high coverage with real database operatio
 """
 
 from datetime import datetime, timedelta
-from django.test import TestCase, TransactionTestCase
-from django.contrib.auth import get_user_model
-from django.urls import reverse
-from django.core.exceptions import ValidationError
-from rest_framework.test import APITestCase, APIClient
-from rest_framework import status
 
-from apps.blog.models import BlogPost, Category, Tag, Author
+from django.contrib.auth import get_user_model
+from django.core.exceptions import ValidationError
+from django.test import TestCase, TransactionTestCase
+from django.urls import reverse
+
+from rest_framework import status
+from rest_framework.test import APIClient, APITestCase
+
+from apps.blog.models import Author, BlogPost, Category, Tag
 from apps.blog.serializers import (
-    BlogPostSerializer,
-    BlogPostListSerializer,
+    AuthorSerializer,
     BlogPostDetailSerializer,
+    BlogPostListSerializer,
+    BlogPostSerializer,
     CategorySerializer,
     TagSerializer,
-    AuthorSerializer,
 )
-from apps.blog.views import BlogPostViewSet, CategoryViewSet, TagViewSet
 from apps.blog.versioning import create_post_version, revert_post_to_version
-
 
 User = get_user_model()
 
@@ -751,10 +751,10 @@ class BlogIntegrationTests(TransactionTestCase):
             )
 
             # Create posts for each author
-            post1 = BlogPost.objects.create(
+            BlogPost.objects.create(
                 title="John's Post", author=author1, category=self.category
             )
-            post2 = BlogPost.objects.create(
+            BlogPost.objects.create(
                 title="Jane's Post", author=author2, category=self.category
             )
 
@@ -781,7 +781,7 @@ class BlogIntegrationTests(TransactionTestCase):
             featured=True,
         )
 
-        draft_post = BlogPost.objects.create(
+        BlogPost.objects.create(
             title="JavaScript Tutorial",
             content="Learn JavaScript basics",
             status="draft",

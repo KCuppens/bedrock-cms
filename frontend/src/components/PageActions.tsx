@@ -24,7 +24,7 @@ import {
 import { PermissionGuard } from "@/components/guards/PermissionGuard";
 import { usePermissions, useCanAccessLocale } from "@/hooks/usePermissions";
 import { Page } from "@/types/api";
-import { api } from "@/lib/api";
+import { api } from "@/lib/api.ts";
 
 interface PageActionsProps {
   page: Page;

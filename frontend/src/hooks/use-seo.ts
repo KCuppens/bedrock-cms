@@ -71,7 +71,6 @@ export const useSEOSettings = (localeCode: string = 'en') => {
         setSettings(response.data || response);
       } catch (err) {
         // If no settings found, use defaults
-        console.warn(`No SEO settings found for locale ${localeCode}, using defaults`);
         setSettings({
           locale: 0,
           locale_code: localeCode,

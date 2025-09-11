@@ -61,7 +61,7 @@ class Migration(migrations.Migration):
         # Add GIN index for blocks field on PostgreSQL
         migrations.RunSQL(
             sql="""
-            CREATE INDEX IF NOT EXISTS blog_blogpost_blocks_gin 
+            CREATE INDEX IF NOT EXISTS blog_blogpost_blocks_gin
             ON blog_blogpost USING gin (blocks jsonb_path_ops)
             WHERE blocks IS NOT NULL;
             """,
@@ -71,11 +71,11 @@ class Migration(migrations.Migration):
         # Add full text search index for PostgreSQL
         migrations.RunSQL(
             sql="""
-            CREATE INDEX IF NOT EXISTS blog_blogpost_search_idx 
+            CREATE INDEX IF NOT EXISTS blog_blogpost_search_idx
             ON blog_blogpost USING gin (
-                to_tsvector('english', 
-                    coalesce(title, '') || ' ' || 
-                    coalesce(excerpt, '') || ' ' || 
+                to_tsvector('english',
+                    coalesce(title, '') || ' ' ||
+                    coalesce(excerpt, '') || ' ' ||
                     coalesce(content, '')
                 )
             );
@@ -93,13 +93,6 @@ class Migration(migrations.Migration):
             model_name="category",
             index=models.Index(
                 fields=["slug", "locale"], name="blog_category_slug_idx"
-            ),
-        ),
-        # Add index for view tracker
-        migrations.AddIndex(
-            model_name="blogpostviewtracker",
-            index=models.Index(
-                fields=["blog_post", "-last_viewed"], name="blog_view_tracker_idx"
             ),
         ),
     ]

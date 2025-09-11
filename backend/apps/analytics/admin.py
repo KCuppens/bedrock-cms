@@ -1,18 +1,15 @@
 from django.contrib import admin
-from django.utils.html import format_html
 from django.urls import reverse
-from django.db.models import Count, Avg
-from django.utils.safestring import mark_safe
-import json
+from django.utils.html import format_html
 
 from .models import (
-    PageView,
-    UserActivity,
-    ContentMetrics,
+    AnalyticsSummary,
     Assessment,
+    ContentMetrics,
+    PageView,
     Risk,
     Threat,
-    AnalyticsSummary,
+    UserActivity,
 )
 
 

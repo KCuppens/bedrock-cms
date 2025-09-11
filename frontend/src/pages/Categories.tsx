@@ -7,7 +7,7 @@ import TopNavbar from "@/components/TopNavbar";
 import CategoryModal from "@/components/modals/CategoryModal";
 import DeleteConfirmModal from "@/components/modals/DeleteConfirmModal";
 import React, { useState, useEffect, useCallback, useMemo, memo } from "react";
-import { api } from "@/lib/api";
+import { api } from "@/lib/api.ts";
 import { Category, CategoryCreateRequest } from "@/types/api";
 import { toast } from "sonner";
 

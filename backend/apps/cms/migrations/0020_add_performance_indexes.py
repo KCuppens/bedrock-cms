@@ -1,7 +1,6 @@
 # Generated migration for performance indexes
 
 from django.db import migrations, models
-from django.contrib.postgres.indexes import GinIndex
 
 
 class Migration(migrations.Migration):
@@ -14,7 +13,7 @@ class Migration(migrations.Migration):
         # Add GIN index for JSON fields on PostgreSQL
         migrations.RunSQL(
             sql="""
-            CREATE INDEX IF NOT EXISTS cms_page_blocks_gin 
+            CREATE INDEX IF NOT EXISTS cms_page_blocks_gin
             ON cms_page USING gin (blocks jsonb_path_ops)
             WHERE blocks IS NOT NULL;
             """,
@@ -23,7 +22,7 @@ class Migration(migrations.Migration):
         ),
         migrations.RunSQL(
             sql="""
-            CREATE INDEX IF NOT EXISTS cms_page_seo_gin 
+            CREATE INDEX IF NOT EXISTS cms_page_seo_gin
             ON cms_page USING gin (seo jsonb_path_ops)
             WHERE seo IS NOT NULL;
             """,

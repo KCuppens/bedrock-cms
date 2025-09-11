@@ -3,10 +3,9 @@ Search app mega coverage booster - comprehensive search functionality testing.
 """
 
 import os
-import sys
+from unittest.mock import Mock
+
 import django
-from unittest.mock import Mock, patch, MagicMock
-from datetime import datetime
 
 # Configure minimal Django
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "apps.config.settings.base")
@@ -30,7 +29,7 @@ def test_search_global():
             # Test search method
             if hasattr(engine, "search"):
                 try:
-                    results = engine.search("test query", filters={"type": "page"})
+                    engine.search("test query", filters={"type": "page"})
                 except:
                     pass
 
@@ -64,9 +63,9 @@ def test_search_global():
                 ("paginated", {"q": "test", "page": 2, "size": 20}),
             ]
 
-            for query_type, params in query_types:
+            for _query_type, params in query_types:
                 try:
-                    query = builder.build(params)
+                    builder.build(params)
                 except:
                     pass
 
@@ -83,7 +82,7 @@ def test_search_global():
             }
 
             try:
-                processed = processor.process(mock_results)
+                processor.process(mock_results)
             except:
                 pass
 
@@ -96,11 +95,11 @@ def test_search_models():
 
     try:
         from apps.search.models import (
-            SearchIndex,
             SearchDocument,
+            SearchFacet,
+            SearchIndex,
             SearchQuery,
             SearchResult,
-            SearchFacet,
         )
 
         # Test SearchIndex
@@ -141,7 +140,7 @@ def test_search_models():
 
         if hasattr(SearchQuery, "execute"):
             try:
-                results = SearchQuery.execute(mock_query)
+                SearchQuery.execute(mock_query)
             except:
                 pass
 
@@ -154,7 +153,7 @@ def test_search_models():
 
         if hasattr(SearchResult, "format"):
             try:
-                formatted = SearchResult.format(mock_result)
+                SearchResult.format(mock_result)
             except:
                 pass
 
@@ -201,9 +200,7 @@ def test_search_services():
 
             if hasattr(es_service, "search"):
                 try:
-                    results = es_service.search(
-                        "test_index", {"query": {"match_all": {}}}
-                    )
+                    es_service.search("test_index", {"query": {"match_all": {}}})
                 except:
                     pass
 
@@ -214,26 +211,26 @@ def test_search_services():
             # Test search methods
             if hasattr(search_service, "search_pages"):
                 try:
-                    results = search_service.search_pages("test query")
+                    search_service.search_pages("test query")
                 except:
                     pass
 
             if hasattr(search_service, "search_files"):
                 try:
-                    results = search_service.search_files("document")
+                    search_service.search_files("document")
                 except:
                     pass
 
             if hasattr(search_service, "search_all"):
                 try:
-                    results = search_service.search_all("test")
+                    search_service.search_all("test")
                 except:
                     pass
 
             # Test autocomplete
             if hasattr(search_service, "autocomplete"):
                 try:
-                    suggestions = search_service.autocomplete("tes")
+                    search_service.autocomplete("tes")
                 except:
                     pass
 
@@ -272,7 +269,7 @@ def test_search_views():
     """Test search views."""
 
     try:
-        from apps.search.views import SearchView, SearchAPIView, AutocompleteView
+        from apps.search.views import AutocompleteView, SearchAPIView, SearchView
 
         # Test SearchView
         if SearchView:
@@ -282,7 +279,7 @@ def test_search_views():
             mock_request.user = Mock()
 
             try:
-                response = view.get(mock_request)
+                view.get(mock_request)
             except:
                 pass
 
@@ -294,14 +291,14 @@ def test_search_views():
             view.request.user = Mock()
 
             try:
-                response = view.list(view.request)
+                view.list(view.request)
             except:
                 pass
 
             # Test faceted search
             view.request.query_params = {"q": "test", "facets": "category,author"}
             try:
-                response = view.faceted_search(view.request)
+                view.faceted_search(view.request)
             except:
                 pass
 
@@ -312,7 +309,7 @@ def test_search_views():
             view.request.query_params = {"q": "tes"}
 
             try:
-                response = view.get(view.request)
+                view.get(view.request)
             except:
                 pass
 
@@ -325,10 +322,10 @@ def test_search_serializers():
 
     try:
         from apps.search.serializers import (
-            SearchQuerySerializer,
-            SearchResultSerializer,
             SearchDocumentSerializer,
             SearchFacetSerializer,
+            SearchQuerySerializer,
+            SearchResultSerializer,
         )
 
         # Test SearchQuerySerializer
@@ -342,7 +339,6 @@ def test_search_serializers():
         serializer = SearchQuerySerializer(data=query_data)
         try:
             serializer.is_valid()
-            validated = serializer.validated_data
         except:
             pass
 
@@ -475,7 +471,7 @@ def test_search_admin():
                     if hasattr(admin_instance, "get_queryset"):
                         mock_request = Mock()
                         try:
-                            qs = admin_instance.get_queryset(mock_request)
+                            admin_instance.get_queryset(mock_request)
                         except:
                             pass
 

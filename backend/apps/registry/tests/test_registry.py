@@ -2,14 +2,12 @@
 Tests for content registry functionality.
 """
 
-from django.test import TestCase, TransactionTestCase, override_settings
-from django.core.exceptions import ValidationError
-from rest_framework.test import APITestCase
-from rest_framework import status
 from django.contrib.auth import get_user_model
-from unittest.mock import patch
-from django.db.models.signals import post_save
-from django.test.utils import override_settings
+from django.core.exceptions import ValidationError
+from django.test import TestCase
+
+from rest_framework import status
+from rest_framework.test import APITestCase
 
 from apps.cms.models import Page
 from apps.i18n.models import Locale
@@ -17,12 +15,10 @@ from apps.registry.config import ContentConfig
 from apps.registry.registry import (
     ContentRegistry,
     ContentRegistryError,
-    register_model,
     content_registry,
 )
 from apps.registry.serializers import ContentSerializerFactory, get_serializer_for_model
 from apps.registry.viewsets import ContentViewSetFactory, get_viewset_for_model
-
 
 User = get_user_model()
 

@@ -1,7 +1,7 @@
 # Manual migration to fix file references
 
-from django.db import migrations, models
 import django.db.models.deletion
+from django.db import migrations, models
 
 
 class Migration(migrations.Migration):

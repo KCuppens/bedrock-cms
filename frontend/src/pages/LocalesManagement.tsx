@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import Sidebar from "@/components/Sidebar";
 import TopNavbar from "@/components/TopNavbar";
 import { Button } from "@/components/ui/button";
-import { api } from "@/lib/api";
+import { api } from "@/lib/api.ts";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent } from "@/components/ui/card";

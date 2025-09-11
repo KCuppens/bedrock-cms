@@ -2,56 +2,51 @@
 API views for translation management.
 """
 
-from typing import Dict, Any
-from django.http import HttpResponse
-from django.shortcuts import get_object_or_404
-from django.contrib.contenttypes.models import ContentType
-from django.db import models
-from django.core.management import call_command
-from django.core.management.base import CommandError
-from rest_framework import viewsets, status, permissions
-from rest_framework.decorators import action
-from rest_framework.response import Response
-from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework import filters
-from drf_spectacular.utils import extend_schema, OpenApiParameter
 import io
 import logging
 
+from django.contrib.contenttypes.models import ContentType
+from django.core.management import call_command
+from django.core.management.base import CommandError
+from django.db import models
+
+from django_filters.rest_framework import DjangoFilterBackend
+from drf_spectacular.utils import OpenApiParameter, extend_schema
+from rest_framework import filters, permissions, status, viewsets
+from rest_framework.decorators import action
+from rest_framework.response import Response
+
 logger = logging.getLogger(__name__)
+
+from django.conf import settings
 
 from .models import (
     Locale,
+    TranslationGlossary,
+    TranslationHistory,
+    TranslationQueue,
     TranslationUnit,
     UiMessage,
     UiMessageTranslation,
-    TranslationGlossary,
-    TranslationQueue,
-    TranslationHistory,
 )
 from .serializers import (
+    BulkAssignmentSerializer,
+    BulkTranslationUpdateSerializer,
+    BulkUiMessageUpdateSerializer,
+    GlossarySearchSerializer,
     LocaleSerializer,
+    MachineTranslationSuggestionSerializer,
+    TranslationApprovalSerializer,
+    TranslationAssignmentSerializer,
+    TranslationGlossarySerializer,
+    TranslationHistorySerializer,
+    TranslationQueueSerializer,
     TranslationUnitSerializer,
     TranslationUnitUpdateSerializer,
     UiMessageSerializer,
     UiMessageTranslationSerializer,
-    ObjectTranslationStatusSerializer,
-    BulkTranslationUpdateSerializer,
-    TranslationGlossarySerializer,
-    GlossarySearchSerializer,
-    TranslationQueueSerializer,
-    TranslationHistorySerializer,
-    TranslationApprovalSerializer,
-    MachineTranslationSuggestionSerializer,
-    BulkUiMessageUpdateSerializer,
-    NamespaceSerializer,
-    TranslationAssignmentSerializer,
-    BulkAssignmentSerializer,
 )
-from .translation import TranslationManager, TranslationResolver, UiMessageResolver
-from .services import DeepLTranslationService
 from .tasks import bulk_auto_translate_ui_messages
-from django.conf import settings
 
 
 class LocaleViewSet(viewsets.ModelViewSet):
@@ -283,7 +278,7 @@ class TranslationUnitViewSet(viewsets.ModelViewSet):
                 app_label=app_label, model=model_name
             )
             model_class = content_type.model_class()
-            obj = model_class.objects.get(pk=object_id)
+            model_class.objects.get(pk=object_id)
         except (ValueError, ContentType.DoesNotExist, model_class.DoesNotExist):
             return Response(
                 {"error": "Invalid model_label or object not found"},
@@ -1080,7 +1075,7 @@ class UiMessageViewSet(viewsets.ModelViewSet):
 
         # Log the sync activity
         if created or updated:
-            from django.contrib.admin.models import LogEntry, ADDITION
+            from django.contrib.admin.models import ADDITION, LogEntry
             from django.contrib.contenttypes.models import ContentType
 
             LogEntry.objects.log_action(
@@ -1124,8 +1119,9 @@ class UiMessageViewSet(viewsets.ModelViewSet):
         Report missing translation keys detected at runtime.
         These are logged for review but not auto-created.
         """
-        from django.core.cache import cache
         from datetime import datetime
+
+        from django.core.cache import cache
 
         keys = request.data.get("keys", [])
         locale = request.data.get("locale", "unknown")
@@ -1167,9 +1163,10 @@ class UiMessageViewSet(viewsets.ModelViewSet):
     )
     def discovery_stats(self, request):
         """Get statistics about discovered translation keys."""
-        from django.db.models import Count
         from datetime import datetime, timedelta
+
         from django.core.cache import cache
+        from django.db.models import Count
 
         # Get counts
         total_messages = UiMessage.objects.count()
@@ -1981,7 +1978,7 @@ class TranslationQueueViewSet(viewsets.ModelViewSet):
     @action(detail=False, methods=["get"])
     def summary(self, request):
         """Get translation queue summary with locale breakdown."""
-        from django.db.models import Count, Q
+        from django.db.models import Count
         from django.utils import timezone
 
         # Get all active locales except the default source locale

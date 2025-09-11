@@ -4,9 +4,9 @@ This script can be run by pytest to boost coverage without complex setup.
 """
 
 import os
-import sys
+from unittest.mock import patch
+
 import django
-from unittest.mock import Mock, patch
 
 # Configure minimal Django
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "apps.config.settings.base")
@@ -49,19 +49,19 @@ def test_cms_views_coverage():
         # Test permissions
         viewset.action = "list"
         try:
-            permissions = viewset.get_permissions()
+            viewset.get_permissions()
         except Exception:
             pass
 
         viewset.action = "create"
         try:
-            permissions = viewset.get_permissions()
+            viewset.get_permissions()
         except Exception:
             pass
 
         # Test queryset
         try:
-            queryset = viewset.get_queryset()
+            viewset.get_queryset()
         except Exception:
             pass
 
@@ -178,10 +178,10 @@ def test_cms_serializers_coverage():
 
         # Import serializer classes
         if hasattr(serializers, "PageReadSerializer"):
-            PageReadSerializer = serializers.PageReadSerializer
+            pass
 
         if hasattr(serializers, "PageWriteSerializer"):
-            PageWriteSerializer = serializers.PageWriteSerializer
+            pass
 
     except ImportError:
         pass

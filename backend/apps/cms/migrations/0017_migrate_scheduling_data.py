@@ -1,7 +1,7 @@
 # Generated manually for data migration
 
-from django.db import migrations
 from django.contrib.contenttypes.models import ContentType
+from django.db import migrations
 
 
 def migrate_page_scheduling_data(apps, schema_editor):

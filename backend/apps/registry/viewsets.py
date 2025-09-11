@@ -2,22 +2,25 @@
 Auto-generated ViewSets for registered content models.
 """
 
-from typing import Type, Dict, Any, List
+from typing import Any
+
 from django.db.models import Q
 from django.shortcuts import get_object_or_404
-from rest_framework import viewsets, status, permissions, filters
+
+from django_filters.rest_framework import DjangoFilterBackend
+from drf_spectacular.utils import OpenApiParameter, extend_schema
+from rest_framework import filters, permissions, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
-from django_filters.rest_framework import DjangoFilterBackend
-from drf_spectacular.utils import extend_schema, OpenApiParameter
 
 from apps.i18n.models import Locale
+
 from .config import ContentConfig
 from .registry import content_registry
 from .serializers import (
-    get_serializer_for_config,
     RegistrySerializer,
     RegistrySummarySerializer,
+    get_serializer_for_config,
 )
 
 
@@ -27,7 +30,7 @@ class ContentViewSetFactory:
     """
 
     @classmethod
-    def create_viewset(cls, config: ContentConfig) -> Type[viewsets.ModelViewSet]:
+    def create_viewset(cls, config: ContentConfig) -> type[viewsets.ModelViewSet]:
         """
         Create a ViewSet class for a content configuration.
 
@@ -64,7 +67,7 @@ class ContentViewSetFactory:
         return viewset_class
 
     @classmethod
-    def _get_filterset_fields(cls, config: ContentConfig) -> List[str]:
+    def _get_filterset_fields(cls, config: ContentConfig) -> list[str]:
         """Get filterset fields for the ViewSet."""
         fields = []
 
@@ -86,7 +89,7 @@ class ContentViewSetFactory:
         return fields
 
     @classmethod
-    def _get_search_fields(cls, config: ContentConfig) -> List[str]:
+    def _get_search_fields(cls, config: ContentConfig) -> list[str]:
         """Get search fields for the ViewSet."""
         # Use configured searchable fields, but flatten nested fields for Django filter
         search_fields = []
@@ -105,7 +108,7 @@ class ContentViewSetFactory:
         return search_fields
 
     @classmethod
-    def _get_ordering_fields(cls, config: ContentConfig) -> List[str]:
+    def _get_ordering_fields(cls, config: ContentConfig) -> list[str]:
         """Get ordering fields for the ViewSet."""
         model_fields = {f.name for f in config.model._meta.get_fields()}
 
@@ -123,7 +126,7 @@ class ContentViewSetFactory:
         return ordering_fields
 
     @classmethod
-    def _get_custom_methods(cls, config: ContentConfig) -> Dict[str, Any]:
+    def _get_custom_methods(cls, config: ContentConfig) -> dict[str, Any]:
         """Get custom methods for the ViewSet."""
         methods = {}
 
@@ -291,7 +294,7 @@ class RegistryViewSet(viewsets.ReadOnlyModelViewSet):
         return Response(export_data, content_type="application/json")
 
 
-def get_viewset_for_model(model_label: str) -> Type[viewsets.ModelViewSet]:
+def get_viewset_for_model(model_label: str) -> type[viewsets.ModelViewSet]:
     """
     Get or create a ViewSet for a registered model.
 
@@ -311,7 +314,7 @@ def get_viewset_for_model(model_label: str) -> Type[viewsets.ModelViewSet]:
     return ContentViewSetFactory.create_viewset(config)
 
 
-def get_viewset_for_config(config: ContentConfig) -> Type[viewsets.ModelViewSet]:
+def get_viewset_for_config(config: ContentConfig) -> type[viewsets.ModelViewSet]:
     """
     Get or create a ViewSet for a content configuration.
 

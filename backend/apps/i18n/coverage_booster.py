@@ -3,9 +3,9 @@ i18n app coverage booster - targets internationalization components.
 """
 
 import os
-import sys
+from unittest.mock import Mock
+
 import django
-from unittest.mock import Mock, patch, MagicMock
 
 # Configure minimal Django
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "apps.config.settings.base")
@@ -22,9 +22,9 @@ def test_i18n_views():
     try:
         from apps.i18n.views import (
             LocaleViewSet,
+            TranslationMemoryViewSet,
             TranslationUnitViewSet,
             UiMessageViewSet,
-            TranslationMemoryViewSet,
         )
 
         viewsets = [
@@ -48,25 +48,25 @@ def test_i18n_views():
                     viewset.action = action
 
                     try:
-                        serializer_class = viewset.get_serializer_class()
+                        viewset.get_serializer_class()
                     except:
                         pass
 
                     try:
-                        permissions = viewset.get_permissions()
+                        viewset.get_permissions()
                     except:
                         pass
 
                 # Test get_queryset
                 try:
-                    queryset = viewset.get_queryset()
+                    viewset.get_queryset()
                 except:
                     pass
 
                 # Test custom actions
                 if hasattr(viewset, "active"):
                     try:
-                        response = viewset.active(viewset.request)
+                        viewset.active(viewset.request)
                     except:
                         pass
 
@@ -75,7 +75,7 @@ def test_i18n_views():
                         mock_locale = Mock()
                         mock_locale.save = Mock()
                         viewset.get_object = Mock(return_value=mock_locale)
-                        response = viewset.set_default(viewset.request, pk=1)
+                        viewset.set_default(viewset.request, pk=1)
                     except:
                         pass
 
@@ -86,7 +86,7 @@ def test_i18n_views():
                             "source_locale": "en",
                             "target_locale": "es",
                         }
-                        response = viewset.translate(viewset.request)
+                        viewset.translate(viewset.request)
                     except:
                         pass
 
@@ -103,11 +103,11 @@ def test_i18n_models():
     try:
         from apps.i18n.models import (
             Locale,
+            TranslationJob,
+            TranslationMemory,
             TranslationUnit,
             UiMessage,
             UiMessageTranslation,
-            TranslationMemory,
-            TranslationJob,
         )
 
         models = [
@@ -123,7 +123,7 @@ def test_i18n_models():
             try:
                 # Test model meta information
                 meta = model_class._meta
-                fields = [f.name for f in meta.fields]
+                [f.name for f in meta.fields]
 
                 # Test __str__ method with mock instance
                 mock_instance = Mock(spec=model_class)
@@ -149,20 +149,20 @@ def test_i18n_models():
                     mock_instance.created_at = Mock()
 
                 try:
-                    str_result = model_class.__str__(mock_instance)
+                    model_class.__str__(mock_instance)
                 except:
                     pass
 
                 # Test model methods
                 if hasattr(model_class, "get_translations"):
                     try:
-                        translations = model_class.get_translations(mock_instance)
+                        model_class.get_translations(mock_instance)
                     except:
                         pass
 
                 if hasattr(model_class, "is_complete"):
                     try:
-                        complete = model_class.is_complete(mock_instance)
+                        model_class.is_complete(mock_instance)
                     except:
                         pass
 
@@ -179,10 +179,10 @@ def test_i18n_serializers():
     try:
         from apps.i18n.serializers import (
             LocaleSerializer,
+            TranslationMemorySerializer,
             TranslationUnitSerializer,
             UiMessageSerializer,
             UiMessageTranslationSerializer,
-            TranslationMemorySerializer,
         )
 
         serializers = [
@@ -230,7 +230,6 @@ def test_i18n_serializers():
                 serializer = serializer_class(data=mock_data)
                 try:
                     serializer.is_valid()
-                    fields = serializer.fields
                 except:
                     pass
 
@@ -256,17 +255,17 @@ def test_i18n_translation_services():
                         # Try service functions
                         if "translate" in attr_name.lower():
                             try:
-                                result = attr("Hello", "en", "es")
+                                attr("Hello", "en", "es")
                             except:
                                 pass
                         elif "detect" in attr_name.lower():
                             try:
-                                result = attr("Hello world")
+                                attr("Hello world")
                             except:
                                 pass
                         elif "validate" in attr_name.lower():
                             try:
-                                result = attr("en")
+                                attr("en")
                             except:
                                 pass
                     elif hasattr(attr, "__init__"):
@@ -276,7 +275,7 @@ def test_i18n_translation_services():
 
                             if hasattr(service, "translate"):
                                 try:
-                                    result = service.translate("Hello", "en", "es")
+                                    service.translate("Hello", "en", "es")
                                 except:
                                     pass
 
@@ -303,13 +302,13 @@ def test_i18n_tasks():
                     attr = getattr(tasks, attr_name)
                     if callable(attr):
                         # Try to get task properties
-                        doc = getattr(attr, "__doc__", None)
-                        name = getattr(attr, "__name__", None)
+                        getattr(attr, "__doc__", None)
+                        getattr(attr, "__name__", None)
 
                         # Try to access task-related attributes
                         if hasattr(attr, "delay"):
                             # Celery task
-                            task_name = getattr(attr, "name", None)
+                            getattr(attr, "name", None)
 
                 except:
                     pass
@@ -331,8 +330,8 @@ def test_i18n_signals():
                     attr = getattr(signals, attr_name)
                     if callable(attr):
                         # Try to get function properties
-                        doc = getattr(attr, "__doc__", None)
-                        name = getattr(attr, "__name__", None)
+                        getattr(attr, "__doc__", None)
+                        getattr(attr, "__name__", None)
 
                         # Signal handlers typically have sender and instance params
                         if (
@@ -366,7 +365,6 @@ def test_i18n_admin():
                     attr = getattr(admin, attr_name)
                     if hasattr(attr, "_meta"):
                         # Try to access admin class properties
-                        meta = attr._meta
 
                         # Test admin methods
                         if hasattr(attr, "get_queryset"):
@@ -374,7 +372,7 @@ def test_i18n_admin():
                                 mock_request = Mock()
                                 mock_request.user = Mock()
                                 admin_instance = attr(Mock(), Mock())
-                                queryset = admin_instance.get_queryset(mock_request)
+                                admin_instance.get_queryset(mock_request)
                             except:
                                 pass
 

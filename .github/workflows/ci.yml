@@ -53,21 +53,7 @@ jobs:
         path: ~/.cache/pre-commit
         key: pre-commit-${{ env.PYTHON_VERSION }}-${{ hashFiles('.pre-commit-config.yaml') }}
 
-    - name: Run pre-commit (first pass)
-      run: pre-commit run --all-files
-      continue-on-error: true
-
-    - name: Commit formatting changes
-      run: |
-        git config --global user.name "github-actions[bot]"
-        git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
-        git add -A
-        if ! git diff --cached --exit-code; then
-          git commit -m "Auto-fix: Apply pre-commit formatting changes" -m "Co-Authored-By: Claude <noreply@anthropic.com>"
-          echo "Committed formatting changes"
-        fi
-
-    - name: Run pre-commit (final check)
+    - name: Run pre-commit checks
       run: pre-commit run --all-files
 
   test:

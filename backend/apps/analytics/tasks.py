@@ -4,13 +4,14 @@ Celery tasks for analytics data processing and aggregation.
 
 import logging
 from datetime import date, datetime, timedelta
-from celery import shared_task
-from django.utils import timezone
-from django.db.models import Count, Avg, Sum
-from django.contrib.auth import get_user_model
 
-from .models import PageView, UserActivity, AnalyticsSummary
+from django.contrib.auth import get_user_model
+from django.utils import timezone
+
+from celery import shared_task
+
 from .aggregation import AnalyticsAggregator
+from .models import PageView, UserActivity
 
 User = get_user_model()
 logger = logging.getLogger(__name__)
@@ -138,7 +139,6 @@ def calculate_content_performance_scores():
     """
     Calculate performance scores for all content items.
     """
-    from django.contrib.contenttypes.models import ContentType
     from .models import ContentMetrics
 
     updated_count = 0
@@ -150,7 +150,7 @@ def calculate_content_performance_scores():
 
     for item in content_types:
         try:
-            score_data = AnalyticsAggregator.calculate_content_performance_score(
+            AnalyticsAggregator.calculate_content_performance_score(
                 item["content_type"], item["object_id"]
             )
             # Here you could update a performance score field or create reports

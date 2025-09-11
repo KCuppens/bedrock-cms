@@ -2,19 +2,19 @@
 Test cases for i18n models.
 """
 
-import pytest
-from django.test import TestCase
 from django.contrib.auth import get_user_model
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ValidationError
+from django.test import TestCase
+
 from apps.i18n.models import (
     Locale,
+    TranslationGlossary,
+    TranslationHistory,
+    TranslationQueue,
     TranslationUnit,
     UiMessage,
     UiMessageTranslation,
-    TranslationGlossary,
-    TranslationQueue,
-    TranslationHistory,
 )
 
 User = get_user_model()
@@ -96,7 +96,6 @@ class LocaleModelTest(TestCase):
 
     def test_circular_fallback_prevention(self):
         """Test that circular fallbacks are prevented."""
-        from django.core.exceptions import ValidationError
 
         # Try to create a circular fallback: en -> es -> en
         self.locale_en.fallback = self.locale_es
@@ -271,7 +270,7 @@ class TranslationUnitModelTest(TestCase):
     def test_translation_unit_string_representation(self):
         """Test translation unit string representation."""
         # TranslationUnit.__str__ returns: f"{self.content_type.model}.{self.field} ({self.source_locale.code} → {self.target_locale.code}) -> {self.target_text}"
-        expected = f"user.username (en → es) -> traductor"
+        expected = "user.username (en → es) -> traductor"
         self.assertEqual(str(self.translation_unit), expected)
 
     def test_unique_constraint(self):
@@ -412,7 +411,7 @@ class TranslationQueueModelTest(TestCase):
         """Test queue item string representation."""
         # TranslationQueue.__str__ returns: f"Queue: {self.translation_unit} ({self.status})"
         # And self.status is 'pending' in the test setup (line 416)
-        expected = f"Queue: user.bio (en → es) (pending)"
+        expected = "Queue: user.bio (en → es) (pending)"
         self.assertEqual(str(self.queue_item), expected)
 
     def test_priority_choices(self):

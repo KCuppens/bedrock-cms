@@ -9,9 +9,9 @@ Usage:
 """
 
 import time
-from django.core.management.base import BaseCommand
+
 from django.core.cache import cache
-from django.db import models
+from django.core.management.base import BaseCommand
 
 from apps.core.cache import cache_manager
 from apps.core.signals import invalidate_all_cache, invalidate_content_type_cache
@@ -245,9 +245,7 @@ class Command(BaseCommand):
 
                 # This would typically involve making a request to the page
                 # For now, we'll just generate and store the cache key structure
-                cache_key = cache_manager.key_builder.page_key(
-                    page.locale.code, page.path
-                )
+                cache_manager.key_builder.page_key(page.locale.code, page.path)
 
                 # In a real implementation, you'd fetch the page data and cache it
                 # cache_manager.set(cache_key, page_data)
@@ -277,9 +275,7 @@ class Command(BaseCommand):
                         f"  Warming blog post: {post.slug} ({post.locale.code})"
                     )
 
-                cache_key = cache_manager.key_builder.blog_key(
-                    post.locale.code, post.slug
-                )
+                cache_manager.key_builder.blog_key(post.locale.code, post.slug)
 
                 # In a real implementation, you'd render the blog post
                 # cache_manager.set(cache_key, rendered_post)
@@ -304,7 +300,7 @@ class Command(BaseCommand):
                 if self.verbose:
                     self.stdout.write(f"  Warming sitemap: {locale.code}")
 
-                cache_key = cache_manager.key_builder.sitemap_key(locale.code)
+                cache_manager.key_builder.sitemap_key(locale.code)
 
                 # In a real implementation, you'd generate the sitemap
                 # cache_manager.set(cache_key, sitemap_xml)

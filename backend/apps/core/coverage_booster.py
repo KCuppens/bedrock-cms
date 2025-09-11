@@ -3,9 +3,9 @@ Core app coverage booster - targets utilities, permissions, and middleware.
 """
 
 import os
-import sys
+from unittest.mock import Mock, patch
+
 import django
-from unittest.mock import Mock, patch, MagicMock
 
 # Configure minimal Django
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "apps.config.settings.base")
@@ -29,33 +29,33 @@ def test_core_utils():
                     attr = getattr(utils, attr_name)
                     if callable(attr):
                         # Try to get function properties
-                        doc = getattr(attr, "__doc__", None)
-                        name = getattr(attr, "__name__", None)
+                        getattr(attr, "__doc__", None)
+                        getattr(attr, "__name__", None)
 
                         # Try common utility function patterns
                         if "format" in attr_name.lower():
                             try:
-                                result = attr("test-string")
+                                attr("test-string")
                             except:
                                 pass
                         elif "parse" in attr_name.lower():
                             try:
-                                result = attr("test-data")
+                                attr("test-data")
                             except:
                                 pass
                         elif "validate" in attr_name.lower():
                             try:
-                                result = attr("test@example.com")
+                                attr("test@example.com")
                             except:
                                 pass
                         elif "generate" in attr_name.lower():
                             try:
-                                result = attr()
+                                attr()
                             except:
                                 pass
                         elif "slugify" in attr_name.lower():
                             try:
-                                result = attr("Test Title")
+                                attr("Test Title")
                             except:
                                 pass
 
@@ -77,7 +77,7 @@ def test_core_permissions():
             if not attr_name.startswith("_"):
                 try:
                     attr = getattr(permissions, attr_name)
-                    if hasattr(attr, "__call__") and "Permission" in str(attr):
+                    if callable(attr) and "Permission" in str(attr):
                         try:
                             permission = attr()
 
@@ -88,14 +88,12 @@ def test_core_permissions():
                                 mock_request.user.is_authenticated = True
                                 mock_request.user.is_superuser = False
                                 mock_view = Mock()
-                                result = permission.has_permission(
-                                    mock_request, mock_view
-                                )
+                                permission.has_permission(mock_request, mock_view)
 
                             # Test has_object_permission method
                             if hasattr(permission, "has_object_permission"):
                                 mock_obj = Mock()
-                                result = permission.has_object_permission(
+                                permission.has_object_permission(
                                     mock_request, mock_view, mock_obj
                                 )
 
@@ -135,15 +133,13 @@ def test_core_mixins():
                                             mock_instance.model.objects.all.return_value = (
                                                 []
                                             )
-                                            queryset = attr.get_queryset(mock_instance)
+                                            attr.get_queryset(mock_instance)
                                     except:
                                         pass
 
                                 if hasattr(attr, "get_serializer_class"):
                                     try:
-                                        serializer_class = attr.get_serializer_class(
-                                            mock_instance
-                                        )
+                                        attr.get_serializer_class(mock_instance)
                                     except:
                                         pass
 
@@ -218,7 +214,7 @@ def test_core_throttling():
             if not attr_name.startswith("_"):
                 try:
                     attr = getattr(throttling, attr_name)
-                    if hasattr(attr, "__call__") and "Throttle" in str(attr):
+                    if callable(attr) and "Throttle" in str(attr):
                         try:
                             throttle = attr()
 
@@ -228,12 +224,12 @@ def test_core_throttling():
                                 mock_request.user = Mock()
                                 mock_request.META = {"REMOTE_ADDR": "127.0.0.1"}
                                 mock_view = Mock()
-                                result = throttle.allow_request(mock_request, mock_view)
+                                throttle.allow_request(mock_request, mock_view)
 
                             # Test get_rate method
                             if hasattr(throttle, "get_rate"):
                                 try:
-                                    rate = throttle.get_rate()
+                                    throttle.get_rate()
                                 except:
                                     pass
 
@@ -258,24 +254,22 @@ def test_core_middleware():
             if not attr_name.startswith("_"):
                 try:
                     attr = getattr(middleware, attr_name)
-                    if hasattr(attr, "__call__") and "Middleware" in str(attr):
+                    if callable(attr) and "Middleware" in str(attr):
                         try:
                             get_response = Mock()
                             middleware_instance = attr(get_response)
 
                             # Test __call__ method
-                            if hasattr(middleware_instance, "__call__"):
+                            if callable(middleware_instance):
                                 mock_request = Mock()
                                 mock_request.path = "/test/"
                                 mock_request.method = "GET"
                                 mock_request.META = {}
-                                response = middleware_instance(mock_request)
+                                middleware_instance(mock_request)
 
                             # Test process_request method
                             if hasattr(middleware_instance, "process_request"):
-                                result = middleware_instance.process_request(
-                                    mock_request
-                                )
+                                middleware_instance.process_request(mock_request)
 
                         except:
                             pass
@@ -302,22 +296,22 @@ def test_core_cache():
                         # Try cache-related function patterns
                         if "get" in attr_name.lower():
                             try:
-                                result = attr("test-key")
+                                attr("test-key")
                             except:
                                 pass
                         elif "set" in attr_name.lower():
                             try:
-                                result = attr("test-key", "test-value")
+                                attr("test-key", "test-value")
                             except:
                                 pass
                         elif "delete" in attr_name.lower():
                             try:
-                                result = attr("test-key")
+                                attr("test-key")
                             except:
                                 pass
                         elif "clear" in attr_name.lower():
                             try:
-                                result = attr()
+                                attr()
                             except:
                                 pass
 
@@ -339,7 +333,7 @@ def test_core_pagination():
             if not attr_name.startswith("_"):
                 try:
                     attr = getattr(pagination, attr_name)
-                    if hasattr(attr, "__call__") and "Paginat" in str(attr):
+                    if callable(attr) and "Paginat" in str(attr):
                         try:
                             paginator = attr()
 
@@ -352,13 +346,13 @@ def test_core_pagination():
                                     "page_size": "10",
                                 }
                                 mock_view = Mock()
-                                result = paginator.paginate_queryset(
+                                paginator.paginate_queryset(
                                     mock_queryset, mock_request, mock_view
                                 )
 
                             if hasattr(paginator, "get_paginated_response"):
                                 mock_data = [{"id": 1}, {"id": 2}]
-                                response = paginator.get_paginated_response(mock_data)
+                                paginator.get_paginated_response(mock_data)
 
                         except:
                             pass
@@ -392,7 +386,7 @@ def test_core_decorators():
                             if callable(decorated):
                                 # Try to call the decorated function
                                 try:
-                                    result = decorated()
+                                    decorated()
                                 except:
                                     pass
 
@@ -423,7 +417,7 @@ def test_core_enums():
                         for member_name in members:
                             try:
                                 member_value = attr[member_name]
-                                member_str = str(member_value)
+                                str(member_value)
                             except:  # nosec B110 - Coverage booster intentionally ignores errors
                                 pass
 

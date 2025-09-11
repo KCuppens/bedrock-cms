@@ -3,10 +3,12 @@ Celery tasks for accounts app.
 """
 
 import logging
-from celery import shared_task
-from django.utils import timezone
+
 from django.contrib.auth import get_user_model
 from django.core.cache import cache
+from django.utils import timezone
+
+from celery import shared_task
 
 logger = logging.getLogger(__name__)
 User = get_user_model()
@@ -92,8 +94,9 @@ def cleanup_inactive_sessions(self, days=30):
         days: Number of days of inactivity before cleanup
     """
     try:
-        from django.contrib.sessions.models import Session
         from datetime import timedelta
+
+        from django.contrib.sessions.models import Session
 
         cutoff_date = timezone.now() - timedelta(days=days)
 

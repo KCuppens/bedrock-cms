@@ -3,10 +3,10 @@ Blog app coverage booster - targets views, models, and serializers.
 """
 
 import os
-import sys
+from datetime import datetime
+from unittest.mock import Mock, patch
+
 import django
-from unittest.mock import Mock, patch, MagicMock
-from datetime import datetime, timedelta
 
 # Configure minimal Django
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "apps.config.settings.base")
@@ -39,12 +39,12 @@ def test_blog_views():
                     viewset.action = action
 
                     try:
-                        serializer_class = viewset.get_serializer_class()
+                        viewset.get_serializer_class()
                     except:
                         pass
 
                     try:
-                        permissions = viewset.get_permissions()
+                        viewset.get_permissions()
                     except:
                         pass
 
@@ -54,7 +54,7 @@ def test_blog_views():
                         mock_model = Mock()
                         mock_model.objects.all.return_value = []
                         viewset.model = mock_model
-                        queryset = viewset.get_queryset()
+                        viewset.get_queryset()
                 except:
                     pass
 
@@ -64,7 +64,7 @@ def test_blog_views():
                         mock_post = Mock()
                         mock_post.save = Mock()
                         viewset.get_object = Mock(return_value=mock_post)
-                        response = viewset.publish(viewset.request, pk=1)
+                        viewset.publish(viewset.request, pk=1)
                     except:
                         pass
 
@@ -73,13 +73,13 @@ def test_blog_views():
                         mock_post = Mock()
                         mock_post.save = Mock()
                         viewset.get_object = Mock(return_value=mock_post)
-                        response = viewset.unpublish(viewset.request, pk=1)
+                        viewset.unpublish(viewset.request, pk=1)
                     except:
                         pass
 
                 if hasattr(viewset, "featured"):
                     try:
-                        response = viewset.featured(viewset.request)
+                        viewset.featured(viewset.request)
                     except:
                         pass
 
@@ -94,7 +94,7 @@ def test_blog_models():
     """Target blog models.py."""
 
     try:
-        from apps.blog.models import BlogPost, Category, Tag, Author
+        from apps.blog.models import Author, BlogPost, Category, Tag
 
         models = [BlogPost, Category, Tag, Author]
 
@@ -102,7 +102,7 @@ def test_blog_models():
             try:
                 # Test model meta information
                 meta = model_class._meta
-                fields = [f.name for f in meta.fields]
+                [f.name for f in meta.fields]
 
                 # Test __str__ method with mock instance
                 mock_instance = Mock(spec=model_class)
@@ -122,14 +122,14 @@ def test_blog_models():
                     mock_instance.email = "author@example.com"
 
                 try:
-                    str_result = model_class.__str__(mock_instance)
+                    model_class.__str__(mock_instance)
                 except:
                     pass
 
                 # Test model methods
                 if hasattr(model_class, "get_absolute_url"):
                     try:
-                        url = model_class.get_absolute_url(mock_instance)
+                        model_class.get_absolute_url(mock_instance)
                     except:
                         pass
 
@@ -153,12 +153,12 @@ def test_blog_serializers():
 
     try:
         from apps.blog.serializers import (
-            BlogPostSerializer,
-            BlogPostListSerializer,
+            AuthorSerializer,
             BlogPostDetailSerializer,
+            BlogPostListSerializer,
+            BlogPostSerializer,
             CategorySerializer,
             TagSerializer,
-            AuthorSerializer,
         )
 
         serializers = [
@@ -200,16 +200,13 @@ def test_blog_serializers():
                 serializer = serializer_class(data=mock_data)
                 try:
                     serializer.is_valid()
-                    fields = serializer.fields
                 except:
                     pass
 
                 # Test serializer methods
                 if hasattr(serializer_class, "validate_slug"):
                     try:
-                        validated = serializer_class.validate_slug(
-                            serializer, "test-slug"
-                        )
+                        serializer_class.validate_slug(serializer, "test-slug")
                     except:
                         pass
 
@@ -233,25 +230,25 @@ def test_blog_versioning():
                     attr = getattr(versioning, attr_name)
                     if callable(attr):
                         # Try to get function properties
-                        doc = getattr(attr, "__doc__", None)
-                        name = getattr(attr, "__name__", None)
+                        getattr(attr, "__doc__", None)
+                        getattr(attr, "__name__", None)
 
                         # Try versioning-related functions
                         if "create_version" in attr_name.lower():
                             try:
                                 mock_obj = Mock()
-                                result = attr(mock_obj)
+                                attr(mock_obj)
                             except:
                                 pass
                         elif "get_version" in attr_name.lower():
                             try:
-                                result = attr(1)
+                                attr(1)
                             except:
                                 pass
                         elif "revert" in attr_name.lower():
                             try:
                                 mock_obj = Mock()
-                                result = attr(mock_obj, 1)
+                                attr(mock_obj, 1)
                             except:
                                 pass
 
@@ -275,7 +272,6 @@ def test_blog_admin():
                     attr = getattr(admin, attr_name)
                     if hasattr(attr, "_meta"):
                         # Try to access admin class properties
-                        meta = attr._meta
 
                         # Test admin methods
                         if hasattr(attr, "get_queryset"):
@@ -283,7 +279,7 @@ def test_blog_admin():
                                 mock_request = Mock()
                                 mock_request.user = Mock()
                                 admin_instance = attr(Mock(), Mock())
-                                queryset = admin_instance.get_queryset(mock_request)
+                                admin_instance.get_queryset(mock_request)
                             except:
                                 pass
 

@@ -2,28 +2,24 @@
 API views for versioning and audit functionality.
 """
 
-from typing import Optional
-from django.shortcuts import get_object_or_404
 from django.utils import timezone
-from django.db.models import Q
-from rest_framework import viewsets, status
-from rest_framework.decorators import action
-from rest_framework.response import Response
-from rest_framework.permissions import IsAuthenticated
-from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework import filters
-from drf_spectacular.utils import extend_schema, OpenApiParameter
 
-from .models import Page
-from .versioning import PageRevision, AuditEntry, RevisionDiffer
+from django_filters.rest_framework import DjangoFilterBackend
+from drf_spectacular.utils import OpenApiParameter, extend_schema
+from rest_framework import filters, status, viewsets
+from rest_framework.decorators import action
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
+
+from .versioning import AuditEntry, PageRevision, RevisionDiffer
 from .versioning_serializers import (
-    PageRevisionSerializer,
-    PageRevisionDetailSerializer,
-    RevisionDiffSerializer,
-    RevertRevisionSerializer,
     AuditEntrySerializer,
     AutosaveSerializer,
+    PageRevisionDetailSerializer,
+    PageRevisionSerializer,
     PublishPageSerializer,
+    RevertRevisionSerializer,
+    RevisionDiffSerializer,
     UnpublishPageSerializer,
 )
 

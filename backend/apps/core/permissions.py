@@ -1,5 +1,4 @@
 from rest_framework import permissions
-from apps.accounts.rbac import ScopedLocale, ScopedSection
 
 
 class HasGroup(permissions.BasePermission):

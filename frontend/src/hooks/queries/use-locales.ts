@@ -19,19 +19,15 @@ export const useLocales = () => {
     queryKey: ['locales'],
     queryFn: async () => {
       try {
-        console.log('🔍 useLocales: Making API call to /api/v1/i18n/locales/');
         // Use the API client's request method directly
         const response = await (api as any).request({ 
           method: 'GET', 
           url: '/api/v1/i18n/locales/' 
         });
-        console.log('🔍 useLocales: API response:', response);
         // Handle paginated response - extract results array
         const result = response.results || response;
-        console.log('🔍 useLocales: Extracted result:', result);
         return result;
       } catch (error) {
-        console.error('🔍 useLocales: API Error:', error);
         throw error;
       }
     },

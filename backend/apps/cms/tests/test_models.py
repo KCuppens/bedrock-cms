@@ -1,14 +1,15 @@
-from django.test import TestCase
 from django.contrib.auth import get_user_model
+from django.test import TestCase
 from django.urls import reverse
-from rest_framework.test import APITestCase
-from rest_framework import status
-from apps.i18n.models import Locale
-from apps.cms.models import Page, Redirect
-from apps.cms.blocks.validation import validate_blocks
-from apps.cms.seo import SeoSettings
-from apps.cms.seo_utils import resolve_seo, generate_seo_links, deep_merge_dicts
 
+from rest_framework import status
+from rest_framework.test import APITestCase
+
+from apps.cms.blocks.validation import validate_blocks
+from apps.cms.models import Page, Redirect
+from apps.cms.seo import SeoSettings
+from apps.cms.seo_utils import deep_merge_dicts, resolve_seo
+from apps.i18n.models import Locale
 
 User = get_user_model()
 
@@ -391,7 +392,7 @@ class PagesAPITest(APITestCase):
         products = Page.objects.create(
             title="Products", slug="products", locale=self.locale, status="published"
         )
-        software = Page.objects.create(
+        Page.objects.create(
             title="Software",
             slug="software",
             parent=products,
@@ -568,7 +569,7 @@ class SeoUtilsTest(TestCase):
     def test_resolve_seo_with_global_settings(self):
         """Test SEO resolution with global settings."""
         # Create global SEO settings
-        seo_settings = SeoSettings.objects.create(
+        SeoSettings.objects.create(
             locale=self.locale,
             title_suffix=" - My Site",
             default_description="Global description",
@@ -624,7 +625,7 @@ class SeoUtilsTest(TestCase):
         from apps.cms.seo_utils import generate_hreflang_alternates
 
         # Create French version of same page
-        fr_page = Page.objects.create(
+        Page.objects.create(
             title="Test Page FR",
             slug="test-fr",
             locale=self.locale_fr,

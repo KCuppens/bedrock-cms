@@ -2,20 +2,20 @@
 Tests for caching functionality.
 """
 
-from django.test import TestCase, override_settings
-from django.core.cache import cache
-from django.contrib.auth import get_user_model
-from unittest.mock import patch, MagicMock
+from unittest.mock import MagicMock, patch
 
-from apps.i18n.models import Locale
+from django.contrib.auth import get_user_model
+from django.core.cache import cache
+from django.test import TestCase, override_settings
+
 from apps.core.cache import CacheKeyBuilder, CacheManager, cache_manager
 from apps.core.signals import (
-    invalidate_page_cache,
+    invalidate_all_cache,
     invalidate_blog_cache,
     invalidate_content_cache,
-    invalidate_all_cache,
+    invalidate_page_cache,
 )
-
+from apps.i18n.models import Locale
 
 User = get_user_model()
 
@@ -169,7 +169,7 @@ class CacheManagerTests(TestCase):
         mock_cache._cache = MagicMock()
         mock_cache._cache.delete_pattern = MagicMock(return_value=5)
 
-        result = self.cache_manager.delete_pattern("test:*")
+        self.cache_manager.delete_pattern("test:*")
         mock_cache._cache.delete_pattern.assert_called_once_with("test:*")
 
     @patch("apps.core.cache.cache")

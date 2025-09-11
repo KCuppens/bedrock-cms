@@ -3,8 +3,9 @@ Test cases for core management commands.
 """
 
 from io import StringIO
-from django.test import TestCase
+
 from django.core.management import call_command
+from django.test import TestCase
 
 
 class ManagementCommandsTest(TestCase):

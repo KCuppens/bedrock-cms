@@ -2,7 +2,6 @@
 Custom storage backends for different use cases.
 """
 
-from typing import Any
 from django.conf import settings
 
 try:

@@ -7,9 +7,8 @@ registered content models, with support for precedence and caching.
 
 # mypy: ignore-errors
 
-from typing import Optional, Dict, Any
-from django.shortcuts import get_object_or_404
-from django.apps import apps
+from typing import Any
+
 from django.core.exceptions import ValidationError
 from django.http import Http404
 
@@ -23,7 +22,7 @@ class PresentationPageResolver:
     def __init__(self):
         self.registry_configs = get_all_configs()
 
-    def resolve_from_route(self, path: str, locale_code: str) -> Dict[str, Any]:
+    def resolve_from_route(self, path: str, locale_code: str) -> dict[str, Any]:
         """
         Resolve content and presentation page from a URL path.
 
@@ -60,7 +59,7 @@ class PresentationPageResolver:
 
     def resolve_by_id(
         self, content_label: str, content_id: int, locale_code: str
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """
         Resolve content and presentation page by explicit ID.
 
@@ -89,7 +88,7 @@ class PresentationPageResolver:
         # Could extend for other registered content types
         raise Http404(f"Content type {content_label} not supported")
 
-    def _resolve_blog_post(self, slug: str, locale_code: str) -> Dict[str, Any]:
+    def _resolve_blog_post(self, slug: str, locale_code: str) -> dict[str, Any]:
         """Resolve blog post by slug."""
         from apps.blog.models import BlogPost
 
@@ -104,7 +103,7 @@ class PresentationPageResolver:
                 f"Published blog post '{slug}' not found for locale {locale_code}"
             )
 
-    def _resolve_blog_post_from_instance(self, post) -> Dict[str, Any]:
+    def _resolve_blog_post_from_instance(self, post) -> dict[str, Any]:
         """Resolve presentation page and options for a blog post instance."""
         from apps.blog.models import BlogSettings
 
@@ -166,7 +165,7 @@ class PresentationPageResolver:
         )
 
     def validate_content_detail_block(
-        self, blocks: list, allowed_labels: Optional[list] = None
+        self, blocks: list, allowed_labels: list | None = None
     ) -> None:
         """
         Validate that a page has exactly one content_detail block for presentation pages.
@@ -214,7 +213,7 @@ def resolve_presentation_page(
     content_label: str = None,
     content_id: int = None,
     locale_code: str = "en",
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     """
     Convenience function to resolve presentation pages.
 

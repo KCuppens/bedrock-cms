@@ -2,10 +2,11 @@
 Translation services for auto-suggestions and machine translation.
 """
 
-import requests
-from django.conf import settings
-from django.core.exceptions import ImproperlyConfigured
 import logging
+
+from django.conf import settings
+
+import requests
 
 logger = logging.getLogger(__name__)
 

@@ -2,7 +2,7 @@ import { useState, useCallback, useEffect, useMemo } from "react";
 import { useKeyboardShortcuts } from "@/hooks/useKeyboardShortcuts";
 import { useAutosave } from "@/hooks/useAutosave";
 import { useParams, useNavigate } from "react-router-dom";
-import { api } from "@/lib/api";
+import { api } from "@/lib/api.ts";
 import { useToast } from "@/hooks/use-toast";
 import { DynamicBlockRenderer } from "@/components/blocks/DynamicBlockRenderer";
 import { Page, Block as ApiBlock } from "@/types/api";

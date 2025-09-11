@@ -37,7 +37,7 @@ import {
 } from "lucide-react";
 import { PageData } from "@/pages/PageEditor";
 import { InlineEditField } from "@/components/InlineEditField";
-import { api } from "@/lib/api";
+import { api } from "@/lib/api.ts";
 import { useToast } from "@/hooks/use-toast";
 
 interface DetailsDrawerProps {

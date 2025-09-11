@@ -2,18 +2,20 @@
 Test cases for i18n background tasks.
 """
 
-from unittest.mock import patch, MagicMock
-from django.test import TestCase
+from unittest.mock import MagicMock, patch
+
 from django.contrib.auth import get_user_model
-from apps.i18n.models import Locale, TranslationUnit, TranslationQueue
-from apps.i18n.tasks import (
-    process_translation_queue,
-    auto_translate_content,
-    generate_translation_report,
-    sync_locale_fallbacks,
-    cleanup_old_translations,
-)
 from django.contrib.contenttypes.models import ContentType
+from django.test import TestCase
+
+from apps.i18n.models import Locale, TranslationQueue, TranslationUnit
+from apps.i18n.tasks import (
+    auto_translate_content,
+    cleanup_old_translations,
+    generate_translation_report,
+    process_translation_queue,
+    sync_locale_fallbacks,
+)
 
 User = get_user_model()
 
@@ -60,7 +62,7 @@ class I18nTasksTest(TestCase):
         with patch("apps.i18n.tasks.TranslationService") as mock_service:
             mock_service.return_value.translate.return_value = "Translated text"
 
-            result = process_translation_queue()
+            process_translation_queue()
 
             # Should complete without error
             mock_logger.info.assert_called()
@@ -73,7 +75,7 @@ class I18nTasksTest(TestCase):
                 "Translation error"
             )
 
-            result = process_translation_queue()
+            process_translation_queue()
 
             # Should handle errors gracefully
             mock_logger.error.assert_called()
@@ -82,7 +84,7 @@ class I18nTasksTest(TestCase):
     def test_auto_translate_content_basic(self, mock_logger):
         """Test basic auto-translation functionality."""
         # Test with minimal parameters
-        result = auto_translate_content(
+        auto_translate_content(
             content_type_id=self.content_type.id,
             object_id=self.user.id,
             field="first_name",
@@ -100,7 +102,7 @@ class I18nTasksTest(TestCase):
             mock_service.translate.return_value = "Auto translated"
             mock_get_service.return_value = mock_service
 
-            result = auto_translate_content(
+            auto_translate_content(
                 content_type_id=self.content_type.id,
                 object_id=self.user.id,
                 field="first_name",
@@ -113,7 +115,7 @@ class I18nTasksTest(TestCase):
     @patch("apps.i18n.tasks.logger")
     def test_generate_translation_report(self, mock_logger):
         """Test translation report generation."""
-        result = generate_translation_report()
+        generate_translation_report()
 
         # Should generate report without error
         mock_logger.info.assert_called()
@@ -121,7 +123,7 @@ class I18nTasksTest(TestCase):
     @patch("apps.i18n.tasks.logger")
     def test_generate_translation_report_with_params(self, mock_logger):
         """Test translation report with specific parameters."""
-        result = generate_translation_report(
+        generate_translation_report(
             locale_codes=["en", "es"], date_from="2024-01-01", date_to="2024-12-31"
         )
 
@@ -131,7 +133,7 @@ class I18nTasksTest(TestCase):
     @patch("apps.i18n.tasks.logger")
     def test_sync_locale_fallbacks(self, mock_logger):
         """Test locale fallback synchronization."""
-        result = sync_locale_fallbacks()
+        sync_locale_fallbacks()
 
         # Should complete sync process
         mock_logger.info.assert_called()
@@ -139,7 +141,7 @@ class I18nTasksTest(TestCase):
     @patch("apps.i18n.tasks.logger")
     def test_sync_locale_fallbacks_specific_locale(self, mock_logger):
         """Test syncing specific locale fallbacks."""
-        result = sync_locale_fallbacks(locale_code="es")
+        sync_locale_fallbacks(locale_code="es")
 
         # Should sync specific locale
         mock_logger.info.assert_called()
@@ -147,7 +149,7 @@ class I18nTasksTest(TestCase):
     @patch("apps.i18n.tasks.logger")
     def test_cleanup_old_translations(self, mock_logger):
         """Test cleanup of old translations."""
-        result = cleanup_old_translations()
+        cleanup_old_translations()
 
         # Should complete cleanup
         mock_logger.info.assert_called()
@@ -155,7 +157,7 @@ class I18nTasksTest(TestCase):
     @patch("apps.i18n.tasks.logger")
     def test_cleanup_old_translations_with_days(self, mock_logger):
         """Test cleanup with specific retention period."""
-        result = cleanup_old_translations(days=30)
+        cleanup_old_translations(days=30)
 
         # Should use custom retention period
         mock_logger.info.assert_called()
@@ -180,7 +182,7 @@ class I18nTasksTest(TestCase):
     def test_task_with_invalid_parameters(self, mock_logger):
         """Test tasks with invalid parameters."""
         # Test with invalid content type
-        result = auto_translate_content(
+        auto_translate_content(
             content_type_id=99999,
             object_id=1,
             field="invalid",

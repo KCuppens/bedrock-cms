@@ -8,24 +8,21 @@ for blog posts, similar to the CMS page versioning system.
 # mypy: ignore-errors
 
 import uuid
-from datetime import timedelta
-from typing import Dict, List, Any, Optional, TYPE_CHECKING
+from datetime import datetime, timedelta
+from typing import TYPE_CHECKING, Optional
+
+from django.contrib.auth import get_user_model
 from django.db import models, transaction
 from django.db.models import (
-    CharField,
-    TextField,
     BooleanField,
     DateTimeField,
     ForeignKey,
-    PositiveIntegerField,
-    UUIDField,
     OneToOneField,
+    PositiveIntegerField,
+    TextField,
+    UUIDField,
 )
-from django.contrib.auth import get_user_model
 from django.utils import timezone
-from datetime import datetime
-from django.contrib.contenttypes.models import ContentType
-from django.contrib.contenttypes.fields import GenericForeignKey
 
 if TYPE_CHECKING:
     from .models import BlogPost
@@ -208,7 +205,7 @@ class BlogPostRevision(models.Model):
         Returns:
             Updated BlogPost instance
         """
-        from .models import BlogPost, Tag
+        from .models import Tag
 
         blog_post = self.blog_post
         snapshot = self.snapshot
@@ -308,7 +305,7 @@ class BlogPostViewTracker(models.Model):
 
 
 # Signal handlers for automatic revision creation
-from django.db.models.signals import post_save, pre_save
+from django.db.models.signals import post_save
 from django.dispatch import receiver
 
 

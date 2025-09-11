@@ -3,6 +3,7 @@ Optimized serializers for CMS with reduced field loading.
 """
 
 from rest_framework import serializers
+
 from .models import Page, Redirect
 
 

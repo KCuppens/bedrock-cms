@@ -1,21 +1,19 @@
-from typing import Any, Optional, Union
+from typing import Any, Optional
 
 from django.contrib.auth.models import AbstractUser, BaseUserManager
 from django.core.validators import FileExtensionValidator
 from django.db import models
+from django.db.models import (
+    BooleanField,
+    CharField,
+    DateTimeField,
+    OneToOneField,
+    TextField,
+    URLField,
+)
 from django.utils import timezone
 from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
-from django.db.models import (
-    F,
-    CharField,
-    TextField,
-    BooleanField,
-    DateTimeField,
-    ForeignKey,
-    OneToOneField,
-    URLField,
-)
 
 
 class CustomUserManager(BaseUserManager["User"]):
@@ -34,7 +32,7 @@ class CustomUserManager(BaseUserManager["User"]):
         return user
 
     def create_superuser(
-        self, email: str, password: Optional[str] = None, **extra_fields: Any
+        self, email: str, password: str | None = None, **extra_fields: Any
     ) -> "User":
         """Create and return a superuser with an email and password."""
         extra_fields.setdefault("is_staff", True)
@@ -169,4 +167,3 @@ class UserProfile(models.Model):
 
 
 # Import RBAC models
-from .rbac import ScopedLocale, ScopedSection, RBACMixin

@@ -2,11 +2,13 @@
 Cache warming and invalidation strategies.
 """
 
-from django.core.cache import cache
-from django.db.models.signals import post_save, post_delete
-from django.dispatch import receiver
-from apps.core.tasks import warm_cache_async, bulk_warm_cache
 import logging
+
+from django.core.cache import cache
+from django.db.models.signals import post_delete, post_save
+from django.dispatch import receiver
+
+from apps.core.tasks import bulk_warm_cache, warm_cache_async
 
 logger = logging.getLogger(__name__)
 
@@ -20,8 +22,8 @@ class CacheWarmer:
     def warm_homepage_cache():
         """Warm cache for homepage and main navigation."""
         from apps.cms.models import Page
-        from apps.i18n.models import Locale
         from apps.core.cache import cache_manager
+        from apps.i18n.models import Locale
 
         configs = []
 
@@ -161,8 +163,8 @@ class CacheWarmer:
     @staticmethod
     def warm_sitemaps():
         """Warm sitemap caches."""
-        from apps.i18n.models import Locale
         from apps.core.cache import cache_manager
+        from apps.i18n.models import Locale
 
         configs = []
 
@@ -332,8 +334,8 @@ class Command(BaseCommand):
         self.stdout.write(f"  Hit Rate: {stats.get('hit_rate', 0):.2%}")
 
         # Show slow endpoints
+
         from django.core.cache import cache
-        import re
 
         self.stdout.write("\nSlow Endpoints:")
         # This is a simplified example - in production you'd query Redis directly

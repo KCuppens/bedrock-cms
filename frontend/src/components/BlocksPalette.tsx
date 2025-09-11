@@ -18,7 +18,7 @@ import {
   LayoutGrid
 } from "lucide-react";
 import { Block } from "@/pages/PageEditor";
-import { api } from "@/lib/api";
+import { api } from "@/lib/api.ts";
 
 interface BlocksPaletteProps {
   onAddBlock: (type: Block['type'], position: number) => void;

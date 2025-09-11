@@ -1,11 +1,13 @@
-from rest_framework import viewsets, status, serializers
-from rest_framework.decorators import action, api_view, permission_classes
-from rest_framework.response import Response
-from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Group, Permission
-from django.db.models import Q, Count
+from django.db.models import Count, Q
+
 from drf_spectacular.utils import extend_schema, extend_schema_view
+from rest_framework import serializers, status, viewsets
+from rest_framework.decorators import action, api_view, permission_classes
+from rest_framework.permissions import IsAdminUser
+from rest_framework.response import Response
+
 from .serializers import UserSerializer
 
 User = get_user_model()
@@ -176,27 +178,27 @@ class UserManagementViewSet(viewsets.ModelViewSet):
 
                 # Generate new password reset token for the invite
                 from django.contrib.auth.tokens import default_token_generator
-                from django.utils.http import urlsafe_base64_encode
                 from django.utils.encoding import force_bytes
+                from django.utils.http import urlsafe_base64_encode
 
                 # Create reset token for password setup
                 token = default_token_generator.make_token(user)
-                uid = urlsafe_base64_encode(force_bytes(user.pk))
+                urlsafe_base64_encode(force_bytes(user.pk))
 
                 # Send resend invitation email
-                from django.core.mail import send_mail
                 from django.conf import settings
+                from django.core.mail import send_mail
 
                 send_mail(
                     subject=f"Invitation Reminder - {settings.SITE_NAME}",
                     message=f"""
                     This is a reminder about your invitation to {settings.SITE_NAME}.
-                    
+
                     {message}
-                    
+
                     Please use the following link to set up your password:
                     {settings.FRONTEND_URL}/accounts/password/reset/key/{user.pk}-{token}/
-                    
+
                     If you already have an account, you can sign in at:
                     {settings.FRONTEND_URL}/sign-in
                     """,
@@ -245,24 +247,24 @@ class UserManagementViewSet(viewsets.ModelViewSet):
 
             # Generate password reset token for new user
             from django.contrib.auth.tokens import default_token_generator
-            from django.utils.http import urlsafe_base64_encode
             from django.utils.encoding import force_bytes
+            from django.utils.http import urlsafe_base64_encode
 
             # Create reset token for password setup
             token = default_token_generator.make_token(user)
-            uid = urlsafe_base64_encode(force_bytes(user.pk))
+            urlsafe_base64_encode(force_bytes(user.pk))
 
             # Send invitation email
-            from django.core.mail import send_mail
             from django.conf import settings
+            from django.core.mail import send_mail
 
             send_mail(
                 subject=f"Invitation to {settings.SITE_NAME}",
                 message=f"""
                 You have been invited to {settings.SITE_NAME}.
-                
+
                 {message}
-                
+
                 Please use the following link to set up your password:
                 {settings.FRONTEND_URL}/accounts/password/reset/key/{user.pk}-{token}/
                 """,
@@ -387,8 +389,9 @@ class RoleViewSet(viewsets.ModelViewSet):
 
             # Create locale scopes if provided
             if locale_scope_ids:
-                from .rbac import ScopedLocale
                 from apps.i18n.models import Locale
+
+                from .rbac import ScopedLocale
 
                 for locale_id in locale_scope_ids:
                     try:
@@ -408,7 +411,7 @@ class RoleViewSet(viewsets.ModelViewSet):
 
     def update(self, request, *args, **kwargs):
         """Update an existing role/group"""
-        partial = kwargs.pop("partial", False)
+        kwargs.pop("partial", False)
         instance = self.get_object()
 
         data = getattr(request, "data", request.POST)
@@ -422,8 +425,9 @@ class RoleViewSet(viewsets.ModelViewSet):
 
         # Update locale scopes if provided
         if "locale_scope_ids" in data:
-            from .rbac import ScopedLocale
             from apps.i18n.models import Locale
+
+            from .rbac import ScopedLocale
 
             # Clear existing locale scopes
             ScopedLocale.objects.filter(group=instance).delete()

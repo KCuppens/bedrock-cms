@@ -1,9 +1,10 @@
-from rest_framework import viewsets, status
-from rest_framework.decorators import action
-from rest_framework.response import Response
-from rest_framework.permissions import IsAuthenticated
 from django.core.cache import cache
-from django.shortcuts import get_object_or_404
+
+from rest_framework import status, viewsets
+from rest_framework.decorators import action
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
+
 from apps.cms.seo import SeoSettings
 from apps.cms.serializers.seo import SeoSettingsSerializer
 from apps.i18n.models import Locale
@@ -129,7 +130,7 @@ class SeoSettingsViewSet(viewsets.ModelViewSet):
         # Check if settings already exist for this locale
         if SeoSettings.objects.filter(locale_id=locale_id).exists():
             return Response(
-                {"error": f"SEO settings already exist for this locale"},
+                {"error": "SEO settings already exist for this locale"},
                 status=status.HTTP_400_BAD_REQUEST,
             )
 

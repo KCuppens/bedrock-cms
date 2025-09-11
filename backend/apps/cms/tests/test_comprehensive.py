@@ -2,28 +2,27 @@
 Comprehensive CMS tests targeting 80%+ coverage with real database operations.
 """
 
-import json
 from datetime import datetime, timedelta
-from django.test import TestCase, TransactionTestCase
-from django.contrib.auth import get_user_model
-from django.urls import reverse
-from django.core.exceptions import ValidationError
-from rest_framework.test import APITestCase, APIClient
-from rest_framework import status
-from unittest.mock import patch, Mock
 
-from apps.cms.models import Page, Category, Block, PageVersion
-from apps.cms.serializers.pages import PageSerializer, PageDetailSerializer
+from django.contrib.auth import get_user_model
+from django.core.exceptions import ValidationError
+from django.test import TestCase, TransactionTestCase
+from django.urls import reverse
+
+from rest_framework import status
+from rest_framework.test import APIClient, APITestCase
+
+from apps.cms import tasks
+from apps.cms.models import Block, Category, Page, PageVersion
+from apps.cms.security import PageSecurityManager
+from apps.cms.seo import SEOManager
+from apps.cms.serializers.pages import PageDetailSerializer, PageSerializer
 from apps.cms.versioning import (
     VersionManager,
     create_page_version,
     revert_page_to_version,
 )
-from apps.cms import tasks
-from apps.cms.security import PageSecurityManager
-from apps.cms.seo import SEOManager
 from apps.i18n.models import Locale
-
 
 User = get_user_model()
 
@@ -461,7 +460,7 @@ class CMSSecurityTests(TestCase):
 
             # Test user permissions
             can_edit = security_manager.can_edit(self.user, page)
-            can_publish = security_manager.can_publish(self.user, page)
+            security_manager.can_publish(self.user, page)
 
             # Author should be able to edit
             self.assertTrue(can_edit)
@@ -580,11 +579,11 @@ class CMSIntegrationTests(TransactionTestCase):
 
         # Create blocks if Block model exists
         try:
-            text_block = Block.objects.create(
+            Block.objects.create(
                 page=page, type="text", content={"text": "Test block content"}, order=1
             )
 
-            image_block = Block.objects.create(
+            Block.objects.create(
                 page=page,
                 type="image",
                 content={"url": "/media/test.jpg", "alt": "Test image"},

@@ -3,10 +3,10 @@ Analytics app coverage booster - targets views, models, and aggregation.
 """
 
 import os
-import sys
+from datetime import datetime
+from unittest.mock import Mock, patch
+
 import django
-from unittest.mock import Mock, patch, MagicMock
-from datetime import datetime, timedelta
 
 # Configure minimal Django
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "apps.config.settings.base")
@@ -22,13 +22,13 @@ def test_analytics_views_comprehensive():
 
     try:
         from apps.analytics.views import (
-            PageViewViewSet,
-            UserActivityViewSet,
-            ContentMetricsViewSet,
+            AnalyticsSummaryViewSet,
             AssessmentViewSet,
+            ContentMetricsViewSet,
+            PageViewViewSet,
             RiskViewSet,
             ThreatViewSet,
-            AnalyticsSummaryViewSet,
+            UserActivityViewSet,
         )
 
         viewsets = [
@@ -55,31 +55,31 @@ def test_analytics_views_comprehensive():
                     viewset.action = action
 
                     try:
-                        serializer_class = viewset.get_serializer_class()
+                        viewset.get_serializer_class()
                     except:
                         pass
 
                     try:
-                        permissions = viewset.get_permissions()
+                        viewset.get_permissions()
                     except:
                         pass
 
                 # Test get_queryset
                 try:
-                    queryset = viewset.get_queryset()
+                    viewset.get_queryset()
                 except:
                     pass
 
                 # Test custom actions if they exist
                 if hasattr(viewset, "dashboard"):
                     try:
-                        response = viewset.dashboard(viewset.request)
+                        viewset.dashboard(viewset.request)
                     except:
                         pass
 
                 if hasattr(viewset, "summary"):
                     try:
-                        response = viewset.summary(viewset.request)
+                        viewset.summary(viewset.request)
                     except:
                         pass
 
@@ -95,13 +95,13 @@ def test_analytics_models():
 
     try:
         from apps.analytics.models import (
-            PageView,
-            UserActivity,
-            ContentMetrics,
+            AnalyticsSummary,
             Assessment,
+            ContentMetrics,
+            PageView,
             Risk,
             Threat,
-            AnalyticsSummary,
+            UserActivity,
         )
 
         models = [
@@ -118,7 +118,7 @@ def test_analytics_models():
             try:
                 # Test model meta information
                 meta = model_class._meta
-                fields = [f.name for f in meta.fields]
+                [f.name for f in meta.fields]
 
                 # Test __str__ method with mock instance
                 mock_instance = Mock(spec=model_class)
@@ -143,7 +143,7 @@ def test_analytics_models():
                     mock_instance.date = datetime.now().date()
 
                 try:
-                    str_result = model_class.__str__(mock_instance)
+                    model_class.__str__(mock_instance)
                 except:
                     pass
 
@@ -152,7 +152,7 @@ def test_analytics_models():
                     try:
                         with patch.object(model_class, "objects") as mock_objects:
                             mock_objects.filter.return_value.aggregate.return_value = {}
-                            stats = model_class.get_stats()
+                            model_class.get_stats()
                     except:
                         pass
 
@@ -168,12 +168,12 @@ def test_analytics_serializers():
 
     try:
         from apps.analytics.serializers import (
-            PageViewSerializer,
-            PageViewCreateSerializer,
-            UserActivitySerializer,
-            ContentMetricsSerializer,
             AssessmentSerializer,
+            ContentMetricsSerializer,
+            PageViewCreateSerializer,
+            PageViewSerializer,
             RiskSerializer,
+            UserActivitySerializer,
         )
 
         serializers = [
@@ -212,7 +212,6 @@ def test_analytics_serializers():
                 serializer = serializer_class(data=mock_data)
                 try:
                     serializer.is_valid()
-                    fields = serializer.fields
                 except:
                     pass
 
@@ -236,8 +235,8 @@ def test_analytics_aggregation():
                     attr = getattr(aggregation, attr_name)
                     if callable(attr):
                         # Try to get function properties
-                        doc = getattr(attr, "__doc__", None)
-                        name = getattr(attr, "__name__", None)
+                        getattr(attr, "__doc__", None)
+                        getattr(attr, "__name__", None)
 
                         # Try to call simple aggregation functions with mock data
                         if "aggregate" in attr_name.lower():
@@ -248,12 +247,12 @@ def test_analytics_aggregation():
                                     mock_objects.filter.return_value.aggregate.return_value = {
                                         "count": 100
                                     }
-                                    result = attr()
+                                    attr()
                             except:
                                 pass
                         elif "calculate" in attr_name.lower():
                             try:
-                                result = attr(
+                                attr(
                                     start_date=datetime.now().date(),
                                     end_date=datetime.now().date(),
                                 )
@@ -278,7 +277,7 @@ def test_analytics_permissions():
             if not attr_name.startswith("_"):
                 try:
                     attr = getattr(permissions, attr_name)
-                    if hasattr(attr, "__call__"):
+                    if callable(attr):
                         # Try to instantiate permission classes
                         if "Permission" in str(attr):
                             try:
@@ -289,9 +288,7 @@ def test_analytics_permissions():
                                     mock_request = Mock()
                                     mock_request.user = Mock()
                                     mock_view = Mock()
-                                    result = permission.has_permission(
-                                        mock_request, mock_view
-                                    )
+                                    permission.has_permission(mock_request, mock_view)
 
                             except:
                                 pass
@@ -316,13 +313,13 @@ def test_analytics_tasks():
                     attr = getattr(tasks, attr_name)
                     if callable(attr):
                         # Try to get task properties
-                        doc = getattr(attr, "__doc__", None)
-                        name = getattr(attr, "__name__", None)
+                        getattr(attr, "__doc__", None)
+                        getattr(attr, "__name__", None)
 
                         # Try to access task-related attributes
                         if hasattr(attr, "delay"):
                             # Celery task
-                            task_name = getattr(attr, "name", None)
+                            getattr(attr, "name", None)
 
                 except:
                     pass
@@ -344,22 +341,22 @@ def test_analytics_utils():
                     attr = getattr(utils, attr_name)
                     if callable(attr):
                         # Try to get function properties
-                        doc = getattr(attr, "__doc__", None)
+                        getattr(attr, "__doc__", None)
 
                         # Try simple utility functions
                         if "parse" in attr_name.lower():
                             try:
-                                result = attr("test-data")
+                                attr("test-data")
                             except:
                                 pass
                         elif "format" in attr_name.lower():
                             try:
-                                result = attr(datetime.now())
+                                attr(datetime.now())
                             except:
                                 pass
                         elif "validate" in attr_name.lower():
                             try:
-                                result = attr({"test": "data"})
+                                attr({"test": "data"})
                             except:
                                 pass
 

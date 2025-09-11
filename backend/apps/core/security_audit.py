@@ -3,12 +3,12 @@ Security audit utilities for verifying permission enforcement.
 """
 
 import logging
-from typing import Dict, List, Any
-from django.urls import get_resolver
+from typing import Any
+
 from django.conf import settings
-from rest_framework import permissions
+from django.urls import get_resolver
+
 from rest_framework.viewsets import ModelViewSet, ViewSet
-from rest_framework.views import APIView
 
 logger = logging.getLogger(__name__)
 
@@ -23,7 +23,7 @@ class SecurityAuditReport:
         self.issues = []
         self.warnings = []
 
-    def audit_all_endpoints(self) -> Dict[str, Any]:
+    def audit_all_endpoints(self) -> dict[str, Any]:
         """
         Audit all API endpoints for security issues.
 
@@ -242,7 +242,7 @@ class SecurityAuditReport:
     def _is_write_endpoint(self, view_class, path):
         """Check if this is a write endpoint."""
         # Check if it's a ViewSet with write methods
-        if issubclass(view_class, (ModelViewSet, ViewSet)):
+        if issubclass(view_class, ModelViewSet | ViewSet):
             return True
 
         # Check path patterns that suggest write operations

@@ -3,6 +3,7 @@ Test DeepL translation service.
 """
 
 from django.core.management.base import BaseCommand
+
 from apps.i18n.services import DeepLTranslationService
 
 
@@ -17,7 +18,7 @@ class Command(BaseCommand):
         source_lang = "en"
         target_lang = "fr"
 
-        self.stdout.write(f"Testing DeepL translation:")
+        self.stdout.write("Testing DeepL translation:")
         self.stdout.write(f'Text: "{test_text}"')
         self.stdout.write(f"From: {source_lang}")
         self.stdout.write(f"To: {target_lang}")

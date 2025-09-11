@@ -6,9 +6,9 @@ and Django's i18n settings (LANGUAGE_CODE and LANGUAGES).
 """
 
 import json
-from django.core.management.base import BaseCommand, CommandError
+
 from django.conf import settings
-from django.core.cache import cache
+from django.core.management.base import BaseCommand, CommandError
 
 from apps.i18n.models import Locale
 from apps.i18n.settings_sync import DjangoSettingsSync

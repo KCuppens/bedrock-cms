@@ -2,21 +2,21 @@
 Management command for comprehensive performance review of Bedrock CMS.
 """
 
-import time
 import json
 import statistics
-from django.core.management.base import BaseCommand
-from django.test import Client
-from django.db import connection, reset_queries
-from django.core.cache import cache
+import time
+
 from django.conf import settings
+from django.core.cache import cache
+from django.core.management.base import BaseCommand
+from django.db import connection, reset_queries
+from django.test import Client
 from django.utils import timezone
 
-from apps.cms.models import Page
 from apps.blog.models import BlogPost
-from apps.media.models import Asset
 from apps.cms.blocks.validation import validate_blocks
-from apps.i18n.models import Locale
+from apps.cms.models import Page
+from apps.media.models import Asset
 
 
 class Command(BaseCommand):
@@ -193,7 +193,7 @@ class Command(BaseCommand):
                 start_time = time.time()
                 try:
                     if method == "GET":
-                        response = self.client.get(endpoint)
+                        self.client.get(endpoint)
                     response_time = (time.time() - start_time) * 1000
                     times.append(response_time)
                 except Exception as e:
@@ -326,7 +326,7 @@ class Command(BaseCommand):
             for _ in range(iterations):
                 start_time = time.time()
                 try:
-                    validated = validate_blocks(blocks)
+                    validate_blocks(blocks)
                     validation_time = (time.time() - start_time) * 1000
                     times.append(validation_time)
                 except Exception as e:
@@ -373,7 +373,7 @@ class Command(BaseCommand):
 
         # Test asset queries
         start_time = time.time()
-        assets = list(Asset.objects.all()[:10])
+        list(Asset.objects.all()[:10])
         query_time = (time.time() - start_time) * 1000
 
         # Test asset with renditions (if any exist)
@@ -627,7 +627,7 @@ class Command(BaseCommand):
 
         # API performance penalties
         api_results = self.results.get("api", {})
-        for name, data in api_results.items():
+        for _name, data in api_results.items():
             if data.get("avg_time_ms", 0) > 500:
                 score -= 15  # Severe penalty for very slow APIs
             elif data.get("avg_time_ms", 0) > 200:
@@ -649,7 +649,7 @@ class Command(BaseCommand):
 
         # Block validation penalties
         block_results = self.results.get("blocks", {})
-        for count, data in block_results.items():
+        for _count, data in block_results.items():
             if data.get("avg_time_ms", 0) > 1000:
                 score -= 8
             elif data.get("avg_time_ms", 0) > 500:

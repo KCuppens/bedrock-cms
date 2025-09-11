@@ -3,8 +3,10 @@ Management command to run security audit on all API endpoints.
 """
 
 import json
+
 from django.core.management.base import BaseCommand
-from apps.core.security_audit import run_security_audit, print_security_audit_report
+
+from apps.core.security_audit import print_security_audit_report, run_security_audit
 
 
 class Command(BaseCommand):
