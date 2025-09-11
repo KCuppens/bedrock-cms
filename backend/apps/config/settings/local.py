@@ -30,8 +30,10 @@ CORS_ALLOWED_ORIGINS = [
     "http://127.0.0.1:8081",
     "http://localhost:8082",  # Another alternative Vite port
     "http://127.0.0.1:8082",
-    "http://localhost:8084",  # Current Vite port
+    "http://localhost:8084",  # Alternative Vite port
     "http://127.0.0.1:8084",
+    "http://localhost:8088",  # Current Vite port
+    "http://127.0.0.1:8088",
 ]
 CORS_ALLOW_CREDENTIALS = True
 
@@ -62,6 +64,8 @@ CSRF_TRUSTED_ORIGINS = [
     "http://127.0.0.1:8082",
     "http://localhost:8084",
     "http://127.0.0.1:8084",
+    "http://localhost:8088",
+    "http://127.0.0.1:8088",
 ]
 CSRF_COOKIE_SAMESITE = "Lax"
 CSRF_COOKIE_HTTPONLY = False  # Allow JavaScript to read the cookie

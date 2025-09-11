@@ -6,7 +6,7 @@ from django.conf import settings
 
 # Configure Django settings before importing models
 if not settings.configured:
-    os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'apps.config.settings.test')
+    os.environ.setdefault("DJANGO_SETTINGS_MODULE", "apps.config.settings.test")
     django.setup()
 
 import pytest

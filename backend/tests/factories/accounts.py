@@ -19,17 +19,17 @@ User = get_user_model()
 
 class GroupFactory(BaseFactory):
     """Factory for creating groups."""
-    
+
     class Meta:
         model = Group
-    
-    name = factory.Faker('word')
-    
+
+    name = factory.Faker("word")
+
     @factory.post_generation
     def permissions(self, create, extracted, **kwargs):
         if not create:
             return
-        
+
         if extracted:
             for permission in extracted:
                 self.permissions.add(permission)
@@ -37,85 +37,83 @@ class GroupFactory(BaseFactory):
 
 class UserProfileFactory(BaseFactory):
     """Factory for user profiles."""
-    
+
     class Meta:
         model = UserProfile
-    
+
     user = factory.SubFactory(UserFactory)
     avatar = None
-    bio = factory.Faker('paragraph', nb_sentences=3)
-    timezone = factory.Iterator([
-        'UTC', 'America/New_York', 'Europe/London', 
-        'Europe/Paris', 'Asia/Tokyo', 'Australia/Sydney'
-    ])
-    language_preference = factory.Iterator(['en', 'es', 'fr', 'de'])
+    bio = factory.Faker("paragraph", nb_sentences=3)
+    timezone = factory.Iterator(
+        [
+            "UTC",
+            "America/New_York",
+            "Europe/London",
+            "Europe/Paris",
+            "Asia/Tokyo",
+            "Australia/Sydney",
+        ]
+    )
+    language_preference = factory.Iterator(["en", "es", "fr", "de"])
 
 
 class ScopedSectionFactory(BaseFactory):
     """Factory for scoped sections."""
-    
+
     class Meta:
         model = ScopedSection
-    
+
     user = factory.SubFactory(UserFactory)
-    section = factory.Iterator(['cms', 'blog', 'media', 'analytics'])
-    permission_level = factory.Iterator(['view', 'edit', 'admin'])
+    section = factory.Iterator(["cms", "blog", "media", "analytics"])
+    permission_level = factory.Iterator(["view", "edit", "admin"])
 
 
 class ScopedLocaleFactory(BaseFactory):
     """Factory for scoped locales."""
-    
+
     class Meta:
         model = ScopedLocale
-    
+
     user = factory.SubFactory(UserFactory)
     locale = factory.SubFactory(LocaleFactory)
-    permission_level = factory.Iterator(['view', 'edit', 'admin'])
+    permission_level = factory.Iterator(["view", "edit", "admin"])
 
 
 # Specialized user factories with specific roles
 class EditorUserFactory(UserFactory):
     """Factory for editor users with CMS permissions."""
-    
+
     @factory.post_generation
     def setup_editor_permissions(self, create, extracted, **kwargs):
         if not create:
             return
-        
+
         # Add to editors group
-        editor_group, _ = Group.objects.get_or_create(name='Editors')
+        editor_group, _ = Group.objects.get_or_create(name="Editors")
         self.groups.add(editor_group)
-        
+
         # Create profile
         UserProfileFactory(user=self)
-        
+
         # Add CMS section access
-        ScopedSectionFactory(
-            user=self, 
-            section='cms', 
-            permission_level='edit'
-        )
+        ScopedSectionFactory(user=self, section="cms", permission_level="edit")
 
 
 class TranslatorUserFactory(UserFactory):
     """Factory for translator users with i18n permissions."""
-    
+
     @factory.post_generation
     def setup_translator_permissions(self, create, extracted, **kwargs):
         if not create:
             return
-        
+
         # Add to translators group
-        translator_group, _ = Group.objects.get_or_create(name='Translators')
+        translator_group, _ = Group.objects.get_or_create(name="Translators")
         self.groups.add(translator_group)
-        
+
         # Create profile
         UserProfileFactory(user=self)
-        
+
         # Add locale access for Spanish
-        locale_es = LocaleFactory(code='es')
-        ScopedLocaleFactory(
-            user=self,
-            locale=locale_es,
-            permission_level='edit'
-        )
+        locale_es = LocaleFactory(code="es")
+        ScopedLocaleFactory(user=self, locale=locale_es, permission_level="edit")

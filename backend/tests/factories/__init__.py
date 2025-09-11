@@ -7,7 +7,7 @@ all test suites with realistic, varied data generation.
 
 try:
     from .base import *
-    from .accounts import *  
+    from .accounts import *
     from .cms import *
     from .i18n import *
     from .media import *
@@ -17,10 +17,10 @@ except ImportError:
     pass
 
 __all__ = [
-    'UserFactory',
-    'LocaleFactory', 
-    'PageFactory',
-    'MediaItemFactory',
-    'TranslationUnitFactory',
-    'AnalyticsEventFactory',
+    "UserFactory",
+    "LocaleFactory",
+    "PageFactory",
+    "MediaItemFactory",
+    "TranslationUnitFactory",
+    "AnalyticsEventFactory",
 ]
