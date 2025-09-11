@@ -92,7 +92,7 @@ class Migration(migrations.Migration):
         migrations.AddIndex(
             model_name="category",
             index=models.Index(
-                fields=["slug", "locale"], name="blog_category_slug_idx"
+                fields=["slug"], name="blog_category_slug_idx"
             ),
         ),
     ]
