@@ -5,6 +5,7 @@ Global content registry for CMS content types.
 # mypy: ignore-errors
 
 import json
+from typing import Dict, List, Optional, Type, Any
 
 from django.core.exceptions import ValidationError
 from django.db import models
@@ -26,8 +27,8 @@ class ContentRegistry:
     """
 
     def __init__(self):
-        self._configs: dict[str, ContentConfig] = {}
-        self._by_model: dict[type[models.Model], ContentConfig] = {}
+        self._configs: Dict[str, ContentConfig] = {}
+        self._by_model: Dict[Type[models.Model], ContentConfig] = {}
         self._validated = False
 
     def register(self, config: ContentConfig):
@@ -65,7 +66,7 @@ class ContentRegistry:
             del self._by_model[config.model]
             self._validated = False
 
-    def get_config(self, model_label: str) -> ContentConfig | None:
+    def get_config(self, model_label: str) -> Optional[ContentConfig]:
         """
         Get a content configuration by model label.
 
@@ -77,7 +78,7 @@ class ContentRegistry:
         """
         return self._configs.get(model_label)
 
-    def get_config_by_model(self, model: type[models.Model]) -> ContentConfig | None:
+    def get_config_by_model(self, model: Type[models.Model]) -> Optional[ContentConfig]:
         """
         Get a content configuration by model class.
 
@@ -89,11 +90,11 @@ class ContentRegistry:
         """
         return self._by_model.get(model)
 
-    def get_all_configs(self) -> list[ContentConfig]:
+    def get_all_configs(self) -> List[ContentConfig]:
         """Get all registered configurations."""
         return list(self._configs.values())
 
-    def get_configs_by_kind(self, kind: str) -> list[ContentConfig]:
+    def get_configs_by_kind(self, kind: str) -> List[ContentConfig]:
         """
         Get all configurations of a specific kind.
 
@@ -105,7 +106,7 @@ class ContentRegistry:
         """
         return [config for config in self._configs.values() if config.kind == kind]
 
-    def get_model_labels(self) -> list[str]:
+    def get_model_labels(self) -> List[str]:
         """Get all registered model labels."""
         return list(self._configs.keys())
 
@@ -113,7 +114,7 @@ class ContentRegistry:
         """Check if a model label is registered."""
         return model_label in self._configs
 
-    def is_model_registered(self, model: type[models.Model]) -> bool:
+    def is_model_registered(self, model: Type[models.Model]) -> bool:
         """Check if a model class is registered."""
         return model in self._by_model
 
@@ -142,7 +143,7 @@ class ContentRegistry:
 
         self._validated = True
 
-    def get_registry_summary(self) -> dict:
+    def get_registry_summary(self) -> Dict[str, Any]:
         """
         Get a summary of all registered content types.
 
@@ -224,17 +225,17 @@ def register_model(
     return config
 
 
-def get_config(model_label: str) -> ContentConfig | None:
+def get_config(model_label: str) -> Optional[ContentConfig]:
     """Get a content configuration by model label."""
     return content_registry.get_config(model_label)
 
 
-def get_config_by_model(model: type[models.Model]) -> ContentConfig | None:
+def get_config_by_model(model: Type[models.Model]) -> Optional[ContentConfig]:
     """Get a content configuration by model class."""
     return content_registry.get_config_by_model(model)
 
 
-def get_all_configs() -> list[ContentConfig]:
+def get_all_configs() -> List[ContentConfig]:
     """Get all registered configurations."""
     return content_registry.get_all_configs()
 
