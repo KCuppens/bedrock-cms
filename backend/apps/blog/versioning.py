@@ -100,7 +100,7 @@ class BlogPostRevision(models.Model):
             'featured': blog_post.featured,
             'allow_comments': blog_post.allow_comments,
             'published_at': blog_post.published_at.isoformat() if blog_post.published_at else None,
-            'scheduled_for': blog_post.scheduled_for.isoformat() if blog_post.scheduled_for else None,
+            'scheduled_publish_at': blog_post.scheduled_publish_at.isoformat() if blog_post.scheduled_publish_at else None,
             'category_id': blog_post.category_id,
             'tag_ids': list(blog_post.tags.values_list('id', flat=True)),
             'social_image_id': blog_post.social_image_id,
@@ -205,9 +205,9 @@ class BlogPostRevision(models.Model):
                 timezone.datetime.fromisoformat(snapshot['published_at']) 
                 if snapshot['published_at'] else None
             )
-            blog_post.scheduled_for = (
-                timezone.datetime.fromisoformat(snapshot['scheduled_for'])
-                if snapshot['scheduled_for'] else None
+            blog_post.scheduled_publish_at = (
+                timezone.datetime.fromisoformat(snapshot['scheduled_publish_at'])
+                if snapshot.get('scheduled_publish_at') else None
             )
             
             # Restore relationships

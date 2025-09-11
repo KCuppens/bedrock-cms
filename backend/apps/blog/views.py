@@ -186,7 +186,7 @@ class BlogPostViewSet(viewsets.ModelViewSet):
         
         blog_post.status = 'published'
         blog_post.published_at = timezone.now()
-        blog_post.scheduled_for = None  # Clear any scheduled date
+        blog_post.scheduled_publish_at = None  # Clear any scheduled date
         blog_post.save()
         
         # Create published snapshot

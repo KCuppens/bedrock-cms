@@ -7,7 +7,7 @@ from django.contrib.postgres.indexes import GinIndex
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('cms', '0004_pagerevision_auditentry'),
+        ('cms', '0019_add_model_relationships_to_blocktype'),
     ]
 
     operations = [

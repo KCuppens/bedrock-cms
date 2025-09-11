@@ -4,6 +4,7 @@ Scheduling models for the CMS.
 This module provides scheduling functionality for pages and blog posts.
 """
 
+from typing import Any, Optional
 from django.db import models
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
@@ -28,15 +29,15 @@ class ScheduledTask(models.Model):
         ('cancelled', _('Cancelled')),
     ]
     
-    id = models.AutoField(primary_key=True)
-    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
-    object_id = models.PositiveIntegerField()
+    id: models.AutoField = models.AutoField(primary_key=True)
+    content_type: models.ForeignKey = models.ForeignKey(ContentType, on_delete=models.CASCADE)
+    object_id: models.PositiveIntegerField = models.PositiveIntegerField()
     content_object = GenericForeignKey('content_type', 'object_id')
     
-    task_type = models.CharField(max_length=10, choices=TASK_TYPES, db_index=True)
-    scheduled_for = models.DateTimeField(db_index=True)
+    task_type: models.CharField = models.CharField(max_length=10, choices=TASK_TYPES, db_index=True)
+    scheduled_for: models.DateTimeField = models.DateTimeField(db_index=True)
     
-    status = models.CharField(
+    status: models.CharField = models.CharField(
         max_length=10, 
         choices=TASK_STATUS, 
         default='pending', 
@@ -44,20 +45,20 @@ class ScheduledTask(models.Model):
     )
     
     # Execution tracking
-    attempts = models.PositiveIntegerField(default=0)
-    last_attempt_at = models.DateTimeField(null=True, blank=True)
-    completed_at = models.DateTimeField(null=True, blank=True)
-    error_message = models.TextField(blank=True)
+    attempts: models.PositiveIntegerField = models.PositiveIntegerField(default=0)
+    last_attempt_at: models.DateTimeField = models.DateTimeField(null=True, blank=True)
+    completed_at: models.DateTimeField = models.DateTimeField(null=True, blank=True)
+    error_message: models.TextField = models.TextField(blank=True)
     
     # Metadata
-    created_by = models.ForeignKey(
+    created_by: models.ForeignKey = models.ForeignKey(
         'accounts.User', 
         on_delete=models.SET_NULL, 
         null=True,
         related_name='scheduled_tasks'
     )
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
+    created_at: models.DateTimeField = models.DateTimeField(auto_now_add=True)
+    updated_at: models.DateTimeField = models.DateTimeField(auto_now=True)
     
     class Meta:
         indexes = [

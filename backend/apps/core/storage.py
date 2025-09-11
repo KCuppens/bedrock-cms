@@ -2,6 +2,7 @@
 Custom storage backends for different use cases.
 """
 
+from typing import Any
 from django.conf import settings
 
 try:
@@ -21,10 +22,10 @@ try:
         
 except ImportError:
     # django-storages not available, create dummy classes
-    class S3MediaStorage:
+    class S3MediaStorage:  # type: ignore[no-redef]
         """Dummy S3 storage class when django-storages is not available."""
         pass
     
-    class S3StaticStorage:
+    class S3StaticStorage:  # type: ignore[no-redef]
         """Dummy S3 storage class when django-storages is not available."""
         pass

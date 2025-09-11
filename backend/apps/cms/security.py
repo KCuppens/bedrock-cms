@@ -2,8 +2,8 @@
 Security utilities for CMS content.
 """
 
-import bleach
-from typing import Any, Dict, List
+import bleach  # type: ignore[import-untyped]
+from typing import Any, Dict, List, Optional
 from django.conf import settings
 
 # Default allowed tags for rich text content
@@ -47,9 +47,9 @@ def get_sanitization_config():
     }
 
 
-def sanitize_html(html_content: str, allowed_tags: List[str] = None, 
-                 allowed_attributes: Dict[str, List[str]] = None,
-                 allowed_protocols: List[str] = None) -> str:
+def sanitize_html(html_content: str, allowed_tags: Optional[List[str]] = None, 
+                 allowed_attributes: Optional[Dict[str, List[str]]] = None,
+                 allowed_protocols: Optional[List[str]] = None) -> str:
     """
     Sanitize HTML content to remove potentially dangerous elements and attributes.
     

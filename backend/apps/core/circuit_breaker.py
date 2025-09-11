@@ -7,7 +7,7 @@ import functools
 import logging
 import time
 from enum import Enum
-from typing import Callable, Optional, Any
+from typing import Callable, Optional, Any, Union, Type, Tuple, Dict
 from django.core.cache import cache
 from django.conf import settings
 
@@ -36,7 +36,7 @@ class CircuitBreaker:
         name: str,
         failure_threshold: int = 5,
         recovery_timeout: int = 60,
-        expected_exception: type = Exception,
+        expected_exception: Union[Type[Exception], Tuple[Type[Exception], ...]] = Exception,
         success_threshold: int = 2,
     ):
         """
@@ -123,7 +123,7 @@ class CircuitBreaker:
             self._on_success()
             return result
             
-        except self.expected_exception as e:
+        except self.expected_exception as e:  # type: ignore[misc]
             self._on_failure()
             raise e
     
@@ -203,7 +203,7 @@ def circuit_breaker(
     name: Optional[str] = None,
     failure_threshold: int = 5,
     recovery_timeout: int = 60,
-    expected_exception: type = Exception,
+    expected_exception: Union[Type[Exception], Tuple[Type[Exception], ...]] = Exception,
     success_threshold: int = 2,
     fallback: Optional[Callable] = None,
 ):
@@ -290,7 +290,7 @@ external_api_circuit_breaker = functools.partial(
 class CircuitBreakerManager:
     """Manager for all circuit breakers in the system"""
     
-    _breakers = {}
+    _breakers: Dict[str, CircuitBreaker] = {}
     
     @classmethod
     def register(cls, breaker: CircuitBreaker):
