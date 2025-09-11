@@ -2,7 +2,7 @@
 Security utilities for CMS content.
 """
 
-from typing import Any
+from typing import Any, Dict, List, Optional
 
 from django.conf import settings
 
@@ -84,9 +84,9 @@ def get_sanitization_config():
 
 def sanitize_html(
     html_content: str,
-    allowed_tags: list[str] | None = None,
-    allowed_attributes: dict[str, list[str]] | None = None,
-    allowed_protocols: list[str] | None = None,
+    allowed_tags: Optional[List[str]] = None,
+    allowed_attributes: Optional[Dict[str, List[str]]] = None,
+    allowed_protocols: Optional[List[str]] = None,
 ) -> str:
     """
     Sanitize HTML content to remove potentially dangerous elements and attributes.
