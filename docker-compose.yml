@@ -1,0 +1,134 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:15-alpine
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_DB: bedrock_cms
+      POSTGRES_USER: bedrock
+      POSTGRES_PASSWORD: bedrock_password
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U bedrock"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    command: redis-server --appendonly yes --maxmemory 256mb --maxmemory-policy allkeys-lru
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  web:
+    build:
+      context: .
+      target: development
+    volumes:
+      - ./backend:/app/backend
+      - ./frontend:/app/frontend
+      - static_volume:/app/backend/staticfiles
+      - media_volume:/app/backend/media
+    ports:
+      - "8000:8000"
+      - "3000:3000"
+    environment:
+      - DEBUG=True
+      - DJANGO_SETTINGS_MODULE=apps.config.settings.local
+      - DATABASE_URL=postgresql://bedrock:bedrock_password@db:5432/bedrock_cms
+      - REDIS_URL=redis://redis:6379/0
+      - CELERY_BROKER_URL=redis://redis:6379/1
+      - CELERY_RESULT_BACKEND=redis://redis:6379/1
+      - DJANGO_SECRET_KEY=your-secret-key-change-in-production
+      - ALLOWED_HOSTS=localhost,127.0.0.1,0.0.0.0
+      - CORS_ALLOWED_ORIGINS=http://localhost:3000,http://localhost:8080
+      - CELERY_ENABLED=true
+      - WARM_CACHE=false
+    depends_on:
+      - db
+      - redis
+    command: >
+      sh -c "
+        python manage.py migrate &&
+        python manage.py runserver 0.0.0.0:8000
+      "
+
+  celery_worker:
+    build:
+      context: .
+      target: development
+    volumes:
+      - ./backend:/app/backend
+    environment:
+      - DJANGO_SETTINGS_MODULE=apps.config.settings.local
+      - DATABASE_URL=postgresql://bedrock:bedrock_password@db:5432/bedrock_cms
+      - REDIS_URL=redis://redis:6379/0
+      - CELERY_BROKER_URL=redis://redis:6379/1
+      - CELERY_RESULT_BACKEND=redis://redis:6379/1
+    depends_on:
+      - db
+      - redis
+    command: celery -A apps.config worker -l info -Q default,publishing,translations,maintenance
+
+  celery_beat:
+    build:
+      context: .
+      target: development
+    volumes:
+      - ./backend:/app/backend
+    environment:
+      - DJANGO_SETTINGS_MODULE=apps.config.settings.local
+      - DATABASE_URL=postgresql://bedrock:bedrock_password@db:5432/bedrock_cms
+      - REDIS_URL=redis://redis:6379/0
+      - CELERY_BROKER_URL=redis://redis:6379/1
+      - CELERY_RESULT_BACKEND=redis://redis:6379/1
+    depends_on:
+      - db
+      - redis
+    command: celery -A apps.config beat -l info
+
+  # Optional: Flower for Celery monitoring
+  flower:
+    build:
+      context: .
+      target: development
+    ports:
+      - "5555:5555"
+    environment:
+      - CELERY_BROKER_URL=redis://redis:6379/1
+      - CELERY_RESULT_BACKEND=redis://redis:6379/1
+    depends_on:
+      - redis
+    command: celery -A apps.config flower
+
+  # Optional: Frontend development server
+  frontend:
+    image: node:18-alpine
+    working_dir: /app
+    volumes:
+      - ./frontend:/app
+    ports:
+      - "8080:8080"
+    environment:
+      - VITE_API_URL=http://localhost:8000
+    command: >
+      sh -c "
+        npm install &&
+        npm run dev -- --host 0.0.0.0 --port 8080
+      "
+
+volumes:
+  postgres_data:
+  redis_data:
+  static_volume:
+  media_volume:

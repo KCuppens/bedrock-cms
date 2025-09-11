@@ -1,0 +1,2 @@
+# Main requirements file - includes dev dependencies
+-r requirements/dev.txt

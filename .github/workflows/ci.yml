@@ -32,14 +32,14 @@ jobs:
       uses: actions/cache@v3
       with:
         path: ~/.cache/pip
-        key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements/*.txt') }}
+        key: ${{ runner.os }}-pip-${{ hashFiles('backend/requirements/*.txt') }}
         restore-keys: |
           ${{ runner.os }}-pip-
     
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip setuptools>=78.1.1
-        pip install -r requirements/dev.txt
+        pip install -r backend/requirements/dev.txt
     
     - name: Install pre-commit
       run: |
@@ -110,14 +110,14 @@ jobs:
       uses: actions/cache@v3
       with:
         path: ~/.cache/pip
-        key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements/*.txt') }}
+        key: ${{ runner.os }}-pip-${{ hashFiles('backend/requirements/*.txt') }}
         restore-keys: |
           ${{ runner.os }}-pip-
     
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip setuptools>=78.1.1
-        pip install -r requirements/dev.txt
+        pip install -r backend/requirements/dev.txt
     
     - name: Set up environment variables
       run: |
@@ -178,14 +178,14 @@ jobs:
       uses: actions/cache@v3
       with:
         path: ~/.cache/pip
-        key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements/*.txt') }}
+        key: ${{ runner.os }}-pip-${{ hashFiles('backend/requirements/*.txt') }}
         restore-keys: |
           ${{ runner.os }}-pip-
     
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip setuptools>=78.1.1
-        pip install -r requirements/dev.txt
+        pip install -r backend/requirements/dev.txt
     
     - name: Run mypy
       run: mypy apps/
@@ -205,7 +205,7 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip setuptools>=78.1.1
-        pip install -r requirements/dev.txt
+        pip install -r backend/requirements/dev.txt
         pip install bandit[toml] pip-audit
     
     - name: Run bandit security check
@@ -214,7 +214,7 @@ jobs:
     - name: Run pip-audit
       run: |
         # Audit installed packages including our requirements
-        pip-audit --requirement requirements/dev.txt
+        pip-audit --requirement backend/requirements/dev.txt
 
   docker-build:
     name: Docker Build
@@ -295,7 +295,7 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip setuptools>=78.1.1
-        pip install -r requirements/dev.txt
+        pip install -r backend/requirements/dev.txt
     
     - name: Check deployment settings
       run: |
