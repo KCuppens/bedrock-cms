@@ -128,10 +128,11 @@ jobs:
         echo "SECRET_KEY=test-secret-key-for-ci" >> $GITHUB_ENV
     
     - name: Create static directory
-      run: mkdir -p static
+      run: mkdir -p backend/static
     
     - name: Create missing migrations
       run: |
+        cd backend
         # Debug: Show current migration status
         echo "=== Checking migration status ==="
         python manage.py showmigrations || echo "showmigrations failed"
@@ -146,18 +147,20 @@ jobs:
         
     - name: Run migrations
       run: |
+        cd backend
         # Apply all migrations including Django's built-in apps
         echo "=== Running migrations ==="
         python manage.py migrate --noinput --verbosity=2
     
     - name: Run tests with coverage
       run: |
+        cd backend
         pytest --cov=apps --cov-report=xml --cov-report=term-missing --cov-fail-under=80
     
     - name: Upload coverage to Codecov
       uses: codecov/codecov-action@v3
       with:
-        file: ./coverage.xml
+        file: ./backend/coverage.xml
         flags: unittests
         name: codecov-umbrella
         fail_ci_if_error: false
@@ -188,7 +191,9 @@ jobs:
         pip install -r backend/requirements/dev.txt
     
     - name: Run mypy
-      run: mypy apps/
+      run: |
+        cd backend
+        mypy apps/
 
   security:
     name: Security Check
@@ -209,7 +214,9 @@ jobs:
         pip install bandit[toml] pip-audit
     
     - name: Run bandit security check
-      run: bandit -c pyproject.toml -r apps/
+      run: |
+        cd backend
+        bandit -c pyproject.toml -r apps/
     
     - name: Run pip-audit
       run: |
@@ -239,7 +246,7 @@ jobs:
     - name: Test Docker image
       run: |
         docker run --rm django-saas-boilerplate:latest python --version
-        docker run --rm django-saas-boilerplate:latest python manage.py check
+        docker run --rm -w /app/backend django-saas-boilerplate:latest python manage.py check
 
   integration-test:
     name: Integration Tests
@@ -299,6 +306,7 @@ jobs:
     
     - name: Check deployment settings
       run: |
+        cd backend
         export DJANGO_SETTINGS_MODULE=apps.config.settings.prod
         export SECRET_KEY=fake-secret-for-check
         export DATABASE_URL=sqlite:///fake.db

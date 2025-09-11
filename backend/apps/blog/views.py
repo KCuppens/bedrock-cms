@@ -82,7 +82,7 @@ class BlogPostViewSet(viewsets.ModelViewSet):
         else:
             # For detail views, load everything
             queryset = BlogPost.objects.select_related(
-                'locale', 'author', 'category', 'social_image', 'presentation_page'
+                'locale', 'author', 'category', 'social_image'
             ).prefetch_related(
                 'tags',
                 Prefetch('revisions', queryset=BlogPostRevision.objects.order_by('-created_at')[:5])

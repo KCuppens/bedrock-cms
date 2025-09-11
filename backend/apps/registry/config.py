@@ -60,12 +60,12 @@ class ContentConfig:
     @property
     def verbose_name(self) -> str:
         """Get the verbose name of the model."""
-        return self.model._meta.verbose_name
+        return str(self.model._meta.verbose_name)
     
     @property
     def verbose_name_plural(self) -> str:
         """Get the verbose name plural of the model."""
-        return self.model._meta.verbose_name_plural
+        return str(self.model._meta.verbose_name_plural)
     
     def _validate_config(self):
         """Validate the configuration against the model."""

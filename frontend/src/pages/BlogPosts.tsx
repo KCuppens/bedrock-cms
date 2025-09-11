@@ -68,6 +68,9 @@ const PostRow = memo<{
   const handlePublish = useCallback(() => handlePublishToggle(post), [post, handlePublishToggle]);
   const handleDuplicate = useCallback(() => handleDuplicatePost(post), [post, handleDuplicatePost]);
   const handleDelete = useCallback(() => handleDeletePost(post), [post, handleDeletePost]);
+  const handlePreview = useCallback(() => {
+    window.open(`/blog/${post.slug}`, '_blank');
+  }, [post.slug]);
 
   return (
     <TableRow 
@@ -133,7 +136,7 @@ const PostRow = memo<{
               <Edit className="w-4 h-4 mr-2" />
               Edit
             </DropdownMenuItem>
-            <DropdownMenuItem>
+            <DropdownMenuItem onClick={handlePreview}>
               <Eye className="w-4 h-4 mr-2" />
               Preview
             </DropdownMenuItem>
@@ -223,11 +226,10 @@ const BlogPosts = memo(() => {
     }
   }, []);
 
-  // Load data on mount
+  // Load filters on mount
   useEffect(() => {
-    loadPosts();
     loadFilters();
-  }, [loadPosts, loadFilters]);
+  }, [loadFilters]);
 
   // Load posts when filters change
   useEffect(() => {
@@ -379,16 +381,20 @@ const BlogPosts = memo(() => {
         copy_tags: true,
         copy_category: true
       });
-      setPosts(prev => [response.data, ...prev]);
-      toast({
-        title: "Success",
-        description: "Blog post duplicated successfully.",
-      });
+      
+      // Add the duplicated post to the list
+      if (response.data) {
+        setPosts(prev => [response.data, ...prev]);
+        toast({
+          title: "Success",
+          description: `Blog post "${post.title}" duplicated successfully.`,
+        });
+      }
     } catch (error: any) {
       console.error('Failed to duplicate blog post:', error);
       toast({
         title: "Error",
-        description: "Failed to duplicate blog post.",
+        description: error.response?.data?.detail || "Failed to duplicate blog post.",
         variant: "destructive",
       });
     }

@@ -55,12 +55,13 @@ class VersionService:
         # Determine environment from branch if not set
         if info['environment'] == 'development':
             branch = info.get('branch', '')
-            if branch == 'main' or branch == 'master':
-                info['environment'] = 'production'
-            elif branch == 'staging':
-                info['environment'] = 'staging'
-            elif branch.startswith('feature/') or branch.startswith('dev'):
-                info['environment'] = 'development'
+            if isinstance(branch, str):
+                if branch == 'main' or branch == 'master':
+                    info['environment'] = 'production'
+                elif branch == 'staging':
+                    info['environment'] = 'staging'
+                elif branch.startswith('feature/') or branch.startswith('dev'):
+                    info['environment'] = 'development'
         
         return info
     
