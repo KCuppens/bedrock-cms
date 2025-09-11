@@ -80,7 +80,7 @@ class FAQBlockModel(BaseBlockModel):
 class ContentDetailSource(BaseModel):
     """Source configuration for content_detail block."""
 
-    id: int | None = None
+    id: Optional[int] = None
 
 
 class ContentDetailOptions(BaseModel):
