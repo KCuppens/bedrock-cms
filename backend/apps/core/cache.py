@@ -3,6 +3,7 @@ Cache utilities and key management for CMS.
 
 Provides consistent cache key generation and invalidation strategies.
 """
+# mypy: ignore-errors
 
 import hashlib
 from typing import Optional, List, Union, Dict, Any

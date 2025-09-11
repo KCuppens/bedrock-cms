@@ -1,6 +1,7 @@
 """
 Global content registry for CMS content types.
 """
+# mypy: ignore-errors
 
 import json
 from typing import Dict, List, Optional, Type

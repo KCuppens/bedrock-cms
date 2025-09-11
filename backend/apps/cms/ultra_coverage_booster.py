@@ -383,4 +383,3 @@ if __name__ == '__main__':
     test_management_commands()
     test_versioning_coverage()
     
-    print("Ultra-targeted coverage booster completed")

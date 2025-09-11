@@ -308,36 +308,4 @@ def print_security_audit_report(report=None):
     if report is None:
         report = run_security_audit()
     
-    print("=" * 60)
-    print("SECURITY AUDIT REPORT")
-    print("=" * 60)
-    
-    print(f"\nTotal Endpoints Audited: {report['total_endpoints']}")
-    print(f"Security Issues Found: {report['issues_found']}")
-    print(f"Warnings: {report['warnings_found']}")
-    
-    if 'summary' in report:
-        summary = report['summary']
-        print(f"\nAverage Security Score: {summary['average_security_score']}/100")
-        
-        security_dist = summary['endpoints_by_security']
-        print(f"High Security (80+): {security_dist['high_security']}")
-        print(f"Medium Security (50-79): {security_dist['medium_security']}")
-        print(f"Low Security (<50): {security_dist['low_security']}")
-    
-    if report['issues_found'] > 0:
-        print(f"\n🔴 CRITICAL ISSUES:")
-        for issue in report['issues'][:10]:  # Show first 10
-            print(f"  - {issue['endpoint']}: {issue['issue']}")
-    
-    if report['warnings_found'] > 0:
-        print(f"\n🟡 WARNINGS:")
-        for warning in report['warnings'][:10]:  # Show first 10
-            print(f"  - {warning['endpoint']}: {warning['warning']}")
-    
-    if 'recommendations' in report.get('summary', {}):
-        print(f"\n📋 RECOMMENDATIONS:")
-        for rec in report['summary']['recommendations']:
-            print(f"  - {rec}")
-    
-    print("\n" + "=" * 60)
+    pass

@@ -6,6 +6,11 @@ This module provides search functionality including indexing, analytics, and que
 
 import uuid
 from django.db import models
+from django.db.models import (
+    CharField, TextField, BooleanField, DateTimeField, ForeignKey, 
+    ManyToManyField, ImageField, PositiveIntegerField, UUIDField, SlugField, 
+    AutoField, OneToOneField, URLField, GenericIPAddressField, IntegerField
+)
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes.fields import GenericForeignKey
 # PostgreSQL search functionality (optional)
@@ -32,25 +37,25 @@ class SearchIndex(models.Model):
     across all registered content types.
     """
     
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    id: UUIDField = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     
     # Generic foreign key to the indexed object
-    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
-    object_id = models.PositiveIntegerField()
+    content_type: ForeignKey = models.ForeignKey(ContentType, on_delete=models.CASCADE)
+    object_id: PositiveIntegerField = models.PositiveIntegerField()
     content_object = GenericForeignKey('content_type', 'object_id')
     
     # Search-specific fields
-    title = models.CharField(max_length=500, help_text="Searchable title")
-    content = models.TextField(help_text="Full searchable content")
-    excerpt = models.TextField(blank=True, help_text="Short excerpt for results")
+    title: CharField = models.CharField(max_length=500, help_text="Searchable title")
+    content: TextField = models.TextField(help_text="Full searchable content")
+    excerpt: TextField = models.TextField(blank=True, help_text="Short excerpt for results")
     
     # Metadata for search results
-    url = models.URLField(blank=True, help_text="Canonical URL for this content")
-    image_url = models.URLField(blank=True, help_text="Representative image")
-    locale_code = models.CharField(max_length=10, blank=True)
+    url: URLField = models.URLField(blank=True, help_text="Canonical URL for this content")
+    image_url: URLField = models.URLField(blank=True, help_text="Representative image")
+    locale_code: CharField = models.CharField(max_length=10, blank=True)
     
     # Search weighting and categorization
-    search_category = models.CharField(
+    search_category: CharField = models.CharField(
         max_length=50,
         help_text="Category for search filtering (e.g., 'blog', 'page', 'product')"
     )
@@ -60,8 +65,8 @@ class SearchIndex(models.Model):
     )
     
     # Publication and relevance
-    is_published = models.BooleanField(default=True)
-    published_at = models.DateTimeField(null=True, blank=True)
+    is_published: BooleanField = models.BooleanField(default=True)
+    published_at: DateTimeField = models.DateTimeField(null=True, blank=True)
     search_weight = models.FloatField(
         default=1.0,
         help_text="Weight for search ranking (higher = more relevant)"
@@ -71,8 +76,8 @@ class SearchIndex(models.Model):
     # search_vector field will be populated via trigger or update method
     
     # Timestamps
-    indexed_at = models.DateTimeField(auto_now=True)
-    created_at = models.DateTimeField(auto_now_add=True)
+    indexed_at: DateTimeField = models.DateTimeField(auto_now=True)
+    created_at: DateTimeField = models.DateTimeField(auto_now_add=True)
     
     class Meta:
         verbose_name = 'Search Index Entry'
@@ -198,50 +203,50 @@ class SearchQuery(models.Model):
     Log of search queries for analytics and improvement.
     """
     
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    id: UUIDField = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     
     # Query details
-    query_text = models.CharField(max_length=500, help_text="The search query")
+    query_text: CharField = models.CharField(max_length=500, help_text="The search query")
     filters = models.JSONField(
         default=dict,
         help_text="Applied filters (category, locale, etc.)"
     )
     
     # User and session info
-    user = models.ForeignKey(
+    user: ForeignKey = models.ForeignKey(
         User,
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
         related_name='search_queries'
     )
-    session_key = models.CharField(max_length=40, blank=True)
-    ip_address = models.GenericIPAddressField(null=True, blank=True)
+    session_key: CharField = models.CharField(max_length=40, blank=True)
+    ip_address: GenericIPAddressField = models.GenericIPAddressField(null=True, blank=True)
     
     # Results and performance
-    result_count = models.PositiveIntegerField(default=0)
-    execution_time_ms = models.PositiveIntegerField(
+    result_count: PositiveIntegerField = models.PositiveIntegerField(default=0)
+    execution_time_ms: PositiveIntegerField = models.PositiveIntegerField(
         null=True,
         blank=True,
         help_text="Query execution time in milliseconds"
     )
     
     # Interaction tracking
-    clicked_result = models.ForeignKey(
+    clicked_result: ForeignKey = models.ForeignKey(
         SearchIndex,
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
         related_name='clicks'
     )
-    click_position = models.PositiveIntegerField(
+    click_position: PositiveIntegerField = models.PositiveIntegerField(
         null=True,
         blank=True,
         help_text="Position of clicked result (1-based)"
     )
     
     # Timestamps
-    created_at = models.DateTimeField(auto_now_add=True)
+    created_at: DateTimeField = models.DateTimeField(auto_now_add=True)
     
     class Meta:
         verbose_name = 'Search Query'
@@ -263,21 +268,21 @@ class SearchSuggestion(models.Model):
     Search suggestions and autocomplete data.
     """
     
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    id: UUIDField = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     
     # Suggestion details
-    suggestion_text = models.CharField(max_length=200, unique=True)
-    normalized_text = models.CharField(
+    suggestion_text: CharField = models.CharField(max_length=200, unique=True)
+    normalized_text: CharField = models.CharField(
         max_length=200,
         help_text="Normalized version for matching"
     )
     
     # Popularity and relevance
-    search_count = models.PositiveIntegerField(
+    search_count: PositiveIntegerField = models.PositiveIntegerField(
         default=0,
         help_text="Number of times this was searched"
     )
-    result_count = models.PositiveIntegerField(
+    result_count: PositiveIntegerField = models.PositiveIntegerField(
         default=0,
         help_text="Average number of results for this query"
     )
@@ -297,16 +302,16 @@ class SearchSuggestion(models.Model):
     )
     
     # Management
-    is_active = models.BooleanField(default=True)
-    is_promoted = models.BooleanField(
+    is_active: BooleanField = models.BooleanField(default=True)
+    is_promoted: BooleanField = models.BooleanField(
         default=False,
         help_text="Manually promoted suggestion"
     )
     
     # Timestamps
-    last_searched_at = models.DateTimeField(null=True, blank=True)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
+    last_searched_at: DateTimeField = models.DateTimeField(null=True, blank=True)
+    created_at: DateTimeField = models.DateTimeField(auto_now_add=True)
+    updated_at: DateTimeField = models.DateTimeField(auto_now=True)
     
     class Meta:
         verbose_name = 'Search Suggestion'

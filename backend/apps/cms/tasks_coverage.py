@@ -344,4 +344,3 @@ if __name__ == '__main__':
     test_cms_task_signals()
     test_cms_task_utilities()
     
-    print("CMS tasks coverage booster completed")

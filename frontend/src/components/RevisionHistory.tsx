@@ -35,7 +35,7 @@ import {
   Alert,
   AlertDescription,
 } from '@/components/ui';
-import { api } from '@/lib/api.ts';
+import { api } from '@/lib/api';
 import { toast } from '@/components/ui/use-toast';
 
 interface Revision {

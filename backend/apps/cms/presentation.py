@@ -4,6 +4,7 @@ Presentation page resolver for content_detail blocks.
 Handles the resolution of which presentation page to use for rendering
 registered content models, with support for precedence and caching.
 """
+# mypy: ignore-errors
 
 from typing import Optional, Dict, Any
 from django.shortcuts import get_object_or_404

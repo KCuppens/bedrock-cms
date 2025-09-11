@@ -386,5 +386,3 @@ if __name__ == '__main__':
     test_cms_view_mixins()
     test_cms_view_filters()
     test_cms_view_pagination()
-    
-    print("CMS views deep coverage booster completed")

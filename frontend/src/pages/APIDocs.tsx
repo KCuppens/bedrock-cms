@@ -114,13 +114,11 @@ const APIDocs = () => {
         }
         
         const schemaData: OpenAPISchema = await response.json();
-        console.log('Fetched schema:', schemaData);
         
         setSchema(schemaData);
         
         // Parse endpoints from schema
         const parsedEndpoints = parseEndpointsFromSchema(schemaData);
-        console.log('Parsed endpoints:', parsedEndpoints);
         
         setEndpoints(parsedEndpoints);
         

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { api } from '@/lib/api.ts';
+import { api } from '@/lib/api';
 import { useLocale } from '@/contexts/LocaleContext';
 
 export interface MenuItem {

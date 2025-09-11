@@ -272,7 +272,7 @@ def global_search(request):
                 total += len(type_results)
         except Exception as e:
             # Log error but continue with other searches
-            print(f"Search error for {search_type}: {e}")
+            pass
             continue
     
     # Format response

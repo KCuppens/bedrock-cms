@@ -508,4 +508,3 @@ if __name__ == '__main__':
     test_search_signals()
     test_search_admin()
     
-    print("Search mega coverage booster completed")

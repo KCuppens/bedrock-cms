@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useMemo, createContext, useContext } from 'react';
-import { api } from '@/lib/api.ts';
+import { api } from '@/lib/api';
 
 export interface User {
   id: string;

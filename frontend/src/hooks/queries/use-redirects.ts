@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { api } from '@/lib/api.ts';
+import { api } from '@/lib/api';
 import { useToast } from '@/hooks/use-toast';
 
 // Query Keys
@@ -73,7 +73,6 @@ export function useCreateRedirect() {
       });
     },
     onError: (error: any) => {
-      console.error('Failed to create redirect:', error);
       toast({
         title: "Error",
         description: error?.response?.data?.error || "Failed to create redirect.",
@@ -97,7 +96,7 @@ export function useUpdateRedirect() {
       }, 100);
     },
     onError: (error: any) => {
-      console.error('Failed to update redirect:', error);
+      // Error handled by UI feedback
     },
   });
 }
@@ -116,7 +115,6 @@ export function useDeleteRedirect() {
       });
     },
     onError: (error: any) => {
-      console.error('Failed to delete redirect:', error);
       toast({
         title: "Error",
         description: error?.response?.data?.error || "Failed to delete redirect.",
@@ -141,7 +139,6 @@ export function useTestRedirect() {
       });
     },
     onError: (error: any) => {
-      console.error('Failed to test redirect:', error);
       toast({
         title: "Error",
         description: "Failed to test redirect.",
@@ -165,7 +162,6 @@ export function useImportRedirectsCSV() {
       });
     },
     onError: (error: any) => {
-      console.error('Failed to import CSV:', error);
       toast({
         title: "Import Failed",
         description: "Failed to import redirects. Please check the CSV format.",

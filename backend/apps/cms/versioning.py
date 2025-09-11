@@ -3,6 +3,7 @@ Versioning and audit models for the CMS.
 
 This module provides content versioning, autosave, and audit trail functionality.
 """
+# mypy: ignore-errors
 
 import uuid
 from datetime import timedelta

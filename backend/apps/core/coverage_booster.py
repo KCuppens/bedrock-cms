@@ -430,5 +430,3 @@ if __name__ == '__main__':
     test_core_pagination()
     test_core_decorators()
     test_core_enums()
-    
-    print("Core coverage booster completed")

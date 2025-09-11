@@ -2,7 +2,7 @@ import uuid
 
 from django.contrib.auth import get_user_model
 from django.db import models
-from django.db.models import F
+from django.db.models import F, UUIDField, CharField, TextField, BooleanField, PositiveIntegerField, DateTimeField
 
 from apps.core.enums import FileType
 from apps.core.mixins import TimestampMixin, UserTrackingMixin
@@ -14,29 +14,29 @@ class FileUpload(TimestampMixin, UserTrackingMixin):
     """File upload model with S3/MinIO storage"""
 
     # File identification
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    original_filename = models.CharField("Original filename", max_length=255)
-    filename = models.CharField("Stored filename", max_length=255, unique=True)
+    id: UUIDField = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    original_filename: CharField = models.CharField("Original filename", max_length=255)
+    filename: CharField = models.CharField("Stored filename", max_length=255, unique=True)
 
     # File metadata
-    file_type = models.CharField(
+    file_type: CharField = models.CharField(
         "File type", max_length=20, choices=FileType.choices, default=FileType.OTHER
     )
-    mime_type = models.CharField("MIME type", max_length=100)
-    file_size = models.PositiveIntegerField("File size (bytes)")
-    checksum = models.CharField("File checksum", max_length=64, blank=True, db_index=True)
+    mime_type: CharField = models.CharField("MIME type", max_length=100)
+    file_size: PositiveIntegerField = models.PositiveIntegerField("File size (bytes)")
+    checksum: CharField = models.CharField("File checksum", max_length=64, blank=True, db_index=True)
 
     # Storage info
-    storage_path = models.TextField("Storage path")
-    is_public = models.BooleanField("Public access", default=False)
+    storage_path: TextField = models.TextField("Storage path")
+    is_public: BooleanField = models.BooleanField("Public access", default=False)
 
     # File details
-    description = models.TextField("Description", blank=True)
-    tags = models.CharField("Tags", max_length=500, blank=True)
+    description: TextField = models.TextField("Description", blank=True)
+    tags: CharField = models.CharField("Tags", max_length=500, blank=True)
 
     # Access control
-    expires_at = models.DateTimeField("Expires at", null=True, blank=True)
-    download_count = models.PositiveIntegerField("Download count", default=0)
+    expires_at: DateTimeField = models.DateTimeField("Expires at", null=True, blank=True)
+    download_count: PositiveIntegerField = models.PositiveIntegerField("Download count", default=0)
 
     class Meta:
         verbose_name = "File Upload"

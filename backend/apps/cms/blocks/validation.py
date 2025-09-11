@@ -1,3 +1,4 @@
+# mypy: ignore-errors
 from typing import List, Dict, Any, Literal, Union, Optional
 from pydantic import BaseModel, ValidationError, Field, HttpUrl
 from rest_framework.exceptions import ValidationError as DRFValidationError

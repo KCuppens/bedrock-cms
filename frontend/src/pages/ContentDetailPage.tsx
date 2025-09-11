@@ -2,7 +2,7 @@ import React, { useMemo } from 'react';
 import { useParams, useLocation } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { Helmet } from 'react-helmet-async';
-import { api } from '@/lib/api.ts';
+import { api } from '@/lib/api';
 import { DynamicBlocksRenderer } from '@/components/blocks/DynamicBlocksRenderer';
 import NotFound from '@/pages/NotFound';
 import { LoadingSpinner } from '@/components/LoadingSpinner';

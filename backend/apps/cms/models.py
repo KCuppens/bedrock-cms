@@ -1,5 +1,11 @@
 import uuid
 from django.db import models, transaction
+from django.db.models import (
+    CharField, TextField, BooleanField, DateTimeField, ForeignKey, 
+    ManyToManyField, ImageField, PositiveIntegerField, UUIDField, SlugField, 
+    AutoField, OneToOneField, URLField, GenericIPAddressField, IntegerField,
+    PositiveSmallIntegerField
+)
 from django.core.exceptions import ValidationError
 from django.db.models import F
 from django.urls import reverse
@@ -29,20 +35,20 @@ class Page(models.Model, RBACMixin):
         ('rejected', _('Rejected')),
     ]
 
-    id = models.AutoField(primary_key=True)
-    group_id = models.UUIDField(default=uuid.uuid4, db_index=True)
-    parent = models.ForeignKey(
+    id: AutoField = models.AutoField(primary_key=True)
+    group_id: UUIDField = models.UUIDField(default=uuid.uuid4, db_index=True)
+    parent: ForeignKey = models.ForeignKey(
         'self',
         null=True,
         blank=True,
         on_delete=models.SET_NULL,
         related_name='children'
     )
-    position = models.PositiveIntegerField(default=0, db_index=True)
-    locale = models.ForeignKey('i18n.Locale', on_delete=models.PROTECT)
-    title = models.CharField(max_length=180)
-    slug = models.SlugField(max_length=120)
-    path = models.CharField(max_length=512, db_index=True)
+    position: PositiveIntegerField = models.PositiveIntegerField(default=0, db_index=True)
+    locale: ForeignKey = models.ForeignKey('i18n.Locale', on_delete=models.PROTECT)
+    title: CharField = models.CharField(max_length=180)
+    slug: SlugField = models.SlugField(max_length=120)
+    path: CharField = models.CharField(max_length=512, db_index=True)
     blocks = models.JSONField(
         default=list,
         validators=[JSONSizeValidator(max_size_mb=2), validate_json_structure]
@@ -51,50 +57,50 @@ class Page(models.Model, RBACMixin):
         default=dict,
         validators=[JSONSizeValidator(max_size_mb=0.5)]
     )
-    status = models.CharField(
+    status: CharField = models.CharField(
         max_length=15,
         choices=STATUS_CHOICES,
         default='draft'
     )
-    published_at = models.DateTimeField(
+    published_at: DateTimeField = models.DateTimeField(
         null=True, 
         blank=True,
         help_text=_("When this page was actually published")
     )
     
     # Scheduling fields
-    scheduled_publish_at = models.DateTimeField(
+    scheduled_publish_at: DateTimeField = models.DateTimeField(
         null=True, 
         blank=True,
         db_index=True,
         help_text=_("When to automatically publish this page")
     )
-    scheduled_unpublish_at = models.DateTimeField(
+    scheduled_unpublish_at: DateTimeField = models.DateTimeField(
         null=True, 
         blank=True,
         db_index=True,
         help_text=_("When to automatically unpublish this page")
     )
     
-    updated_at = models.DateTimeField(auto_now=True)
-    created_at = models.DateTimeField(auto_now_add=True)
-    preview_token = models.UUIDField(default=uuid.uuid4, editable=False)
+    updated_at: DateTimeField = models.DateTimeField(auto_now=True)
+    created_at: DateTimeField = models.DateTimeField(auto_now_add=True)
+    preview_token: UUIDField = models.UUIDField(default=uuid.uuid4, editable=False)
     
     # Navigation fields
-    in_main_menu = models.BooleanField(default=False, db_index=True)
-    in_footer = models.BooleanField(default=False, db_index=True)
-    is_homepage = models.BooleanField(default=False, db_index=True)
+    in_main_menu: BooleanField = models.BooleanField(default=False, db_index=True)
+    in_footer: BooleanField = models.BooleanField(default=False, db_index=True)
+    is_homepage: BooleanField = models.BooleanField(default=False, db_index=True)
     
     # Moderation fields
-    submitted_for_review_at = models.DateTimeField(null=True, blank=True)
-    reviewed_by = models.ForeignKey(
+    submitted_for_review_at: DateTimeField = models.DateTimeField(null=True, blank=True)
+    reviewed_by: ForeignKey = models.ForeignKey(
         'accounts.User', 
         null=True, 
         blank=True,
         on_delete=models.SET_NULL,
         related_name='reviewed_pages'
     )
-    review_notes = models.TextField(blank=True)
+    review_notes: TextField = models.TextField(blank=True)
 
     class Meta:
         constraints = [
@@ -374,19 +380,19 @@ class Redirect(models.Model):
         (308, _('308 Permanent Preserve')),
     ]
 
-    from_path = models.CharField(max_length=512, db_index=True)
-    to_path = models.CharField(max_length=512)
-    status = models.PositiveSmallIntegerField(choices=STATUS_CHOICES, default=301)
-    is_active = models.BooleanField(default=True, help_text=_("Enable or disable this redirect"))
-    notes = models.TextField(blank=True, null=True, help_text=_("Optional notes about this redirect"))
-    hits = models.PositiveIntegerField(default=0, help_text=_("Number of times this redirect has been used"))
-    locale = models.ForeignKey(
+    from_path: CharField = models.CharField(max_length=512, db_index=True)
+    to_path: CharField = models.CharField(max_length=512)
+    status: PositiveSmallIntegerField = models.PositiveSmallIntegerField(choices=STATUS_CHOICES, default=301)
+    is_active: BooleanField = models.BooleanField(default=True, help_text=_("Enable or disable this redirect"))
+    notes: TextField = models.TextField(blank=True, null=True, help_text=_("Optional notes about this redirect"))
+    hits: PositiveIntegerField = models.PositiveIntegerField(default=0, help_text=_("Number of times this redirect has been used"))
+    locale: ForeignKey = models.ForeignKey(
         'i18n.Locale',
         null=True,
         blank=True,
         on_delete=models.SET_NULL
     )
-    created_at = models.DateTimeField(auto_now_add=True)
+    created_at: DateTimeField = models.DateTimeField(auto_now_add=True)
 
     class Meta:
         unique_together = [('from_path', 'locale')]
@@ -440,44 +446,44 @@ class BlockType(models.Model):
     """
     
     # Core identification
-    type = models.CharField(
+    type: CharField = models.CharField(
         max_length=50, 
         unique=True,
         help_text=_('Unique identifier for this block type (e.g., "hero", "richtext")')
     )
-    component = models.CharField(
+    component: CharField = models.CharField(
         max_length=100,
         help_text=_('Frontend component name (e.g., "HeroBlock", "RichtextBlock")')
     )
     
     # Display metadata
-    label = models.CharField(
+    label: CharField = models.CharField(
         max_length=100,
         help_text=_('Human-readable label shown in the editor')
     )
-    description = models.TextField(
+    description: TextField = models.TextField(
         blank=True,
         help_text=_('Description of what this block does')
     )
-    category = models.CharField(
+    category: CharField = models.CharField(
         max_length=20,
         choices=BlockTypeCategory.choices,
         default=BlockTypeCategory.CONTENT,
         help_text=_('Category for organizing blocks in the editor')
     )
-    icon = models.CharField(
+    icon: CharField = models.CharField(
         max_length=50,
         default='square',
         help_text=_('Icon identifier (Lucide icon name)')
     )
     
     # Model relationship for dynamic blocks
-    model_name = models.CharField(
+    model_name: CharField = models.CharField(
         max_length=100,
         blank=True,
         help_text=_('Model to fetch data from (e.g., "blog.BlogPost", "cms.Page")')
     )
-    data_source = models.CharField(
+    data_source: CharField = models.CharField(
         max_length=50,
         choices=[
             ('static', _('Static - No data fetching')),
@@ -488,7 +494,7 @@ class BlockType(models.Model):
         default='static',
         help_text=_('How this block fetches data')
     )
-    api_endpoint = models.CharField(
+    api_endpoint: CharField = models.CharField(
         max_length=200,
         blank=True,
         help_text=_('API endpoint for data fetching (e.g., "/api/v1/blog/posts/")')
@@ -502,15 +508,15 @@ class BlockType(models.Model):
     )
     
     # Configuration
-    is_active = models.BooleanField(
+    is_active: BooleanField = models.BooleanField(
         default=True,
         help_text=_('Whether this block type is available in the editor')
     )
-    preload = models.BooleanField(
+    preload: BooleanField = models.BooleanField(
         default=False,
         help_text=_('Whether to preload this component for better performance')
     )
-    editing_mode = models.CharField(
+    editing_mode: CharField = models.CharField(
         max_length=20,
         choices=[
             ('inline', _('Inline')),
@@ -532,16 +538,16 @@ class BlockType(models.Model):
     )
     
     # Metadata
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-    created_by = models.ForeignKey(
+    created_at: DateTimeField = models.DateTimeField(auto_now_add=True)
+    updated_at: DateTimeField = models.DateTimeField(auto_now=True)
+    created_by: ForeignKey = models.ForeignKey(
         'accounts.User',
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
         related_name='created_block_types'
     )
-    updated_by = models.ForeignKey(
+    updated_by: ForeignKey = models.ForeignKey(
         'accounts.User', 
         on_delete=models.SET_NULL,
         null=True,

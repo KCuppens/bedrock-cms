@@ -88,7 +88,6 @@ const AppContent = () => {
   useEffect(() => {
     // TEMPORARILY DISABLED: Memory guard might be causing issues
     // const memoryGuard = initMemoryGuard();
-    console.log("Memory guard DISABLED for testing");
     
     return () => {
       // memoryGuard.destroy();
@@ -100,7 +99,6 @@ const AppContent = () => {
     const handleMemoryPressure = () => {
       // Clear old queries when memory pressure is detected
       queryClient.clear();
-      console.log('[App] Cleared React Query cache due to memory pressure');
     };
 
     // Listen for custom memory pressure events from memory guard

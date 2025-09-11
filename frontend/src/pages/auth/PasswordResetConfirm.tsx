@@ -6,7 +6,7 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Loader2, CheckCircle, AlertCircle } from 'lucide-react';
-import { api } from '@/lib/api.ts';
+import { api } from '@/lib/api';
 import { useAuth } from '@/contexts/AuthContext';
 
 export default function PasswordResetConfirm() {

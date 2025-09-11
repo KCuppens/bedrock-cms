@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { api } from '@/lib/api.ts';
+import { api } from '@/lib/api';
 
 interface SEOSettings {
   id?: number;

@@ -350,4 +350,3 @@ if __name__ == '__main__':
     test_analytics_tasks()
     test_analytics_utils()
     
-    print("Analytics coverage booster completed")

@@ -287,7 +287,6 @@ class PagesAPITest(APITestCase):
         response = self.client.post(url, data)
         
         if response.status_code != status.HTTP_201_CREATED:
-            print("Response data:", response.data)
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(response.data['title'], 'About Us')
         
@@ -690,7 +689,6 @@ class SeoAPITest(APITestCase):
         
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         
-        print("Response data keys:", list(response.data.keys()) if response.data else "No data")
         
         # Check resolved SEO
         resolved_seo = response.data['resolved_seo']
