@@ -7,6 +7,6 @@ from apps.files.models import FileUpload
 
 class Asset(FileUpload):
     """Proxy model for backward compatibility with old migrations."""
-    
+
     class Meta:
         proxy = True

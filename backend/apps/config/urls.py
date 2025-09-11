@@ -15,12 +15,24 @@ urlpatterns = [
     # API Documentation
     path("api/schema/", SpectacularAPIView.as_view(), name="schema"),
     path("api/schema.yaml", SpectacularAPIView.as_view(), name="schema-yaml"),
-    path("api/docs/", SpectacularSwaggerView.as_view(url_name="schema"), name="swagger-ui"),
+    path(
+        "api/docs/",
+        SpectacularSwaggerView.as_view(url_name="schema"),
+        name="swagger-ui",
+    ),
     path("api/redoc/", SpectacularRedocView.as_view(url_name="schema"), name="redoc"),
     # Legacy schema URLs (for backward compatibility)
     path("schema/", SpectacularAPIView.as_view(), name="schema-legacy"),
-    path("schema/swagger/", SpectacularSwaggerView.as_view(url_name="schema"), name="swagger-ui-legacy"),
-    path("schema/redoc/", SpectacularRedocView.as_view(url_name="schema"), name="redoc-legacy"),
+    path(
+        "schema/swagger/",
+        SpectacularSwaggerView.as_view(url_name="schema"),
+        name="swagger-ui-legacy",
+    ),
+    path(
+        "schema/redoc/",
+        SpectacularRedocView.as_view(url_name="schema"),
+        name="redoc-legacy",
+    ),
     # Sitemaps (at root level for SEO)
     path("sitemap.xml", default_sitemap_view, name="default-sitemap"),
     path("sitemap-<str:locale_code>.xml", sitemap_view, name="sitemap"),
@@ -29,7 +41,9 @@ urlpatterns = [
     path("api/v1/analytics/", include("apps.analytics.urls")),
     path("api/v1/blog/", include("apps.blog.urls")),
     path("api/v1/cms/", include("apps.cms.urls")),
-    path("api/v1/redirects/", include("apps.cms.redirect_urls")),  # Direct redirects endpoint
+    path(
+        "api/v1/redirects/", include("apps.cms.redirect_urls")
+    ),  # Direct redirects endpoint
     path("api/v1/i18n/", include("apps.i18n.urls")),
     path("api/v1/", include("apps.registry.urls")),
     path("api/v1/reports/", include("apps.reports.urls")),

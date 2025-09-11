@@ -82,9 +82,11 @@ def email_preview_html(request, template_key):
     # Sample context data
     sample_context = {
         "user": request.user if request.user.is_authenticated else None,
-        "user_name": request.user.get_full_name()
-        if request.user.is_authenticated
-        else "John Doe",
+        "user_name": (
+            request.user.get_full_name()
+            if request.user.is_authenticated
+            else "John Doe"
+        ),
         "site_name": "Django SaaS Boilerplate",
         "site_url": request.build_absolute_uri("/"),
         "login_url": request.build_absolute_uri("/auth/login/"),
@@ -110,9 +112,11 @@ def email_preview_text(request, template_key):
 
     sample_context = {
         "user": request.user if request.user.is_authenticated else None,
-        "user_name": request.user.get_full_name()
-        if request.user.is_authenticated
-        else "John Doe",
+        "user_name": (
+            request.user.get_full_name()
+            if request.user.is_authenticated
+            else "John Doe"
+        ),
         "site_name": "Django SaaS Boilerplate",
         "site_url": request.build_absolute_uri("/"),
     }
@@ -182,21 +186,19 @@ def verify_webhook_signature(request):
     """Verify webhook signature for security"""
     import hmac
     import hashlib
-    
-    webhook_secret = getattr(settings, 'EMAIL_WEBHOOK_SECRET', None)
+
+    webhook_secret = getattr(settings, "EMAIL_WEBHOOK_SECRET", None)
     if not webhook_secret:
         return False  # No secret configured, reject webhook
-    
+
     # Get signature from headers (adjust based on your provider)
-    signature = request.headers.get('X-Webhook-Signature', '')
-    
+    signature = request.headers.get("X-Webhook-Signature", "")
+
     # Calculate expected signature
     expected = hmac.new(
-        webhook_secret.encode('utf-8'),
-        request.body,
-        hashlib.sha256
+        webhook_secret.encode("utf-8"), request.body, hashlib.sha256
     ).hexdigest()
-    
+
     # Constant-time comparison to prevent timing attacks
     return hmac.compare_digest(signature, expected)
 
@@ -206,7 +208,7 @@ def email_webhook(request):
     """Webhook endpoint for email delivery status updates with signature validation"""
     if request.method != "POST":
         return JsonResponse({"error": "POST method required"}, status=405)
-    
+
     # Verify webhook signature
     if not verify_webhook_signature(request):
         return JsonResponse({"error": "Invalid signature"}, status=403)

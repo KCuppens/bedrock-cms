@@ -2,4 +2,4 @@
 from .category import Category, Tag, Collection
 
 # Re-export for convenience
-__all__ = ['Category', 'Tag', 'Collection']
+__all__ = ["Category", "Tag", "Collection"]

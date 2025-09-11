@@ -15,8 +15,12 @@ urlpatterns = [
     # API v1 endpoints
     path("", include(router.urls)),
     # Blocks API - standalone endpoints
-    path("blocks/", BlockTypesAPIView.as_view(), name='api-block-types'),
-    path("blocks/<str:block_type>/schema/", BlockSchemaAPIView.as_view(), name='api-block-schema'),
+    path("blocks/", BlockTypesAPIView.as_view(), name="api-block-types"),
+    path(
+        "blocks/<str:block_type>/schema/",
+        BlockSchemaAPIView.as_view(),
+        name="api-block-schema",
+    ),
     # Include other app APIs
     path("auth/", include("apps.accounts.urls")),
     path("", include("apps.files.urls")),  # Files API

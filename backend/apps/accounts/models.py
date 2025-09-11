@@ -6,7 +6,16 @@ from django.db import models
 from django.utils import timezone
 from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
-from django.db.models import F, CharField, TextField, BooleanField, DateTimeField, ForeignKey, OneToOneField, URLField
+from django.db.models import (
+    F,
+    CharField,
+    TextField,
+    BooleanField,
+    DateTimeField,
+    ForeignKey,
+    OneToOneField,
+    URLField,
+)
 
 
 class CustomUserManager(BaseUserManager["User"]):
@@ -51,10 +60,14 @@ class User(AbstractUser):
         blank=True,
         null=True,
         validators=[
-            FileExtensionValidator(allowed_extensions=["jpg", "jpeg", "png", "gif", "webp"])
+            FileExtensionValidator(
+                allowed_extensions=["jpg", "jpeg", "png", "gif", "webp"]
+            )
         ],
     )
-    last_seen: DateTimeField = models.DateTimeField(_("Last seen"), default=timezone.now, db_index=True)
+    last_seen: DateTimeField = models.DateTimeField(
+        _("Last seen"), default=timezone.now, db_index=True
+    )
 
     # Additional fields for SaaS features
     created_at: DateTimeField = models.DateTimeField(_("Created"), auto_now_add=True)
@@ -70,9 +83,9 @@ class User(AbstractUser):
         verbose_name_plural = _("Users")
         ordering = ["-created_at"]
         indexes = [
-            models.Index(fields=['email']),
-            models.Index(fields=['last_seen']),
-            models.Index(fields=['-created_at']),
+            models.Index(fields=["email"]),
+            models.Index(fields=["last_seen"]),
+            models.Index(fields=["-created_at"]),
         ]
 
     def __str__(self):
@@ -101,8 +114,8 @@ class User(AbstractUser):
     @cached_property
     def user_groups(self):
         """Cache user groups to prevent repeated database queries"""
-        return set(self.groups.values_list('name', flat=True))
-    
+        return set(self.groups.values_list("name", flat=True))
+
     def has_group(self, group_name):
         """Check if user belongs to a specific group"""
         return group_name in self.user_groups
@@ -123,7 +136,9 @@ class User(AbstractUser):
 class UserProfile(models.Model):
     """Extended user profile information"""
 
-    user: OneToOneField = models.OneToOneField(User, on_delete=models.CASCADE, related_name="profile")
+    user: OneToOneField = models.OneToOneField(
+        User, on_delete=models.CASCADE, related_name="profile"
+    )
 
     # Profile fields
     bio: TextField = models.TextField(_("Biography"), max_length=500, blank=True)
@@ -134,7 +149,9 @@ class UserProfile(models.Model):
     # Preferences
     timezone: CharField = models.CharField(_("Timezone"), max_length=50, default="UTC")
     language: CharField = models.CharField(_("Language"), max_length=10, default="en")
-    receive_notifications: BooleanField = models.BooleanField(_("Receive notifications"), default=True)
+    receive_notifications: BooleanField = models.BooleanField(
+        _("Receive notifications"), default=True
+    )
     receive_marketing_emails: BooleanField = models.BooleanField(
         _("Receive marketing emails"), default=False
     )

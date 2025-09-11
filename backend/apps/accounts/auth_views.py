@@ -19,12 +19,14 @@ User = get_user_model()
 
 class LoginThrottle(AnonRateThrottle):
     """Rate limiting for login attempts"""
+
     scope = "login"
     rate = "5/min"
 
 
 class PasswordResetThrottle(AnonRateThrottle):
     """Rate limiting for password reset requests"""
+
     scope = "password_reset"
     rate = "3/hour"
 
@@ -52,34 +54,34 @@ def login_view(request):
     """REST API endpoint for user login"""
     email = request.data.get("email", "").lower().strip()
     password = request.data.get("password", "")
-    
+
     if not email or not password:
         return Response(
             {"error": "Email and password are required"},
             status=status.HTTP_400_BAD_REQUEST,
         )
-    
+
     # Authenticate user
     user = authenticate(request, username=email, password=password)
-    
+
     if user is None:
         return Response(
             {"error": "Invalid email or password"},
             status=status.HTTP_400_BAD_REQUEST,
         )
-    
+
     if not user.is_active:
         return Response(
             {"error": "Account is disabled"},
             status=status.HTTP_400_BAD_REQUEST,
         )
-    
+
     # Email verification is disabled - users can login immediately
     # No verification check needed since ACCOUNT_EMAIL_VERIFICATION = "none"
-    
+
     # Login user (creates session)
     login(request, user)
-    
+
     # Return user data
     serializer = UserSerializer(user, context={"request": request})
     return Response(
@@ -146,13 +148,13 @@ def current_user_view(request):
 def password_reset_view(request):
     """REST API endpoint for password reset request"""
     email = request.data.get("email", "").lower().strip()
-    
+
     if not email:
         return Response(
             {"error": "Email is required"},
             status=status.HTTP_400_BAD_REQUEST,
         )
-    
+
     # Validate email format
     try:
         validate_email(email)
@@ -161,23 +163,27 @@ def password_reset_view(request):
             {"error": "Invalid email format"},
             status=status.HTTP_400_BAD_REQUEST,
         )
-    
+
     # Use Allauth's password reset form
     form = ResetPasswordForm(data={"email": email})
-    
+
     if form.is_valid():
         # This will send the password reset email
         form.save(request)
-        
+
         # Always return success to prevent email enumeration
         return Response(
-            {"message": "If an account exists with this email, a password reset link has been sent."},
+            {
+                "message": "If an account exists with this email, a password reset link has been sent."
+            },
             status=status.HTTP_200_OK,
         )
-    
+
     # Even if form is invalid, return success to prevent enumeration
     return Response(
-        {"message": "If an account exists with this email, a password reset link has been sent."},
+        {
+            "message": "If an account exists with this email, a password reset link has been sent."
+        },
         status=status.HTTP_200_OK,
     )
 
@@ -190,7 +196,7 @@ def _parse_token_from_formats(uid_param, token_param):
     """
     from django.utils.http import urlsafe_base64_decode
     from django.utils.encoding import force_str
-    
+
     if uid_param and token_param:
         # Standard format: /password-reset/uid/token
         try:
@@ -198,21 +204,21 @@ def _parse_token_from_formats(uid_param, token_param):
             return user_id, token_param
         except (TypeError, ValueError):
             pass
-    
+
     # Try allauth format: "4-cvtit9-cc6628ec2531c2cc114f2d6d8f06d72d"
     full_token = uid_param or token_param
-    if full_token and '-' in full_token:
-        parts = full_token.split('-')
+    if full_token and "-" in full_token:
+        parts = full_token.split("-")
         if len(parts) >= 2:
             # First part is base36 user ID, rest is token
             try:
                 user_id_base36 = parts[0]
                 user_id = str(int(user_id_base36, 36))  # Convert base36 to decimal
-                token = '-'.join(parts[1:])  # Join remaining parts as token
+                token = "-".join(parts[1:])  # Join remaining parts as token
                 return user_id, token
             except ValueError:
                 pass
-    
+
     raise ValueError("Invalid token format")
 
 
@@ -220,7 +226,7 @@ def _parse_token_from_formats(uid_param, token_param):
     summary="Verify password reset token",
     description="Verify if password reset token is valid",
     request={
-        "type": "object", 
+        "type": "object",
         "properties": {
             "uid": {"type": "string"},
             "token": {"type": "string"},
@@ -237,9 +243,9 @@ def _parse_token_from_formats(uid_param, token_param):
 def password_reset_verify_token(request):
     """REST API endpoint for verifying password reset token"""
     uid = request.data.get("uid")
-    token = request.data.get("token") 
+    token = request.data.get("token")
     full_token = request.data.get("full_token")
-    
+
     try:
         user_id, parsed_token = _parse_token_from_formats(uid or full_token, token)
         user = User.objects.get(pk=user_id)
@@ -248,26 +254,29 @@ def password_reset_verify_token(request):
             {"error": "Invalid reset link", "valid": False},
             status=status.HTTP_400_BAD_REQUEST,
         )
-    
+
     # Check if token is valid using allauth's token generator
     from allauth.account.utils import user_pk_to_url_str
     from allauth.account.forms import default_token_generator
-    
+
     # Try allauth token generator first
     if default_token_generator.check_token(user, parsed_token):
         return Response(
             {"message": "Token is valid", "valid": True, "user_id": user_id},
             status=status.HTTP_200_OK,
         )
-    
+
     # Fallback to Django's token generator
-    from django.contrib.auth.tokens import default_token_generator as django_token_generator
+    from django.contrib.auth.tokens import (
+        default_token_generator as django_token_generator,
+    )
+
     if django_token_generator.check_token(user, parsed_token):
         return Response(
             {"message": "Token is valid", "valid": True, "user_id": user_id},
             status=status.HTTP_200_OK,
         )
-    
+
     return Response(
         {"error": "Invalid or expired reset link", "valid": False},
         status=status.HTTP_400_BAD_REQUEST,
@@ -302,19 +311,19 @@ def password_reset_confirm_view(request):
     full_token = request.data.get("full_token")
     new_password1 = request.data.get("new_password1")
     new_password2 = request.data.get("new_password2")
-    
+
     if not new_password1 or not new_password2:
         return Response(
             {"error": "Both password fields are required"},
             status=status.HTTP_400_BAD_REQUEST,
         )
-    
+
     if new_password1 != new_password2:
         return Response(
             {"error": "Passwords do not match"},
             status=status.HTTP_400_BAD_REQUEST,
         )
-    
+
     try:
         user_id, parsed_token = _parse_token_from_formats(uid or full_token, token)
         user = User.objects.get(pk=user_id)
@@ -323,28 +332,33 @@ def password_reset_confirm_view(request):
             {"error": "Invalid reset link"},
             status=status.HTTP_400_BAD_REQUEST,
         )
-    
+
     # Check if token is valid using allauth's token generator
     from allauth.account.forms import default_token_generator
+
     token_valid = False
-    
+
     # Try allauth token generator first
     if default_token_generator.check_token(user, parsed_token):
         token_valid = True
     else:
         # Fallback to Django's token generator
-        from django.contrib.auth.tokens import default_token_generator as django_token_generator
+        from django.contrib.auth.tokens import (
+            default_token_generator as django_token_generator,
+        )
+
         if django_token_generator.check_token(user, parsed_token):
             token_valid = True
-    
+
     if not token_valid:
         return Response(
             {"error": "Invalid or expired reset link"},
             status=status.HTTP_400_BAD_REQUEST,
         )
-    
+
     # Validate password strength
     from django.contrib.auth.password_validation import validate_password
+
     try:
         validate_password(new_password1, user)
     except ValidationError as e:
@@ -352,16 +366,16 @@ def password_reset_confirm_view(request):
             {"error": "; ".join(e.messages)},
             status=status.HTTP_400_BAD_REQUEST,
         )
-    
+
     # Set the new password
     user.set_password(new_password1)
-    
+
     # Activate user if they were inactive (e.g., from invitation)
     if not user.is_active:
         user.is_active = True
-    
+
     user.save()
-    
+
     return Response(
         {"message": "Password has been reset successfully"},
         status=status.HTTP_200_OK,
@@ -370,8 +384,9 @@ def password_reset_confirm_view(request):
 
 class SessionCheckView(APIView):
     """Check if user has valid session"""
+
     permission_classes = [AllowAny]
-    
+
     @extend_schema(
         summary="Check session",
         description="Check if current session is valid",

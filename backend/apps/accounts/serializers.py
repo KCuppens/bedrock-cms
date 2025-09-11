@@ -59,7 +59,7 @@ class UserSerializer(serializers.ModelSerializer):
             "id",
             "last_seen",
             "is_staff",
-            "is_superuser", 
+            "is_superuser",
             "date_joined",
             "created_at",
             "updated_at",
@@ -113,7 +113,7 @@ class UserRegistrationSerializer(serializers.Serializer):
         user.name = self.validated_data.get("name", "")
         user.set_password(self.validated_data.get("password1"))
         user.save()
-        
+
         setup_user_email(request, user, [])
 
         return user

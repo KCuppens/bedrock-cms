@@ -47,7 +47,16 @@ class FileUploadViewSet(viewsets.ModelViewSet):
     serializer_class = FileUploadSerializer
     permission_classes = [permissions.IsAuthenticated, IsOwnerOrAdmin]
     parser_classes = [MultiPartParser, FormParser, JSONParser]
-    http_method_names = ['get', 'post', 'put', 'patch', 'delete', 'head', 'options', 'trace']
+    http_method_names = [
+        "get",
+        "post",
+        "put",
+        "patch",
+        "delete",
+        "head",
+        "options",
+        "trace",
+    ]
 
     def get_queryset(self):
         """Get files based on user permissions"""
@@ -81,7 +90,7 @@ class FileUploadViewSet(viewsets.ModelViewSet):
 
     def create(self, request, *args, **kwargs):
         """Create a new file upload"""
-        if 'file' not in request.FILES:
+        if "file" not in request.FILES:
             return Response(
                 {"error": "No file provided"}, status=status.HTTP_400_BAD_REQUEST
             )
@@ -90,7 +99,7 @@ class FileUploadViewSet(viewsets.ModelViewSet):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
-        file = request.FILES['file']
+        file = request.FILES["file"]
 
         # Validate file
         validation = FileService.validate_file(file)
@@ -110,27 +119,29 @@ class FileUploadViewSet(viewsets.ModelViewSet):
         )
 
         # Return response
-        response_serializer = FileUploadSerializer(file_upload, context={'request': request})
+        response_serializer = FileUploadSerializer(
+            file_upload, context={"request": request}
+        )
         return Response(response_serializer.data, status=status.HTTP_201_CREATED)
 
     def update(self, request, *args, **kwargs):
         """Update file metadata (PUT)"""
-        partial = kwargs.pop('partial', False)
+        partial = kwargs.pop("partial", False)
         instance = self.get_object()
-        
+
         # For metadata updates, we only allow certain fields
-        allowed_fields = ['description', 'tags', 'is_public']
+        allowed_fields = ["description", "tags", "is_public"]
         update_data = {k: v for k, v in request.data.items() if k in allowed_fields}
-        
+
         serializer = self.get_serializer(instance, data=update_data, partial=partial)
         serializer.is_valid(raise_exception=True)
         self.perform_update(serializer)
-        
+
         return Response(serializer.data)
-    
+
     def partial_update(self, request, *args, **kwargs):
         """Update file metadata (PATCH)"""
-        kwargs['partial'] = True
+        kwargs["partial"] = True
         return self.update(request, *args, **kwargs)
 
     @extend_schema(

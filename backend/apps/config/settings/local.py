@@ -38,14 +38,14 @@ CORS_ALLOW_CREDENTIALS = True
 # Custom headers for API requests
 CORS_ALLOW_HEADERS = [
     # Default headers
-    'authorization',
-    'content-type', 
-    'x-csrftoken',
-    'x-requested-with',
+    "authorization",
+    "content-type",
+    "x-csrftoken",
+    "x-requested-with",
     # Custom permission context headers
-    'x-locale',
-    'x-user-scopes',
-    'x-user-role',
+    "x-locale",
+    "x-user-scopes",
+    "x-user-role",
 ]
 
 # CSRF settings for development
@@ -63,7 +63,7 @@ CSRF_TRUSTED_ORIGINS = [
     "http://localhost:8084",
     "http://127.0.0.1:8084",
 ]
-CSRF_COOKIE_SAMESITE = 'Lax'
+CSRF_COOKIE_SAMESITE = "Lax"
 CSRF_COOKIE_HTTPONLY = False  # Allow JavaScript to read the cookie
 
 # Static files (CSS, JavaScript, Images)
@@ -74,8 +74,8 @@ CELERY_TASK_ALWAYS_EAGER = True  # Execute tasks locally instead of sending to q
 CELERY_TASK_EAGER_PROPAGATES = True  # Propagate exceptions from eager tasks
 
 # Use in-memory broker for Celery (not actually used when ALWAYS_EAGER is True)
-CELERY_BROKER_URL = 'memory://localhost/'
-CELERY_RESULT_BACKEND = 'cache+memory://'
+CELERY_BROKER_URL = "memory://localhost/"
+CELERY_RESULT_BACKEND = "cache+memory://"
 
 # Django Extensions (if you want to add it later)
 if "django_extensions" in INSTALLED_APPS:
@@ -83,6 +83,7 @@ if "django_extensions" in INSTALLED_APPS:
 
 # Development logging
 from typing import Any
+
 LOGGING_DICT: dict[str, Any] = LOGGING
 LOGGING_DICT["handlers"]["console"]["formatter"] = "simple"
 LOGGING_DICT["root"]["level"] = "DEBUG"
@@ -103,13 +104,13 @@ CACHES = {
 }
 
 # Override session engine to use database instead of cache
-SESSION_ENGINE = 'django.contrib.sessions.backends.db'
+SESSION_ENGINE = "django.contrib.sessions.backends.db"
 
 # Frontend URL for redirects
-FRONTEND_URL = env.str('FRONTEND_URL', default='http://localhost:8082')
+FRONTEND_URL = env.str("FRONTEND_URL", default="http://localhost:8082")
 
 # Override Allauth to send password reset emails to frontend
-ACCOUNT_ADAPTER = 'apps.accounts.custom_adapter.CustomAccountAdapter'
+ACCOUNT_ADAPTER = "apps.accounts.custom_adapter.CustomAccountAdapter"
 
 # Disable throttling for development to avoid rate limit issues
 # Option 1: Keep throttle classes but set very high rates for development

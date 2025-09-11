@@ -72,23 +72,24 @@ class NoteViewSet(viewsets.ModelViewSet):
     def list(self, request, *args, **kwargs):
         """List notes with caching"""
         return super().list(request, *args, **kwargs)
-    
+
     @cache_method_response(timeout=600)  # Cache for 10 minutes
     def retrieve(self, request, *args, **kwargs):
         """Retrieve note with caching"""
         return super().retrieve(request, *args, **kwargs)
-    
+
     def get_queryset(self):
         """Get notes based on user permissions"""
         queryset = Note.objects.select_related("created_by", "updated_by")
-        
+
         # Only prefetch tags for detail views
         if self.action == "retrieve":
             queryset = queryset.prefetch_related("tags")
         # For list views, annotate with count
         elif self.action == "list":
             from django.db.models import Count
-            queryset = queryset.annotate(tags_count=Count('tags'))
+
+            queryset = queryset.annotate(tags_count=Count("tags"))
 
         # Users can see their own notes and public notes
         if not self.request.user.is_admin():

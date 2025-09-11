@@ -7,38 +7,33 @@ from apps.i18n.services import DeepLTranslationService
 
 
 class Command(BaseCommand):
-    help = 'Test DeepL translation service'
+    help = "Test DeepL translation service"
 
     def handle(self, *args, **options):
         service = DeepLTranslationService()
-        
+
         # Test translation
         test_text = "Hello world"
         source_lang = "en"
         target_lang = "fr"
-        
-        self.stdout.write(f'Testing DeepL translation:')
+
+        self.stdout.write(f"Testing DeepL translation:")
         self.stdout.write(f'Text: "{test_text}"')
-        self.stdout.write(f'From: {source_lang}')
-        self.stdout.write(f'To: {target_lang}')
-        self.stdout.write('-' * 30)
-        
+        self.stdout.write(f"From: {source_lang}")
+        self.stdout.write(f"To: {target_lang}")
+        self.stdout.write("-" * 30)
+
         result = service.translate(test_text, source_lang, target_lang)
-        
+
         if result:
             self.stdout.write(self.style.SUCCESS(f'Translation: "{result}"'))
         else:
-            self.stdout.write(self.style.ERROR('Translation failed'))
-        
+            self.stdout.write(self.style.ERROR("Translation failed"))
+
         # Test with actual UI message content
-        self.stdout.write('\nTesting actual UI message content:')
-        ui_texts = [
-            "15 min ago",
-            "Add Locale", 
-            "Blog Post: Q4 Updates",
-            "Broken Links"
-        ]
-        
+        self.stdout.write("\nTesting actual UI message content:")
+        ui_texts = ["15 min ago", "Add Locale", "Blog Post: Q4 Updates", "Broken Links"]
+
         for text in ui_texts:
             result = service.translate(text, "en", "fr")
             if result:

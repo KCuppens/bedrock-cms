@@ -1,6 +1,7 @@
 """
 Core application views
 """
+
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny
@@ -28,16 +29,16 @@ from .version import VersionService
                 "frontend_version": {"type": "string", "example": "1.0.0"},
                 "backend_version": {"type": "string", "example": "1.0.0"},
                 "python_version": {"type": "string", "example": "3.9.13"},
-            }
+            },
         }
-    }
+    },
 )
-@api_view(['GET'])
+@api_view(["GET"])
 @permission_classes([AllowAny])
 def version_info(request):
     """
     Get application version and environment information.
-    
+
     This endpoint is public and can be accessed without authentication.
     It provides version tracking information from git and the environment.
     """
@@ -52,18 +53,16 @@ def version_info(request):
     responses={
         200: {
             "type": "object",
-            "properties": {
-                "version": {"type": "string", "example": "1.2.3+abc1234"}
-            }
+            "properties": {"version": {"type": "string", "example": "1.2.3+abc1234"}},
         }
-    }
+    },
 )
-@api_view(['GET'])
+@api_view(["GET"])
 @permission_classes([AllowAny])
 def version_simple(request):
     """
     Get a simple version string.
-    
+
     Returns just the version string in a simple format,
     including commit hash if ahead of tag and dirty flag if uncommitted changes.
     """

@@ -19,20 +19,18 @@ def create_page_translation_units(sender, instance, created, **kwargs):
     """Create translation units when a page is saved."""
     try:
         # Skip if this is being restored from a revision
-        if getattr(instance, '_skip_translation_units', False):
+        if getattr(instance, "_skip_translation_units", False):
             return
-        
+
         # Get the page's locale (source locale)
         source_locale = instance.locale
-        user = getattr(instance, '_current_user', None)
-        
+        user = getattr(instance, "_current_user", None)
+
         # Create or update translation units
         TranslationManager.create_translation_units(
-            obj=instance,
-            source_locale=source_locale,
-            user=user
+            obj=instance, source_locale=source_locale, user=user
         )
-        
+
     except Exception:
         # Don't let translation unit creation break page saving
         # This would be logged in production
@@ -56,27 +54,25 @@ def store_old_page_data(sender, instance, **kwargs):
 def create_translation_units_handler(sender, instance, created, **kwargs):
     """
     Generic signal handler for creating translation units.
-    
+
     This can be connected to any model that supports translation.
     """
     try:
         # Get the source locale - this would need to be customized per model
         # For now, assume models have a 'locale' field
-        if hasattr(instance, 'locale'):
+        if hasattr(instance, "locale"):
             source_locale = instance.locale
         else:
             # Fall back to default locale
             source_locale = Locale.objects.get(is_default=True, is_active=True)
-        
-        user = getattr(instance, '_current_user', None)
-        
+
+        user = getattr(instance, "_current_user", None)
+
         # Create or update translation units
         TranslationManager.create_translation_units(
-            obj=instance,
-            source_locale=source_locale,
-            user=user
+            obj=instance, source_locale=source_locale, user=user
         )
-        
+
     except Exception:
         # Don't let translation unit creation break saving
         pass
@@ -85,7 +81,7 @@ def create_translation_units_handler(sender, instance, created, **kwargs):
 def register_model_for_translation(model_class, fields=None):
     """
     Register a model to automatically create translation units.
-    
+
     Args:
         model_class: Model class to register
         fields: List of translatable field names (optional)
@@ -94,58 +90,59 @@ def register_model_for_translation(model_class, fields=None):
         content_type = ContentType.objects.get_for_model(model_class)
         model_label = f"{content_type.app_label}.{content_type.model}"
         TranslationManager.register_translatable_fields(model_label, fields)
-    
+
     # Connect the signal
-    post_save.connect(
-        create_translation_units_handler,
-        sender=model_class,
-        weak=False
-    )
+    post_save.connect(create_translation_units_handler, sender=model_class, weak=False)
 
 
 # Locale synchronization signals
+
 
 @receiver(post_save, sender=Locale)
 def sync_django_settings_on_locale_save(sender, instance, created, **kwargs):
     """
     Sync Django settings when a locale is saved.
-    
+
     This clears the settings cache to ensure fresh data is loaded
     when Django settings are next accessed.
     """
     try:
         from .settings_sync import DjangoSettingsSync
-        
+
         # Clear the cache to force refresh of dynamic settings
         DjangoSettingsSync.clear_cache()
-        
+
         action = "Created" if created else "Updated"
-        logger.info(f"{action} locale '{instance.code}' - Django settings cache cleared")
-        
+        logger.info(
+            f"{action} locale '{instance.code}' - Django settings cache cleared"
+        )
+
         # Log if default locale changed
         if instance.is_default:
-            logger.info(f"Default locale set to '{instance.code}' - LANGUAGE_CODE will update dynamically")
-            
+            logger.info(
+                f"Default locale set to '{instance.code}' - LANGUAGE_CODE will update dynamically"
+            )
+
     except Exception as e:
         logger.error(f"Failed to sync Django settings after locale save: {e}")
 
 
-@receiver(post_delete, sender=Locale)  
+@receiver(post_delete, sender=Locale)
 def sync_django_settings_on_locale_delete(sender, instance, **kwargs):
     """
     Sync Django settings when a locale is deleted.
-    
+
     This clears the settings cache and ensures another locale
     becomes the default if the default locale was deleted.
     """
     try:
         from .settings_sync import DjangoSettingsSync
-        
+
         # Clear the cache to force refresh of dynamic settings
         DjangoSettingsSync.clear_cache()
-        
+
         logger.info(f"Deleted locale '{instance.code}' - Django settings cache cleared")
-        
+
         # If the default locale was deleted, ensure we have a new default
         if instance.is_default:
             try:
@@ -156,10 +153,12 @@ def sync_django_settings_on_locale_delete(sender, instance, **kwargs):
                     new_default.save()
                     logger.info(f"Set '{new_default.code}' as new default locale")
                 else:
-                    logger.warning("No active locales found after deleting default locale")
+                    logger.warning(
+                        "No active locales found after deleting default locale"
+                    )
             except Exception as e:
                 logger.error(f"Failed to set new default locale: {e}")
-                
+
     except Exception as e:
         logger.error(f"Failed to sync Django settings after locale deletion: {e}")
 
@@ -168,33 +167,41 @@ def sync_django_settings_on_locale_delete(sender, instance, **kwargs):
 def validate_locale_changes(sender, instance, **kwargs):
     """
     Validate locale changes before saving.
-    
+
     Ensures there's always at least one default locale and handles
     default locale transitions properly.
     """
     try:
         # If this is a new locale being set as default, unset other defaults
         if instance.is_default:
-            Locale.objects.filter(is_default=True).exclude(pk=instance.pk).update(is_default=False)
-        
+            Locale.objects.filter(is_default=True).exclude(pk=instance.pk).update(
+                is_default=False
+            )
+
         # If this was the default locale and is being set to not default,
         # ensure another locale becomes default
         if instance.pk:  # Only for existing locales
             old_instance = Locale.objects.get(pk=instance.pk)
             if old_instance.is_default and not instance.is_default:
                 # Find another active locale to be default
-                other_locale = Locale.objects.filter(
-                    is_active=True
-                ).exclude(pk=instance.pk).first()
-                
+                other_locale = (
+                    Locale.objects.filter(is_active=True)
+                    .exclude(pk=instance.pk)
+                    .first()
+                )
+
                 if other_locale:
-                    other_locale.is_default = True  
+                    other_locale.is_default = True
                     other_locale.save()
-                    logger.info(f"Transferred default locale from '{instance.code}' to '{other_locale.code}'")
+                    logger.info(
+                        f"Transferred default locale from '{instance.code}' to '{other_locale.code}'"
+                    )
                 else:
                     # Force this locale to remain default if no others available
                     instance.is_default = True
-                    logger.warning(f"Cannot remove default status from '{instance.code}' - no other active locales")
-                    
+                    logger.warning(
+                        f"Cannot remove default status from '{instance.code}' - no other active locales"
+                    )
+
     except Exception as e:
         logger.error(f"Failed to validate locale changes: {e}")

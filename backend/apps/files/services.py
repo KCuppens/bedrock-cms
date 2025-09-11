@@ -63,19 +63,21 @@ class FileService:
         file.seek(0)
         hasher = hashlib.sha256()
         chunk_size = 65536  # 64KB chunks
-        
+
         # Stream file in chunks for checksum calculation
         while True:
             chunk = file.read(chunk_size)
             if not chunk:
                 break
             hasher.update(chunk)
-        
+
         checksum = hasher.hexdigest()
         file.seek(0)  # Reset file pointer
-        
+
         # Read file content for storage (with size limit check)
-        max_size = getattr(settings, 'FILE_UPLOAD_MAX_MEMORY_SIZE', 10485760)  # 10MB default
+        max_size = getattr(
+            settings, "FILE_UPLOAD_MAX_MEMORY_SIZE", 10485760
+        )  # 10MB default
         if file.size > max_size:
             # For large files, use streaming upload
             file_content = file
@@ -91,7 +93,7 @@ class FileService:
         @storage_circuit_breaker()
         def store_file():
             return default_storage.save(storage_path, ContentFile(file_content))
-        
+
         stored_path = store_file()
 
         # Create FileUpload record
@@ -181,7 +183,7 @@ class FileService:
             def delete_from_storage():
                 if default_storage.exists(file_upload.storage_path):
                     default_storage.delete(file_upload.storage_path)
-            
+
             delete_from_storage()
 
             # Delete database record
@@ -212,7 +214,18 @@ class FileService:
         allowed_extensions = getattr(
             settings,
             "ALLOWED_FILE_EXTENSIONS",
-            [".jpg", ".jpeg", ".png", ".gif", ".webp", ".pdf", ".doc", ".docx", ".txt", ".csv"],
+            [
+                ".jpg",
+                ".jpeg",
+                ".png",
+                ".gif",
+                ".webp",
+                ".pdf",
+                ".doc",
+                ".docx",
+                ".txt",
+                ".csv",
+            ],
         )
 
         file_extension = os.path.splitext(file.name)[1].lower()
@@ -260,20 +273,20 @@ class FileService:
         from django.db import transaction
 
         expired_files = FileUpload.objects.filter(expires_at__lt=timezone.now())
-        
+
         # Get file paths for batch deletion
-        file_paths = list(expired_files.values_list('storage_path', flat=True))
-        file_ids = list(expired_files.values_list('id', flat=True))
-        
+        file_paths = list(expired_files.values_list("storage_path", flat=True))
+        file_ids = list(expired_files.values_list("id", flat=True))
+
         deleted_count = 0
         error_count = 0
         batch_size = 100
 
         # Process in batches for better performance
         for i in range(0, len(file_paths), batch_size):
-            batch_paths = file_paths[i:i + batch_size]
-            batch_ids = file_ids[i:i + batch_size]
-            
+            batch_paths = file_paths[i : i + batch_size]
+            batch_ids = file_ids[i : i + batch_size]
+
             # Collect paths that exist for batch deletion
             existing_paths = []
             for path in batch_paths:
@@ -283,9 +296,9 @@ class FileService:
                 except Exception as e:
                     logger.error("Failed to check file %s: %s", path, str(e))
                     error_count += 1
-            
+
             # Batch delete files if storage backend supports it
-            if hasattr(default_storage, 'delete_many'):
+            if hasattr(default_storage, "delete_many"):
                 try:
                     default_storage.delete_many(existing_paths)
                     deleted_count += len(existing_paths)
@@ -308,10 +321,10 @@ class FileService:
                     except Exception as e:
                         logger.error("Failed to delete file %s: %s", path, str(e))
                         error_count += 1
-            
+
             # Bulk delete database records
             with transaction.atomic():
                 FileUpload.objects.filter(id__in=batch_ids).delete()
-        
+
         logger.info("Cleaned up %s expired files, {error_count} errors", deleted_count)
         return {"deleted": deleted_count, "errors": error_count}

@@ -8,7 +8,7 @@ env = environ.Env()
 BASE_DIR = Path(__file__).resolve().parent.parent.parent.parent
 
 # Read .env file
-env_file = BASE_DIR / '.env'
+env_file = BASE_DIR / ".env"
 if env_file.exists():
     env.read_env(env_file)
 
@@ -63,61 +63,44 @@ INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
 MIDDLEWARE = [
     # Performance monitoring (first to track everything)
     "apps.core.middleware_performance.PerformanceMonitoringMiddleware",
-    
     # Compression and optimization (early for efficiency)
     "django.middleware.gzip.GZipMiddleware",
     # "apps.core.middleware_performance.CompressionMiddleware",  # Disabled - requires brotli
-    
     # Early exit middleware (prevent unnecessary processing)
     "apps.core.middleware.AdminIPAllowlistMiddleware",
-    
     # Security headers (cached for performance)
     "django.middleware.security.SecurityMiddleware",
     "apps.core.middleware.SecurityHeadersMiddleware",
-    
     # Static file serving
     "whitenoise.middleware.WhiteNoiseMiddleware",
-    
     # CORS handling
     "corsheaders.middleware.CorsMiddleware",
-    
     # Cache and conditional responses (early for cache hits)
     "django.middleware.http.ConditionalGetMiddleware",
     "apps.core.middleware_performance.CacheHitRateMiddleware",
-    
     # Session management
     "django.contrib.sessions.middleware.SessionMiddleware",
-    
     # Dynamic language loading
     "apps.i18n.middleware.DynamicLanguageMiddleware",
-    
     # Common middleware
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
-    
     # Redirect middleware
     "apps.cms.middleware.RedirectMiddleware",
-    
     # Authentication (MUST come before any middleware that uses request.user)
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "allauth.account.middleware.AccountMiddleware",
-    
     # Messages
     "django.contrib.messages.middleware.MessageMiddleware",
-    
     # Throttling (AFTER authentication so it can check user status)
     "apps.core.middleware_performance.RequestThrottlingMiddleware",
-    
     # Additional security
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
-    
     # Feature flags
     "waffle.middleware.WaffleMiddleware",
-    
     # Database optimization
     "apps.core.middleware_performance.DatabaseConnectionPoolMiddleware",
     # "apps.core.middleware_performance.QueryCountLimitMiddleware",  # Disabled in dev
-    
     # Heavy middleware at the end
     "apps.accounts.middleware.LastSeenMiddleware",
     "apps.core.middleware.DemoModeMiddleware",
@@ -150,21 +133,26 @@ DATABASES = {
 }
 
 # Database connection pooling
-DATABASES['default']['CONN_MAX_AGE'] = env.int('DB_CONN_MAX_AGE', 600)  # 10 minutes default
+DATABASES["default"]["CONN_MAX_AGE"] = env.int(
+    "DB_CONN_MAX_AGE", 600
+)  # 10 minutes default
 
 # PostgreSQL-specific optimizations
-if 'postgresql' in DATABASES['default']['ENGINE'] or 'postgis' in DATABASES['default']['ENGINE']:
-    DATABASES['default']['OPTIONS'] = {
-        'connect_timeout': 10,
-        'options': '-c statement_timeout=30000',  # 30 seconds
-        'keepalives': 1,
-        'keepalives_idle': 30,
-        'keepalives_interval': 10,
-        'keepalives_count': 5,
+if (
+    "postgresql" in DATABASES["default"]["ENGINE"]
+    or "postgis" in DATABASES["default"]["ENGINE"]
+):
+    DATABASES["default"]["OPTIONS"] = {
+        "connect_timeout": 10,
+        "options": "-c statement_timeout=30000",  # 30 seconds
+        "keepalives": 1,
+        "keepalives_idle": 30,
+        "keepalives_interval": 10,
+        "keepalives_count": 5,
     }
 
 # Enable persistent connections
-DATABASES['default']['CONN_HEALTH_CHECKS'] = True
+DATABASES["default"]["CONN_HEALTH_CHECKS"] = True
 
 # Cache Configuration
 CACHES = {
@@ -172,13 +160,13 @@ CACHES = {
 }
 
 # Cache key settings
-CACHE_MIDDLEWARE_ALIAS = 'default'
+CACHE_MIDDLEWARE_ALIAS = "default"
 CACHE_MIDDLEWARE_SECONDS = 600  # 10 minutes
-CACHE_MIDDLEWARE_KEY_PREFIX = 'bedrock'
+CACHE_MIDDLEWARE_KEY_PREFIX = "bedrock"
 
 # Session cache
-SESSION_ENGINE = 'django.contrib.sessions.backends.cache'
-SESSION_CACHE_ALIAS = 'default'
+SESSION_ENGINE = "django.contrib.sessions.backends.cache"
+SESSION_CACHE_ALIAS = "default"
 
 # Password validation
 AUTH_PASSWORD_VALIDATORS = [
@@ -239,8 +227,8 @@ AUTH_USER_MODEL = "accounts.User"
 
 # Authentication backends (include RBAC backend)
 AUTHENTICATION_BACKENDS = [
-    'apps.accounts.auth_backends.ScopedPermissionBackend',
-    'django.contrib.auth.backends.ModelBackend',
+    "apps.accounts.auth_backends.ScopedPermissionBackend",
+    "django.contrib.auth.backends.ModelBackend",
 ]
 
 # Django REST Framework
@@ -299,14 +287,14 @@ SPECTACULAR_SETTINGS = {
             "name": "sessionAuth",
             "type": "apiKey",
             "in": "cookie",
-            "description": "Django session-based authentication"
+            "description": "Django session-based authentication",
         },
         {
-            "name": "csrfToken", 
+            "name": "csrfToken",
             "type": "apiKey",
             "in": "header",
-            "description": "CSRF token for write operations"
-        }
+            "description": "CSRF token for write operations",
+        },
     ],
     "TAGS": [
         {"name": "Pages", "description": "CMS page management and hierarchies"},
@@ -339,10 +327,10 @@ SPECTACULAR_SETTINGS = {
                         "updated_at": "2024-01-20T14:45:00Z",
                         "seo": {
                             "meta_title": "Welcome to Our Site",
-                            "meta_description": "The best CMS platform"
-                        }
+                            "meta_description": "The best CMS platform",
+                        },
                     }
-                ]
+                ],
             }
         },
         "SearchResponse": {
@@ -353,15 +341,15 @@ SPECTACULAR_SETTINGS = {
                         "content_snippet": "Learn Django basics...",
                         "content_type": "blog.blogpost",
                         "url": "/blog/django-tutorial/",
-                        "score": 0.95
+                        "score": 0.95,
                     }
                 ],
                 "total": 42,
                 "page": 1,
-                "suggestions": ["django", "python", "tutorial"]
+                "suggestions": ["django", "python", "tutorial"],
             }
-        }
-    }
+        },
+    },
 }
 
 # Django Allauth
@@ -402,29 +390,29 @@ CELERY_ENABLE_UTC = True
 
 # Celery Beat Schedule (Periodic Tasks)
 CELERY_BEAT_SCHEDULE = {
-    'publish-scheduled-content': {
-        'task': 'apps.cms.tasks.publish_scheduled_content',
-        'schedule': 60.0,  # Every minute
-        'options': {'queue': 'publishing'}
+    "publish-scheduled-content": {
+        "task": "apps.cms.tasks.publish_scheduled_content",
+        "schedule": 60.0,  # Every minute
+        "options": {"queue": "publishing"},
     },
-    'nightly-link-check': {
-        'task': 'apps.cms.tasks.nightly_link_check',
-        'schedule': 60.0 * 60.0 * 24.0,  # Daily at midnight
-        'options': {'queue': 'reports'}
+    "nightly-link-check": {
+        "task": "apps.cms.tasks.nightly_link_check",
+        "schedule": 60.0 * 60.0 * 24.0,  # Daily at midnight
+        "options": {"queue": "reports"},
     },
-    'cleanup-orphaned-translation-units': {
-        'task': 'apps.i18n.tasks.cleanup_orphaned_translation_units',
-        'schedule': 60.0 * 60.0 * 24.0 * 7.0,  # Weekly
-        'options': {'queue': 'maintenance'}
+    "cleanup-orphaned-translation-units": {
+        "task": "apps.i18n.tasks.cleanup_orphaned_translation_units",
+        "schedule": 60.0 * 60.0 * 24.0 * 7.0,  # Weekly
+        "options": {"queue": "maintenance"},
     },
 }
 
 # Celery Task Routes
 CELERY_TASK_ROUTES = {
-    'apps.cms.tasks.publish_scheduled_content': {'queue': 'publishing'},
-    'apps.cms.tasks.unpublish_expired_content': {'queue': 'publishing'},
-    'apps.cms.tasks.*': {'queue': 'reports'},
-    'apps.i18n.tasks.*': {'queue': 'translations'},
+    "apps.cms.tasks.publish_scheduled_content": {"queue": "publishing"},
+    "apps.cms.tasks.unpublish_expired_content": {"queue": "publishing"},
+    "apps.cms.tasks.*": {"queue": "reports"},
+    "apps.i18n.tasks.*": {"queue": "translations"},
 }
 
 # Logging
@@ -465,14 +453,14 @@ CORS_ALLOWED_ORIGINS = env.list("CORS_ALLOWED_ORIGINS", default=[])
 # Default CORS allowed headers - can be overridden in environment-specific settings
 CORS_ALLOW_HEADERS = [
     # Standard headers
-    'authorization',
-    'content-type', 
-    'x-csrftoken',
-    'x-requested-with',
+    "authorization",
+    "content-type",
+    "x-csrftoken",
+    "x-requested-with",
     # Custom headers for permission context
-    'x-locale',
-    'x-user-scopes',
-    'x-user-role',
+    "x-locale",
+    "x-user-scopes",
+    "x-user-role",
 ]
 
 # File Upload
@@ -494,27 +482,54 @@ CMS_SITEMAP_BASE_URL = env("CMS_SITEMAP_BASE_URL", default="http://localhost:800
 
 # HTML Sanitization settings
 HTML_SANITIZER_ALLOWED_TAGS = [
-    'p', 'div', 'span', 'br', 'hr',
-    'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
-    'strong', 'b', 'em', 'i', 'u', 's', 'sub', 'sup',
-    'ul', 'ol', 'li',
-    'a', 'img',
-    'blockquote', 'pre', 'code',
-    'table', 'thead', 'tbody', 'tr', 'th', 'td',
-    'figure', 'figcaption',
+    "p",
+    "div",
+    "span",
+    "br",
+    "hr",
+    "h1",
+    "h2",
+    "h3",
+    "h4",
+    "h5",
+    "h6",
+    "strong",
+    "b",
+    "em",
+    "i",
+    "u",
+    "s",
+    "sub",
+    "sup",
+    "ul",
+    "ol",
+    "li",
+    "a",
+    "img",
+    "blockquote",
+    "pre",
+    "code",
+    "table",
+    "thead",
+    "tbody",
+    "tr",
+    "th",
+    "td",
+    "figure",
+    "figcaption",
 ]
 
 HTML_SANITIZER_ALLOWED_ATTRIBUTES = {
-    '*': ['class', 'id'],
-    'a': ['href', 'title', 'target', 'rel'],
-    'img': ['src', 'alt', 'title', 'width', 'height'],
-    'blockquote': ['cite'],
-    'table': ['cellpadding', 'cellspacing', 'border'],
-    'th': ['scope', 'rowspan', 'colspan'],
-    'td': ['rowspan', 'colspan'],
+    "*": ["class", "id"],
+    "a": ["href", "title", "target", "rel"],
+    "img": ["src", "alt", "title", "width", "height"],
+    "blockquote": ["cite"],
+    "table": ["cellpadding", "cellspacing", "border"],
+    "th": ["scope", "rowspan", "colspan"],
+    "td": ["rowspan", "colspan"],
 }
 
-HTML_SANITIZER_ALLOWED_PROTOCOLS = ['http', 'https', 'mailto', 'tel']
+HTML_SANITIZER_ALLOWED_PROTOCOLS = ["http", "https", "mailto", "tel"]
 
 # Media storage settings
 USE_S3_STORAGE = env.bool("USE_S3_STORAGE", default=False)
@@ -528,9 +543,9 @@ if USE_S3_STORAGE:
     AWS_S3_CUSTOM_DOMAIN = env("AWS_S3_CUSTOM_DOMAIN", default=None)
     AWS_DEFAULT_ACL = env("AWS_DEFAULT_ACL", default="public-read")
     AWS_S3_OBJECT_PARAMETERS = {
-        'CacheControl': 'max-age=86400',
+        "CacheControl": "max-age=86400",
     }
-    
+
     # Use different storage for static vs media files
     DEFAULT_FILE_STORAGE = "apps.core.storage.S3MediaStorage"
     STATICFILES_STORAGE = "apps.core.storage.S3StaticStorage"

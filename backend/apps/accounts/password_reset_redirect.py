@@ -13,22 +13,23 @@ from django.utils.encoding import force_bytes
 def password_reset_redirect(request, uidb36, key):
     """
     Redirect Allauth password reset URLs to frontend.
-    
+
     Allauth sends URLs like:
     /accounts/password/reset/key/4-cvteep-7d4243083d5d48b785e9d73cff267a72/
-    
+
     We need to redirect to:
     /password-reset/{uid}/{token}
     """
     from django.contrib.auth import get_user_model
+
     User = get_user_model()
-    
+
     # The uidb36 is the user ID in base36 format
     # The key is the token
-    
+
     # Get frontend URL from settings or default to localhost
-    frontend_url = getattr(settings, 'FRONTEND_URL', 'http://localhost:8082')
-    
+    frontend_url = getattr(settings, "FRONTEND_URL", "http://localhost:8082")
+
     # Convert base36 user ID to base64 for consistency with Django's default
     try:
         # Convert base36 to int
@@ -39,24 +40,24 @@ def password_reset_redirect(request, uidb36, key):
         uid = urlsafe_base64_encode(force_bytes(user.pk))
     except (ValueError, User.DoesNotExist):
         # Invalid user ID, redirect to password reset request page
-        return redirect(f'{frontend_url}/forgot-password')
-    
+        return redirect(f"{frontend_url}/forgot-password")
+
     # Redirect to frontend with the UID and token
-    return redirect(f'{frontend_url}/password-reset/{uid}/{key}')
+    return redirect(f"{frontend_url}/password-reset/{uid}/{key}")
 
 
-@require_GET  
+@require_GET
 def email_verification_redirect(request, key):
     """
     Redirect email verification URLs to frontend.
-    
+
     Allauth sends URLs like:
     /accounts/confirm-email/{key}/
-    
+
     We can handle this by redirecting to a frontend page.
     """
-    frontend_url = getattr(settings, 'FRONTEND_URL', 'http://localhost:8082')
-    
+    frontend_url = getattr(settings, "FRONTEND_URL", "http://localhost:8082")
+
     # For now, just redirect to sign-in with a message
     # You can create a dedicated email verification page if needed
-    return redirect(f'{frontend_url}/sign-in?verify={key}')
+    return redirect(f"{frontend_url}/sign-in?verify={key}")

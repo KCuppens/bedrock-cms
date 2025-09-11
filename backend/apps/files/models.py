@@ -2,7 +2,15 @@ import uuid
 
 from django.contrib.auth import get_user_model
 from django.db import models
-from django.db.models import F, UUIDField, CharField, TextField, BooleanField, PositiveIntegerField, DateTimeField
+from django.db.models import (
+    F,
+    UUIDField,
+    CharField,
+    TextField,
+    BooleanField,
+    PositiveIntegerField,
+    DateTimeField,
+)
 
 from apps.core.enums import FileType
 from apps.core.mixins import TimestampMixin, UserTrackingMixin
@@ -14,9 +22,13 @@ class FileUpload(TimestampMixin, UserTrackingMixin):
     """File upload model with S3/MinIO storage"""
 
     # File identification
-    id: UUIDField = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    id: UUIDField = models.UUIDField(
+        primary_key=True, default=uuid.uuid4, editable=False
+    )
     original_filename: CharField = models.CharField("Original filename", max_length=255)
-    filename: CharField = models.CharField("Stored filename", max_length=255, unique=True)
+    filename: CharField = models.CharField(
+        "Stored filename", max_length=255, unique=True
+    )
 
     # File metadata
     file_type: CharField = models.CharField(
@@ -24,7 +36,9 @@ class FileUpload(TimestampMixin, UserTrackingMixin):
     )
     mime_type: CharField = models.CharField("MIME type", max_length=100)
     file_size: PositiveIntegerField = models.PositiveIntegerField("File size (bytes)")
-    checksum: CharField = models.CharField("File checksum", max_length=64, blank=True, db_index=True)
+    checksum: CharField = models.CharField(
+        "File checksum", max_length=64, blank=True, db_index=True
+    )
 
     # Storage info
     storage_path: TextField = models.TextField("Storage path")
@@ -35,8 +49,12 @@ class FileUpload(TimestampMixin, UserTrackingMixin):
     tags: CharField = models.CharField("Tags", max_length=500, blank=True)
 
     # Access control
-    expires_at: DateTimeField = models.DateTimeField("Expires at", null=True, blank=True)
-    download_count: PositiveIntegerField = models.PositiveIntegerField("Download count", default=0)
+    expires_at: DateTimeField = models.DateTimeField(
+        "Expires at", null=True, blank=True
+    )
+    download_count: PositiveIntegerField = models.PositiveIntegerField(
+        "Download count", default=0
+    )
 
     class Meta:
         verbose_name = "File Upload"
@@ -102,7 +120,7 @@ class FileUpload(TimestampMixin, UserTrackingMixin):
     def increment_download_count(self):
         """Increment download counter atomically using F expression"""
         FileUpload.objects.filter(pk=self.pk).update(
-            download_count=F('download_count') + 1
+            download_count=F("download_count") + 1
         )
 
     def get_download_url(self, expires_in=3600):

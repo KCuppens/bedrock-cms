@@ -24,16 +24,16 @@ CSRF_COOKIE_HTTPONLY = True
 # Database
 DATABASES = {"default": env.db("DATABASE_URL")}
 # Optimal connection pooling for production
-DATABASES["default"]["CONN_MAX_AGE"] = env.int('DB_CONN_MAX_AGE', 600)  # 10 minutes
+DATABASES["default"]["CONN_MAX_AGE"] = env.int("DB_CONN_MAX_AGE", 600)  # 10 minutes
 DATABASES["default"]["CONN_HEALTH_CHECKS"] = True
 DATABASES["default"]["OPTIONS"] = {
-    'connect_timeout': 10,
-    'options': '-c statement_timeout=30000',  # 30 seconds  
-    'keepalives': 1,
-    'keepalives_idle': 30,
-    'keepalives_interval': 10,
-    'keepalives_count': 5,
-    'sslmode': 'require',  # Force SSL in production
+    "connect_timeout": 10,
+    "options": "-c statement_timeout=30000",  # 30 seconds
+    "keepalives": 1,
+    "keepalives_idle": 30,
+    "keepalives_interval": 10,
+    "keepalives_count": 5,
+    "sslmode": "require",  # Force SSL in production
 }
 
 # Email
@@ -126,14 +126,14 @@ CORS_PREFLIGHT_MAX_AGE = 86400  # 24 hours cache for preflight requests
 # Custom headers for API requests (inherit from base, can be overridden via env)
 CORS_ALLOW_HEADERS = [
     # Standard headers
-    'authorization',
-    'content-type', 
-    'x-csrftoken',
-    'x-requested-with',
+    "authorization",
+    "content-type",
+    "x-csrftoken",
+    "x-requested-with",
     # Custom headers for permission context
-    'x-locale',
-    'x-user-scopes',
-    'x-user-role',
+    "x-locale",
+    "x-user-scopes",
+    "x-user-role",
 ]
 
 # Admin security

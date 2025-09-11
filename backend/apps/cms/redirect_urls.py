@@ -8,6 +8,6 @@ from rest_framework.routers import DefaultRouter
 from .views.redirect import RedirectViewSet
 
 router = DefaultRouter()
-router.register(r'', RedirectViewSet, basename='redirect')
+router.register(r"", RedirectViewSet, basename="redirect")
 
 urlpatterns = router.urls

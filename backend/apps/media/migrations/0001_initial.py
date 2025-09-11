@@ -6,20 +6,20 @@ from django.db import migrations
 
 class Migration(migrations.Migration):
     initial = True
-    
+
     dependencies = [
-        ('files', '0001_initial'),
+        ("files", "0001_initial"),
     ]
-    
+
     operations = [
         migrations.CreateModel(
-            name='Asset',
+            name="Asset",
             fields=[],
             options={
-                'proxy': True,
-                'indexes': [],
-                'constraints': [],
+                "proxy": True,
+                "indexes": [],
+                "constraints": [],
             },
-            bases=('files.fileupload',),
+            bases=("files.fileupload",),
         ),
     ]

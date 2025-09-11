@@ -45,7 +45,9 @@ class FeatureFlags:
     }
 
     @classmethod
-    def is_enabled(cls, flag_name: str, request=None, user: Optional[User] = None) -> bool:
+    def is_enabled(
+        cls, flag_name: str, request=None, user: Optional[User] = None
+    ) -> bool:
         """
         Check if a feature flag is enabled
 
@@ -142,7 +144,9 @@ class FeatureFlags:
 
 
 # Convenience functions
-def is_feature_enabled(flag_name: str, request=None, user: Optional[User] = None) -> bool:
+def is_feature_enabled(
+    flag_name: str, request=None, user: Optional[User] = None
+) -> bool:
     """Convenience function to check if a feature flag is enabled"""
     return FeatureFlags.is_enabled(flag_name, request, user)
 

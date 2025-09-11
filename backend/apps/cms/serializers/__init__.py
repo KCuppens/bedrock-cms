@@ -2,8 +2,8 @@ from .pages import PageWriteSerializer, PageTreeItemSerializer, PageReadSerializ
 from .redirect import RedirectSerializer
 
 __all__ = [
-    'PageReadSerializer',
-    'PageWriteSerializer', 
-    'PageTreeItemSerializer',
-    'RedirectSerializer'
+    "PageReadSerializer",
+    "PageWriteSerializer",
+    "PageTreeItemSerializer",
+    "RedirectSerializer",
 ]

@@ -1,5 +1,8 @@
 from django.contrib import admin
-from django.contrib.auth.admin import UserAdmin as BaseUserAdmin, GroupAdmin as BaseGroupAdmin
+from django.contrib.auth.admin import (
+    UserAdmin as BaseUserAdmin,
+    GroupAdmin as BaseGroupAdmin,
+)
 from django.contrib.auth.models import Group
 from django.utils.translation import gettext_lazy as _
 
@@ -109,52 +112,48 @@ UserAdmin.inlines = [UserProfileInline]
 
 # RBAC Admin Classes
 
+
 class ScopedLocaleInline(admin.TabularInline):
     """Inline admin for ScopedLocale."""
+
     model = ScopedLocale
     extra = 1
-    autocomplete_fields = ['locale']
+    autocomplete_fields = ["locale"]
 
 
 class ScopedSectionInline(admin.TabularInline):
     """Inline admin for ScopedSection."""
+
     model = ScopedSection
     extra = 1
-    fields = ['path_prefix', 'name', 'description']
+    fields = ["path_prefix", "name", "description"]
 
 
 @admin.register(ScopedLocale)
 class ScopedLocaleAdmin(admin.ModelAdmin):
     """Admin for ScopedLocale model."""
-    
-    list_display = ['group', 'locale', 'created_at']
-    list_filter = ['locale', 'created_at']
-    search_fields = ['group__name', 'locale__name', 'locale__code']
-    autocomplete_fields = ['group', 'locale']
-    readonly_fields = ['created_at']
+
+    list_display = ["group", "locale", "created_at"]
+    list_filter = ["locale", "created_at"]
+    search_fields = ["group__name", "locale__name", "locale__code"]
+    autocomplete_fields = ["group", "locale"]
+    readonly_fields = ["created_at"]
 
 
 @admin.register(ScopedSection)
 class ScopedSectionAdmin(admin.ModelAdmin):
     """Admin for ScopedSection model."""
-    
-    list_display = ['group', 'name', 'path_prefix', 'created_at']
-    list_filter = ['created_at']
-    search_fields = ['group__name', 'name', 'path_prefix', 'description']
-    autocomplete_fields = ['group']
-    readonly_fields = ['created_at']
-    
+
+    list_display = ["group", "name", "path_prefix", "created_at"]
+    list_filter = ["created_at"]
+    search_fields = ["group__name", "name", "path_prefix", "description"]
+    autocomplete_fields = ["group"]
+    readonly_fields = ["created_at"]
+
     fieldsets = [
-        ('Group Assignment', {
-            'fields': ['group']
-        }),
-        ('Section Details', {
-            'fields': ['path_prefix', 'name', 'description']
-        }),
-        ('Metadata', {
-            'fields': ['created_at'],
-            'classes': ['collapse']
-        })
+        ("Group Assignment", {"fields": ["group"]}),
+        ("Section Details", {"fields": ["path_prefix", "name", "description"]}),
+        ("Metadata", {"fields": ["created_at"], "classes": ["collapse"]}),
     ]
 
 
@@ -165,26 +164,29 @@ admin.site.unregister(Group)
 @admin.register(Group)
 class EnhancedGroupAdmin(BaseGroupAdmin):
     """Enhanced Group admin with RBAC scope inlines."""
-    
+
     inlines = [ScopedLocaleInline, ScopedSectionInline]
-    
+
     fieldsets = (
-        (None, {'fields': ('name', 'permissions')}),
-        ('Scope Configuration', {
-            'description': 'Configure which locales and sections this group can access. If no scopes are defined, the group has no content access restrictions.',
-            'classes': ('collapse',),
-            'fields': (),  # Scopes are handled via inlines
-        }),
+        (None, {"fields": ("name", "permissions")}),
+        (
+            "Scope Configuration",
+            {
+                "description": "Configure which locales and sections this group can access. If no scopes are defined, the group has no content access restrictions.",
+                "classes": ("collapse",),
+                "fields": (),  # Scopes are handled via inlines
+            },
+        ),
     )
-    
+
     def save_related(self, request, form, formsets, change):
         """Save related objects including inlines."""
         super().save_related(request, form, formsets, change)
-        
+
         # Add helpful message about scope configuration
         if not change:  # New group
             self.message_user(
-                request, 
-                'Group created successfully. Configure locale and section scopes below to restrict access.',
-                level='info'
+                request,
+                "Group created successfully. Configure locale and section scopes below to restrict access.",
+                level="info",
             )

@@ -82,10 +82,12 @@ class UserViewSet(RetrieveModelMixin, UpdateModelMixin, GenericViewSet):
         return Response(
             {
                 "user": user_serializer.data,
-                "message": "Registration successful. Please check your email to verify your account."
-                if allauth_settings.EMAIL_VERIFICATION
-                == allauth_settings.EmailVerificationMethod.MANDATORY
-                else "Registration successful.",
+                "message": (
+                    "Registration successful. Please check your email to verify your account."
+                    if allauth_settings.EMAIL_VERIFICATION
+                    == allauth_settings.EmailVerificationMethod.MANDATORY
+                    else "Registration successful."
+                ),
             },
             status=status.HTTP_201_CREATED,
         )

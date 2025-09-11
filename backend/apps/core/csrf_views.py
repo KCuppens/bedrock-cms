@@ -11,20 +11,20 @@ from django.views.decorators.http import require_GET
 def get_csrf_token(request):
     """
     Get CSRF token for frontend application.
-    
+
     This endpoint allows the frontend to get a CSRF token
     that can be used for subsequent POST requests.
     """
     token = get_token(request)
-    response = JsonResponse({'csrfToken': token})
-    
+    response = JsonResponse({"csrfToken": token})
+
     # Set cookie as well for session-based auth
     response.set_cookie(
-        'csrftoken',
+        "csrftoken",
         token,
         max_age=60 * 60 * 24 * 7,  # 1 week
         httponly=False,  # Allow JavaScript to read it
-        samesite='Lax',
+        samesite="Lax",
     )
-    
+
     return response

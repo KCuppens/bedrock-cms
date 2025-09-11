@@ -179,7 +179,9 @@ class EmailService:
 
     @staticmethod
     def preview_email(
-        template_key: str, context: Optional[dict[str, Any]] = None, language: str = "en"
+        template_key: str,
+        context: Optional[dict[str, Any]] = None,
+        language: str = "en",
     ) -> dict[str, str]:
         """Preview email content without sending"""
         template = EmailTemplate.get_template(template_key, language)
@@ -197,9 +199,9 @@ def send_welcome_email(
     email_context = {
         "user": user,
         "user_name": user.get_full_name(),
-        "login_url": settings.LOGIN_URL
-        if hasattr(settings, "LOGIN_URL")
-        else "/auth/login/",
+        "login_url": (
+            settings.LOGIN_URL if hasattr(settings, "LOGIN_URL") else "/auth/login/"
+        ),
         **(context or {}),
     }
 

@@ -125,13 +125,13 @@ def send_bulk_email_task(
         from .models import EmailMessageLog, EmailTemplate
 
         # Get template once and cache it
-        template = EmailTemplate.get_template(template_key, 'en')
+        template = EmailTemplate.get_template(template_key, "en")
         if not template:
             raise ValueError(f"Email template '{template_key}' not found")
-        
+
         # Pre-render template content once if context is the same for all
         rendered_content = template.render_all(context or {})
-        
+
         sent_count = 0
         failed_count = 0
         failed_emails = []
@@ -139,9 +139,9 @@ def send_bulk_email_task(
 
         # Process emails in batches for better performance
         for i in range(0, len(recipient_emails), batch_size):
-            batch = recipient_emails[i:i + batch_size]
+            batch = recipient_emails[i : i + batch_size]
             email_logs = []
-            
+
             # Create all log entries in a single transaction
             with transaction.atomic():
                 for email in batch:
@@ -160,12 +160,14 @@ def send_bulk_email_task(
                     except Exception as e:
                         failed_count += 1
                         failed_emails.append({"email": email, "error": str(e)})
-                        logger.error("Failed to prepare bulk email for %s: {str(e)}", email)
-                
+                        logger.error(
+                            "Failed to prepare bulk email for %s: {str(e)}", email
+                        )
+
                 # Bulk create all email logs
                 if email_logs:
                     EmailMessageLog.objects.bulk_create(email_logs)
-            
+
             # Send emails in this batch
             for email_log in email_logs:
                 try:
@@ -174,7 +176,9 @@ def send_bulk_email_task(
                 except Exception as e:
                     failed_count += 1
                     failed_emails.append({"email": email_log.to_email, "error": str(e)})
-                    logger.error("Failed to send bulk email to %s: {str(e)}", email_log.to_email)
+                    logger.error(
+                        "Failed to send bulk email to %s: {str(e)}", email_log.to_email
+                    )
 
         logger.info(
             f"Bulk email task completed: {sent_count} sent, {failed_count} failed"
@@ -220,52 +224,60 @@ def retry_failed_emails(max_retries: int = 3):
 
         # Get failed emails from the last 24 hours that haven't exceeded retry limit
         cutoff_time = timezone.now() - timedelta(hours=24)
-        
+
         # Use select_for_update to prevent concurrent retries
         with transaction.atomic():
-            failed_emails = EmailMessageLog.objects.select_for_update().filter(
-                Q(status=EmailStatus.FAILED) &
-                Q(created_at__gte=cutoff_time) &
-                Q(retry_count__lt=max_retries)  # Assuming retry_count field exists
-            ).select_related('template')[:50]  # Process fewer at a time for better performance
-            
-            email_ids = list(failed_emails.values_list('id', flat=True))
-            
+            failed_emails = (
+                EmailMessageLog.objects.select_for_update()
+                .filter(
+                    Q(status=EmailStatus.FAILED)
+                    & Q(created_at__gte=cutoff_time)
+                    & Q(
+                        retry_count__lt=max_retries
+                    )  # Assuming retry_count field exists
+                )
+                .select_related("template")[:50]
+            )  # Process fewer at a time for better performance
+
+            email_ids = list(failed_emails.values_list("id", flat=True))
+
             # Bulk update to mark as retrying
             EmailMessageLog.objects.filter(id__in=email_ids).update(
                 status=EmailStatus.PENDING,
-                error_message='',
-                retry_count=F('retry_count') + 1
+                error_message="",
+                retry_count=F("retry_count") + 1,
             )
-        
+
         retried_count = 0
         tasks = []
-        
+
         # Schedule retries with exponential backoff
         for idx, email_id in enumerate(email_ids):
             try:
                 # Calculate backoff delay based on retry count
-                delay = min(60 * (2 ** idx), 3600)  # Max 1 hour delay
-                
+                delay = min(60 * (2**idx), 3600)  # Max 1 hour delay
+
                 # Schedule task with delay
                 task = send_email_task.apply_async(
                     args=[email_id],
                     countdown=delay,
-                    queue='high_priority'  # Use high priority queue for retries
+                    queue="high_priority",  # Use high priority queue for retries
                 )
                 tasks.append((email_id, task.id))
                 retried_count += 1
-                
+
             except Exception as e:
-                logger.error("Failed to schedule retry for email %s: {str(e)}", email_id)
-        
+                logger.error(
+                    "Failed to schedule retry for email %s: {str(e)}", email_id
+                )
+
         # Bulk update celery task IDs
         if tasks:
             for email_id, task_id in tasks:
                 EmailMessageLog.objects.filter(id=email_id).update(
                     celery_task_id=task_id
                 )
-        
+
         logger.info("Scheduled %s failed emails for retry", retried_count)
 
         return {

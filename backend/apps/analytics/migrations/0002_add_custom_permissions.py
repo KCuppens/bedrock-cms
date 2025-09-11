@@ -13,212 +13,733 @@ class Migration(migrations.Migration):
     initial = True
 
     dependencies = [
-        ('contenttypes', '0002_remove_content_type_name'),
-        ('cms', '0007_add_custom_permissions'),
+        ("contenttypes", "0002_remove_content_type_name"),
+        ("cms", "0007_add_custom_permissions"),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        ('analytics', '0001_initial'),
+        ("analytics", "0001_initial"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='Assessment',
+            name="Assessment",
             fields=[
-                ('id', models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True, serialize=False)),
-                ('title', models.CharField(max_length=255)),
-                ('description', models.TextField(blank=True)),
-                ('assessment_type', models.CharField(choices=[('security', 'Security Assessment'), ('compliance', 'Compliance Audit'), ('performance', 'Performance Review'), ('accessibility', 'Accessibility Check'), ('seo', 'SEO Audit')], max_length=20)),
-                ('status', models.CharField(choices=[('scheduled', 'Scheduled'), ('in_progress', 'In Progress'), ('completed', 'Completed'), ('failed', 'Failed'), ('cancelled', 'Cancelled')], default='scheduled', max_length=20)),
-                ('target_url', models.URLField(blank=True, null=True)),
-                ('scope', models.JSONField(blank=True, default=dict)),
-                ('score', models.PositiveIntegerField(blank=True, null=True, validators=[django.core.validators.MinValueValidator(0), django.core.validators.MaxValueValidator(100)])),
-                ('severity', models.CharField(choices=[('low', 'Low'), ('medium', 'Medium'), ('high', 'High'), ('critical', 'Critical')], default='low', max_length=10)),
-                ('findings', models.JSONField(blank=True, default=list)),
-                ('recommendations', models.TextField(blank=True)),
-                ('scheduled_for', models.DateTimeField(blank=True, null=True)),
-                ('started_at', models.DateTimeField(blank=True, null=True)),
-                ('completed_at', models.DateTimeField(blank=True, null=True)),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('updated_at', models.DateTimeField(auto_now=True)),
-                ('assigned_to', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='assigned_assessments', to=settings.AUTH_USER_MODEL)),
-                ('created_by', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='created_assessments', to=settings.AUTH_USER_MODEL)),
+                (
+                    "id",
+                    models.UUIDField(
+                        default=uuid.uuid4,
+                        editable=False,
+                        primary_key=True,
+                        serialize=False,
+                    ),
+                ),
+                ("title", models.CharField(max_length=255)),
+                ("description", models.TextField(blank=True)),
+                (
+                    "assessment_type",
+                    models.CharField(
+                        choices=[
+                            ("security", "Security Assessment"),
+                            ("compliance", "Compliance Audit"),
+                            ("performance", "Performance Review"),
+                            ("accessibility", "Accessibility Check"),
+                            ("seo", "SEO Audit"),
+                        ],
+                        max_length=20,
+                    ),
+                ),
+                (
+                    "status",
+                    models.CharField(
+                        choices=[
+                            ("scheduled", "Scheduled"),
+                            ("in_progress", "In Progress"),
+                            ("completed", "Completed"),
+                            ("failed", "Failed"),
+                            ("cancelled", "Cancelled"),
+                        ],
+                        default="scheduled",
+                        max_length=20,
+                    ),
+                ),
+                ("target_url", models.URLField(blank=True, null=True)),
+                ("scope", models.JSONField(blank=True, default=dict)),
+                (
+                    "score",
+                    models.PositiveIntegerField(
+                        blank=True,
+                        null=True,
+                        validators=[
+                            django.core.validators.MinValueValidator(0),
+                            django.core.validators.MaxValueValidator(100),
+                        ],
+                    ),
+                ),
+                (
+                    "severity",
+                    models.CharField(
+                        choices=[
+                            ("low", "Low"),
+                            ("medium", "Medium"),
+                            ("high", "High"),
+                            ("critical", "Critical"),
+                        ],
+                        default="low",
+                        max_length=10,
+                    ),
+                ),
+                ("findings", models.JSONField(blank=True, default=list)),
+                ("recommendations", models.TextField(blank=True)),
+                ("scheduled_for", models.DateTimeField(blank=True, null=True)),
+                ("started_at", models.DateTimeField(blank=True, null=True)),
+                ("completed_at", models.DateTimeField(blank=True, null=True)),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
+                ("updated_at", models.DateTimeField(auto_now=True)),
+                (
+                    "assigned_to",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name="assigned_assessments",
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
+                (
+                    "created_by",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="created_assessments",
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
             ],
             options={
-                'ordering': ['-created_at'],
+                "ordering": ["-created_at"],
             },
         ),
         migrations.CreateModel(
-            name='AnalyticsSummary',
+            name="AnalyticsSummary",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('date', models.DateField(db_index=True)),
-                ('period_type', models.CharField(choices=[('daily', 'Daily'), ('weekly', 'Weekly'), ('monthly', 'Monthly')], max_length=10)),
-                ('total_views', models.PositiveIntegerField(default=0)),
-                ('unique_visitors', models.PositiveIntegerField(default=0)),
-                ('returning_visitors', models.PositiveIntegerField(default=0)),
-                ('avg_session_duration', models.PositiveIntegerField(default=0)),
-                ('bounce_rate', models.DecimalField(decimal_places=2, default=0, max_digits=5, validators=[django.core.validators.MinValueValidator(0), django.core.validators.MaxValueValidator(100)])),
-                ('new_users', models.PositiveIntegerField(default=0)),
-                ('active_users', models.PositiveIntegerField(default=0)),
-                ('user_actions', models.PositiveIntegerField(default=0)),
-                ('pages_published', models.PositiveIntegerField(default=0)),
-                ('files_uploaded', models.PositiveIntegerField(default=0)),
-                ('content_updates', models.PositiveIntegerField(default=0)),
-                ('threats_detected', models.PositiveIntegerField(default=0)),
-                ('risks_identified', models.PositiveIntegerField(default=0)),
-                ('assessments_completed', models.PositiveIntegerField(default=0)),
-                ('avg_load_time', models.PositiveIntegerField(default=0)),
-                ('uptime_percentage', models.DecimalField(decimal_places=2, default=100, max_digits=5, validators=[django.core.validators.MinValueValidator(0), django.core.validators.MaxValueValidator(100)])),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('updated_at', models.DateTimeField(auto_now=True)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("date", models.DateField(db_index=True)),
+                (
+                    "period_type",
+                    models.CharField(
+                        choices=[
+                            ("daily", "Daily"),
+                            ("weekly", "Weekly"),
+                            ("monthly", "Monthly"),
+                        ],
+                        max_length=10,
+                    ),
+                ),
+                ("total_views", models.PositiveIntegerField(default=0)),
+                ("unique_visitors", models.PositiveIntegerField(default=0)),
+                ("returning_visitors", models.PositiveIntegerField(default=0)),
+                ("avg_session_duration", models.PositiveIntegerField(default=0)),
+                (
+                    "bounce_rate",
+                    models.DecimalField(
+                        decimal_places=2,
+                        default=0,
+                        max_digits=5,
+                        validators=[
+                            django.core.validators.MinValueValidator(0),
+                            django.core.validators.MaxValueValidator(100),
+                        ],
+                    ),
+                ),
+                ("new_users", models.PositiveIntegerField(default=0)),
+                ("active_users", models.PositiveIntegerField(default=0)),
+                ("user_actions", models.PositiveIntegerField(default=0)),
+                ("pages_published", models.PositiveIntegerField(default=0)),
+                ("files_uploaded", models.PositiveIntegerField(default=0)),
+                ("content_updates", models.PositiveIntegerField(default=0)),
+                ("threats_detected", models.PositiveIntegerField(default=0)),
+                ("risks_identified", models.PositiveIntegerField(default=0)),
+                ("assessments_completed", models.PositiveIntegerField(default=0)),
+                ("avg_load_time", models.PositiveIntegerField(default=0)),
+                (
+                    "uptime_percentage",
+                    models.DecimalField(
+                        decimal_places=2,
+                        default=100,
+                        max_digits=5,
+                        validators=[
+                            django.core.validators.MinValueValidator(0),
+                            django.core.validators.MaxValueValidator(100),
+                        ],
+                    ),
+                ),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
+                ("updated_at", models.DateTimeField(auto_now=True)),
             ],
             options={
-                'ordering': ['-date'],
-                'indexes': [models.Index(fields=['date', 'period_type'], name='analytics_a_date_17b964_idx'), models.Index(fields=['period_type', 'date'], name='analytics_a_period__b2c590_idx')],
-                'unique_together': {('date', 'period_type')},
+                "ordering": ["-date"],
+                "indexes": [
+                    models.Index(
+                        fields=["date", "period_type"],
+                        name="analytics_a_date_17b964_idx",
+                    ),
+                    models.Index(
+                        fields=["period_type", "date"],
+                        name="analytics_a_period__b2c590_idx",
+                    ),
+                ],
+                "unique_together": {("date", "period_type")},
             },
         ),
         migrations.CreateModel(
-            name='UserActivity',
+            name="UserActivity",
             fields=[
-                ('id', models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True, serialize=False)),
-                ('action', models.CharField(choices=[('login', 'User Login'), ('logout', 'User Logout'), ('page_create', 'Page Created'), ('page_update', 'Page Updated'), ('page_delete', 'Page Deleted'), ('page_publish', 'Page Published'), ('file_upload', 'File Uploaded'), ('file_delete', 'File Deleted'), ('search', 'Search Query'), ('form_submit', 'Form Submitted'), ('download', 'File Downloaded'), ('click', 'Link/Button Clicked'), ('error', 'Error Occurred'), ('other', 'Other Action')], max_length=20)),
-                ('description', models.CharField(blank=True, max_length=255)),
-                ('object_id', models.PositiveIntegerField(blank=True, null=True)),
-                ('metadata', models.JSONField(blank=True, default=dict)),
-                ('ip_address', models.GenericIPAddressField()),
-                ('user_agent', models.TextField(blank=True)),
-                ('session_id', models.CharField(db_index=True, max_length=40)),
-                ('created_at', models.DateTimeField(db_index=True, default=django.utils.timezone.now)),
-                ('content_type', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, to='contenttypes.contenttype')),
-                ('user', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='activities', to=settings.AUTH_USER_MODEL)),
+                (
+                    "id",
+                    models.UUIDField(
+                        default=uuid.uuid4,
+                        editable=False,
+                        primary_key=True,
+                        serialize=False,
+                    ),
+                ),
+                (
+                    "action",
+                    models.CharField(
+                        choices=[
+                            ("login", "User Login"),
+                            ("logout", "User Logout"),
+                            ("page_create", "Page Created"),
+                            ("page_update", "Page Updated"),
+                            ("page_delete", "Page Deleted"),
+                            ("page_publish", "Page Published"),
+                            ("file_upload", "File Uploaded"),
+                            ("file_delete", "File Deleted"),
+                            ("search", "Search Query"),
+                            ("form_submit", "Form Submitted"),
+                            ("download", "File Downloaded"),
+                            ("click", "Link/Button Clicked"),
+                            ("error", "Error Occurred"),
+                            ("other", "Other Action"),
+                        ],
+                        max_length=20,
+                    ),
+                ),
+                ("description", models.CharField(blank=True, max_length=255)),
+                ("object_id", models.PositiveIntegerField(blank=True, null=True)),
+                ("metadata", models.JSONField(blank=True, default=dict)),
+                ("ip_address", models.GenericIPAddressField()),
+                ("user_agent", models.TextField(blank=True)),
+                ("session_id", models.CharField(db_index=True, max_length=40)),
+                (
+                    "created_at",
+                    models.DateTimeField(
+                        db_index=True, default=django.utils.timezone.now
+                    ),
+                ),
+                (
+                    "content_type",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="contenttypes.contenttype",
+                    ),
+                ),
+                (
+                    "user",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="activities",
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
             ],
             options={
-                'ordering': ['-created_at'],
-                'indexes': [models.Index(fields=['user', 'created_at'], name='analytics_u_user_id_630f80_idx'), models.Index(fields=['action', 'created_at'], name='analytics_u_action_df6b3c_idx'), models.Index(fields=['session_id', 'created_at'], name='analytics_u_session_67f334_idx'), models.Index(fields=['content_type', 'object_id'], name='analytics_u_content_d77385_idx')],
+                "ordering": ["-created_at"],
+                "indexes": [
+                    models.Index(
+                        fields=["user", "created_at"],
+                        name="analytics_u_user_id_630f80_idx",
+                    ),
+                    models.Index(
+                        fields=["action", "created_at"],
+                        name="analytics_u_action_df6b3c_idx",
+                    ),
+                    models.Index(
+                        fields=["session_id", "created_at"],
+                        name="analytics_u_session_67f334_idx",
+                    ),
+                    models.Index(
+                        fields=["content_type", "object_id"],
+                        name="analytics_u_content_d77385_idx",
+                    ),
+                ],
             },
         ),
         migrations.CreateModel(
-            name='Threat',
+            name="Threat",
             fields=[
-                ('id', models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True, serialize=False)),
-                ('title', models.CharField(max_length=255)),
-                ('description', models.TextField()),
-                ('threat_type', models.CharField(choices=[('malware', 'Malware'), ('phishing', 'Phishing'), ('ddos', 'DDoS Attack'), ('brute_force', 'Brute Force'), ('sql_injection', 'SQL Injection'), ('xss', 'Cross-Site Scripting'), ('csrf', 'Cross-Site Request Forgery'), ('data_breach', 'Data Breach'), ('insider', 'Insider Threat'), ('other', 'Other')], max_length=20)),
-                ('status', models.CharField(choices=[('detected', 'Detected'), ('investigating', 'Investigating'), ('contained', 'Contained'), ('resolved', 'Resolved'), ('false_positive', 'False Positive')], default='detected', max_length=20)),
-                ('severity', models.CharField(choices=[('info', 'Informational'), ('low', 'Low'), ('medium', 'Medium'), ('high', 'High'), ('critical', 'Critical')], default='low', max_length=10)),
-                ('source_ip', models.GenericIPAddressField(blank=True, null=True)),
-                ('target_url', models.URLField(blank=True, null=True)),
-                ('attack_vector', models.CharField(blank=True, max_length=255)),
-                ('indicators', models.JSONField(blank=True, default=list)),
-                ('affected_systems', models.JSONField(blank=True, default=list)),
-                ('data_compromised', models.BooleanField(default=False)),
-                ('service_disrupted', models.BooleanField(default=False)),
-                ('estimated_damage', models.DecimalField(blank=True, decimal_places=2, max_digits=10, null=True)),
-                ('response_actions', models.TextField(blank=True)),
-                ('lessons_learned', models.TextField(blank=True)),
-                ('detected_at', models.DateTimeField(db_index=True, default=django.utils.timezone.now)),
-                ('resolved_at', models.DateTimeField(blank=True, null=True)),
-                ('updated_at', models.DateTimeField(auto_now=True)),
-                ('assigned_to', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='assigned_threats', to=settings.AUTH_USER_MODEL)),
-                ('reported_by', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='reported_threats', to=settings.AUTH_USER_MODEL)),
+                (
+                    "id",
+                    models.UUIDField(
+                        default=uuid.uuid4,
+                        editable=False,
+                        primary_key=True,
+                        serialize=False,
+                    ),
+                ),
+                ("title", models.CharField(max_length=255)),
+                ("description", models.TextField()),
+                (
+                    "threat_type",
+                    models.CharField(
+                        choices=[
+                            ("malware", "Malware"),
+                            ("phishing", "Phishing"),
+                            ("ddos", "DDoS Attack"),
+                            ("brute_force", "Brute Force"),
+                            ("sql_injection", "SQL Injection"),
+                            ("xss", "Cross-Site Scripting"),
+                            ("csrf", "Cross-Site Request Forgery"),
+                            ("data_breach", "Data Breach"),
+                            ("insider", "Insider Threat"),
+                            ("other", "Other"),
+                        ],
+                        max_length=20,
+                    ),
+                ),
+                (
+                    "status",
+                    models.CharField(
+                        choices=[
+                            ("detected", "Detected"),
+                            ("investigating", "Investigating"),
+                            ("contained", "Contained"),
+                            ("resolved", "Resolved"),
+                            ("false_positive", "False Positive"),
+                        ],
+                        default="detected",
+                        max_length=20,
+                    ),
+                ),
+                (
+                    "severity",
+                    models.CharField(
+                        choices=[
+                            ("info", "Informational"),
+                            ("low", "Low"),
+                            ("medium", "Medium"),
+                            ("high", "High"),
+                            ("critical", "Critical"),
+                        ],
+                        default="low",
+                        max_length=10,
+                    ),
+                ),
+                ("source_ip", models.GenericIPAddressField(blank=True, null=True)),
+                ("target_url", models.URLField(blank=True, null=True)),
+                ("attack_vector", models.CharField(blank=True, max_length=255)),
+                ("indicators", models.JSONField(blank=True, default=list)),
+                ("affected_systems", models.JSONField(blank=True, default=list)),
+                ("data_compromised", models.BooleanField(default=False)),
+                ("service_disrupted", models.BooleanField(default=False)),
+                (
+                    "estimated_damage",
+                    models.DecimalField(
+                        blank=True, decimal_places=2, max_digits=10, null=True
+                    ),
+                ),
+                ("response_actions", models.TextField(blank=True)),
+                ("lessons_learned", models.TextField(blank=True)),
+                (
+                    "detected_at",
+                    models.DateTimeField(
+                        db_index=True, default=django.utils.timezone.now
+                    ),
+                ),
+                ("resolved_at", models.DateTimeField(blank=True, null=True)),
+                ("updated_at", models.DateTimeField(auto_now=True)),
+                (
+                    "assigned_to",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name="assigned_threats",
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
+                (
+                    "reported_by",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="reported_threats",
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
             ],
             options={
-                'ordering': ['-detected_at'],
-                'indexes': [models.Index(fields=['threat_type', 'status'], name='analytics_t_threat__31d0c0_idx'), models.Index(fields=['severity', 'detected_at'], name='analytics_t_severit_7a114d_idx'), models.Index(fields=['assigned_to', 'status'], name='analytics_t_assigne_4f8f52_idx'), models.Index(fields=['detected_at'], name='analytics_t_detecte_27bf37_idx'), models.Index(fields=['source_ip', 'detected_at'], name='analytics_t_source__51667d_idx')],
+                "ordering": ["-detected_at"],
+                "indexes": [
+                    models.Index(
+                        fields=["threat_type", "status"],
+                        name="analytics_t_threat__31d0c0_idx",
+                    ),
+                    models.Index(
+                        fields=["severity", "detected_at"],
+                        name="analytics_t_severit_7a114d_idx",
+                    ),
+                    models.Index(
+                        fields=["assigned_to", "status"],
+                        name="analytics_t_assigne_4f8f52_idx",
+                    ),
+                    models.Index(
+                        fields=["detected_at"], name="analytics_t_detecte_27bf37_idx"
+                    ),
+                    models.Index(
+                        fields=["source_ip", "detected_at"],
+                        name="analytics_t_source__51667d_idx",
+                    ),
+                ],
             },
         ),
         migrations.CreateModel(
-            name='Risk',
+            name="Risk",
             fields=[
-                ('id', models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True, serialize=False)),
-                ('title', models.CharField(max_length=255)),
-                ('description', models.TextField()),
-                ('category', models.CharField(choices=[('security', 'Security Risk'), ('operational', 'Operational Risk'), ('compliance', 'Compliance Risk'), ('technical', 'Technical Risk'), ('business', 'Business Risk')], max_length=20)),
-                ('status', models.CharField(choices=[('identified', 'Identified'), ('assessed', 'Assessed'), ('mitigated', 'Mitigated'), ('accepted', 'Accepted'), ('closed', 'Closed')], default='identified', max_length=20)),
-                ('probability', models.PositiveIntegerField(help_text='Probability of occurrence (1-5)', validators=[django.core.validators.MinValueValidator(1), django.core.validators.MaxValueValidator(5)])),
-                ('impact', models.PositiveIntegerField(help_text='Impact severity (1-5)', validators=[django.core.validators.MinValueValidator(1), django.core.validators.MaxValueValidator(5)])),
-                ('risk_score', models.PositiveIntegerField(default=1)),
-                ('severity', models.CharField(choices=[('very_low', 'Very Low'), ('low', 'Low'), ('medium', 'Medium'), ('high', 'High'), ('very_high', 'Very High')], max_length=10)),
-                ('mitigation_plan', models.TextField(blank=True)),
-                ('mitigation_deadline', models.DateField(blank=True, null=True)),
-                ('mitigation_cost', models.DecimalField(blank=True, decimal_places=2, max_digits=10, null=True)),
-                ('identified_at', models.DateTimeField(auto_now_add=True)),
-                ('last_reviewed', models.DateTimeField(auto_now=True)),
-                ('assessment', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='risks', to='analytics.assessment')),
-                ('assigned_to', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='assigned_risks', to=settings.AUTH_USER_MODEL)),
-                ('owner', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='owned_risks', to=settings.AUTH_USER_MODEL)),
+                (
+                    "id",
+                    models.UUIDField(
+                        default=uuid.uuid4,
+                        editable=False,
+                        primary_key=True,
+                        serialize=False,
+                    ),
+                ),
+                ("title", models.CharField(max_length=255)),
+                ("description", models.TextField()),
+                (
+                    "category",
+                    models.CharField(
+                        choices=[
+                            ("security", "Security Risk"),
+                            ("operational", "Operational Risk"),
+                            ("compliance", "Compliance Risk"),
+                            ("technical", "Technical Risk"),
+                            ("business", "Business Risk"),
+                        ],
+                        max_length=20,
+                    ),
+                ),
+                (
+                    "status",
+                    models.CharField(
+                        choices=[
+                            ("identified", "Identified"),
+                            ("assessed", "Assessed"),
+                            ("mitigated", "Mitigated"),
+                            ("accepted", "Accepted"),
+                            ("closed", "Closed"),
+                        ],
+                        default="identified",
+                        max_length=20,
+                    ),
+                ),
+                (
+                    "probability",
+                    models.PositiveIntegerField(
+                        help_text="Probability of occurrence (1-5)",
+                        validators=[
+                            django.core.validators.MinValueValidator(1),
+                            django.core.validators.MaxValueValidator(5),
+                        ],
+                    ),
+                ),
+                (
+                    "impact",
+                    models.PositiveIntegerField(
+                        help_text="Impact severity (1-5)",
+                        validators=[
+                            django.core.validators.MinValueValidator(1),
+                            django.core.validators.MaxValueValidator(5),
+                        ],
+                    ),
+                ),
+                ("risk_score", models.PositiveIntegerField(default=1)),
+                (
+                    "severity",
+                    models.CharField(
+                        choices=[
+                            ("very_low", "Very Low"),
+                            ("low", "Low"),
+                            ("medium", "Medium"),
+                            ("high", "High"),
+                            ("very_high", "Very High"),
+                        ],
+                        max_length=10,
+                    ),
+                ),
+                ("mitigation_plan", models.TextField(blank=True)),
+                ("mitigation_deadline", models.DateField(blank=True, null=True)),
+                (
+                    "mitigation_cost",
+                    models.DecimalField(
+                        blank=True, decimal_places=2, max_digits=10, null=True
+                    ),
+                ),
+                ("identified_at", models.DateTimeField(auto_now_add=True)),
+                ("last_reviewed", models.DateTimeField(auto_now=True)),
+                (
+                    "assessment",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name="risks",
+                        to="analytics.assessment",
+                    ),
+                ),
+                (
+                    "assigned_to",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name="assigned_risks",
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
+                (
+                    "owner",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name="owned_risks",
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
             ],
             options={
-                'ordering': ['-risk_score', '-identified_at'],
-                'indexes': [models.Index(fields=['category', 'status'], name='analytics_r_categor_c67cf5_idx'), models.Index(fields=['severity', 'identified_at'], name='analytics_r_severit_e28ac4_idx'), models.Index(fields=['owner', 'status'], name='analytics_r_owner_i_b05707_idx'), models.Index(fields=['risk_score', 'identified_at'], name='analytics_r_risk_sc_12eed7_idx')],
+                "ordering": ["-risk_score", "-identified_at"],
+                "indexes": [
+                    models.Index(
+                        fields=["category", "status"],
+                        name="analytics_r_categor_c67cf5_idx",
+                    ),
+                    models.Index(
+                        fields=["severity", "identified_at"],
+                        name="analytics_r_severit_e28ac4_idx",
+                    ),
+                    models.Index(
+                        fields=["owner", "status"],
+                        name="analytics_r_owner_i_b05707_idx",
+                    ),
+                    models.Index(
+                        fields=["risk_score", "identified_at"],
+                        name="analytics_r_risk_sc_12eed7_idx",
+                    ),
+                ],
             },
         ),
         migrations.CreateModel(
-            name='PageView',
+            name="PageView",
             fields=[
-                ('id', models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True, serialize=False)),
-                ('session_id', models.CharField(db_index=True, max_length=40)),
-                ('ip_address', models.GenericIPAddressField()),
-                ('user_agent', models.TextField()),
-                ('url', models.URLField(max_length=1024)),
-                ('referrer', models.URLField(blank=True, max_length=1024, null=True)),
-                ('title', models.CharField(blank=True, max_length=255)),
-                ('load_time', models.PositiveIntegerField(blank=True, null=True)),
-                ('time_on_page', models.PositiveIntegerField(blank=True, null=True)),
-                ('country', models.CharField(blank=True, max_length=2, null=True)),
-                ('city', models.CharField(blank=True, max_length=100, null=True)),
-                ('device_type', models.CharField(choices=[('desktop', 'Desktop'), ('mobile', 'Mobile'), ('tablet', 'Tablet'), ('other', 'Other')], default='other', max_length=20)),
-                ('browser', models.CharField(blank=True, max_length=50)),
-                ('os', models.CharField(blank=True, max_length=50)),
-                ('viewed_at', models.DateTimeField(db_index=True, default=django.utils.timezone.now)),
-                ('page', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, related_name='page_views', to='cms.page')),
-                ('user', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='page_views', to=settings.AUTH_USER_MODEL)),
+                (
+                    "id",
+                    models.UUIDField(
+                        default=uuid.uuid4,
+                        editable=False,
+                        primary_key=True,
+                        serialize=False,
+                    ),
+                ),
+                ("session_id", models.CharField(db_index=True, max_length=40)),
+                ("ip_address", models.GenericIPAddressField()),
+                ("user_agent", models.TextField()),
+                ("url", models.URLField(max_length=1024)),
+                ("referrer", models.URLField(blank=True, max_length=1024, null=True)),
+                ("title", models.CharField(blank=True, max_length=255)),
+                ("load_time", models.PositiveIntegerField(blank=True, null=True)),
+                ("time_on_page", models.PositiveIntegerField(blank=True, null=True)),
+                ("country", models.CharField(blank=True, max_length=2, null=True)),
+                ("city", models.CharField(blank=True, max_length=100, null=True)),
+                (
+                    "device_type",
+                    models.CharField(
+                        choices=[
+                            ("desktop", "Desktop"),
+                            ("mobile", "Mobile"),
+                            ("tablet", "Tablet"),
+                            ("other", "Other"),
+                        ],
+                        default="other",
+                        max_length=20,
+                    ),
+                ),
+                ("browser", models.CharField(blank=True, max_length=50)),
+                ("os", models.CharField(blank=True, max_length=50)),
+                (
+                    "viewed_at",
+                    models.DateTimeField(
+                        db_index=True, default=django.utils.timezone.now
+                    ),
+                ),
+                (
+                    "page",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="page_views",
+                        to="cms.page",
+                    ),
+                ),
+                (
+                    "user",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name="page_views",
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
             ],
             options={
-                'ordering': ['-viewed_at'],
-                'indexes': [models.Index(fields=['viewed_at'], name='analytics_p_viewed__6302cc_idx'), models.Index(fields=['page', 'viewed_at'], name='analytics_p_page_id_778f37_idx'), models.Index(fields=['session_id', 'viewed_at'], name='analytics_p_session_efb097_idx'), models.Index(fields=['user', 'viewed_at'], name='analytics_p_user_id_1212d8_idx'), models.Index(fields=['ip_address', 'viewed_at'], name='analytics_p_ip_addr_569d25_idx')],
+                "ordering": ["-viewed_at"],
+                "indexes": [
+                    models.Index(
+                        fields=["viewed_at"], name="analytics_p_viewed__6302cc_idx"
+                    ),
+                    models.Index(
+                        fields=["page", "viewed_at"],
+                        name="analytics_p_page_id_778f37_idx",
+                    ),
+                    models.Index(
+                        fields=["session_id", "viewed_at"],
+                        name="analytics_p_session_efb097_idx",
+                    ),
+                    models.Index(
+                        fields=["user", "viewed_at"],
+                        name="analytics_p_user_id_1212d8_idx",
+                    ),
+                    models.Index(
+                        fields=["ip_address", "viewed_at"],
+                        name="analytics_p_ip_addr_569d25_idx",
+                    ),
+                ],
             },
         ),
         migrations.CreateModel(
-            name='ContentMetrics',
+            name="ContentMetrics",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('object_id', models.PositiveIntegerField()),
-                ('date', models.DateField(db_index=True)),
-                ('content_category', models.CharField(choices=[('page', 'Page'), ('blog_post', 'Blog Post'), ('file', 'File'), ('other', 'Other')], default='other', max_length=20)),
-                ('views', models.PositiveIntegerField(default=0)),
-                ('unique_views', models.PositiveIntegerField(default=0)),
-                ('avg_time_on_content', models.PositiveIntegerField(default=0)),
-                ('bounce_rate', models.DecimalField(decimal_places=2, default=0, max_digits=5, validators=[django.core.validators.MinValueValidator(0), django.core.validators.MaxValueValidator(100)])),
-                ('shares', models.PositiveIntegerField(default=0)),
-                ('comments', models.PositiveIntegerField(default=0)),
-                ('downloads', models.PositiveIntegerField(default=0)),
-                ('search_impressions', models.PositiveIntegerField(default=0)),
-                ('search_clicks', models.PositiveIntegerField(default=0)),
-                ('avg_position', models.DecimalField(blank=True, decimal_places=2, max_digits=5, null=True)),
-                ('updated_at', models.DateTimeField(auto_now=True)),
-                ('content_type', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='contenttypes.contenttype')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("object_id", models.PositiveIntegerField()),
+                ("date", models.DateField(db_index=True)),
+                (
+                    "content_category",
+                    models.CharField(
+                        choices=[
+                            ("page", "Page"),
+                            ("blog_post", "Blog Post"),
+                            ("file", "File"),
+                            ("other", "Other"),
+                        ],
+                        default="other",
+                        max_length=20,
+                    ),
+                ),
+                ("views", models.PositiveIntegerField(default=0)),
+                ("unique_views", models.PositiveIntegerField(default=0)),
+                ("avg_time_on_content", models.PositiveIntegerField(default=0)),
+                (
+                    "bounce_rate",
+                    models.DecimalField(
+                        decimal_places=2,
+                        default=0,
+                        max_digits=5,
+                        validators=[
+                            django.core.validators.MinValueValidator(0),
+                            django.core.validators.MaxValueValidator(100),
+                        ],
+                    ),
+                ),
+                ("shares", models.PositiveIntegerField(default=0)),
+                ("comments", models.PositiveIntegerField(default=0)),
+                ("downloads", models.PositiveIntegerField(default=0)),
+                ("search_impressions", models.PositiveIntegerField(default=0)),
+                ("search_clicks", models.PositiveIntegerField(default=0)),
+                (
+                    "avg_position",
+                    models.DecimalField(
+                        blank=True, decimal_places=2, max_digits=5, null=True
+                    ),
+                ),
+                ("updated_at", models.DateTimeField(auto_now=True)),
+                (
+                    "content_type",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="contenttypes.contenttype",
+                    ),
+                ),
             ],
             options={
-                'ordering': ['-date'],
-                'indexes': [models.Index(fields=['date', 'content_category'], name='analytics_c_date_a64e00_idx'), models.Index(fields=['content_type', 'object_id', 'date'], name='analytics_c_content_83cde9_idx'), models.Index(fields=['views', 'date'], name='analytics_c_views_c320bd_idx')],
-                'unique_together': {('content_type', 'object_id', 'date')},
+                "ordering": ["-date"],
+                "indexes": [
+                    models.Index(
+                        fields=["date", "content_category"],
+                        name="analytics_c_date_a64e00_idx",
+                    ),
+                    models.Index(
+                        fields=["content_type", "object_id", "date"],
+                        name="analytics_c_content_83cde9_idx",
+                    ),
+                    models.Index(
+                        fields=["views", "date"], name="analytics_c_views_c320bd_idx"
+                    ),
+                ],
+                "unique_together": {("content_type", "object_id", "date")},
             },
         ),
         migrations.AddIndex(
-            model_name='assessment',
-            index=models.Index(fields=['assessment_type', 'status'], name='analytics_a_assessm_320e04_idx'),
+            model_name="assessment",
+            index=models.Index(
+                fields=["assessment_type", "status"],
+                name="analytics_a_assessm_320e04_idx",
+            ),
         ),
         migrations.AddIndex(
-            model_name='assessment',
-            index=models.Index(fields=['severity', 'created_at'], name='analytics_a_severit_106f2d_idx'),
+            model_name="assessment",
+            index=models.Index(
+                fields=["severity", "created_at"], name="analytics_a_severit_106f2d_idx"
+            ),
         ),
         migrations.AddIndex(
-            model_name='assessment',
-            index=models.Index(fields=['assigned_to', 'status'], name='analytics_a_assigne_21d932_idx'),
+            model_name="assessment",
+            index=models.Index(
+                fields=["assigned_to", "status"], name="analytics_a_assigne_21d932_idx"
+            ),
         ),
         migrations.AddIndex(
-            model_name='assessment',
-            index=models.Index(fields=['scheduled_for'], name='analytics_a_schedul_d0056f_idx'),
+            model_name="assessment",
+            index=models.Index(
+                fields=["scheduled_for"], name="analytics_a_schedul_d0056f_idx"
+            ),
         ),
     ]

@@ -7,48 +7,48 @@ from django.utils.deprecation import MiddlewareMixin
 
 class SecurityHeadersMiddleware(MiddlewareMixin):
     """Middleware to add security headers"""
-    
+
     # Cache computed headers at class level
     _cached_headers = None
     _cached_debug_mode = None
-    
+
     @classmethod
     def _get_cached_headers(cls):
         """Get or compute cached headers"""
         current_debug = settings.DEBUG
-        
+
         # Recompute if debug mode changed or not cached
         if cls._cached_headers is None or cls._cached_debug_mode != current_debug:
             cls._cached_debug_mode = current_debug
             cls._cached_headers = cls._compute_headers()
-        
+
         return cls._cached_headers
-    
+
     @classmethod
     def _compute_headers(cls):
         """Compute security headers once"""
         headers = {}
-        
+
         # CSP directives
         csp_directives = cls._get_csp_directives()
-        headers['Content-Security-Policy'] = '; '.join(csp_directives)
-        
+        headers["Content-Security-Policy"] = "; ".join(csp_directives)
+
         # Other security headers
-        headers['Referrer-Policy'] = 'strict-origin-when-cross-origin'
-        headers['X-Content-Type-Options'] = 'nosniff'
-        headers['X-XSS-Protection'] = '1; mode=block'
-        
+        headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
+        headers["X-Content-Type-Options"] = "nosniff"
+        headers["X-XSS-Protection"] = "1; mode=block"
+
         # Permissions Policy
         permissions_policy = [
-            'camera=()',
-            'microphone=()',
-            'geolocation=()',
-            'interest-cohort=()',
+            "camera=()",
+            "microphone=()",
+            "geolocation=()",
+            "interest-cohort=()",
         ]
-        headers['Permissions-Policy'] = ', '.join(permissions_policy)
-        
+        headers["Permissions-Policy"] = ", ".join(permissions_policy)
+
         return headers
-    
+
     @classmethod
     def _get_csp_directives(cls):
         """Get CSP directives based on settings"""
@@ -86,7 +86,7 @@ class SecurityHeadersMiddleware(MiddlewareMixin):
         # Apply cached headers
         for header, value in headers.items():
             response[header] = value
-        
+
         # HSTS handling (dynamic based on settings)
         if getattr(settings, "SECURE_SSL_REDIRECT", False):
             max_age = getattr(settings, "SECURE_HSTS_SECONDS", 31536000)
@@ -99,7 +99,7 @@ class SecurityHeadersMiddleware(MiddlewareMixin):
                 hsts_header += "; preload"
 
             response["Strict-Transport-Security"] = hsts_header
-        
+
         # X-Frame-Options (ensure it's there)
         if "X-Frame-Options" not in response:
             response["X-Frame-Options"] = "DENY"
@@ -191,7 +191,7 @@ class DemoModeMiddleware(MiddlewareMixin):
         # Add demo banner to HTML content
         if hasattr(response, "content"):
             from django.utils.html import escape
-            
+
             # Use escaped content for security
             demo_banner = """
             <div id="demo-banner" style="
@@ -217,14 +217,16 @@ class DemoModeMiddleware(MiddlewareMixin):
             """
 
             try:
-                content = response.content.decode("utf-8", errors='ignore')
-                
+                content = response.content.decode("utf-8", errors="ignore")
+
                 # Only insert in valid HTML documents
                 if "<!DOCTYPE" in content.upper() and "<body" in content.lower():
                     body_end = content.find(">", content.find("<body"))
                     if body_end != -1:
                         content = (
-                            content[: body_end + 1] + demo_banner + content[body_end + 1 :]
+                            content[: body_end + 1]
+                            + demo_banner
+                            + content[body_end + 1 :]
                         )
                         response.content = content.encode("utf-8")
                         response["Content-Length"] = len(response.content)

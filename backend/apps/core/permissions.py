@@ -76,7 +76,7 @@ class IsMemberOrAbove(permissions.BasePermission):
 class RBACPermission(permissions.BasePermission):
     """
     Role-Based Access Control permission that checks both locale and section access.
-    
+
     This permission integrates with the RBAC system to verify that users have
     the appropriate permissions for the locale and path section of the object
     they're trying to access.
@@ -96,7 +96,7 @@ class RBACPermission(permissions.BasePermission):
             return True
 
         # Check if object has RBAC support
-        if not hasattr(obj, 'user_has_scope_access'):
+        if not hasattr(obj, "user_has_scope_access"):
             # If no RBAC support, fall back to standard permissions
             return True
 

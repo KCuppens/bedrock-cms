@@ -34,7 +34,9 @@ class EmailTemplate(TimestampMixin, UserTrackingMixin):
 
     # Template configuration
     is_active = models.BooleanField("Active", default=True, db_index=True)
-    category = models.CharField("Category", max_length=50, default="general", db_index=True)
+    category = models.CharField(
+        "Category", max_length=50, default="general", db_index=True
+    )
     language = models.CharField("Language", max_length=10, default="en")
 
     # Template variables (for documentation)
@@ -51,9 +53,9 @@ class EmailTemplate(TimestampMixin, UserTrackingMixin):
         ordering = ["category", "name"]
         unique_together = [["key", "language"]]
         indexes = [
-            models.Index(fields=['is_active', 'category']),
-            models.Index(fields=['key', 'language']),
-            models.Index(fields=['category', '-created_at']),
+            models.Index(fields=["is_active", "category"]),
+            models.Index(fields=["key", "language"]),
+            models.Index(fields=["category", "-created_at"]),
         ]
 
     def __str__(self):
@@ -154,8 +156,9 @@ class EmailMessageLog(TimestampMixin):
     )
     celery_task_id = models.CharField("Celery task ID", max_length=255, blank=True)
     retry_count = models.PositiveSmallIntegerField(
-        "Retry Count", default=0,
-        help_text="Number of times this email has been retried"
+        "Retry Count",
+        default=0,
+        help_text="Number of times this email has been retried",
     )
 
     # Metadata

@@ -9,91 +9,184 @@ class Migration(migrations.Migration):
 
     dependencies = [
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        ('cms', '0006_add_performance_indexes'),
+        ("cms", "0006_add_performance_indexes"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='Category',
+            name="Category",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(max_length=100)),
-                ('slug', models.SlugField(blank=True, max_length=100, unique=True)),
-                ('description', models.TextField(blank=True)),
-                ('color', models.CharField(default='#6B7280', max_length=7)),
-                ('icon', models.CharField(blank=True, max_length=50)),
-                ('order', models.IntegerField(default=0)),
-                ('is_active', models.BooleanField(default=True)),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('updated_at', models.DateTimeField(auto_now=True)),
-                ('created_by', models.ForeignKey(null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='created_categories', to=settings.AUTH_USER_MODEL)),
-                ('parent', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, related_name='children', to='cms.category')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("name", models.CharField(max_length=100)),
+                ("slug", models.SlugField(blank=True, max_length=100, unique=True)),
+                ("description", models.TextField(blank=True)),
+                ("color", models.CharField(default="#6B7280", max_length=7)),
+                ("icon", models.CharField(blank=True, max_length=50)),
+                ("order", models.IntegerField(default=0)),
+                ("is_active", models.BooleanField(default=True)),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
+                ("updated_at", models.DateTimeField(auto_now=True)),
+                (
+                    "created_by",
+                    models.ForeignKey(
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name="created_categories",
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
+                (
+                    "parent",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="children",
+                        to="cms.category",
+                    ),
+                ),
             ],
             options={
-                'verbose_name_plural': 'Categories',
-                'ordering': ['order', 'name'],
+                "verbose_name_plural": "Categories",
+                "ordering": ["order", "name"],
             },
         ),
         migrations.AlterModelOptions(
-            name='page',
-            options={'ordering': ['parent_id', 'position', 'id'], 'permissions': [('publish_page', 'Can publish pages'), ('unpublish_page', 'Can unpublish pages'), ('preview_page', 'Can preview draft pages'), ('revert_page', 'Can revert page to previous version'), ('translate_page', 'Can translate pages'), ('manage_page_seo', 'Can manage page SEO settings'), ('bulk_delete_pages', 'Can bulk delete pages'), ('export_pages', 'Can export pages'), ('import_pages', 'Can import pages')]},
-        ),
-        migrations.CreateModel(
-            name='Tag',
-            fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(max_length=50, unique=True)),
-                ('slug', models.SlugField(blank=True, unique=True)),
-                ('description', models.TextField(blank=True)),
-                ('color', models.CharField(default='#6B7280', max_length=7)),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('updated_at', models.DateTimeField(auto_now=True)),
-                ('created_by', models.ForeignKey(null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='created_tags', to=settings.AUTH_USER_MODEL)),
-            ],
+            name="page",
             options={
-                'ordering': ['name'],
+                "ordering": ["parent_id", "position", "id"],
+                "permissions": [
+                    ("publish_page", "Can publish pages"),
+                    ("unpublish_page", "Can unpublish pages"),
+                    ("preview_page", "Can preview draft pages"),
+                    ("revert_page", "Can revert page to previous version"),
+                    ("translate_page", "Can translate pages"),
+                    ("manage_page_seo", "Can manage page SEO settings"),
+                    ("bulk_delete_pages", "Can bulk delete pages"),
+                    ("export_pages", "Can export pages"),
+                    ("import_pages", "Can import pages"),
+                ],
             },
         ),
         migrations.CreateModel(
-            name='Collection',
+            name="Tag",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(max_length=200)),
-                ('slug', models.SlugField(blank=True, max_length=200, unique=True)),
-                ('description', models.TextField(blank=True)),
-                ('cover_image', models.URLField(blank=True)),
-                ('status', models.CharField(choices=[('draft', 'Draft'), ('published', 'Published'), ('archived', 'Archived')], default='draft', max_length=20)),
-                ('meta_title', models.CharField(blank=True, max_length=200)),
-                ('meta_description', models.TextField(blank=True)),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('updated_at', models.DateTimeField(auto_now=True)),
-                ('published_at', models.DateTimeField(blank=True, null=True)),
-                ('categories', models.ManyToManyField(blank=True, related_name='collections', to='cms.category')),
-                ('created_by', models.ForeignKey(null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='created_collections', to=settings.AUTH_USER_MODEL)),
-                ('tags', models.ManyToManyField(blank=True, related_name='collections', to='cms.tag')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("name", models.CharField(max_length=50, unique=True)),
+                ("slug", models.SlugField(blank=True, unique=True)),
+                ("description", models.TextField(blank=True)),
+                ("color", models.CharField(default="#6B7280", max_length=7)),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
+                ("updated_at", models.DateTimeField(auto_now=True)),
+                (
+                    "created_by",
+                    models.ForeignKey(
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name="created_tags",
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
             ],
             options={
-                'ordering': ['-created_at'],
+                "ordering": ["name"],
+            },
+        ),
+        migrations.CreateModel(
+            name="Collection",
+            fields=[
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("name", models.CharField(max_length=200)),
+                ("slug", models.SlugField(blank=True, max_length=200, unique=True)),
+                ("description", models.TextField(blank=True)),
+                ("cover_image", models.URLField(blank=True)),
+                (
+                    "status",
+                    models.CharField(
+                        choices=[
+                            ("draft", "Draft"),
+                            ("published", "Published"),
+                            ("archived", "Archived"),
+                        ],
+                        default="draft",
+                        max_length=20,
+                    ),
+                ),
+                ("meta_title", models.CharField(blank=True, max_length=200)),
+                ("meta_description", models.TextField(blank=True)),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
+                ("updated_at", models.DateTimeField(auto_now=True)),
+                ("published_at", models.DateTimeField(blank=True, null=True)),
+                (
+                    "categories",
+                    models.ManyToManyField(
+                        blank=True, related_name="collections", to="cms.category"
+                    ),
+                ),
+                (
+                    "created_by",
+                    models.ForeignKey(
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name="created_collections",
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
+                (
+                    "tags",
+                    models.ManyToManyField(
+                        blank=True, related_name="collections", to="cms.tag"
+                    ),
+                ),
+            ],
+            options={
+                "ordering": ["-created_at"],
             },
         ),
         migrations.AddIndex(
-            model_name='tag',
-            index=models.Index(fields=['slug'], name='cms_tag_slug_220ab1_idx'),
+            model_name="tag",
+            index=models.Index(fields=["slug"], name="cms_tag_slug_220ab1_idx"),
         ),
         migrations.AddIndex(
-            model_name='collection',
-            index=models.Index(fields=['slug'], name='cms_collect_slug_3d6711_idx'),
+            model_name="collection",
+            index=models.Index(fields=["slug"], name="cms_collect_slug_3d6711_idx"),
         ),
         migrations.AddIndex(
-            model_name='collection',
-            index=models.Index(fields=['status'], name='cms_collect_status_bd9194_idx'),
+            model_name="collection",
+            index=models.Index(fields=["status"], name="cms_collect_status_bd9194_idx"),
         ),
         migrations.AddIndex(
-            model_name='category',
-            index=models.Index(fields=['slug'], name='cms_categor_slug_83e0a4_idx'),
+            model_name="category",
+            index=models.Index(fields=["slug"], name="cms_categor_slug_83e0a4_idx"),
         ),
         migrations.AddIndex(
-            model_name='category',
-            index=models.Index(fields=['is_active'], name='cms_categor_is_acti_d7f522_idx'),
+            model_name="category",
+            index=models.Index(
+                fields=["is_active"], name="cms_categor_is_acti_d7f522_idx"
+            ),
         ),
     ]
