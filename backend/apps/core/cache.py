@@ -7,7 +7,7 @@ Provides consistent cache key generation and invalidation strategies.
 # mypy: ignore-errors
 
 import hashlib
-from typing import Any
+from typing import Dict, List, Optional, Union
 
 from django.core.cache import cache
 
@@ -43,7 +43,7 @@ class CacheKeyBuilder:
     def __init__(self, prefix: str = "cms"):
         self.prefix = prefix
 
-    def build_key(self, namespace: str, *parts: str | int) -> str:
+    def build_key(self, namespace: str, *parts) -> str:
         """
         Build a cache key from namespace and parts.
 
@@ -64,7 +64,7 @@ class CacheKeyBuilder:
         return f"{self.prefix}:{ns_prefix}:{key_suffix}"
 
     def page_key(
-        self, locale: str, path: str, revision_id: str | int | None = None
+        self, locale: str, path: str, revision_id: Optional[Union[str, int]] = None
     ) -> str:
         """
         Build cache key for a page.
@@ -87,7 +87,7 @@ class CacheKeyBuilder:
         model_label: str,
         locale: str,
         slug: str,
-        revision_id: str | int | None = None,
+        revision_id: Optional[Union[str, int]] = None,
     ) -> str:
         """
         Build cache key for registry content.
@@ -104,8 +104,8 @@ class CacheKeyBuilder:
         self,
         locale: str,
         slug: str,
-        post_rev: str | int | None = None,
-        page_rev: str | int | None = None,
+        post_rev: Optional[Union[str, int]] = None,
+        page_rev: Optional[Union[str, int]] = None,
     ) -> str:
         """
         Build cache key for blog post presentation.
@@ -136,7 +136,7 @@ class CacheKeyBuilder:
         else:
             return self.build_key("api", endpoint)
 
-    def search_key(self, query: str, filters: dict[str, Any] = None) -> str:
+    def search_key(self, query: str, filters: Optional[Dict] = None) -> str:
         """
         Build cache key for search results.
 
@@ -164,7 +164,7 @@ class CacheKeyBuilder:
         """
         return self.build_key("sitemap", locale)
 
-    def seo_key(self, model_label: str, object_id: str | int, locale: str) -> str:
+    def seo_key(self, model_label: str, object_id: Union[str, int], locale: str) -> str:
         """
         Build cache key for SEO data.
 
@@ -178,14 +178,14 @@ class CacheManager:
     High-level cache management with invalidation support.
     """
 
-    def __init__(self, key_builder: CacheKeyBuilder | None = None):
+    def __init__(self, key_builder: Optional[CacheKeyBuilder] = None):
         self.key_builder = key_builder or CacheKeyBuilder()
 
     def get(self, key: str, default=None, version=None):
         """Get value from cache."""
         return cache.get(key, default, version=version)
 
-    def set(self, key: str, value, timeout: int | None = None, version=None):
+    def set(self, key: str, value, timeout: Optional[int] = None, version=None):
         """Set value in cache with appropriate timeout."""
         if timeout is None:
             # Try to determine timeout from key pattern
@@ -225,7 +225,7 @@ class CacheManager:
             pass
 
     def get_or_set(
-        self, key: str, callable_func, timeout: int | None = None, version=None
+        self, key: str, callable_func, timeout: Optional[int] = None, version=None
     ):
         """Get from cache or set using callable if not found."""
         value = self.get(key, version=version)
