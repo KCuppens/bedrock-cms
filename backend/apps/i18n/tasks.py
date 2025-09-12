@@ -975,7 +975,7 @@ def cleanup_old_translations(days_old: int = 90, days: int = None) -> dict[str, 
 
 
 
-    Cleanup old translation records.
+    """Cleanup old translation records."""
 
 
 
@@ -1061,31 +1061,19 @@ def bulk_auto_translate_ui_messages(
 
 
 
-    Auto-translate all missing UI messages for a locale using DeepL.
-
-
-
+    """Auto-translate all missing UI messages for a locale using DeepL.
     This task runs in the background to avoid timeout issues when translating
-
     large numbers of UI messages.
 
-
-
     Args:
-
         locale_code: Target locale code (e.g., 'es', 'fr')
-
         source_locale_code: Source locale code (default: 'en')
-
         namespace: Filter by namespace (optional)
-
         max_translations: Maximum number of translations to create (optional)
 
-
-
     Returns:
-
         Dict with translation results and statistics
+    """
 
 
 
