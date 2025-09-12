@@ -10,6 +10,7 @@ from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APIClient, APITestCase
 from apps.blog.models import BlogPost, Group, Tag
+from apps.accounts.serializers import UserSerializer
 from apps.blog.serializers import (
     BlogPostListSerializer,
     BlogPostSerializer,
@@ -26,11 +27,13 @@ class BlogModelTests(TestCase):
 
     def setUp(self):
         self.user = User.objects.create_user(
-            username="testuser", email="test@example.com", password="testpass123"
+            username="testuser", email="test@example.com",
+                password="testpass123"
         )
 
         self.category = Group.objects.create(
-            name="Technology", slug="technology", description="Tech-related posts"
+            name="Technology", slug="technology",
+                description="Tech-related posts"
         )
 
         self.tag = Tag.objects.create(name="Python")
@@ -145,7 +148,8 @@ class BlogModelTests(TestCase):
 
     def test_blog_post_validation(self):
         """Test blog post model validation."""
-        post = BlogPost(title="", author=self.author)  # Empty title should fail
+        post = BlogPost(title="", author=self.author)
+        # Empty title should fail
 
         if hasattr(post, "clean"):
             with self.assertRaises(ValidationError):
@@ -154,7 +158,8 @@ class BlogModelTests(TestCase):
     def test_category_creation_and_methods(self):
         """Test Group model creation and methods."""
         category = Group.objects.create(
-            name="Science", slug="science", description="Science posts", is_active=True
+            name="Science", slug="science",
+                description="Science posts", is_active=True
         )
 
         self.assertEqual(category.name, "Science")
@@ -220,7 +225,8 @@ class BlogVersioningTests(TestCase):
 
     def setUp(self):
         self.user = User.objects.create_user(
-            username="testuser", email="test@example.com", password="testpass123"
+            username="testuser", email="test@example.com",
+                password="testpass123"
         )
 
         try:
@@ -229,7 +235,8 @@ class BlogVersioningTests(TestCase):
             self.author = self.user
 
         self.post = BlogPost.objects.create(
-            title="Versioned Post", content="Original content", author=self.author
+            title="Versioned Post", content="Original content", author=self.aut
+                hor
         )
 
     def test_create_post_version(self):
@@ -273,7 +280,8 @@ class BlogAPITests(APITestCase):
 
     def setUp(self):
         self.user = User.objects.create_user(
-            username="testuser", email="test@example.com", password="testpass123"
+            username="testuser", email="test@example.com",
+                password="testpass123"
         )
         self.client = APIClient()
         self.client.force_authenticate(user=self.user)
@@ -319,7 +327,8 @@ class BlogAPITests(APITestCase):
             "content": "This is new blog post content.",
             "status": "draft",
             "category": self.category.id,
-            "author": self.author.id if hasattr(self.author, "id") else self.author.pk,
+            "author": self.author.id if hasattr(self.author, "id") else self.au
+                thor.pk,
         }
 
         try:
@@ -327,7 +336,8 @@ class BlogAPITests(APITestCase):
             response = self.client.post(url, post_data, format="json")
             if response.status_code in [201, 200]:
                 self.assertIn(
-                    response.status_code, [status.HTTP_201_CREATED, status.HTTP_200_OK]
+                    response.status_code, [status.HTTP_201_CREATED, status.HTTP
+                        _200_OK]
                 )
                 data = response.json()
                 self.assertEqual(data.get("title"), "New Blog Post")
@@ -352,7 +362,10 @@ class BlogAPITests(APITestCase):
 
     def test_blog_post_update_api(self):
         """Test blog post update via API."""
-        post = BlogPost.objects.create(title="Original Title", author=self.author)
+        post = BlogPost.objects.create(
+            title="Original Title",
+            author=self.author
+        )
 
         update_data = {"title": "Updated Title", "content": "Updated content"}
         try:
@@ -461,7 +474,8 @@ class BlogSerializerTests(TestCase):
 
     def setUp(self):
         self.user = User.objects.create_user(
-            username="testuser", email="test@example.com", password="testpass123"
+            username="testuser", email="test@example.com",
+                password="testpass123"
         )
 
         self.category = Group.objects.create(name="Tech", slug="tech")
@@ -534,7 +548,8 @@ class BlogSerializerTests(TestCase):
             "title": "Valid Post",
             "content": "Valid content",
             "status": "draft",
-            "author": self.author.id if hasattr(self.author, "id") else self.author.pk,
+            "author": self.author.id if hasattr(self.author, "id") else self.au
+                thor.pk,
         }
 
         serializer = BlogPostSerializer(data=valid_data)
@@ -592,13 +607,20 @@ class BlogIntegrationTests(TransactionTestCase):
 
     def setUp(self):
         self.user = User.objects.create_user(
-            username="testuser", email="test@example.com", password="testpass123"
+            username="testuser", email="test@example.com",
+                password="testpass123"
         )
 
-        self.category = Group.objects.create(name="Integration", slug="integration")
+        self.category = Group.objects.create(
+            name="Integration",
+            slug="integration"
+        )
 
         try:
-            self.author = User.objects.create(user=self.user, name="Integration User")
+            self.author = User.objects.create(
+                user=self.user,
+                name="Integration User"
+            )
         except Exception:
             self.author = self.user
 
@@ -665,15 +687,22 @@ class BlogIntegrationTests(TransactionTestCase):
     def test_blog_categorization_workflow(self):
         """Test blog post categorization and tagging workflow."""
         # Create multiple categories
-        tech_category = Group.objects.create(name="Technology", slug="technology")
-        lifestyle_category = Group.objects.create(name="Lifestyle", slug="lifestyle")
+        tech_category = Group.objects.create(
+            name="Technology",
+            slug="technology"
+        )
+        lifestyle_category = Group.objects.create(
+            name="Lifestyle",
+            slug="lifestyle"
+        )
 
         # Create posts in different categories
         tech_post = BlogPost.objects.create(
             title="Tech Post", author=self.author, category=tech_category
         )
         lifestyle_post = BlogPost.objects.create(
-            title="Lifestyle Post", author=self.author, category=lifestyle_category
+            title="Lifestyle Post", author=self.author,
+                category=lifestyle_category
         )
 
         # Create tags and assign to posts

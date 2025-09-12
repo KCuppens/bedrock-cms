@@ -45,9 +45,9 @@ class PageReadSerializer(serializers.ModelSerializer):
             processed_block = dict(block)
 
             # Add component field if not present
-            if "component" not in processed_block and "type" in processed_block:
-                # Map type to component name (e.g., 'faq' -> 'faq', 'hero' -> 'hero')
-                # The component field tells frontend exactly which component to load
+            # Add component field if not present
+            if "component" not in processed_block and "type" in processed_block
+                :
                 processed_block["component"] = processed_block["type"]
 
             processed_blocks.append(processed_block)
@@ -74,7 +74,8 @@ class PageReadSerializer(serializers.ModelSerializer):
         return None
 
     def get_seo_links(self, obj):
-        """Return SEO links (canonical + alternates) if with_seo=1 parameter is provided."""
+        """Return SEO links (canonical + alternates)
+        if with_seo=1 parameter is provided."""
         request = self.context.get("request")
         if request and request.query_params.get("with_seo") == "1":
             try:
@@ -88,9 +89,11 @@ class PageReadSerializer(serializers.ModelSerializer):
 
     def get_recent_revisions(self, obj):
         """Return the 5 most recent revisions for this page."""
-        # print(f"DEBUG: get_recent_revisions called for page {obj.id} in serializers.py")
+        # print(f"DEBUG: get_recent_revisions called for
+        #        page {obj.id} in serializers.py")
 
-        # Return mock revision data since database versioning isn't configured yet
+        # Return mock revision data since database
+        # versioning isn't configured yet
         from datetime import datetime, timedelta
 
         now = datetime.now()
@@ -132,7 +135,8 @@ class PageReadSerializer(serializers.ModelSerializer):
         ]
 
         # print(
-        #     f"DEBUG: Returning {len(mock_revisions)} mock revisions from serializers.py"
+
+        #     f"DEBUG: Returning {len(mock_revisions)} mock revisions from seri
         # )
         return mock_revisions
 
@@ -142,7 +146,8 @@ class PageTreeItemSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Page
-        fields = ["id", "title", "slug", "path", "position", "status", "children_count"]
+        fields = ["id", "title", "slug", "path", "position", "status", "childre
+            n_count"]
 
     def get_children_count(self, obj):
         # Use cached count if available from prefetch_related annotation
@@ -202,7 +207,8 @@ class PageWriteSerializer(serializers.ModelSerializer):
         if scheduled_publish_at and scheduled_unpublish_at:
             if scheduled_unpublish_at <= scheduled_publish_at:
                 raise serializers.ValidationError(
-                    {"scheduled_unpublish_at": "Must be after scheduled publish time"}
+                    {"scheduled_unpublish_at": "Must be after scheduled publish
+                        time"}
                 )
 
         return attrs

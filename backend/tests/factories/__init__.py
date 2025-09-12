@@ -10,7 +10,8 @@ from .base import BaseFactory, UserFactory
 
 # Then import other factories
 try:
-    from .accounts import ScopedLocaleFactory, ScopedSectionFactory, UserProfileFactory
+    from .accounts import ScopedLocaleFactory,
+        ScopedSectionFactory, UserProfileFactory
 except ImportError:
     pass
 

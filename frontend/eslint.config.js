@@ -24,6 +24,18 @@ export default tseslint.config(
         { allowConstantExport: true },
       ],
       "@typescript-eslint/no-unused-vars": "off",
+      // Prevent importing with .ts or .tsx extensions
+      "no-restricted-imports": [
+        "error",
+        {
+          "patterns": [
+            {
+              "regex": ".*\\.tsx?$",
+              "message": "Do not import TypeScript files with .ts or .tsx extension. Import without the extension."
+            }
+          ]
+        }
+      ],
     },
   }
 );

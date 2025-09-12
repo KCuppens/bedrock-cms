@@ -133,7 +133,8 @@ class AccountsModelTests(TestCase):
 
         # Add permission to group
         permission = Permission.objects.create(
-            name="Can publish pages", content_type_id=1, codename="publish_pages"
+            name="Can publish pages", content_type_id=1,
+                codename="publish_pages"
         )
         group.permissions.add(permission)
 
@@ -148,7 +149,9 @@ class AccountsModelTests(TestCase):
     def test_user_validation(self):
         """Test user model validation."""
         # Test invalid email
-        user = User(username="testuser2", email="invalid-email", password="testpass123")
+        user = User(
+            username="testuser2", email="invalid-email", password="testpass123"
+        )
 
         if hasattr(user, "clean"):
             with self.assertRaises(ValidationError):
@@ -160,7 +163,8 @@ class AccountsAuthTests(TestCase):
 
     def setUp(self):
         self.user = User.objects.create_user(
-            username="testuser", email="test@example.com", password="testpass123"
+            username="testuser", email="test@example.com",
+                password="testpass123"
         )
 
     def test_user_authentication(self):
@@ -169,7 +173,8 @@ class AccountsAuthTests(TestCase):
         user = authenticate(username="testuser", password="testpass123")
         self.assertEqual(user, self.user)
         # Test email authentication if supported
-        user = authenticate(username="test@example.com", password="testpass123")
+        user = authenticate(username="test@example.com", password="testpass123"
+            )
         if user:  # May not be supported
             self.assertEqual(user, self.user)
         # Test invalid credentials
@@ -238,7 +243,8 @@ class AccountsAPITests(APITestCase):
 
     def setUp(self):
         self.user = User.objects.create_user(
-            username="testuser", email="test@example.com", password="testpass123"
+            username="testuser", email="test@example.com",
+                password="testpass123"
         )
         self.client = APIClient()
         self.client.force_authenticate(user=self.user)
@@ -287,7 +293,8 @@ class AccountsAPITests(APITestCase):
             response = self.client.post(url, registration_data, format="json")
             if response.status_code in [201, 200]:
                 self.assertIn(
-                    response.status_code, [status.HTTP_201_CREATED, status.HTTP_200_OK]
+                    response.status_code, [status.HTTP_201_CREATED, status.HTTP
+                        _200_OK]
                 )
 
                 # Verify user was created
@@ -307,7 +314,8 @@ class AccountsAPITests(APITestCase):
                 data = response.json()
                 self.assertIsInstance(data, dict)
             # Test profile update
-            profile_data = {"bio": "Updated bio", "phone_number": "+1234567890"}
+            profile_data = {"bio": "Updated bio", "phone_number": "+1234567890"
+                }
 
             response = self.client.patch(url, profile_data, format="json")
             if response.status_code in [200, 202]:
@@ -374,12 +382,14 @@ class AccountsRBACTests(TestCase):
 
     def setUp(self):
         self.user = User.objects.create_user(
-            username="testuser", email="test@example.com", password="testpass123"
+            username="testuser", email="test@example.com",
+                password="testpass123"
         )
 
         # Create superuser for comparison
         self.superuser = User.objects.create_superuser(
-            username="admin", email="admin@example.com", password="adminpass123"
+            username="admin", email="admin@example.com",
+                password="adminpass123"
         )
 
     def test_rbac_permission_check(self):
@@ -425,7 +435,8 @@ class AccountsRBACTests(TestCase):
 
             # Create permissions
             edit_perm = Permission.objects.create(
-                name="Can edit content", content_type_id=1, codename="edit_content"
+                name="Can edit content", content_type_id=1,
+                    codename="edit_content"
             )
 
             # Test permission assignment through role
@@ -437,7 +448,8 @@ class AccountsRBACTests(TestCase):
 
                 # Test inherited permission
                 if hasattr(rbac, "user_has_role_permission"):
-                    has_perm = rbac.user_has_role_permission(self.user, "edit_content")
+                    has_perm = rbac.user_has_role_permission(self.user, "edit_c
+                        ontent")
                     self.assertIsInstance(has_perm, bool)
         except Exception:
             pass  # Models or functions may not exist
@@ -487,7 +499,8 @@ class AccountsSerializerTests(TestCase):
                     pass
 
             # Test invalid data
-            invalid_data = {"username": "", "email": "invalid-email"}  # Empty username
+            invalid_data = {"username": "", "email": "invalid-email"}  # Empty 
+                username
 
             serializer = UserSerializer(data=invalid_data)
             if hasattr(serializer, "is_valid"):
@@ -518,7 +531,8 @@ class AccountsIntegrationTests(TransactionTestCase):
 
     def setUp(self):
         self.user = User.objects.create_user(
-            username="testuser", email="test@example.com", password="testpass123"
+            username="testuser", email="test@example.com",
+                password="testpass123"
         )
 
     def test_complete_user_registration_workflow(self):
@@ -535,7 +549,10 @@ class AccountsIntegrationTests(TransactionTestCase):
 
         # Create profile
         try:
-            profile = UserProfile.objects.create(user=new_user, bio="New user bio")
+            profile = UserProfile.objects.create(
+                user=new_user,
+                bio="New user bio"
+            )
             self.assertEqual(profile.user, new_user)
         except Exception:
             pass  # UserProfile may not exist
@@ -557,7 +574,8 @@ class AccountsIntegrationTests(TransactionTestCase):
         new_user.save()
 
         # Verify user can authenticate
-        authenticated_user = authenticate(username="newuser", password="newpass123")
+        authenticated_user = authenticate(username="newuser", password="newpass
+            123")
         self.assertEqual(authenticated_user, new_user)
 
     def test_user_permission_workflow(self):
@@ -568,7 +586,8 @@ class AccountsIntegrationTests(TransactionTestCase):
         )
 
         publish_permission = Permission.objects.create(
-            name="Can publish content", content_type_id=1, codename="publish_content"
+            name="Can publish content", content_type_id=1,
+                codename="publish_content"
         )
 
         # Create group with permissions
@@ -596,7 +615,8 @@ class AccountsIntegrationTests(TransactionTestCase):
 
             # Create permissions
             manage_permission = Permission.objects.create(
-                name="Can manage content", content_type_id=1, codename="manage_content"
+                name="Can manage content",
+                    content_type_id=1, codename="manage_content"
             )
 
             # Assign permission to role if supported

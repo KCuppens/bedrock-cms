@@ -435,7 +435,10 @@ class TranslationManager:
             return TranslationResolver(locale)
         except Locale.DoesNotExist:
             # Fall back to default locale
-            default_locale = Locale.objects.get(is_default=True, is_active=True)
+            default_locale = Locale.objects.get(
+                is_default=True,
+                is_active=True
+            )
             return TranslationResolver(default_locale)
 
 
@@ -514,7 +517,8 @@ class UiMessageResolver:
 
         return message
 
-    def get_message_bundle(self, namespace: str | None = None) -> dict[str, str]:
+    def get_message_bundle(self, namespace: str | None = None) -> dict[str, str
+        ]:
         """
         Get all messages for a namespace as a dict.
 
@@ -546,7 +550,8 @@ class UiMessageResolver:
         from .models import UiMessage
 
         # Get all namespaces
-        namespaces = UiMessage.objects.values_list("namespace", flat=True).distinct()
+        namespaces = UiMessage.objects.values_list("namespace", flat=True).dist
+            inct()
 
         result = {}
         for namespace in namespaces:
