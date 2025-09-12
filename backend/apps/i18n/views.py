@@ -1366,8 +1366,8 @@ class UiMessageViewSet(viewsets.ModelViewSet):
                     error_msg = f"Error processing key '{key}': {str(e)}"
                     errors.append(error_msg)
                     # Log full traceback for debugging
-                    print(f"DEBUG: {error_msg}")
-                    print(f"DEBUG: Traceback: {traceback.format_exc()}")
+                    # print(f"DEBUG: {error_msg}")
+                    # print(f"DEBUG: Traceback: {traceback.format_exc()}")
                     continue
 
             # Check if any actual work was done

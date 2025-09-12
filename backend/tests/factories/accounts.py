@@ -10,8 +10,7 @@ from faker import Faker
 
 from apps.accounts.models import ScopedLocale, ScopedSection, UserProfile
 
-from .base import BaseFactory, UserFactory
-from .cms import LocaleFactory
+from .base import BaseFactory
 
 fake = Faker()
 

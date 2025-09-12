@@ -12,7 +12,7 @@ from rest_framework import status
 from rest_framework.test import APIClient, APITestCase
 
 from apps.cms import tasks
-from apps.cms.models import Block, Category, Page, PageVersion
+from apps.cms.models import Page, Redirect, BlockType
 from apps.cms.security import PageSecurityManager
 from apps.cms.seo import SEOManager
 from apps.cms.serializers.pages import PageDetailSerializer, PageSerializer

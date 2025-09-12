@@ -3,7 +3,7 @@ Translation utilities for content fallback and resolution.
 """
 
 import json
-from typing import Any, Optional
+from typing import Any, Dict, Optional
 
 from django.contrib.contenttypes.models import ContentType
 
@@ -483,7 +483,7 @@ class UiMessageResolver:
         self,
         key: str,
         default: Optional[str] = None,
-        parameters: Dict[str, Any] | None = None,
+        parameters: Optional[Dict[str, Any]] = None,
     ) -> str:
         """
         Resolve a UI message with fallback and parameter substitution.

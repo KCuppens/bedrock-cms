@@ -88,7 +88,7 @@ class PageReadSerializer(serializers.ModelSerializer):
 
     def get_recent_revisions(self, obj):
         """Return the 5 most recent revisions for this page."""
-        print(f"DEBUG: get_recent_revisions called for page {obj.id} in serializers.py")
+        # print(f"DEBUG: get_recent_revisions called for page {obj.id} in serializers.py")
 
         # Return mock revision data since database versioning isn't configured yet
         from datetime import datetime, timedelta
@@ -131,9 +131,9 @@ class PageReadSerializer(serializers.ModelSerializer):
             },
         ]
 
-        print(
-            f"DEBUG: Returning {len(mock_revisions)} mock revisions from serializers.py"
-        )
+        # print(
+        #     f"DEBUG: Returning {len(mock_revisions)} mock revisions from serializers.py"
+        # )
         return mock_revisions
 
 

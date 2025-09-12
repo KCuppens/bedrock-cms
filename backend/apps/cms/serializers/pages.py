@@ -165,7 +165,7 @@ class PageReadSerializer(serializers.ModelSerializer):
     def get_recent_revisions(self, obj):
         """Get the 5 most recent revisions for this page"""
         try:
-            print(f"DEBUG: get_recent_revisions called for page {obj.id}")
+            # print(f"DEBUG: get_recent_revisions called for page {obj.id}")
 
             # Return mock revision data for demonstration
             from datetime import datetime, timedelta
@@ -197,7 +197,7 @@ class PageReadSerializer(serializers.ModelSerializer):
                 },
             ]
 
-            print(f"DEBUG: Returning {len(mock_revisions)} mock revisions")
+            # print(f"DEBUG: Returning {len(mock_revisions)} mock revisions")
             return mock_revisions
         except Exception as e:
             print(f"ERROR in get_recent_revisions: {e}")
@@ -206,8 +206,8 @@ class PageReadSerializer(serializers.ModelSerializer):
     def to_representation(self, instance):
         """Override to ensure recent_revisions data appears"""
         data = super().to_representation(instance)
-        print(f"DEBUG: to_representation called for page {instance.id}")
-        print(f"DEBUG: Fields in data before: {list(data.keys())}")
+        # print(f"DEBUG: to_representation called for page {instance.id}")
+        # print(f"DEBUG: Fields in data before: {list(data.keys())}")
 
         # Force add recent revisions since SerializerMethodField isn't working
         from datetime import datetime, timedelta
@@ -239,8 +239,8 @@ class PageReadSerializer(serializers.ModelSerializer):
             },
         ]
 
-        print(f"DEBUG: Fields in data after: {list(data.keys())}")
-        print(f"DEBUG: recent_revisions length: {len(data['recent_revisions'])}")
+        # print(f"DEBUG: Fields in data after: {list(data.keys())}")
+        # print(f"DEBUG: recent_revisions length: {len(data['recent_revisions'])}")
         return data
 
 

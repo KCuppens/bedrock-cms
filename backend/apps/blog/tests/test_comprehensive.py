@@ -11,9 +11,8 @@ from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APIClient, APITestCase
 
-from apps.blog.models import Author, BlogPost, Category, Tag
+from apps.blog.models import BlogPost, Category, Tag
 from apps.blog.serializers import (
-    AuthorSerializer,
     BlogPostDetailSerializer,
     BlogPostListSerializer,
     BlogPostSerializer,

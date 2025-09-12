@@ -24,7 +24,7 @@ base_patterns = [
 
 action_patterns = [
     "^posts/(?P<pk>[^/.]+)/publish/$",    # Custom action: publish
-    "^posts/(?P<pk>[^/.]+)/unpublish/$",  # Custom action: unpublish  
+    "^posts/(?P<pk>[^/.]+)/unpublish/$",  # Custom action: unpublish
     "^posts/(?P<pk>[^/.]+)/duplicate/$",  # Custom action: duplicate
 ]
 

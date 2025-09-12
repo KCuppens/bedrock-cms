@@ -11,7 +11,7 @@ from rest_framework import status
 from rest_framework.test import APIClient, APITestCase
 
 from apps.accounts import rbac
-from apps.accounts.auth_backends import CustomAuthBackend
+from apps.accounts.auth_backends import ScopedPermissionBackend
 from apps.accounts.models import Role, UserProfile, UserRole
 from apps.accounts.serializers import UserProfileSerializer, UserSerializer
 
