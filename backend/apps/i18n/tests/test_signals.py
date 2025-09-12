@@ -216,7 +216,6 @@ class GenericSignalsTest(TestCase):
             ) as mock_register,
             patch("apps.i18n.signals.post_save.connect") as mock_connect,
         ):
-
             # Mock ContentType
             mock_ct = MagicMock()
             mock_ct.app_label = "test_app"
@@ -246,7 +245,6 @@ class GenericSignalsTest(TestCase):
             ) as mock_register,
             patch("apps.i18n.signals.post_save.connect") as mock_connect,
         ):
-
             # Call register function without fields
             register_model_for_translation(MockModel)
 

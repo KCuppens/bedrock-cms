@@ -57,7 +57,7 @@ class Command(BaseCommand):
                 with open(options["file"], "w") as f:
                     f.write(output)
                 self.stdout.write(
-                    self.style.SUCCESS(f'Report saved to {options["file"]}')
+                    self.style.SUCCESS(f"Report saved to {options['file']}")
                 )
             except Exception as e:
                 self.stdout.write(self.style.ERROR(f"Failed to save report: {e}"))
@@ -99,23 +99,23 @@ class Command(BaseCommand):
         self.stdout.write("=" * 80)
 
         for endpoint in report["endpoints"]:
-            self.stdout.write(f'\n📍 {endpoint["path"]}')
-            self.stdout.write(f'   View: {endpoint.get("view_class", "Unknown")}')
-            self.stdout.write(f'   Security Score: {endpoint["security_score"]}/100')
+            self.stdout.write(f"\n📍 {endpoint['path']}")
+            self.stdout.write(f"   View: {endpoint.get('view_class', 'Unknown')}")
+            self.stdout.write(f"   Security Score: {endpoint['security_score']}/100")
 
             if endpoint["permission_classes"]:
                 self.stdout.write(
-                    f'   Permissions: {", ".join(endpoint["permission_classes"])}'
+                    f"   Permissions: {', '.join(endpoint['permission_classes'])}"
                 )
 
             if endpoint["throttle_classes"]:
                 self.stdout.write(
-                    f'   Throttling: {", ".join(endpoint["throttle_classes"])}'
+                    f"   Throttling: {', '.join(endpoint['throttle_classes'])}"
                 )
 
             if endpoint["authentication_classes"]:
                 self.stdout.write(
-                    f'   Authentication: {", ".join(endpoint["authentication_classes"])}'
+                    f"   Authentication: {', '.join(endpoint['authentication_classes'])}"
                 )
 
             if endpoint["issues"]:

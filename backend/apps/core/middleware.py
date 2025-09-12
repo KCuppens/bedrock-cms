@@ -190,7 +190,6 @@ class DemoModeMiddleware(MiddlewareMixin):
 
         # Add demo banner to HTML content
         if hasattr(response, "content"):
-
             # Use escaped content for security
             demo_banner = """
             <div id="demo-banner" style="

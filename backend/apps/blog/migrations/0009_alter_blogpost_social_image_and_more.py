@@ -5,7 +5,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("files", "0001_initial"),
         ("blog", "0008_alter_category_options_alter_tag_options"),

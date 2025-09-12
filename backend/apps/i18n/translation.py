@@ -3,9 +3,9 @@ Translation utilities for content fallback and resolution.
 """
 
 import json
-from typing import Any, Dict, Optional
-
+from typing import Any, Optional
 from django.contrib.contenttypes.models import ContentType
+from django.db.models import QuerySet
 
 from .models import Locale, TranslationUnit
 
@@ -221,7 +221,6 @@ class TranslationManager:
         """
         try:
             value = getattr(obj, field)
-
             if isinstance(value, str):
                 return value
             elif isinstance(value, list):
@@ -282,8 +281,8 @@ class TranslationManager:
     def update_translation(
         self,
         unit: TranslationUnit,
-        target_text: Optional[str] = None,
-        status: Optional[str] = None,
+        target_text: str | None = None,
+        status: str | None = None,
         user=None,
     ) -> TranslationUnit:
         """
@@ -436,8 +435,7 @@ class TranslationManager:
             return TranslationResolver(locale)
         except Locale.DoesNotExist:
             # Fall back to default locale
-            default_locale = Locale.objects.get(is_default=True,
-                is_active=True)
+            default_locale = Locale.objects.get(is_default=True, is_active=True)
             return TranslationResolver(default_locale)
 
 
@@ -486,8 +484,8 @@ class UiMessageResolver:
     def resolve(
         self,
         key: str,
-        default: Optional[str] = None,
-        parameters: Optional[Dict[str, Any]] = None,
+        default: str | None = None,
+        parameters: dict[str, Any] | None = None,
     ) -> str:
         """
         Resolve a UI message with fallback and parameter substitution.
@@ -505,7 +503,6 @@ class UiMessageResolver:
             default = key
 
         message = self.resolve_message(key, default)
-
         # Apply parameter substitution if provided
         if parameters:
             try:
@@ -517,9 +514,7 @@ class UiMessageResolver:
 
         return message
 
-    def get_message_bundle(self,
-        namespace: Optional[str] = None) -> dict[str,
-        str]:
+    def get_message_bundle(self, namespace: str | None = None) -> dict[str, str]:
         """
         Get all messages for a namespace as a dict.
 
@@ -551,8 +546,7 @@ class UiMessageResolver:
         from .models import UiMessage
 
         # Get all namespaces
-        namespaces = UiMessage.objects.values_list("namespace",
-            flat=True).distinct()
+        namespaces = UiMessage.objects.values_list("namespace", flat=True).distinct()
 
         result = {}
         for namespace in namespaces:

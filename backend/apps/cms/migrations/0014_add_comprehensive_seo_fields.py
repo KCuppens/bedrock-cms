@@ -5,7 +5,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("media", "0001_initial"),
         ("cms", "0013_page_in_footer_page_in_main_menu_page_is_homepage"),

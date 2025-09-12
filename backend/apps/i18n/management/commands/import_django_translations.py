@@ -173,7 +173,7 @@ class Command(BaseCommand):
                 defaults={
                     "namespace": namespace,
                     "default_value": default_value,
-                    "description": f'Django built-in: {key.replace(".", " ").title()}',
+                    "description": f"Django built-in: {key.replace('.', ' ').title()}",
                 },
             )
 

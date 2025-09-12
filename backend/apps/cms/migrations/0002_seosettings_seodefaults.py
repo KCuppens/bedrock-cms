@@ -5,7 +5,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("i18n", "0001_initial"),
         ("cms", "0001_initial"),

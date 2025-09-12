@@ -4,7 +4,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("blog", "0002_add_presentation_features"),
     ]
@@ -91,8 +90,6 @@ class Migration(migrations.Migration):
         # Add index for category lookups
         migrations.AddIndex(
             model_name="category",
-            index=models.Index(
-                fields=["slug"], name="blog_category_slug_idx"
-            ),
+            index=models.Index(fields=["slug"], name="blog_category_slug_idx"),
         ),
     ]

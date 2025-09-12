@@ -122,7 +122,7 @@ class BlockTypeViewSet(viewsets.ModelViewSet):
             {
                 "id": block_type.id,
                 "is_active": block_type.is_active,
-                "message": f'Block type {block_type.label} is now {"active" if block_type.is_active else "inactive"}',
+                "message": f"Block type {block_type.label} is now {'active' if block_type.is_active else 'inactive'}",
             }
         )
 

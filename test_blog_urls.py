@@ -2,10 +2,11 @@
 """
 Test blog URL routing by making actual HTTP requests
 """
+
 import requests
-import json
 
 BASE_URL = "http://localhost:8000"
+
 
 def test_blog_urls():
     """Test various blog API endpoints to see which ones work"""
@@ -68,6 +69,7 @@ def test_blog_urls():
     print(f"\nMissing endpoints (404): {len(not_found_endpoints)}")
     for ep in not_found_endpoints:
         print(f"  ❌ {ep}")
+
 
 if __name__ == "__main__":
     test_blog_urls()

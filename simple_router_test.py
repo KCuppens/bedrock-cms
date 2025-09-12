@@ -2,8 +2,10 @@
 """
 Simple test to check what URLs the DefaultRouter generates
 """
+
 import sys
-sys.path.append('backend')
+
+sys.path.append("backend")
 
 # Minimal imports without Django setup
 from rest_framework.routers import DefaultRouter
@@ -18,12 +20,12 @@ print()
 
 # Simulate what the router would generate
 base_patterns = [
-    "^posts/$",                     # List/Create
-    "^posts/(?P<pk>[^/.]+)/$",     # Detail
+    "^posts/$",  # List/Create
+    "^posts/(?P<pk>[^/.]+)/$",  # Detail
 ]
 
 action_patterns = [
-    "^posts/(?P<pk>[^/.]+)/publish/$",    # Custom action: publish
+    "^posts/(?P<pk>[^/.]+)/publish/$",  # Custom action: publish
     "^posts/(?P<pk>[^/.]+)/unpublish/$",  # Custom action: unpublish
     "^posts/(?P<pk>[^/.]+)/duplicate/$",  # Custom action: duplicate
 ]

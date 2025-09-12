@@ -1,4 +1,4 @@
-from typing import TYPE_CHECKING, cast, Optional
+from typing import TYPE_CHECKING, cast
 
 from django.contrib.auth import get_user_model
 from django.contrib.contenttypes.fields import GenericForeignKey
@@ -233,7 +233,7 @@ class TranslationUnit(models.Model):
         source_locale: Locale,
         target_locale: Locale,
         source_text: str,
-        user: Optional[User] = None,
+        user: User | None = None,
     ) -> "TranslationUnit":
         """
         Create or update a translation unit.
@@ -277,7 +277,7 @@ class TranslationUnit(models.Model):
 
     @classmethod
     def get_units_for_object(
-        cls, obj, target_locale: Optional[Locale] = None
+        cls, obj, target_locale: Locale | None = None
     ) -> "QuerySet[TranslationUnit]":
         """Get all translation units for an object."""
         content_type = ContentType.objects.get_for_model(obj)

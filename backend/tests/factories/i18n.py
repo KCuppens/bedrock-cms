@@ -38,7 +38,6 @@ class TranslationUnitFactory(BaseFactory):
 
     @factory.lazy_attribute
     def object_id(self):
-
         page = PageFactory()
         return page.id
 

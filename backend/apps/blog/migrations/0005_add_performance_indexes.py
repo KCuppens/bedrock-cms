@@ -4,7 +4,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("blog", "0004_alter_blogpost_blocks_alter_blogpost_seo"),
     ]

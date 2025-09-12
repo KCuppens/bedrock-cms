@@ -135,7 +135,7 @@ class Command(BaseCommand):
                     "name": name,
                     "type": python_type,
                     "default": default,
-                    "description": f'{name.replace("_", " ").title()} field',
+                    "description": f"{name.replace('_', ' ').title()} field",
                 }
             )
 
@@ -154,9 +154,9 @@ class Command(BaseCommand):
         self.stdout.write("\nFiles that would be created/modified:")
         self.stdout.write("  * apps/cms/blocks/validation.py (updated)")
         self.stdout.write(
-            f'  * tests/unit/test_blocks_{context["block_type"]}.py (new)'
+            f"  * tests/unit/test_blocks_{context['block_type']}.py (new)"
         )
-        self.stdout.write(f'  * docs/blocks/{context["block_type"]}.md (new)')
+        self.stdout.write(f"  * docs/blocks/{context['block_type']}.md (new)")
 
         self.stdout.write("\nBlock schema preview:")
         schema_content = self._generate_block_schema(context)
@@ -237,7 +237,7 @@ class {{ block_class }}BlockModel(BaseBlockModel):
         test_dir = Path("tests/unit")
         test_dir.mkdir(parents=True, exist_ok=True)
 
-        test_file = test_dir / f'test_blocks_{context["block_type"]}.py'
+        test_file = test_dir / f"test_blocks_{context['block_type']}.py"
 
         template = Template(
             '''"""
@@ -341,7 +341,7 @@ class Test{{ block_class }}Block:
         docs_dir = Path("docs/blocks")
         docs_dir.mkdir(parents=True, exist_ok=True)
 
-        docs_file = docs_dir / f'{context["block_type"]}.md'
+        docs_file = docs_dir / f"{context['block_type']}.md"
 
         template = Template(
             """# {{ block_title }} Block
@@ -457,15 +457,15 @@ pytest tests/unit/test_blocks_{{ block_type }}.py -v
         self.stdout.write("\n1. Review the generated files:")
         self.stdout.write("   - Check the block schema in validation.py")
         self.stdout.write(
-            f'   - Review tests in tests/unit/test_blocks_{context["block_type"]}.py'
+            f"   - Review tests in tests/unit/test_blocks_{context['block_type']}.py"
         )
         self.stdout.write(
-            f'   - Update documentation in docs/blocks/{context["block_type"]}.md'
+            f"   - Update documentation in docs/blocks/{context['block_type']}.md"
         )
 
         self.stdout.write("\n2. Run the tests:")
         self.stdout.write(
-            f'   python manage.py test tests.unit.test_blocks_{context["block_type"]}'
+            f"   python manage.py test tests.unit.test_blocks_{context['block_type']}"
         )
 
         self.stdout.write("\n3. Test the block validation:")

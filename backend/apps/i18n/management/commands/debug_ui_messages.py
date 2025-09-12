@@ -52,7 +52,7 @@ class Command(BaseCommand):
             self.stdout.write(f"{i}. Key: {message.key}")
             self.stdout.write(f"   Namespace: {message.namespace}")
             self.stdout.write(f'   Default value: "{message.default_value}"')
-            self.stdout.write(f'   Description: {message.description or "None"}')
+            self.stdout.write(f"   Description: {message.description or 'None'}")
             self.stdout.write(f"   Created: {message.created_at}")
             self.stdout.write("")
 

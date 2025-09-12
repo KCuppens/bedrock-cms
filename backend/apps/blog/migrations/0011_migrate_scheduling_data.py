@@ -25,7 +25,6 @@ def reverse_migration(apps, schema_editor):
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("blog", "0010_add_scheduling_fields"),
     ]

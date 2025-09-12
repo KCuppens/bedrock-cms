@@ -130,9 +130,7 @@ def test_core_mixins():
                                     try:
                                         with patch.object(attr, "model", Mock()):
                                             mock_instance.model = Mock()
-                                            mock_instance.model.objects.all.return_value = (
-                                                []
-                                            )
+                                            mock_instance.model.objects.all.return_value = []
                                             attr.get_queryset(mock_instance)
                                     except:
                                         pass

@@ -7,5 +7,4 @@ class CmsConfig(AppConfig):
     verbose_name = "Content Management System"
 
     def ready(self):
-
         pass

@@ -160,9 +160,7 @@ class LocaleViewSet(viewsets.ModelViewSet):
             )
 
         # Check if there are dependent objects (optional)
-        # You might want to add checks for pages,
-            translations,
-            etc. that depend on this locale
+        # You might want to add checks for pages, translations, etc. that depend on this locale
 
         # Perform the deletion
         locale.delete()
@@ -348,8 +346,7 @@ class TranslationUnitViewSet(viewsets.ModelViewSet):
 
                 # Check permissions (optional)
                 # if not self.check_object_permissions(request, unit):
-                #     errors.append({'id': unit_data['id'],
-                    'error': 'Permission denied'})
+                #     errors.append({'id': unit_data['id'], 'error': 'Permission denied'})
                 #     continue
 
                 # Update fields
@@ -371,7 +368,6 @@ class TranslationUnitViewSet(viewsets.ModelViewSet):
                 )
             except Exception as e:
                 errors.append({"id": unit_data["id"], "error": str(e)})
-
         return Response(
             {
                 "updated": updated_units,
@@ -394,7 +390,6 @@ class TranslationUnitViewSet(viewsets.ModelViewSet):
         serializer.is_valid(raise_exception=True)
 
         comment = serializer.validated_data.get("comment", "")
-
         # Check if translation has content
         if not translation_unit.target_text.strip():
             return Response(
@@ -440,7 +435,6 @@ class TranslationUnitViewSet(viewsets.ModelViewSet):
         serializer.is_valid(raise_exception=True)
 
         comment = serializer.validated_data.get("comment", "")
-
         # Record history
         TranslationHistory.objects.create(
             translation_unit=translation_unit,
@@ -479,7 +473,6 @@ class TranslationUnitViewSet(viewsets.ModelViewSet):
         serializer.is_valid(raise_exception=True)
 
         comment = serializer.validated_data.get("comment", "")
-
         # Record history
         TranslationHistory.objects.create(
             translation_unit=translation_unit,
@@ -518,7 +511,6 @@ class TranslationUnitViewSet(viewsets.ModelViewSet):
         serializer.is_valid(raise_exception=True)
 
         comment = serializer.validated_data.get("comment", "")
-
         # Check if translation has content
         if not translation_unit.target_text.strip():
             return Response(
@@ -568,7 +560,6 @@ class TranslationUnitViewSet(viewsets.ModelViewSet):
         source_lang = serializer.validated_data["source_locale"]
         target_lang = serializer.validated_data["target_locale"]
         service = serializer.validated_data.get("service", "auto")
-
         # Use DeepL for machine translation suggestions
         try:
             from .services import DeepLTranslationService
@@ -577,14 +568,12 @@ class TranslationUnitViewSet(viewsets.ModelViewSet):
 
             # Get translation from DeepL
             suggestion = deepl.translate(text, source_lang, target_lang)
-
             # If DeepL doesn't return a translation, return the original text
             if not suggestion:
                 suggestion = text
 
         except Exception as e:
-            # If DeepL service is not configured or fails,
-                return the original text
+            # If DeepL service is not configured or fails, return the original text
             logger.warning(f"Translation service error: {e}")
             suggestion = text
 
@@ -616,7 +605,6 @@ class TranslationUnitViewSet(viewsets.ModelViewSet):
 
         assigned_to = serializer.validated_data.get("assigned_to")
         comment = serializer.validated_data.get("comment", "")
-
         # Get or create queue item
         queue_item, created = TranslationQueue.objects.get_or_create(
             translation_unit=translation_unit,
@@ -674,7 +662,6 @@ class TranslationUnitViewSet(viewsets.ModelViewSet):
         translation_unit_ids = serializer.validated_data["translation_unit_ids"]
         assigned_to = serializer.validated_data.get("assigned_to")
         comment = serializer.validated_data.get("comment", "")
-
         # Get translation units
         translation_units = TranslationUnit.objects.filter(id__in=translation_unit_ids)
 
@@ -729,7 +716,6 @@ class TranslationUnitViewSet(viewsets.ModelViewSet):
 
             except Exception as e:
                 errors.append({"id": translation_unit.id, "error": str(e)})
-
         return Response(
             {
                 "assigned": assigned_units,
@@ -760,7 +746,6 @@ class TranslationUnitViewSet(viewsets.ModelViewSet):
         serializer.is_valid(raise_exception=True)
 
         comment = serializer.validated_data.get("comment", "")
-
         # Check if translation has content
         if not translation_unit.target_text.strip():
             return Response(
@@ -826,7 +811,6 @@ class UiMessageViewSet(viewsets.ModelViewSet):
     search_fields = ["key", "description", "default_value"]
     ordering_fields = ["created_at", "updated_at", "namespace", "key"]
     ordering = ["namespace", "key"]
-
     @extend_schema(
         summary="Sync with .po files",
         description="Import from or export to .po files",
@@ -856,7 +840,6 @@ class UiMessageViewSet(viewsets.ModelViewSet):
         direction = request.data.get("direction", "sync")
         locale_code = request.data.get("locale")
         namespace = request.data.get("namespace", "django")
-
         try:
             # Capture command output
             out = io.StringIO()
@@ -872,7 +855,6 @@ class UiMessageViewSet(viewsets.ModelViewSet):
 
             # Run management command
             call_command(*command_args, stdout=out)
-
             output = out.getvalue()
 
             return Response(
@@ -917,7 +899,6 @@ class UiMessageViewSet(viewsets.ModelViewSet):
         """Import Django built-in strings."""
         locale_code = request.data.get("locale")
         namespace = request.data.get("namespace", "django")
-
         try:
             # Capture command output
             out = io.StringIO()
@@ -930,7 +911,6 @@ class UiMessageViewSet(viewsets.ModelViewSet):
 
             # Run management command
             call_command(*command_args, stdout=out)
-
             output = out.getvalue()
 
             return Response(
@@ -1031,7 +1011,6 @@ class UiMessageViewSet(viewsets.ModelViewSet):
         source = request.data.get(
             "source", "unknown"
         )  # 'build', 'runtime-discovery', etc.
-
         # Determine if we should auto-approve
         auto_approve = source == "build" or getattr(
             settings, "AUTO_APPROVE_TRANSLATIONS", False
@@ -1097,7 +1076,6 @@ class UiMessageViewSet(viewsets.ModelViewSet):
 
             except Exception as e:
                 errors.append({"key": key, "error": str(e)})
-
         # Log the sync activity
         if created or updated:
             from django.contrib.admin.models import ADDITION, LogEntry
@@ -1152,11 +1130,9 @@ class UiMessageViewSet(viewsets.ModelViewSet):
         locale = request.data.get("locale", "unknown")
         url = request.data.get("url", "")
         component = request.data.get("component", "")
-
         # Store in cache for admin review
         cache_key = f"missing_translations_{datetime.now().strftime('%Y%m%d')}"
         existing = cache.get(cache_key, [])
-
         for key in keys:
             entry = {
                 "key": key,
@@ -1171,7 +1147,6 @@ class UiMessageViewSet(viewsets.ModelViewSet):
             existing.append(entry)
 
         cache.set(cache_key, existing, 86400)  # Store for 24 hours
-
         return Response(
             {"reported": len(keys),
                 "message": "Missing keys logged for review"}
@@ -1190,7 +1165,6 @@ class UiMessageViewSet(viewsets.ModelViewSet):
     def discovery_stats(self, request):
         """Get statistics about discovered translation keys."""
         from datetime import datetime, timedelta
-
         from django.core.cache import cache
         from django.db.models import Count
 
@@ -1215,7 +1189,6 @@ class UiMessageViewSet(viewsets.ModelViewSet):
             translated = UiMessageTranslation.objects.filter(
                 locale=locale, status="approved"
             ).values_list("message_id", flat=True)
-
             untranslated_count = UiMessage.objects.exclude(id__in=translated).count()
 
             untranslated[locale.code] = untranslated_count
@@ -1228,7 +1201,6 @@ class UiMessageViewSet(viewsets.ModelViewSet):
         # Get today's missing keys from cache
         cache_key = f"missing_translations_{datetime.now().strftime('%Y%m%d')}"
         missing_today = cache.get(cache_key, [])
-
         return Response(
             {
                 "total_messages": total_messages,
@@ -1527,11 +1499,10 @@ class UiMessageTranslationViewSet(viewsets.ModelViewSet):
                 locale_id = update_data["locale_id"]
                 value = update_data["value"]
                 status_val = update_data.get("status", "draft")
-
                 # Get or create translation
                 translation,
                     created = UiMessageTranslation.objects.get_or_create(
-                    message_id=message_id,
+                        message_id=message_id,
                     locale_id=locale_id,
                     defaults={
                         "value": value,
@@ -1695,7 +1666,6 @@ class UiMessageTranslationViewSet(viewsets.ModelViewSet):
 
             # Check if Celery is running in eager mode (local development)
             is_eager = getattr(settings, "CELERY_TASK_ALWAYS_EAGER", False)
-
             if is_eager:
                 # Run task synchronously for local development
                 try:
@@ -1964,7 +1934,6 @@ class TranslationQueueViewSet(viewsets.ModelViewSet):
     filterset_fields = ["status", "priority", "assigned_to"]
     ordering_fields = ["priority", "deadline", "created_at"]
     ordering = ["-priority", "deadline"]
-
     def perform_create(self, serializer):
         """Set the created_by field when creating."""
         serializer.save(created_by=self.request.user)
@@ -2071,7 +2040,6 @@ class TranslationQueueViewSet(viewsets.ModelViewSet):
             pending = status_dict.get("pending", 0)
             in_progress = status_dict.get("in_progress", 0)
             completed = status_dict.get("completed", 0)
-
             # Calculate completion percentage
             completion_percentage = (completed / total * 100) if total > 0 else 100
 

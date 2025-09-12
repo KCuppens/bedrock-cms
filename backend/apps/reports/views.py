@@ -77,7 +77,7 @@ def broken_links_report(request):
             {
                 "task_id": task.id,
                 "status": "running",
-                "message": f'Started link check for {"all pages" if not page_ids else f"{len(page_ids)} pages"}',
+                "message": f"Started link check for {'all pages' if not page_ids else f'{len(page_ids)} pages'}",
                 "check_status_url": f"/api/v1/reports/task-status/{task.id}/",
             }
         )

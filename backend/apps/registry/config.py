@@ -3,7 +3,7 @@ Content configuration and registry for CMS content types.
 """
 
 from dataclasses import dataclass, field
-from typing import Any, Dict, List, Optional, Union
+from typing import Any
 
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ValidationError
@@ -20,21 +20,21 @@ class ContentConfig:
     """
 
     # Required fields
-    model: 'type[models.Model]'
+    model: "type[models.Model]"
     kind: str  # 'collection', 'singleton', 'snippet'
     name: str
 
     # Optional fields with defaults
-    slug_field: Optional[str] = None
-    locale_field: Optional[str] = "locale"
-    translatable_fields: 'List[str]' = field(default_factory=list)
-    searchable_fields: 'List[str]' = field(default_factory=list)
-    seo_fields: 'List[str]' = field(default_factory=lambda: ["title", "seo"])
-    route_pattern: Optional[str] = None
+    slug_field: str | None = None
+    locale_field: str | None = "locale"
+    translatable_fields: "list[str]" = field(default_factory=list)
+    searchable_fields: "list[str]" = field(default_factory=list)
+    seo_fields: "list[str]" = field(default_factory=lambda: ["title", "seo"])
+    route_pattern: str | None = None
     can_publish: bool = True
-    allowed_block_types: 'Optional[List[str]]' = None
-    form_fields: 'Optional[List[str]]' = None
-    ordering: 'List[str]' = field(default_factory=lambda: ["-created_at"])
+    allowed_block_types: "list[str] | None" = None
+    form_fields: "list[str] | None" = None
+    ordering: "list[str]" = field(default_factory=lambda: ["-created_at"])
 
     def __post_init__(self):
         """Validate configuration after initialization."""
@@ -155,7 +155,7 @@ class ContentConfig:
                 f"Invalid ContentConfig for {self.model}: " + "; ".join(errors)
             )
 
-    def get_effective_form_fields(self) -> 'List[str]':
+    def get_effective_form_fields(self) -> "list[str]":
         """
         Get the effective form fields to use for serialization.
 
@@ -179,7 +179,7 @@ class ContentConfig:
         """Check if this content type supports localization."""
         return self.locale_field is not None
 
-    def get_route_pattern(self) -> Optional[str]:
+    def get_route_pattern(self) -> str | None:
         """Get the route pattern for this content type."""
         if self.route_pattern:
             return self.route_pattern
@@ -192,7 +192,7 @@ class ContentConfig:
 
         return None
 
-    def to_dict(self) -> 'Dict[str, Any]':
+    def to_dict(self) -> "dict[str, Any]":
         """Convert config to dictionary for serialization."""
         return {
             "model_label": self.model_label,

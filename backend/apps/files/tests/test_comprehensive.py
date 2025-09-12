@@ -12,7 +12,6 @@ from django.urls import reverse
 from PIL import Image
 from rest_framework import status
 from rest_framework.test import APIClient, APITestCase
-
 from apps.files import services
 from apps.files.serializers import FileUploadSerializer
 
@@ -24,9 +23,7 @@ class FilesModelTests(TestCase):
 
     def setUp(self):
         self.user = User.objects.create_user(
-            username="testuser",
-                email="test@example.com",
-                password="testpass123"
+            username="testuser", email="test@example.com", password="testpass123"
         )
         self.category = MediaCategory.objects.create(
             name="Test Group", slug="test-category"
@@ -61,13 +58,14 @@ class FilesModelTests(TestCase):
     def test_file_size_display(self):
         """Test file size formatting."""
         file_obj = File.objects.create(
-            name="test.pdf", size=1024, uploaded_by=self.user  # 1 KB
+            name="test.pdf",
+            size=1024,
+            uploaded_by=self.user,  # 1 KB
         )
 
         if hasattr(file_obj, "get_size_display"):
             size_display = file_obj.get_size_display()
             self.assertIn("KB", size_display.upper())
-
         # Test different sizes
         file_obj.size = 1048576  # 1 MB
         if hasattr(file_obj, "get_size_display"):
@@ -94,8 +92,7 @@ class FilesModelTests(TestCase):
 
     def test_file_validation(self):
         """Test file model validation."""
-        file_obj = File(name="",
-            uploaded_by=self.user)  # Empty name should fail
+        file_obj = File(name="", uploaded_by=self.user)  # Empty name should fail
 
         if hasattr(file_obj, "clean"):
             from django.core.exceptions import ValidationError
@@ -110,7 +107,6 @@ class FilesModelTests(TestCase):
         )
 
         self.assertEqual(file_obj.category, self.category)
-
         # Test category file count
         if hasattr(self.category, "files"):
             files_in_category = self.category.files.count()
@@ -119,7 +115,6 @@ class FilesModelTests(TestCase):
     def test_file_tags_relationship(self):
         """Test file-tags many-to-many relationship."""
         file_obj = File.objects.create(name="test.pdf", uploaded_by=self.user)
-
         if hasattr(file_obj, "tags"):
             file_obj.tags.add(self.tag)
 
@@ -130,7 +125,6 @@ class FilesModelTests(TestCase):
     def test_file_version_creation(self):
         """Test file versioning."""
         file_obj = File.objects.create(name="test.pdf", uploaded_by=self.user)
-
         try:
             version = FileVersion.objects.create(
                 file=file_obj,
@@ -143,14 +137,12 @@ class FilesModelTests(TestCase):
             self.assertEqual(version.file, file_obj)
             self.assertEqual(version.version_number, 1)
             self.assertEqual(version.created_by, self.user)
-
         except Exception:
             pass  # FileVersion model may not exist
 
     def test_file_category_methods(self):
         """Test MediaCategory model methods."""
         self.assertEqual(str(self.category), "Test Group")
-
         # Test get_file_count method
         File.objects.create(
             name="file1.pdf", uploaded_by=self.user, category=self.category
@@ -166,11 +158,9 @@ class FilesModelTests(TestCase):
     def test_file_tag_methods(self):
         """Test FileTag model methods."""
         self.assertEqual(str(self.tag), "test-tag")
-
         # Test tag usage count
         file1 = File.objects.create(name="file1.pdf", uploaded_by=self.user)
         file2 = File.objects.create(name="file2.pdf", uploaded_by=self.user)
-
         if hasattr(file1, "tags") and hasattr(file2, "tags"):
             file1.tags.add(self.tag)
             file2.tags.add(self.tag)
@@ -185,9 +175,7 @@ class FilesAPITests(APITestCase):
 
     def setUp(self):
         self.user = User.objects.create_user(
-            username="testuser",
-                email="test@example.com",
-                password="testpass123"
+            username="testuser", email="test@example.com", password="testpass123"
         )
         self.client = APIClient()
         self.client.force_authenticate(user=self.user)
@@ -200,9 +188,7 @@ class FilesAPITests(APITestCase):
         """Test file list API endpoint."""
         # Create test files
         File.objects.create(
-            name="file1.pdf",
-                mime_type="application/pdf",
-                uploaded_by=self.user
+            name="file1.pdf", mime_type="application/pdf", uploaded_by=self.user
         )
         File.objects.create(
             name="file2.jpg", mime_type="image/jpeg", uploaded_by=self.user
@@ -236,9 +222,7 @@ class FilesAPITests(APITestCase):
             response = self.client.post(url, upload_data, format="multipart")
             if response.status_code in [201, 200]:
                 self.assertIn(
-                    response.status_code,
-                        [status.HTTP_201_CREATED,
-                        status.HTTP_200_OK]
+                    response.status_code, [status.HTTP_201_CREATED, status.HTTP_200_OK]
                 )
 
                 # Verify file was created
@@ -251,9 +235,7 @@ class FilesAPITests(APITestCase):
     def test_file_detail_api(self):
         """Test file detail API endpoint."""
         file_obj = File.objects.create(
-            name="detail.pdf",
-                mime_type="application/pdf",
-                uploaded_by=self.user
+            name="detail.pdf", mime_type="application/pdf", uploaded_by=self.user
         )
 
         try:
@@ -269,9 +251,7 @@ class FilesAPITests(APITestCase):
     def test_file_download_api(self):
         """Test file download API endpoint."""
         file_obj = File.objects.create(
-            name="download.pdf",
-                path="/media/files/download.pdf",
-                uploaded_by=self.user
+            name="download.pdf", path="/media/files/download.pdf", uploaded_by=self.user
         )
 
         try:
@@ -285,9 +265,7 @@ class FilesAPITests(APITestCase):
     def test_file_search_api(self):
         """Test file search API."""
         File.objects.create(
-            name="searchable.pdf",
-                mime_type="application/pdf",
-                uploaded_by=self.user
+            name="searchable.pdf", mime_type="application/pdf", uploaded_by=self.user
         )
         File.objects.create(
             name="another.txt", mime_type="text/plain", uploaded_by=self.user
@@ -306,15 +284,13 @@ class FilesAPITests(APITestCase):
         """Test bulk file operations."""
         file1 = File.objects.create(name="bulk1.pdf", uploaded_by=self.user)
         file2 = File.objects.create(name="bulk2.pdf", uploaded_by=self.user)
-
         # Test bulk delete
         try:
             url = reverse("file-bulk-delete")
             response = self.client.post(url, {"ids": [file1.id, file2.id]})
             if response.status_code in [200, 204]:
                 # Check if files were deleted
-                remaining = File.objects.filter(id__in=[file1.id,
-                    file2.id]).count()
+                remaining = File.objects.filter(id__in=[file1.id, file2.id]).count()
                 self.assertEqual(remaining, 0)
         except Exception:
             pass  # URL may not exist
@@ -325,9 +301,7 @@ class FilesSerializerTests(TestCase):
 
     def setUp(self):
         self.user = User.objects.create_user(
-            username="testuser",
-                email="test@example.com",
-                password="testpass123"
+            username="testuser", email="test@example.com", password="testpass123"
         )
         self.category = MediaCategory.objects.create(
             name="Test Group", slug="test-category"
@@ -368,7 +342,6 @@ class FilesSerializerTests(TestCase):
 
         # Test invalid data
         invalid_data = {"name": "", "category": self.category.id}  # Empty name
-
         serializer = FileUploadSerializer(data=invalid_data)
         self.assertFalse(serializer.is_valid())
 
@@ -396,9 +369,7 @@ class FilesServiceTests(TestCase):
 
     def setUp(self):
         self.user = User.objects.create_user(
-            username="testuser",
-                email="test@example.com",
-                password="testpass123"
+            username="testuser", email="test@example.com", password="testpass123"
         )
 
     def test_file_storage_service(self):
@@ -411,18 +382,15 @@ class FilesServiceTests(TestCase):
             if hasattr(storage_service, "save"):
                 path = storage_service.save(test_file, "test.txt")
                 self.assertIsInstance(path, str)
-
             # Test file existence check
             if hasattr(storage_service, "exists"):
                 exists = storage_service.exists("test.txt")
                 self.assertIsInstance(exists, bool)
-
             # Test file deletion
             if hasattr(storage_service, "delete"):
                 result = storage_service.delete("test.txt")
                 # Should return boolean or None
                 self.assertIn(type(result), [bool, type(None)])
-
         except (AttributeError, ImportError):
             pass  # Service may not exist
 
@@ -433,19 +401,14 @@ class FilesServiceTests(TestCase):
 
             # Create test image
             image = Image.new("RGB", (100, 100), color="red")
-
             # Test image processing
             if hasattr(processing_service, "process_image"):
-                processed = processing_service.process_image(image,
-                    width=50,
-                    height=50)
+                processed = processing_service.process_image(image, width=50, height=50)
                 self.assertIsNotNone(processed)
 
             # Test thumbnail generation
             if hasattr(processing_service, "generate_thumbnail"):
-                thumbnail = processing_service.generate_thumbnail(image,
-                    size=(32,
-                    32))
+                thumbnail = processing_service.generate_thumbnail(image, size=(32, 32))
                 self.assertIsNotNone(thumbnail)
 
         except (AttributeError, ImportError):
@@ -464,12 +427,10 @@ class FilesServiceTests(TestCase):
             if hasattr(validation_service, "validate"):
                 is_valid = validation_service.validate(test_file)
                 self.assertIsInstance(is_valid, bool)
-
             # Test virus scanning
             if hasattr(validation_service, "scan_for_virus"):
                 is_safe = validation_service.scan_for_virus(test_file)
                 self.assertIsInstance(is_safe, bool)
-
         except (AttributeError, ImportError):
             pass  # Service may not exist
 
@@ -479,9 +440,7 @@ class FilesViewTests(TestCase):
 
     def setUp(self):
         self.user = User.objects.create_user(
-            username="testuser",
-                email="test@example.com",
-                password="testpass123"
+            username="testuser", email="test@example.com", password="testpass123"
         )
 
     def test_file_viewset_methods(self):
@@ -491,10 +450,7 @@ class FilesViewTests(TestCase):
             viewset.request = type(
                 "MockRequest",
                 (),
-                {"user": self.user,
-                    "query_params": {},
-                    "data": {},
-                    "FILES": {}},
+                {"user": self.user, "query_params": {}, "data": {}, "FILES": {}},
             )()
 
             # Test get_queryset
@@ -511,7 +467,6 @@ class FilesViewTests(TestCase):
             if hasattr(viewset, "get_permissions"):
                 permissions = viewset.get_permissions()
                 self.assertIsInstance(permissions, list)
-
         except (AttributeError, ImportError):
             pass  # ViewSet may not exist
 
@@ -521,14 +476,9 @@ class FilesIntegrationTests(TestCase):
 
     def setUp(self):
         self.user = User.objects.create_user(
-            username="testuser",
-                email="test@example.com",
-                password="testpass123"
+            username="testuser", email="test@example.com", password="testpass123"
         )
-        self.category = MediaCategory.objects.create(
-                                                         name="Documents",
-                                                         slug="documents"
-                                                     )
+        self.category = MediaCategory.objects.create(name="Documents", slug="documents")
 
     def test_complete_file_upload_workflow(self):
         """Test complete file upload and management workflow."""
@@ -548,18 +498,13 @@ class FilesIntegrationTests(TestCase):
 
         if hasattr(file_obj, "tags"):
             file_obj.tags.add(tag1, tag2)
-
             # Verify tags were added
             tags = file_obj.tags.all()
             self.assertEqual(tags.count(), 2)
-
         # Create file version
         try:
             version = FileVersion.objects.create(
-                file=file_obj,
-                    version_number=1,
-                    size=2048,
-                    created_by=self.user
+                file=file_obj, version_number=1, size=2048, created_by=self.user
             )
             self.assertEqual(version.file, file_obj)
         except Exception:
@@ -577,16 +522,13 @@ class FilesIntegrationTests(TestCase):
         files = []
         for i in range(3):
             file_obj = File.objects.create(
-                name=f"test_file_{i}.pdf",
-                    uploaded_by=self.user,
-                    category=self.category
+                name=f"test_file_{i}.pdf", uploaded_by=self.user, category=self.category
             )
             files.append(file_obj)
 
         # Test category relationship
         category_files = File.objects.filter(category=self.category)
         self.assertEqual(category_files.count(), 3)
-
         # Create and assign tags
         tag = FileTag.objects.create(name="batch-uploaded")
 
@@ -617,7 +559,6 @@ class FilesIntegrationTests(TestCase):
         if hasattr(file_obj, "get_file_url"):
             url = file_obj.get_file_url()
             self.assertIsInstance(url, str)
-
         # Test file download preparation
         if hasattr(file_obj, "prepare_download"):
             download_data = file_obj.prepare_download()

@@ -194,7 +194,9 @@ class BlogPostRevision(models.Model):
         # Delete old non-published revisions
         old_revisions.delete()
 
-    def restore_to_blog_post(self, user: Optional["User"] = None, create_backup: bool = True) -> "BlogPost":  # type: ignore
+    def restore_to_blog_post(
+        self, user: Optional["User"] = None, create_backup: bool = True
+    ) -> "BlogPost":  # type: ignore
         """
         Restore this revision's content to the blog post.
 

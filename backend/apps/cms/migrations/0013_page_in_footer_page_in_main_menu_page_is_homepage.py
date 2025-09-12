@@ -4,7 +4,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("cms", "0012_redirect_hits_redirect_is_active_redirect_notes_and_more"),
     ]

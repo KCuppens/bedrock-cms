@@ -1,5 +1,5 @@
 # mypy: ignore-errors
-from typing import Any, Literal, Optional
+from typing import Any, Literal
 
 from pydantic import BaseModel, Field, ValidationError
 from rest_framework.exceptions import ValidationError as DRFValidationError
@@ -80,7 +80,7 @@ class FAQBlockModel(BaseBlockModel):
 class ContentDetailSource(BaseModel):
     """Source configuration for content_detail block."""
 
-    id: Optional[int] = None
+    id: int | None = None
 
 
 class ContentDetailOptions(BaseModel):

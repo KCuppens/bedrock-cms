@@ -2,7 +2,7 @@
 Security utilities for CMS content.
 """
 
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 import bleach  # type: ignore
 from django.conf import settings
@@ -83,9 +83,9 @@ def get_sanitization_config():
 
 def sanitize_html(
     html_content: str,
-    allowed_tags: Optional[List[str]] = None,
-    allowed_attributes: Optional[Dict[str, List[str]]] = None,
-    allowed_protocols: Optional[List[str]] = None,
+    allowed_tags: list[str] | None = None,
+    allowed_attributes: dict[str, list[str]] | None = None,
+    allowed_protocols: list[str] | None = None,
 ) -> str:
     """
     Sanitize HTML content to remove potentially dangerous elements and attributes.
@@ -114,7 +114,7 @@ def sanitize_html(
     )
 
 
-def sanitize_rich_text_block(block_data: Dict[str, Any]) -> Dict[str, Any]:
+def sanitize_rich_text_block(block_data: dict[str, Any]) -> dict[str, Any]:
     """
     Sanitize HTML content in a rich_text block.
 
@@ -143,7 +143,7 @@ def sanitize_rich_text_block(block_data: Dict[str, Any]) -> Dict[str, Any]:
     return sanitized_block
 
 
-def sanitize_block_content(block_data: Dict[str, Any]) -> Dict[str, Any]:
+def sanitize_block_content(block_data: dict[str, Any]) -> dict[str, Any]:
     """
     Recursively sanitize HTML content in block data.
 
@@ -246,7 +246,7 @@ def sanitize_block_content(block_data: Dict[str, Any]) -> Dict[str, Any]:
     return block_data
 
 
-def sanitize_blocks(blocks: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+def sanitize_blocks(blocks: list[dict[str, Any]]) -> list[dict[str, Any]]:
     """
     Sanitize HTML content in a list of blocks.
 

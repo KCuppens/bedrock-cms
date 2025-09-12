@@ -91,7 +91,7 @@ class Command(BaseCommand):
             batch = list(messages_to_translate[i : i + batch_size])
 
             self.stdout.write(
-                f"\nProcessing batch {i//batch_size + 1} ({i+1}-{min(i+batch_size, total_messages)} of {total_messages})"
+                f"\nProcessing batch {i // batch_size + 1} ({i + 1}-{min(i + batch_size, total_messages)} of {total_messages})"
             )
 
             for message in batch:

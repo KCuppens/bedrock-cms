@@ -87,7 +87,7 @@ def cache_method_response(timeout=300, vary_on_user=True, vary_on_headers=None):
             if vary_on_headers:
                 for header in vary_on_headers:
                     header_value = request.META.get(
-                        f'HTTP_{header.upper().replace("-", "_")}'
+                        f"HTTP_{header.upper().replace('-', '_')}"
                     )
                     if header_value:
                         cache_key_parts.append(f"{header}:{header_value}")

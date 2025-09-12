@@ -5,7 +5,7 @@ Provides search functionality including indexing, querying, and analytics.
 """
 
 import time
-from typing import Any, Dict, List, Optional, Union
+from typing import Any
 
 from django.contrib.contenttypes.models import ContentType
 from django.core.paginator import Paginator
@@ -41,12 +41,12 @@ class SearchService:
     def search(
         self,
         query: str,
-        filters: Optional[Dict[str, Any]] = None,
+        filters: dict[str, Any] | None = None,
         page: int = 1,
         page_size: int = 20,
         user=None,
         request=None,
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """
         Perform a search across all indexed content.
 
@@ -108,7 +108,7 @@ class SearchService:
             "suggestions": self.get_suggestions(query)[:5],  # Top 5 suggestions
         }
 
-    def _build_search_queryset(self, query: str, filters: Dict[str, Any]):
+    def _build_search_queryset(self, query: str, filters: dict[str, Any]):
         """
         Build search queryset with query and filters.
         """
@@ -165,7 +165,7 @@ class SearchService:
 
         return queryset
 
-    def _serialize_search_result(self, result: SearchIndex) -> Dict[str, Any]:
+    def _serialize_search_result(self, result: SearchIndex) -> dict[str, Any]:
         """
         Serialize a search result for API response.
         """
@@ -192,7 +192,7 @@ class SearchService:
     def _log_search_query(
         self,
         query: str,
-        filters: Dict[str, Any],
+        filters: dict[str, Any],
         result_count: int,
         execution_time_ms: int,
         user=None,
@@ -241,7 +241,7 @@ class SearchService:
         # Update search count and stats
         suggestion.increment_search_count(result_count)
 
-    def get_suggestions(self, query: str, limit: int = 10) -> List[str]:
+    def get_suggestions(self, query: str, limit: int = 10) -> list[str]:
         """
         Get search suggestions for autocomplete.
 
@@ -297,7 +297,7 @@ class SearchService:
             content_type=content_type, object_id=obj.pk
         ).delete()
 
-    def reindex_all(self, model_label: Optional[str] = None):
+    def reindex_all(self, model_label: str | None = None):
         """
         Re-index all registered content types or a specific model.
 
@@ -335,7 +335,7 @@ class SearchService:
 
         return indexed_count
 
-    def get_search_analytics(self, days: int = 30) -> Dict[str, Any]:
+    def get_search_analytics(self, days: int = 30) -> dict[str, Any]:
         """
         Get search analytics for the last N days.
 

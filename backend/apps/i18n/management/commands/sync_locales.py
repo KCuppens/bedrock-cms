@@ -180,9 +180,9 @@ class Command(BaseCommand):
             self.stdout.write(
                 self.style.SUCCESS("✓ Synced database locales to Django settings")
             )
-            self.stdout.write(f'  LANGUAGE_CODE: {db_settings["LANGUAGE_CODE"]}')
-            self.stdout.write(f'  LANGUAGES: {db_settings["LANGUAGES"]}')
-            self.stdout.write(f'  RTL_LANGUAGES: {db_settings["RTL_LANGUAGES"]}')
+            self.stdout.write(f"  LANGUAGE_CODE: {db_settings['LANGUAGE_CODE']}")
+            self.stdout.write(f"  LANGUAGES: {db_settings['LANGUAGES']}")
+            self.stdout.write(f"  RTL_LANGUAGES: {db_settings['RTL_LANGUAGES']}")
 
             if update_settings_file:
                 if result["file_updated"]:
@@ -299,19 +299,19 @@ class Command(BaseCommand):
         else:
             self.stdout.write(
                 self.style.SUCCESS(
-                    f'✓ Synced Django settings to database: {result["summary"]}'
+                    f"✓ Synced Django settings to database: {result['summary']}"
                 )
             )
 
             if result["created_locales"]:
                 self.stdout.write("  Created locales:")
                 for locale in result["created_locales"]:
-                    self.stdout.write(f'    • {locale["name"]} ({locale["code"]})')
+                    self.stdout.write(f"    • {locale['name']} ({locale['code']})")
 
             if result["updated_locales"]:
                 self.stdout.write("  Updated locales:")
                 for locale in result["updated_locales"]:
-                    self.stdout.write(f'    • {locale["name"]} ({locale["code"]})')
+                    self.stdout.write(f"    • {locale['name']} ({locale['code']})")
 
             if made_default:
                 self.stdout.write(f"  Default locale: {made_default}")

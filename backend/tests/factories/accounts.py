@@ -1,5 +1,6 @@
-from .i18n import LocaleFactory
 from .base import UserFactory
+from .i18n import LocaleFactory
+
 """
 Account-specific factories for users, roles, and permissions.
 """
@@ -11,7 +12,6 @@ from django.contrib.auth.models import Group
 from faker import Faker
 
 from apps.accounts.models import ScopedLocale, ScopedSection, UserProfile
-
 from .base import BaseFactory
 
 fake = Faker()
@@ -118,6 +118,4 @@ class TranslatorUserFactory(UserFactory):
 
         # Add locale access for Spanish
         locale_es = LocaleFactory(code="es")
-        ScopedLocaleFactory(user=self,
-            locale=locale_es,
-            permission_level="edit")
+        ScopedLocaleFactory(user=self, locale=locale_es, permission_level="edit")

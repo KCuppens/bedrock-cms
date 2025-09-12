@@ -2,10 +2,12 @@
 """
 Simple test script to verify authentication and blog endpoints
 """
+
 import requests
 
 # Base URL for the backend API
 BASE_URL = "http://localhost:8000"
+
 
 def test_endpoint(url, method="GET", data=None, cookies=None):
     """Test an API endpoint and return the response details"""
@@ -13,17 +15,18 @@ def test_endpoint(url, method="GET", data=None, cookies=None):
         if method == "GET":
             response = requests.get(url, cookies=cookies)
         elif method == "POST":
-            headers = {'Content-Type': 'application/json'}
+            headers = {"Content-Type": "application/json"}
             response = requests.post(url, json=data, headers=headers, cookies=cookies)
 
         return {
-            'status_code': response.status_code,
-            'headers': dict(response.headers),
-            'content': response.text[:500] if response.text else '',
-            'cookies': dict(response.cookies) if response.cookies else {}
+            "status_code": response.status_code,
+            "headers": dict(response.headers),
+            "content": response.text[:500] if response.text else "",
+            "cookies": dict(response.cookies) if response.cookies else {},
         }
     except Exception as e:
-        return {'error': str(e)}
+        return {"error": str(e)}
+
 
 def main():
     print("=== Testing Blog API Endpoints ===\n")
@@ -58,8 +61,11 @@ def main():
 
     # Test 5: Check duplicate endpoint without auth
     print("5. Testing duplicate endpoint (should fail without auth):")
-    result = test_endpoint(f"{BASE_URL}/api/v1/blog/posts/1/duplicate/", method="POST",
-                          data={"title": "Test Duplicate", "locale": 1})
+    result = test_endpoint(
+        f"{BASE_URL}/api/v1/blog/posts/1/duplicate/",
+        method="POST",
+        data={"title": "Test Duplicate", "locale": 1},
+    )
     print(f"   Status: {result.get('status_code', 'ERROR')}")
     print(f"   Content: {result.get('content', '')}")
     print()
@@ -72,12 +78,15 @@ def main():
     print()
 
     print("=== Summary ===")
-    print("If you see 403 errors for publish/unpublish/duplicate, that's expected without authentication.")
+    print(
+        "If you see 403 errors for publish/unpublish/duplicate, that's expected without authentication."
+    )
     print("If you see 404 errors, there's a URL routing issue.")
     print("To use these endpoints, you need to:")
     print("1. Log in through the frontend")
     print("2. Ensure the session cookies are being passed")
     print("3. Include CSRF tokens in the requests")
+
 
 if __name__ == "__main__":
     main()

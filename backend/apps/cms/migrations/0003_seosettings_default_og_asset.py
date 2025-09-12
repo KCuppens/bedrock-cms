@@ -5,7 +5,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("media", "0001_initial"),
         ("cms", "0002_seosettings_seodefaults"),

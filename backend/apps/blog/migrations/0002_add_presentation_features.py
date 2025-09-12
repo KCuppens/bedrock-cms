@@ -5,7 +5,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("cms", "0004_pagerevision_auditentry"),
         ("i18n", "0003_translationunit_uimessage_uimessagetranslation_and_more"),

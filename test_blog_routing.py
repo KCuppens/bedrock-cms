@@ -2,21 +2,23 @@
 """
 Test blog routing and ViewSet configuration
 """
+
 import sys
 import os
 import django
 
 # Add the backend directory to the path
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), 'backend'))
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), "backend"))
 
 # Setup Django
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'apps.config.settings.local')
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "apps.config.settings.local")
 django.setup()
 
 from apps.blog.models import BlogPost
 from apps.blog.views import BlogPostViewSet
 from django.test import RequestFactory
 from django.contrib.auth.models import AnonymousUser
+
 
 def test_blog_routing():
     print("=== Testing Blog Post ViewSet ===\n")
@@ -33,12 +35,12 @@ def test_blog_routing():
 
     # Test list view
     print("Testing list view:")
-    request = factory.get('/api/v1/blog/posts/')
+    request = factory.get("/api/v1/blog/posts/")
     request.user = AnonymousUser()
 
     viewset = BlogPostViewSet()
     viewset.setup(request, pk=None)
-    viewset.action = 'list'
+    viewset.action = "list"
 
     queryset = viewset.get_queryset()
     print(f"  Queryset count: {queryset.count()}")
@@ -48,12 +50,12 @@ def test_blog_routing():
 
     # Test retrieve view
     print("Testing retrieve view:")
-    request = factory.get('/api/v1/blog/posts/1/')
+    request = factory.get("/api/v1/blog/posts/1/")
     request.user = AnonymousUser()
 
     viewset = BlogPostViewSet()
-    viewset.setup(request, pk='1')
-    viewset.action = 'retrieve'
+    viewset.setup(request, pk="1")
+    viewset.action = "retrieve"
 
     try:
         queryset = viewset.get_queryset()
@@ -69,7 +71,10 @@ def test_blog_routing():
     # Check permissions
     print("Testing permissions:")
     permissions = viewset.get_permissions()
-    print(f"  Permissions for retrieve action: {[type(p).__name__ for p in permissions]}")
+    print(
+        f"  Permissions for retrieve action: {[type(p).__name__ for p in permissions]}"
+    )
+
 
 if __name__ == "__main__":
     test_blog_routing()

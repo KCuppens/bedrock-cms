@@ -98,7 +98,7 @@ def seed_locale_translation_units(
             meta={
                 "current": current_progress,
                 "total": 100,
-                "status": f'Processed pages: {page_results["created"]} created, {page_results["skipped"]} skipped',
+                "status": f"Processed pages: {page_results['created']} created, {page_results['skipped']} skipped",
             },
         )
 
@@ -125,7 +125,7 @@ def seed_locale_translation_units(
                     meta={
                         "current": current_progress,
                         "total": 100,
-                        "status": f'Processed {config_label}: {model_results["created"]} created',
+                        "status": f"Processed {config_label}: {model_results['created']} created",
                     },
                 )
 
@@ -140,7 +140,7 @@ def seed_locale_translation_units(
             meta={
                 "current": 100,
                 "total": 100,
-                "status": f'Completed: {results["total_units_created"]} units created',
+                "status": f"Completed: {results['total_units_created']} units created",
             },
         )
 

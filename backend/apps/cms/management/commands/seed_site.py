@@ -149,8 +149,8 @@ class Command(BaseCommand):
                     "size": 1024000,  # 1MB placeholder
                     "uploaded_by": user,
                     "alt_json": {
-                        "en-US": f'Demo {filename.replace("-", " ").replace(".jpg", "")}',
-                        "es-MX": f'Demo {filename.replace("-", " ").replace(".jpg", "")}',
+                        "en-US": f"Demo {filename.replace('-', ' ').replace('.jpg', '')}",
+                        "es-MX": f"Demo {filename.replace('-', ' ').replace('.jpg', '')}",
                     },
                     "tags": ["demo", "placeholder"],
                 },
@@ -586,11 +586,11 @@ class Command(BaseCommand):
         for _key, page in pages.items():
             self.stdout.write(f"  - {page.title} ({page.locale.code}) - {page.path}")
 
-        self.stdout.write(f'\nBlog Posts: {len(blog_data["posts"])}')
+        self.stdout.write(f"\nBlog Posts: {len(blog_data['posts'])}")
         for post in blog_data["posts"]:
             self.stdout.write(f"  - {post.title} ({post.locale.code})")
 
-        self.stdout.write(f'\nCategories: {len(blog_data["categories"])}')
+        self.stdout.write(f"\nCategories: {len(blog_data['categories'])}")
         for cat in blog_data["categories"]:
             self.stdout.write(f"  - {cat.name}")
 

@@ -99,7 +99,7 @@ class RedirectViewSet(viewsets.ModelViewSet):
             if not all(col in csv_reader.fieldnames for col in required_columns):
                 return Response(
                     {
-                        "error": f'CSV must contain columns: {", ".join(required_columns)}'
+                        "error": f"CSV must contain columns: {', '.join(required_columns)}"
                     },
                     status=status.HTTP_400_BAD_REQUEST,
                 )

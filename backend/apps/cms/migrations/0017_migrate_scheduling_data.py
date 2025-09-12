@@ -50,7 +50,6 @@ def reverse_migration(apps, schema_editor):
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("cms", "0016_add_scheduling_fields"),
     ]

@@ -138,11 +138,11 @@ class Command(BaseCommand):
     def _show_dry_run(self, context, output_dir):
         """Show what would be created in dry run mode."""
         files = [
-            f'{context["snake_name"]}_serializers.py',
-            f'{context["snake_name"]}_views.py',
-            f'{context["snake_name"]}_urls.py',
-            f'{context["snake_name"]}_admin.py',
-            f'docs/api/{context["kebab_name"]}.md',
+            f"{context['snake_name']}_serializers.py",
+            f"{context['snake_name']}_views.py",
+            f"{context['snake_name']}_urls.py",
+            f"{context['snake_name']}_admin.py",
+            f"docs/api/{context['kebab_name']}.md",
         ]
 
         self.stdout.write("\nFiles that would be created:")
@@ -152,35 +152,35 @@ class Command(BaseCommand):
 
         self.stdout.write("\nAPI endpoints that would be available:")
         self.stdout.write(
-            f'  GET    /api/content/{context["model_label"]}/           - List {context["model_verbose_plural"]}'
+            f"  GET    /api/content/{context['model_label']}/           - List {context['model_verbose_plural']}"
         )
         self.stdout.write(
-            f'  POST   /api/content/{context["model_label"]}/           - Create {context["model_verbose"]}'
+            f"  POST   /api/content/{context['model_label']}/           - Create {context['model_verbose']}"
         )
         self.stdout.write(
-            f'  GET    /api/content/{context["model_label"]}/{{id}}/       - Get {context["model_verbose"]}'
+            f"  GET    /api/content/{context['model_label']}/{{id}}/       - Get {context['model_verbose']}"
         )
         self.stdout.write(
-            f'  PUT    /api/content/{context["model_label"]}/{{id}}/       - Update {context["model_verbose"]}'
+            f"  PUT    /api/content/{context['model_label']}/{{id}}/       - Update {context['model_verbose']}"
         )
         self.stdout.write(
-            f'  PATCH  /api/content/{context["model_label"]}/{{id}}/       - Partial update {context["model_verbose"]}'
+            f"  PATCH  /api/content/{context['model_label']}/{{id}}/       - Partial update {context['model_verbose']}"
         )
         self.stdout.write(
-            f'  DELETE /api/content/{context["model_label"]}/{{id}}/       - Delete {context["model_verbose"]}'
+            f"  DELETE /api/content/{context['model_label']}/{{id}}/       - Delete {context['model_verbose']}"
         )
 
         if context["config"]["slug_field"]:
             self.stdout.write(
-                f'  GET    /api/content/{context["model_label"]}:by-slug    - Get by slug'
+                f"  GET    /api/content/{context['model_label']}:by-slug    - Get by slug"
             )
 
         if context["config"]["can_publish"]:
             self.stdout.write(
-                f'  POST   /api/content/{context["model_label"]}/{{id}}/publish   - Publish {context["model_verbose"]}'
+                f"  POST   /api/content/{context['model_label']}/{{id}}/publish   - Publish {context['model_verbose']}"
             )
             self.stdout.write(
-                f'  POST   /api/content/{context["model_label"]}/{{id}}/unpublish - Unpublish {context["model_verbose"]}'
+                f"  POST   /api/content/{context['model_label']}/{{id}}/unpublish - Unpublish {context['model_verbose']}"
             )
 
     def _create_serializers_file(self, context, output_dir, force):
@@ -243,7 +243,7 @@ class {{ model_class }}WriteSerializer(serializers.ModelSerializer):
 '''
         )
 
-        file_path = output_dir / f'{context["snake_name"]}_serializers.py'
+        file_path = output_dir / f"{context['snake_name']}_serializers.py"
         self._write_file(file_path, template.render(Context(context)), force)
         self.stdout.write(f"  * Created {file_path}")
 
@@ -371,7 +371,7 @@ class {{ model_class }}ViewSet(viewsets.ModelViewSet):
 '''
         )
 
-        file_path = output_dir / f'{context["snake_name"]}_views.py'
+        file_path = output_dir / f"{context['snake_name']}_views.py"
         self._write_file(file_path, template.render(Context(context)), force)
         self.stdout.write(f"  * Created {file_path}")
 
@@ -393,7 +393,7 @@ urlpatterns = router.urls
 '''
         )
 
-        file_path = output_dir / f'{context["snake_name"]}_urls.py'
+        file_path = output_dir / f"{context['snake_name']}_urls.py"
         self._write_file(file_path, template.render(Context(context)), force)
         self.stdout.write(f"  * Created {file_path}")
 
@@ -442,7 +442,7 @@ class {{ model_class }}Admin(admin.ModelAdmin):
 '''
         )
 
-        file_path = output_dir / f'{context["snake_name"]}_admin.py'
+        file_path = output_dir / f"{context['snake_name']}_admin.py"
         self._write_file(file_path, template.render(Context(context)), force)
         self.stdout.write(f"  * Created {file_path}")
 
@@ -581,7 +581,7 @@ curl "/api/content/{{ model_label }}/?search=example{% if config.locale_field %}
 """
         )
 
-        file_path = docs_dir / f'{context["kebab_name"]}.md'
+        file_path = docs_dir / f"{context['kebab_name']}.md"
         self._write_file(file_path, template.render(Context(context)), force)
         self.stdout.write(f"  * Created {file_path}")
 
@@ -616,10 +616,10 @@ curl "/api/content/{{ model_label }}/?search=example{% if config.locale_field %}
         self.stdout.write("\n3. Test the API endpoints:")
         self.stdout.write("   python manage.py test  # Run your tests")
         self.stdout.write("   # Or test manually:")
-        self.stdout.write(f'   curl /api/content/{context["model_label"]}/')
+        self.stdout.write(f"   curl /api/content/{context['model_label']}/")
 
         self.stdout.write("\n4. Update API documentation as needed")
 
         self.stdout.write(
-            f'\nAPI endpoints for {context["model_label"]} are ready to use!'
+            f"\nAPI endpoints for {context['model_label']} are ready to use!"
         )

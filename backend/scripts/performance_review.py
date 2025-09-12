@@ -223,7 +223,9 @@ class PerformanceReviewer:
                     "status": (
                         "good"
                         if avg_time < 100
-                        else "warning" if avg_time < 500 else "critical"
+                        else "warning"
+                        if avg_time < 500
+                        else "critical"
                     ),
                 }
 
@@ -329,7 +331,9 @@ class PerformanceReviewer:
                     "status": (
                         "good"
                         if avg_time < 200
-                        else "warning" if avg_time < 1000 else "critical"
+                        else "warning"
+                        if avg_time < 1000
+                        else "critical"
                     ),
                 }
 
@@ -337,7 +341,7 @@ class PerformanceReviewer:
                     "✅" if avg_time < 200 else "⚠️" if avg_time < 1000 else "🔴"
                 )
                 print(
-                    f"      {status_icon} {avg_time:.1f}ms total, {avg_time/count:.2f}ms per block"
+                    f"      {status_icon} {avg_time:.1f}ms total, {avg_time / count:.2f}ms per block"
                 )
 
         self.results["blocks"] = block_results
@@ -422,7 +426,7 @@ class PerformanceReviewer:
                 {
                     "category": "API",
                     "severity": "medium",
-                    "issue": f'Slow API endpoints: {", ".join(slow_apis)}',
+                    "issue": f"Slow API endpoints: {', '.join(slow_apis)}",
                     "solution": "Add caching, optimize queries, consider pagination",
                     "impact": "Medium - Improves user experience",
                 }
@@ -501,10 +505,10 @@ class PerformanceReviewer:
             pt = db["page_tree"]
             print("Page Tree Queries:")
             print(
-                f"  • Naive: {pt['naive']['queries']} queries, {pt['naive']['time']*1000:.1f}ms"
+                f"  • Naive: {pt['naive']['queries']} queries, {pt['naive']['time'] * 1000:.1f}ms"
             )
             print(
-                f"  • Optimized: {pt['optimized']['queries']} queries, {pt['optimized']['time']*1000:.1f}ms"
+                f"  • Optimized: {pt['optimized']['queries']} queries, {pt['optimized']['time'] * 1000:.1f}ms"
             )
             print(f"  • Improvement: {pt['improvement']}")
 
@@ -512,10 +516,10 @@ class PerformanceReviewer:
             bp = db["blog_posts"]
             print("Blog Post Queries:")
             print(
-                f"  • Naive: {bp['naive']['queries']} queries, {bp['naive']['time']*1000:.1f}ms"
+                f"  • Naive: {bp['naive']['queries']} queries, {bp['naive']['time'] * 1000:.1f}ms"
             )
             print(
-                f"  • Optimized: {bp['optimized']['queries']} queries, {bp['optimized']['time']*1000:.1f}ms"
+                f"  • Optimized: {bp['optimized']['queries']} queries, {bp['optimized']['time'] * 1000:.1f}ms"
             )
             print(f"  • Improvement: {bp['improvement']}")
 
@@ -526,7 +530,9 @@ class PerformanceReviewer:
             status_icon = (
                 "✅"
                 if data["status"] == "good"
-                else "⚠️" if data["status"] == "warning" else "🔴"
+                else "⚠️"
+                if data["status"] == "warning"
+                else "🔴"
             )
             print(
                 f"{status_icon} {name}: {data['avg_time_ms']}ms avg ({data['min_time_ms']}-{data['max_time_ms']}ms)"
@@ -550,7 +556,9 @@ class PerformanceReviewer:
             status_icon = (
                 "✅"
                 if data["status"] == "good"
-                else "⚠️" if data["status"] == "warning" else "🔴"
+                else "⚠️"
+                if data["status"] == "warning"
+                else "🔴"
             )
             print(
                 f"{status_icon} {count} blocks: {data['avg_time_ms']}ms total, {data['per_block_ms']}ms per block"
@@ -573,7 +581,9 @@ class PerformanceReviewer:
             severity_icon = (
                 "🔴"
                 if rec["severity"] == "high"
-                else "🟡" if rec["severity"] == "medium" else "🟢"
+                else "🟡"
+                if rec["severity"] == "medium"
+                else "🟢"
             )
             print(f"\n{i}. {severity_icon} [{rec['category']}] {rec['issue']}")
             print(f"   Solution: {rec['solution']}")

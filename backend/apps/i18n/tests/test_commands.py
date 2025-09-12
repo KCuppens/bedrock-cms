@@ -225,7 +225,6 @@ class SyncPoFilesCommandTest(TestCase):
                 "apps.i18n.management.commands.sync_po_files.Command.export_to_po_files"
             ) as mock_export,
         ):
-
             # Run sync command
             call_command("sync_po_files", direction="sync")
 

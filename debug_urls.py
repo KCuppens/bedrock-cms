@@ -2,16 +2,17 @@
 """
 Debug script to print all registered blog URLs
 """
+
 import os
 import sys
 import django
 
 # Add the backend directory to Python path
-backend_path = os.path.join(os.path.dirname(__file__), 'backend')
+backend_path = os.path.join(os.path.dirname(__file__), "backend")
 sys.path.insert(0, backend_path)
 
 # Set Django settings
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'apps.config.settings.local')
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "apps.config.settings.local")
 django.setup()
 
 from rest_framework.routers import DefaultRouter
@@ -35,16 +36,16 @@ viewset = views.BlogPostViewSet()
 print(f"  Available actions: {list(viewset.get_extra_actions())}")
 
 print("\nChecking specific ViewSet methods:")
-for action_name in ['publish', 'unpublish', 'duplicate']:
+for action_name in ["publish", "unpublish", "duplicate"]:
     if hasattr(viewset, action_name):
         method = getattr(viewset, action_name)
         print(f"  ✅ {action_name}: {method}")
         # Check if it's decorated as an action
-        if hasattr(method, 'mapping'):
+        if hasattr(method, "mapping"):
             print(f"    -> HTTP methods: {method.mapping}")
-        if hasattr(method, 'detail'):
+        if hasattr(method, "detail"):
             print(f"    -> Detail: {method.detail}")
-        if hasattr(method, 'url_path'):
+        if hasattr(method, "url_path"):
             print(f"    -> URL path: {method.url_path}")
     else:
         print(f"  ❌ {action_name}: Not found")

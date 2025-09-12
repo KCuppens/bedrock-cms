@@ -6,39 +6,41 @@ all test suites with realistic, varied data generation.
 """
 
 # Import base factories first to avoid circular dependencies
-from .base import BaseFactory, UserFactory, AdminUserFactory, StaffUserFactory
+from .base import BaseFactory, UserFactory
 
 # Then import other factories
 try:
-    from .accounts import *
+    from .accounts import ScopedLocaleFactory, ScopedSectionFactory, UserProfileFactory
 except ImportError:
     pass
 
 try:
-    from .analytics import *
+    from .analytics import AnalyticsEventFactory
 except ImportError:
     pass
 
 try:
-    from .cms import *
+    from .cms import PageFactory
 except ImportError:
     pass
 
 try:
-    from .i18n import *
+    from .i18n import LocaleFactory, TranslationUnitFactory
 except ImportError:
     pass
 
 try:
-    from .media import *
+    from .media import MediaItemFactory
 except ImportError:
     pass
 
 __all__ = [
     "BaseFactory",
     "UserFactory",
+    "UserProfileFactory",
     "PageFactory",
     "MediaItemFactory",
     "TranslationUnitFactory",
     "AnalyticsEventFactory",
+    "LocaleFactory",
 ]
