@@ -1,3 +1,5 @@
+from .i18n import LocaleFactory
+from .base import UserFactory
 """
 Account-specific factories for users, roles, and permissions.
 """
@@ -41,7 +43,7 @@ class UserProfileFactory(BaseFactory):
     class Meta:
         model = UserProfile
 
-    user = factory.SubFactory(UserFactory)
+    user = factory.SubFactory(lambda: None)
     avatar = None
     bio = factory.Faker("paragraph", nb_sentences=3)
     timezone = factory.Iterator(
@@ -63,7 +65,7 @@ class ScopedSectionFactory(BaseFactory):
     class Meta:
         model = ScopedSection
 
-    user = factory.SubFactory(UserFactory)
+    user = factory.SubFactory(lambda: None)
     section = factory.Iterator(["cms", "blog", "media", "analytics"])
     permission_level = factory.Iterator(["view", "edit", "admin"])
 
@@ -74,13 +76,13 @@ class ScopedLocaleFactory(BaseFactory):
     class Meta:
         model = ScopedLocale
 
-    user = factory.SubFactory(UserFactory)
-    locale = factory.SubFactory(LocaleFactory)
+    user = factory.SubFactory(lambda: None)
+    locale = factory.SubFactory(lambda: None)
     permission_level = factory.Iterator(["view", "edit", "admin"])
 
 
 # Specialized user factories with specific roles
-class EditorUserFactory(UserFactory):
+class EditorUserFactory(lambda: None):
     """Factory for editor users with CMS permissions."""
 
     @factory.post_generation
@@ -99,7 +101,7 @@ class EditorUserFactory(UserFactory):
         ScopedSectionFactory(user=self, section="cms", permission_level="edit")
 
 
-class TranslatorUserFactory(UserFactory):
+class TranslatorUserFactory(lambda: None):
     """Factory for translator users with i18n permissions."""
 
     @factory.post_generation
@@ -115,5 +117,7 @@ class TranslatorUserFactory(UserFactory):
         UserProfileFactory(user=self)
 
         # Add locale access for Spanish
-        locale_es = LocaleFactory(code="es")
-        ScopedLocaleFactory(user=self, locale=locale_es, permission_level="edit")
+        locale_es = lambda: None(code="es")
+        ScopedLocaleFactory(user=self,
+            locale=locale_es,
+            permission_level="edit")

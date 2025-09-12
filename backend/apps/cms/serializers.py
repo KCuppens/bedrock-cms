@@ -46,7 +46,9 @@ class PageReadSerializer(serializers.ModelSerializer):
 
             # Add component field if not present
             if "component" not in processed_block and "type" in processed_block:
-                # Map type to component name (e.g., 'faq' -> 'faq', 'hero' -> 'hero')
+                # Map type to component name (e.g.,
+                    'faq' -> 'faq',
+                    'hero' -> 'hero')
                 # The component field tells frontend exactly which component to load
                 processed_block["component"] = processed_block["type"]
 
@@ -142,7 +144,13 @@ class PageTreeItemSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Page
-        fields = ["id", "title", "slug", "path", "position", "status", "children_count"]
+        fields = ["id",
+            "title",
+            "slug",
+            "path",
+            "position",
+            "status",
+            "children_count"]
 
     def get_children_count(self, obj):
         # Use cached count if available from prefetch_related annotation

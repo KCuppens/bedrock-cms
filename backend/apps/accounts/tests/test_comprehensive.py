@@ -1,5 +1,5 @@
 """
-Comprehensive Accounts app tests targeting high coverage with real database operations.
+Accounts app tests with high coverage and real database operations.
 """
 
 from django.contrib.auth import authenticate, get_user_model
@@ -11,8 +11,7 @@ from rest_framework import status
 from rest_framework.test import APIClient, APITestCase
 
 from apps.accounts import rbac
-from apps.accounts.auth_backends import ScopedPermissionBackend
-from apps.accounts.models import Role, UserProfile, UserRole
+from apps.accounts.models import UserProfile
 from apps.accounts.serializers import UserProfileSerializer, UserSerializer
 
 User = get_user_model()
@@ -80,7 +79,7 @@ class AccountsModelTests(TestCase):
             if hasattr(self.user, "profile"):
                 self.assertEqual(self.user.profile, profile)
 
-        except:
+        except Exception:
             pass  # UserProfile model may not exist
 
     def test_user_profile_str_representation(self):
@@ -88,45 +87,38 @@ class AccountsModelTests(TestCase):
         try:
             profile = UserProfile.objects.create(user=self.user)
             self.assertIn(self.user.username, str(profile))
-        except:
+        except Exception:
             pass  # UserProfile model may not exist
 
     def test_role_creation(self):
         """Test Role creation and methods."""
         try:
-            role = Role.objects.create(
-                name="Editor", description="Can edit content", is_active=True
+            role = Group.objects.create(
+                name="Editor"
             )
 
             self.assertEqual(role.name, "Editor")
-            self.assertEqual(role.description, "Can edit content")
-            self.assertTrue(role.is_active)
+            # Groups don't have description or is_active attributes
             self.assertEqual(str(role), "Editor")
 
-        except:
-            pass  # Role model may not exist
+        except Exception:
+            pass  # Group model may not exist
 
     def test_user_role_assignment(self):
         """Test UserRole assignment and relationship."""
         try:
-            role = Role.objects.create(name="Author", description="Can create content")
+            role = Group.objects.create(name="User")
 
-            user_role = UserRole.objects.create(
-                user=self.user, role=role, is_active=True
-            )
-
-            self.assertEqual(user_role.user, self.user)
-            self.assertEqual(user_role.role, role)
-            self.assertTrue(user_role.is_active)
+            # Add user to group
+            self.user.groups.add(role)
 
             # Test user has role
-            if hasattr(self.user, "user_roles"):
-                user_roles = self.user.user_roles.all()
-                self.assertEqual(user_roles.count(), 1)
-                self.assertEqual(user_roles.first().role, role)
+            groups = self.user.groups.all()
+            self.assertEqual(groups.count(), 1)
+            self.assertEqual(groups.first(), role)
 
-        except:
-            pass  # UserRole model may not exist
+        except Exception:
+            pass  # Group assignment may fail
 
     def test_user_permissions(self):
         """Test user permission system."""
@@ -148,7 +140,9 @@ class AccountsModelTests(TestCase):
 
         # Add permission to group
         permission = Permission.objects.create(
-            name="Can publish pages", content_type_id=1, codename="publish_pages"
+            name="Can publish pages",
+                content_type_id=1,
+                codename="publish_pages"
         )
         group.permissions.add(permission)
 
@@ -164,7 +158,9 @@ class AccountsModelTests(TestCase):
     def test_user_validation(self):
         """Test user model validation."""
         # Test invalid email
-        user = User(username="testuser2", email="invalid-email", password="testpass123")
+        user = User(username="testuser2",
+            email="invalid-email",
+            password="testpass123")
 
         if hasattr(user, "clean"):
             with self.assertRaises(ValidationError):
@@ -176,7 +172,9 @@ class AccountsAuthTests(TestCase):
 
     def setUp(self):
         self.user = User.objects.create_user(
-            username="testuser", email="test@example.com", password="testpass123"
+            username="testuser",
+                email="test@example.com",
+                password="testpass123"
         )
 
     def test_user_authentication(self):
@@ -186,7 +184,8 @@ class AccountsAuthTests(TestCase):
         self.assertEqual(user, self.user)
 
         # Test email authentication if supported
-        user = authenticate(username="test@example.com", password="testpass123")
+        user = authenticate(username="test@example.com",
+            password="testpass123")
         if user:  # May not be supported
             self.assertEqual(user, self.user)
 
@@ -197,7 +196,8 @@ class AccountsAuthTests(TestCase):
     def test_custom_auth_backend(self):
         """Test custom authentication backend."""
         try:
-            backend = CustomAuthBackend()
+            from apps.accounts.auth_backends import ScopedPermissionBackend
+            backend = ScopedPermissionBackend()
 
             # Test authenticate method
             if hasattr(backend, "authenticate"):
@@ -257,7 +257,9 @@ class AccountsAPITests(APITestCase):
 
     def setUp(self):
         self.user = User.objects.create_user(
-            username="testuser", email="test@example.com", password="testpass123"
+            username="testuser",
+                email="test@example.com",
+                password="testpass123"
         )
         self.client = APIClient()
         self.client.force_authenticate(user=self.user)
@@ -276,7 +278,7 @@ class AccountsAPITests(APITestCase):
                 self.assertEqual(response.status_code, status.HTTP_200_OK)
                 data = response.json()
                 self.assertIsInstance(data, (dict, list))
-        except:
+        except Exception:
             pass  # URL may not exist
 
     def test_user_detail_api(self):
@@ -288,7 +290,7 @@ class AccountsAPITests(APITestCase):
                 self.assertEqual(response.status_code, status.HTTP_200_OK)
                 data = response.json()
                 self.assertEqual(data.get("username"), "testuser")
-        except:
+        except Exception:
             pass  # URL may not exist
 
     def test_user_registration_api(self):
@@ -306,14 +308,16 @@ class AccountsAPITests(APITestCase):
             response = self.client.post(url, registration_data, format="json")
             if response.status_code in [201, 200]:
                 self.assertIn(
-                    response.status_code, [status.HTTP_201_CREATED, status.HTTP_200_OK]
+                    response.status_code,
+                        [status.HTTP_201_CREATED,
+                        status.HTTP_200_OK]
                 )
 
                 # Verify user was created
                 new_user = User.objects.filter(username="newuser").first()
                 if new_user:
                     self.assertEqual(new_user.email, "newuser@example.com")
-        except:
+        except Exception:
             pass  # URL may not exist
 
     def test_user_profile_api(self):
@@ -327,14 +331,15 @@ class AccountsAPITests(APITestCase):
                 self.assertIsInstance(data, dict)
 
             # Test profile update
-            profile_data = {"bio": "Updated bio", "phone_number": "+1234567890"}
+            profile_data = {"bio": "Updated bio",
+                "phone_number": "+1234567890"}
 
             response = self.client.patch(url, profile_data, format="json")
             if response.status_code in [200, 202]:
                 # Profile should be updated
                 pass
 
-        except:
+        except Exception:
             pass  # URL may not exist
 
     def test_role_management_api(self):
@@ -368,7 +373,7 @@ class AccountsAPITests(APITestCase):
                     # Role should be assigned
                     pass
 
-        except:
+        except Exception:
             pass  # URLs may not exist
 
     def test_password_change_api(self):
@@ -385,7 +390,7 @@ class AccountsAPITests(APITestCase):
                 # Password should be changed
                 self.user.refresh_from_db()
                 self.assertTrue(self.user.check_password("newtestpass123"))
-        except:
+        except Exception:
             pass  # URL may not exist
 
 
@@ -394,12 +399,16 @@ class AccountsRBACTests(TestCase):
 
     def setUp(self):
         self.user = User.objects.create_user(
-            username="testuser", email="test@example.com", password="testpass123"
+            username="testuser",
+                email="test@example.com",
+                password="testpass123"
         )
 
         # Create superuser for comparison
         self.superuser = User.objects.create_superuser(
-            username="admin", email="admin@example.com", password="adminpass123"
+            username="admin",
+                email="admin@example.com",
+                password="adminpass123"
         )
 
     def test_rbac_permission_check(self):
@@ -426,10 +435,10 @@ class AccountsRBACTests(TestCase):
         """Test role hierarchy functionality."""
         try:
             # Create roles
-            admin_role = Role.objects.create(
-                name="Admin", description="Administrator role"
+            admin_role = Group.objects.create(
+                name="Admin"
             )
-            Role.objects.create(name="Editor", description="Editor role")
+            Group.objects.create(name="Editor")
 
             # Test role hierarchy if implemented
             if hasattr(rbac, "get_user_roles"):
@@ -440,18 +449,20 @@ class AccountsRBACTests(TestCase):
                 result = rbac.role_has_permission(admin_role, "edit_pages")
                 self.assertIsInstance(result, bool)
 
-        except:
-            pass  # Role model or RBAC functions may not exist
+        except Exception:
+            pass  # Group model or RBAC functions may not exist
 
     def test_permission_inheritance(self):
         """Test permission inheritance through roles."""
         try:
             # Create role with permissions
-            role = Role.objects.create(name="Content Manager")
+            role = Group.objects.create(name="Content Manager")
 
             # Create permissions
             edit_perm = Permission.objects.create(
-                name="Can edit content", content_type_id=1, codename="edit_content"
+                name="Can edit content",
+                    content_type_id=1,
+                    codename="edit_content"
             )
 
             # Test permission assignment through role
@@ -459,14 +470,15 @@ class AccountsRBACTests(TestCase):
                 role.permissions.add(edit_perm)
 
                 # Assign role to user
-                UserRole.objects.create(user=self.user, role=role, is_active=True)
+                self.user.groups.add(role)
 
                 # Test inherited permission
                 if hasattr(rbac, "user_has_role_permission"):
-                    has_perm = rbac.user_has_role_permission(self.user, "edit_content")
+                    has_perm = rbac.user_has_role_permission(self.user,
+                        "edit_content")
                     self.assertIsInstance(has_perm, bool)
 
-        except:
+        except Exception:
             pass  # Models or functions may not exist
 
 
@@ -515,7 +527,8 @@ class AccountsSerializerTests(TestCase):
                     pass
 
             # Test invalid data
-            invalid_data = {"username": "", "email": "invalid-email"}  # Empty username
+            invalid_data = {"username": "",
+                "email": "invalid-email"}  # Empty username
 
             serializer = UserSerializer(data=invalid_data)
             if hasattr(serializer, "is_valid"):
@@ -538,7 +551,7 @@ class AccountsSerializerTests(TestCase):
             self.assertEqual(data["bio"], "Test bio")
             self.assertEqual(data["phone_number"], "+1234567890")
 
-        except:
+        except Exception:
             pass  # Profile model or serializer may not exist
 
 
@@ -547,7 +560,9 @@ class AccountsIntegrationTests(TransactionTestCase):
 
     def setUp(self):
         self.user = User.objects.create_user(
-            username="testuser", email="test@example.com", password="testpass123"
+            username="testuser",
+                email="test@example.com",
+                password="testpass123"
         )
 
     def test_complete_user_registration_workflow(self):
@@ -564,32 +579,36 @@ class AccountsIntegrationTests(TransactionTestCase):
 
         # Create profile
         try:
-            profile = UserProfile.objects.create(user=new_user, bio="New user bio")
+            profile = UserProfile.objects.create(
+                                                     user=new_user,
+                                                     bio="New user bio"
+                                                 )
             self.assertEqual(profile.user, new_user)
-        except:
+        except Exception:
             pass  # UserProfile may not exist
 
         # Assign default role
         try:
-            default_role = Role.objects.create(
-                name="User", description="Default user role", is_active=True
+            default_role = Group.objects.create(
+                name="User"
             )
 
-            user_role = UserRole.objects.create(
-                user=new_user, role=default_role, is_active=True
-            )
+            # Add user to group
+            new_user.groups.add(default_role)
 
-            self.assertEqual(user_role.role, default_role)
+            # Test group membership
+            self.assertIn(default_role, new_user.groups.all())
 
-        except:
-            pass  # Role models may not exist
+        except Exception:
+            pass  # Group models may not exist
 
         # Activate user
         new_user.is_active = True
         new_user.save()
 
         # Verify user can authenticate
-        authenticated_user = authenticate(username="newuser", password="newpass123")
+        authenticated_user = authenticate(username="newuser",
+            password="newpass123")
         self.assertEqual(authenticated_user, new_user)
 
     def test_user_permission_workflow(self):
@@ -600,7 +619,9 @@ class AccountsIntegrationTests(TransactionTestCase):
         )
 
         publish_permission = Permission.objects.create(
-            name="Can publish content", content_type_id=1, codename="publish_content"
+            name="Can publish content",
+                content_type_id=1,
+                codename="publish_content"
         )
 
         # Create group with permissions
@@ -624,13 +645,15 @@ class AccountsIntegrationTests(TransactionTestCase):
         """Test role-based permission assignment workflow."""
         try:
             # Create role with permissions
-            content_manager_role = Role.objects.create(
-                name="Content Manager", description="Can manage content", is_active=True
+            content_manager_role = Group.objects.create(
+                name="Content Manager"
             )
 
             # Create permissions
             manage_permission = Permission.objects.create(
-                name="Can manage content", content_type_id=1, codename="manage_content"
+                name="Can manage content",
+                    content_type_id=1,
+                    codename="manage_content"
             )
 
             # Assign permission to role if supported
@@ -638,14 +661,11 @@ class AccountsIntegrationTests(TransactionTestCase):
                 content_manager_role.permissions.add(manage_permission)
 
             # Assign role to user
-            user_role = UserRole.objects.create(
-                user=self.user, role=content_manager_role, is_active=True
-            )
+            # Add user to group
+            self.user.groups.add(content_manager_role)
 
-            # Test role assignment
-            self.assertEqual(user_role.user, self.user)
-            self.assertEqual(user_role.role, content_manager_role)
-            self.assertTrue(user_role.is_active)
+            # Test group membership
+            self.assertIn(content_manager_role, self.user.groups.all())
 
             # Test role-based permission if RBAC system exists
             if hasattr(rbac, "user_has_role_permission"):
@@ -654,5 +674,5 @@ class AccountsIntegrationTests(TransactionTestCase):
                 )
                 self.assertIsInstance(has_permission, bool)
 
-        except:
-            pass  # Role models or RBAC may not exist
+        except Exception:
+            pass  # Group models or RBAC may not exist

@@ -17,7 +17,7 @@ import {
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
-import { api } from "@/lib/api.ts";
+import { api } from "@/lib/api";
 import { format } from "date-fns";
 import Sidebar from "@/components/Sidebar";
 import TopNavbar from "@/components/TopNavbar";

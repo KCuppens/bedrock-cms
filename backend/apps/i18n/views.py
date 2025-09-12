@@ -18,7 +18,6 @@ from rest_framework.response import Response
 logger = logging.getLogger(__name__)
 
 from django.conf import settings
-
 from .models import (
     Locale,
     TranslationGlossary,
@@ -67,7 +66,8 @@ class LocaleViewSet(viewsets.ModelViewSet):
         """Optionally filter by active status."""
         queryset = super().get_queryset()
         active_only = (
-            self.request.query_params.get("active_only", "false").lower() == "true"
+            self.request.query_params.get("active_only",
+                "false").lower() == "true"
         )
         if active_only:
             queryset = queryset.filter(is_active=True)
@@ -78,7 +78,9 @@ class LocaleViewSet(viewsets.ModelViewSet):
         description="Toggle the active status of a locale. Requires authentication.",
     )
     @action(
-        detail=True, methods=["post"], permission_classes=[permissions.IsAuthenticated]
+        detail=True,
+            methods=["post"],
+            permission_classes=[permissions.IsAuthenticated]
     )
     def toggle_active(self, request, pk=None):
         """Toggle the active status of a locale."""
@@ -108,7 +110,9 @@ class LocaleViewSet(viewsets.ModelViewSet):
         description="Set this locale as the default locale. Requires authentication.",
     )
     @action(
-        detail=True, methods=["post"], permission_classes=[permissions.IsAuthenticated]
+        detail=True,
+            methods=["post"],
+            permission_classes=[permissions.IsAuthenticated]
     )
     def set_default(self, request, pk=None):
         """Set the locale as default."""
@@ -156,7 +160,9 @@ class LocaleViewSet(viewsets.ModelViewSet):
             )
 
         # Check if there are dependent objects (optional)
-        # You might want to add checks for pages, translations, etc. that depend on this locale
+        # You might want to add checks for pages,
+            translations,
+            etc. that depend on this locale
 
         # Perform the deletion
         locale.delete()
@@ -205,7 +211,9 @@ class TranslationUnitViewSet(viewsets.ModelViewSet):
             ),
             OpenApiParameter("object_id", int, description="Object ID"),
             OpenApiParameter(
-                "target_locale", str, description="Target locale code (optional)"
+                "target_locale",
+                    str,
+                    description="Target locale code (optional)"
             ),
         ],
     )
@@ -229,7 +237,8 @@ class TranslationUnitViewSet(viewsets.ModelViewSet):
             )
         except (ValueError, ContentType.DoesNotExist):
             return Response(
-                {"error": "Invalid model_label"}, status=status.HTTP_400_BAD_REQUEST
+                {"error": "Invalid model_label"},
+                    status=status.HTTP_400_BAD_REQUEST
             )
 
         queryset = self.get_queryset().filter(
@@ -278,7 +287,9 @@ class TranslationUnitViewSet(viewsets.ModelViewSet):
             )
             model_class = content_type.model_class()
             model_class.objects.get(pk=object_id)
-        except (ValueError, ContentType.DoesNotExist, model_class.DoesNotExist):
+        except (ValueError,
+            ContentType.DoesNotExist,
+            model_class.DoesNotExist):
             return Response(
                 {"error": "Invalid model_label or object not found"},
                 status=status.HTTP_400_BAD_REQUEST,
@@ -291,7 +302,9 @@ class TranslationUnitViewSet(viewsets.ModelViewSet):
         for locale in locales:
             # Get translation units for this locale
             units = TranslationUnit.objects.filter(
-                content_type=content_type, object_id=object_id, target_locale=locale
+                content_type=content_type,
+                    object_id=object_id,
+                    target_locale=locale
             )
 
             # Calculate completion
@@ -335,7 +348,8 @@ class TranslationUnitViewSet(viewsets.ModelViewSet):
 
                 # Check permissions (optional)
                 # if not self.check_object_permissions(request, unit):
-                #     errors.append({'id': unit_data['id'], 'error': 'Permission denied'})
+                #     errors.append({'id': unit_data['id'],
+                    'error': 'Permission denied'})
                 #     continue
 
                 # Update fields
@@ -352,7 +366,8 @@ class TranslationUnitViewSet(viewsets.ModelViewSet):
 
             except TranslationUnit.DoesNotExist:
                 errors.append(
-                    {"id": unit_data["id"], "error": "Translation unit not found"}
+                    {"id": unit_data["id"],
+                        "error": "Translation unit not found"}
                 )
             except Exception as e:
                 errors.append({"id": unit_data["id"], "error": str(e)})
@@ -568,7 +583,8 @@ class TranslationUnitViewSet(viewsets.ModelViewSet):
                 suggestion = text
 
         except Exception as e:
-            # If DeepL service is not configured or fails, return the original text
+            # If DeepL service is not configured or fails,
+                return the original text
             logger.warning(f"Translation service error: {e}")
             suggestion = text
 
@@ -816,7 +832,11 @@ class UiMessageViewSet(viewsets.ModelViewSet):
         description="Import from or export to .po files",
         parameters=[
             OpenApiParameter(
-                "direction", str, description="Direction: import, export, or sync"
+                "direction",
+                    str,
+                    description="Direction: import,
+                    export,
+                    or sync"
             ),
             OpenApiParameter(
                 "locale", str, description="Specific locale code (optional)"
@@ -827,7 +847,9 @@ class UiMessageViewSet(viewsets.ModelViewSet):
         ],
     )
     @action(
-        detail=False, methods=["post"], permission_classes=[permissions.IsAuthenticated]
+        detail=False,
+            methods=["post"],
+            permission_classes=[permissions.IsAuthenticated]
     )
     def sync_po_files(self, request):
         """Sync with .po files."""
@@ -887,7 +909,9 @@ class UiMessageViewSet(viewsets.ModelViewSet):
         ],
     )
     @action(
-        detail=False, methods=["post"], permission_classes=[permissions.IsAuthenticated]
+        detail=False,
+            methods=["post"],
+            permission_classes=[permissions.IsAuthenticated]
     )
     def import_django_strings(self, request):
         """Import Django built-in strings."""
@@ -899,7 +923,8 @@ class UiMessageViewSet(viewsets.ModelViewSet):
             out = io.StringIO()
 
             # Build command arguments
-            command_args = ["import_django_translations", f"--namespace={namespace}"]
+            command_args = ["import_django_translations",
+                f"--namespace={namespace}"]
             if locale_code:
                 command_args.append(f"--locale={locale_code}")
 
@@ -985,7 +1010,8 @@ class UiMessageViewSet(viewsets.ModelViewSet):
                     },
                     "source": {
                         "type": "string",
-                        "description": "Source of keys (build, runtime-discovery)",
+                        "description": "Source of keys (build,
+                            runtime-discovery)",
                     },
                 },
             }
@@ -1147,7 +1173,8 @@ class UiMessageViewSet(viewsets.ModelViewSet):
         cache.set(cache_key, existing, 86400)  # Store for 24 hours
 
         return Response(
-            {"reported": len(keys), "message": "Missing keys logged for review"}
+            {"reported": len(keys),
+                "message": "Missing keys logged for review"}
         )
 
     @extend_schema(
@@ -1210,7 +1237,8 @@ class UiMessageViewSet(viewsets.ModelViewSet):
                 "untranslated_by_locale": untranslated,
                 "needs_review": needs_review,
                 "missing_keys_today": len(missing_today),
-                "last_sync": request.session.get("last_translation_sync", "Never"),
+                "last_sync": request.session.get("last_translation_sync",
+                    "Never"),
             }
         )
 
@@ -1226,7 +1254,8 @@ class UiMessageViewSet(viewsets.ModelViewSet):
                         "format": "binary",
                         "description": "JSON file containing translations",
                     },
-                    "locale": {"type": "string", "description": "Target locale code"},
+                    "locale": {"type": "string",
+                        "description": "Target locale code"},
                     "namespace": {
                         "type": "string",
                         "description": "Namespace for messages (default: general)",
@@ -1240,7 +1269,9 @@ class UiMessageViewSet(viewsets.ModelViewSet):
         },
     )
     @action(
-        detail=False, methods=["post"], permission_classes=[permissions.IsAuthenticated]
+        detail=False,
+            methods=["post"],
+            permission_classes=[permissions.IsAuthenticated]
     )
     def import_json(self, request):
         """Import translations from a JSON file."""
@@ -1257,7 +1288,8 @@ class UiMessageViewSet(viewsets.ModelViewSet):
         json_file = request.FILES["file"]
         locale_code = request.data.get("locale")
         namespace = request.data.get("namespace", "general")
-        flatten_keys = request.data.get("flatten_keys", "true").lower() == "true"
+        flatten_keys = request.data.get("flatten_keys",
+            "true").lower() == "true"
 
         if not locale_code:
             return Response(
@@ -1270,7 +1302,8 @@ class UiMessageViewSet(viewsets.ModelViewSet):
             locale = Locale.objects.get(code=locale_code)
         except Locale.DoesNotExist:
             return Response(
-                {"status": "error", "message": f"Locale {locale_code} not found"},
+                {"status": "error",
+                    "message": f"Locale {locale_code} not found"},
                 status=status.HTTP_404_NOT_FOUND,
             )
 
@@ -1311,7 +1344,8 @@ class UiMessageViewSet(viewsets.ModelViewSet):
 
             for key, value in translations.items():
                 try:
-                    # Get or create UI message (key is unique, so only look up by key)
+                    # Get or create UI message (key is unique,
+                        so only look up by key)
                     try:
                         message = UiMessage.objects.get(key=key)
                         message_created = False
@@ -1383,7 +1417,8 @@ class UiMessageViewSet(viewsets.ModelViewSet):
                 # All operations failed
                 response_data = {
                     "status": "error",
-                    "message": f"Import failed: {len(errors)} errors occurred, no data was imported",
+                    "message": f"Import failed: {len(errors)} errors occurred,
+                        no data was imported",
                     "details": {
                         "total_keys": len(translations),
                         "messages_created": created_messages,
@@ -1395,7 +1430,8 @@ class UiMessageViewSet(viewsets.ModelViewSet):
                         ),  # Show first 10 errors
                     },
                 }
-                return Response(response_data, status=status.HTTP_400_BAD_REQUEST)
+                return Response(response_data,
+                    status=status.HTTP_400_BAD_REQUEST)
             elif errors:
                 # Partial success
                 response_data = {
@@ -1431,7 +1467,8 @@ class UiMessageViewSet(viewsets.ModelViewSet):
 
         except json.JSONDecodeError as e:
             return Response(
-                {"status": "error", "message": f"Invalid JSON format: {str(e)}"},
+                {"status": "error",
+                    "message": f"Invalid JSON format: {str(e)}"},
                 status=status.HTTP_400_BAD_REQUEST,
             )
         except Exception as e:
@@ -1492,7 +1529,8 @@ class UiMessageTranslationViewSet(viewsets.ModelViewSet):
                 status_val = update_data.get("status", "draft")
 
                 # Get or create translation
-                translation, created = UiMessageTranslation.objects.get_or_create(
+                translation,
+                    created = UiMessageTranslation.objects.get_or_create(
                     message_id=message_id,
                     locale_id=locale_id,
                     defaults={
@@ -1555,7 +1593,9 @@ class UiMessageTranslationViewSet(viewsets.ModelViewSet):
             locale_stats = []
             for locale in locales:
                 translated_count = UiMessageTranslation.objects.filter(
-                    message__namespace=namespace, locale=locale, status="approved"
+                    message__namespace=namespace,
+                        locale=locale,
+                        status="approved"
                 ).count()
 
                 locale_stats.append(
@@ -1627,7 +1667,8 @@ class UiMessageTranslationViewSet(viewsets.ModelViewSet):
 
         try:
             # Validate locale exists
-            target_locale = Locale.objects.get(code=locale_code, is_active=True)
+            target_locale = Locale.objects.get(code=locale_code,
+                is_active=True)
 
             # Check how many messages need translation
             messages_query = UiMessage.objects.exclude(
@@ -1764,7 +1805,9 @@ class UiMessageTranslationViewSet(viewsets.ModelViewSet):
                 response_data.update(
                     {
                         "message": "Task is waiting to start",
-                        "progress": {"current": 0, "total": 0, "percentage": 0},
+                        "progress": {"current": 0,
+                            "total": 0,
+                            "percentage": 0},
                     }
                 )
             elif task_result.status == "PROGRESS":
@@ -1790,7 +1833,8 @@ class UiMessageTranslationViewSet(viewsets.ModelViewSet):
                 result = task_result.get()
                 response_data.update(
                     {
-                        "message": result.get("message", "Task completed successfully"),
+                        "message": result.get("message",
+                            "Task completed successfully"),
                         "results": result.get("details", {}),
                         "progress": {
                             "current": result.get("details", {}).get(
@@ -1851,7 +1895,10 @@ class TranslationGlossaryViewSet(viewsets.ModelViewSet):
         filters.SearchFilter,
         filters.OrderingFilter,
     ]
-    filterset_fields = ["source_locale", "target_locale", "category", "is_verified"]
+    filterset_fields = ["source_locale",
+        "target_locale",
+        "category",
+        "is_verified"]
     search_fields = ["term", "translation", "context"]
     ordering_fields = ["term", "created_at", "updated_at"]
     ordering = ["term"]
@@ -1934,7 +1981,8 @@ class TranslationQueueViewSet(viewsets.ModelViewSet):
 
         if not user_id:
             return Response(
-                {"error": "user_id is required"}, status=status.HTTP_400_BAD_REQUEST
+                {"error": "user_id is required"},
+                    status=status.HTTP_400_BAD_REQUEST
             )
 
         try:
@@ -1955,7 +2003,8 @@ class TranslationQueueViewSet(viewsets.ModelViewSet):
         return Response(serializer.data)
 
     @extend_schema(
-        summary="Get overdue items", description="Get all overdue translation items."
+        summary="Get overdue items",
+            description="Get all overdue translation items."
     )
     @action(detail=False, methods=["get"])
     def overdue(self, request):

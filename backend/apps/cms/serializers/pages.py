@@ -29,7 +29,11 @@ class PageTreeItemSerializer(serializers.ModelSerializer):
             "in_footer",
             "is_homepage",
         ]
-        read_only_fields = ["id", "path", "created_at", "updated_at", "locale_name"]
+        read_only_fields = ["id",
+            "path",
+            "created_at",
+            "updated_at",
+            "locale_name"]
 
     def get_children_count(self, obj):
         # Use cached count if available from prefetch_related annotation
@@ -320,7 +324,9 @@ class PageWriteSerializer(serializers.ModelSerializer):
             locale = None
 
         # Check for existing page with same slug, parent, and locale
-        queryset = Page.objects.filter(slug=value, parent=parent, locale=locale)
+        queryset = Page.objects.filter(slug=value,
+            parent=parent,
+            locale=locale)
 
         # Exclude current instance if updating
         if instance:

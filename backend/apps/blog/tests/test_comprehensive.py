@@ -11,9 +11,8 @@ from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APIClient, APITestCase
 
-from apps.blog.models import BlogPost, Category, Tag
+from apps.blog.models import BlogPost, Group, Tag
 from apps.blog.serializers import (
-    BlogPostDetailSerializer,
     BlogPostListSerializer,
     BlogPostSerializer,
     CategorySerializer,
@@ -29,24 +28,28 @@ class BlogModelTests(TestCase):
 
     def setUp(self):
         self.user = User.objects.create_user(
-            username="testuser", email="test@example.com", password="testpass123"
+            username="testuser",
+                email="test@example.com",
+                password="testpass123"
         )
 
-        self.category = Category.objects.create(
-            name="Technology", slug="technology", description="Tech-related posts"
+        self.category = Group.objects.create(
+            name="Technology",
+                slug="technology",
+                description="Tech-related posts"
         )
 
         self.tag = Tag.objects.create(name="Python")
 
         try:
-            self.author = Author.objects.create(
+            self.author = User.objects.create(
                 user=self.user,
-                name="Test Author",
+                name="Test User",
                 bio="Test author bio",
                 email="author@example.com",
             )
-        except:
-            # Author model may not exist, use user directly
+        except Exception:
+            # User model may not exist, use user directly
             self.author = self.user
 
     def test_blog_post_creation(self):
@@ -149,16 +152,20 @@ class BlogModelTests(TestCase):
 
     def test_blog_post_validation(self):
         """Test blog post model validation."""
-        post = BlogPost(title="", author=self.author)  # Empty title should fail
+        post = BlogPost(title="",
+            author=self.author)  # Empty title should fail
 
         if hasattr(post, "clean"):
             with self.assertRaises(ValidationError):
                 post.clean()
 
     def test_category_creation_and_methods(self):
-        """Test Category model creation and methods."""
-        category = Category.objects.create(
-            name="Science", slug="science", description="Science posts", is_active=True
+        """Test Group model creation and methods."""
+        category = Group.objects.create(
+            name="Science",
+                slug="science",
+                description="Science posts",
+                is_active=True
         )
 
         self.assertEqual(category.name, "Science")
@@ -201,9 +208,9 @@ class BlogModelTests(TestCase):
                 self.assertEqual(usage, 2)
 
     def test_author_creation_and_methods(self):
-        """Test Author model if it exists."""
+        """Test User model if it exists."""
         try:
-            author = Author.objects.create(
+            author = User.objects.create(
                 user=self.user,
                 name="Jane Doe",
                 bio="Experienced writer",
@@ -216,14 +223,14 @@ class BlogModelTests(TestCase):
             self.assertEqual(str(author), "Jane Doe")
 
             # Test author post count
-            BlogPost.objects.create(title="Author Post", author=author)
+            BlogPost.objects.create(title="User Post", author=author)
 
             if hasattr(author, "get_post_count"):
                 count = author.get_post_count()
                 self.assertEqual(count, 1)
 
-        except:
-            pass  # Author model may not exist
+        except Exception:
+            pass  # User model may not exist
 
 
 class BlogVersioningTests(TestCase):
@@ -231,16 +238,20 @@ class BlogVersioningTests(TestCase):
 
     def setUp(self):
         self.user = User.objects.create_user(
-            username="testuser", email="test@example.com", password="testpass123"
+            username="testuser",
+                email="test@example.com",
+                password="testpass123"
         )
 
         try:
-            self.author = Author.objects.create(user=self.user, name="Test Author")
-        except:
+            self.author = User.objects.create(user=self.user, name="Test User")
+        except Exception:
             self.author = self.user
 
         self.post = BlogPost.objects.create(
-            title="Versioned Post", content="Original content", author=self.author
+            title="Versioned Post",
+                content="Original content",
+                author=self.author
         )
 
     def test_create_post_version(self):
@@ -250,7 +261,7 @@ class BlogVersioningTests(TestCase):
             self.assertIsNotNone(version)
             self.assertEqual(version.post, self.post)
             self.assertEqual(version.created_by, self.user)
-        except:
+        except Exception:
             pass  # Versioning functions may not exist
 
     def test_revert_to_version(self):
@@ -276,7 +287,7 @@ class BlogVersioningTests(TestCase):
             self.post.refresh_from_db()
             self.assertEqual(self.post.content, original_content)
 
-        except:
+        except Exception:
             pass  # Versioning models/functions may not exist
 
 
@@ -285,17 +296,19 @@ class BlogAPITests(APITestCase):
 
     def setUp(self):
         self.user = User.objects.create_user(
-            username="testuser", email="test@example.com", password="testpass123"
+            username="testuser",
+                email="test@example.com",
+                password="testpass123"
         )
         self.client = APIClient()
         self.client.force_authenticate(user=self.user)
 
-        self.category = Category.objects.create(name="Tech", slug="tech")
+        self.category = Group.objects.create(name="Tech", slug="tech")
         self.tag = Tag.objects.create(name="Python")
 
         try:
-            self.author = Author.objects.create(user=self.user, name="Test Author")
-        except:
+            self.author = User.objects.create(user=self.user, name="Test User")
+        except Exception:
             self.author = self.user
 
     def test_blog_post_list_api(self):
@@ -321,7 +334,7 @@ class BlogAPITests(APITestCase):
                 self.assertEqual(response.status_code, status.HTTP_200_OK)
                 data = response.json()
                 self.assertIsInstance(data, (dict, list))
-        except:
+        except Exception:
             pass  # URL may not exist
 
     def test_blog_post_creation_api(self):
@@ -331,7 +344,8 @@ class BlogAPITests(APITestCase):
             "content": "This is new blog post content.",
             "status": "draft",
             "category": self.category.id,
-            "author": self.author.id if hasattr(self.author, "id") else self.author.pk,
+            "author": self.author.id if hasattr(self.author,
+                "id") else self.author.pk,
         }
 
         try:
@@ -339,11 +353,13 @@ class BlogAPITests(APITestCase):
             response = self.client.post(url, post_data, format="json")
             if response.status_code in [201, 200]:
                 self.assertIn(
-                    response.status_code, [status.HTTP_201_CREATED, status.HTTP_200_OK]
+                    response.status_code,
+                        [status.HTTP_201_CREATED,
+                        status.HTTP_200_OK]
                 )
                 data = response.json()
                 self.assertEqual(data.get("title"), "New Blog Post")
-        except:
+        except Exception:
             pass  # URL may not exist
 
     def test_blog_post_detail_api(self):
@@ -359,12 +375,15 @@ class BlogAPITests(APITestCase):
                 self.assertEqual(response.status_code, status.HTTP_200_OK)
                 data = response.json()
                 self.assertEqual(data.get("title"), "Detail Post")
-        except:
+        except Exception:
             pass  # URL may not exist
 
     def test_blog_post_update_api(self):
         """Test blog post update via API."""
-        post = BlogPost.objects.create(title="Original Title", author=self.author)
+        post = BlogPost.objects.create(
+                                           title="Original Title",
+                                           author=self.author
+                                       )
 
         update_data = {"title": "Updated Title", "content": "Updated content"}
 
@@ -374,7 +393,7 @@ class BlogAPITests(APITestCase):
             if response.status_code in [200, 202]:
                 post.refresh_from_db()
                 self.assertEqual(post.title, "Updated Title")
-        except:
+        except Exception:
             pass  # URL may not exist
 
     def test_blog_post_publish_api(self):
@@ -389,7 +408,7 @@ class BlogAPITests(APITestCase):
             if response.status_code in [200, 202]:
                 post.refresh_from_db()
                 self.assertEqual(post.status, "published")
-        except:
+        except Exception:
             pass  # URL may not exist
 
     def test_category_api_endpoints(self):
@@ -404,18 +423,18 @@ class BlogAPITests(APITestCase):
 
             # Test category creation
             category_data = {
-                "name": "New Category",
+                "name": "New Group",
                 "slug": "new-category",
                 "description": "New category description",
             }
 
             response = self.client.post(url, category_data, format="json")
             if response.status_code in [201, 200]:
-                new_category = Category.objects.filter(name="New Category").first()
+                new_category = Group.objects.filter(name="New Group").first()
                 if new_category:
-                    self.assertEqual(new_category.name, "New Category")
+                    self.assertEqual(new_category.name, "New Group")
 
-        except:
+        except Exception:
             pass  # URLs may not exist
 
     def test_tag_api_endpoints(self):
@@ -437,7 +456,7 @@ class BlogAPITests(APITestCase):
                 if new_tag:
                     self.assertEqual(new_tag.name, "New Tag")
 
-        except:
+        except Exception:
             pass  # URLs may not exist
 
     def test_blog_post_filtering_api(self):
@@ -473,7 +492,7 @@ class BlogAPITests(APITestCase):
                 data = response.json()
                 self.assertIsInstance(data, (dict, list))
 
-        except:
+        except Exception:
             pass  # URL or filtering may not exist
 
 
@@ -482,14 +501,16 @@ class BlogSerializerTests(TestCase):
 
     def setUp(self):
         self.user = User.objects.create_user(
-            username="testuser", email="test@example.com", password="testpass123"
+            username="testuser",
+                email="test@example.com",
+                password="testpass123"
         )
 
-        self.category = Category.objects.create(name="Tech", slug="tech")
+        self.category = Group.objects.create(name="Tech", slug="tech")
 
         try:
-            self.author = Author.objects.create(user=self.user, name="Test Author")
-        except:
+            self.author = User.objects.create(user=self.user, name="Test User")
+        except Exception:
             self.author = self.user
 
     def test_blog_post_serializer(self):
@@ -558,7 +579,8 @@ class BlogSerializerTests(TestCase):
             "title": "Valid Post",
             "content": "Valid content",
             "status": "draft",
-            "author": self.author.id if hasattr(self.author, "id") else self.author.pk,
+            "author": self.author.id if hasattr(self.author,
+                "id") else self.author.pk,
         }
 
         serializer = BlogPostSerializer(data=valid_data)
@@ -599,20 +621,20 @@ class BlogSerializerTests(TestCase):
             pass  # Serializer may not exist
 
     def test_author_serializer(self):
-        """Test AuthorSerializer functionality."""
+        """Test UserSerializer functionality."""
         try:
-            author = Author.objects.create(
-                user=self.user, name="Serializer Author", bio="Author bio"
+            author = User.objects.create(
+                user=self.user, name="Serializer User", bio="User bio"
             )
 
-            serializer = AuthorSerializer(author)
+            serializer = UserSerializer(author)
             data = serializer.data
 
-            self.assertEqual(data["name"], "Serializer Author")
-            self.assertEqual(data["bio"], "Author bio")
+            self.assertEqual(data["name"], "Serializer User")
+            self.assertEqual(data["bio"], "User bio")
 
-        except:
-            pass  # Author model or serializer may not exist
+        except Exception:
+            pass  # User model or serializer may not exist
 
 
 class BlogIntegrationTests(TransactionTestCase):
@@ -620,16 +642,21 @@ class BlogIntegrationTests(TransactionTestCase):
 
     def setUp(self):
         self.user = User.objects.create_user(
-            username="testuser", email="test@example.com", password="testpass123"
+            username="testuser",
+                email="test@example.com",
+                password="testpass123"
         )
 
-        self.category = Category.objects.create(name="Integration", slug="integration")
+        self.category = Group.objects.create(
+                                                 name="Integration",
+                                                 slug="integration"
+                                             )
 
         try:
-            self.author = Author.objects.create(
-                user=self.user, name="Integration Author"
+            self.author = User.objects.create(
+                user=self.user, name="Integration User"
             )
-        except:
+        except Exception:
             self.author = self.user
 
     def test_complete_blog_post_workflow(self):
@@ -662,7 +689,7 @@ class BlogIntegrationTests(TransactionTestCase):
         try:
             version = create_post_version(post, self.user)
             self.assertIsNotNone(version)
-        except:
+        except Exception:
             pass
 
         # Publish post
@@ -698,15 +725,23 @@ class BlogIntegrationTests(TransactionTestCase):
     def test_blog_categorization_workflow(self):
         """Test blog post categorization and tagging workflow."""
         # Create multiple categories
-        tech_category = Category.objects.create(name="Technology", slug="technology")
-        lifestyle_category = Category.objects.create(name="Lifestyle", slug="lifestyle")
+        tech_category = Group.objects.create(
+                                                 name="Technology",
+                                                 slug="technology"
+                                             )
+        lifestyle_category = Group.objects.create(
+                                                      name="Lifestyle",
+                                                      slug="lifestyle"
+                                                  )
 
         # Create posts in different categories
         tech_post = BlogPost.objects.create(
             title="Tech Post", author=self.author, category=tech_category
         )
         lifestyle_post = BlogPost.objects.create(
-            title="Lifestyle Post", author=self.author, category=lifestyle_category
+            title="Lifestyle Post",
+                author=self.author,
+                category=lifestyle_category
         )
 
         # Create tags and assign to posts
@@ -731,7 +766,7 @@ class BlogIntegrationTests(TransactionTestCase):
         """Test blog author management workflow."""
         try:
             # Create additional authors
-            author1 = Author.objects.create(
+            author1 = User.objects.create(
                 user=self.user,
                 name="John Doe",
                 bio="Tech writer",
@@ -739,9 +774,11 @@ class BlogIntegrationTests(TransactionTestCase):
             )
 
             user2 = User.objects.create_user(
-                username="author2", email="author2@example.com", password="pass123"
+                username="author2",
+                    email="author2@example.com",
+                    password="pass123"
             )
-            author2 = Author.objects.create(
+            author2 = User.objects.create(
                 user=user2,
                 name="Jane Smith",
                 bio="Lifestyle blogger",
@@ -764,8 +801,8 @@ class BlogIntegrationTests(TransactionTestCase):
                 jane_posts = author2.get_post_count()
                 self.assertEqual(jane_posts, 1)
 
-        except:
-            pass  # Author model may not exist
+        except Exception:
+            pass  # User model may not exist
 
     def test_blog_search_and_filtering_workflow(self):
         """Test blog search and filtering workflow."""

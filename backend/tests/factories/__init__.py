@@ -1,5 +1,3 @@
-"""
-Test data factories for all applications.
 
 Provides Factory Boy factories for creating consistent test data across
 all test suites with realistic, varied data generation.
@@ -35,8 +33,8 @@ except ImportError:
     pass
 
 __all__ = [
+    "BaseFactory",
     "UserFactory",
-    "LocaleFactory",
     "PageFactory",
     "MediaItemFactory",
     "TranslationUnitFactory",
