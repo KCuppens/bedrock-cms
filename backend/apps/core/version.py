@@ -1,20 +1,11 @@
 import json
-
 import os
-
 import re
-
 import sys
-
 from datetime import datetime
-
 from functools import lru_cache
-
 from pathlib import Path
-
 from typing import Any
-
-
 
 from git import Repo
 
@@ -413,4 +404,3 @@ def get_version() -> str:
     """Get the current application version"""
 
     """return VersionService.get_simple_version()"""
-

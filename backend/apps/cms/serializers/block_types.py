@@ -1,6 +1,5 @@
 from rest_framework import serializers
 
-
 from apps.cms.models import BlockType, BlockTypeCategory
 
 

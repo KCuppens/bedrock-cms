@@ -1,23 +1,14 @@
 import os
-
 from unittest.mock import Mock, patch
-
 
 import django
 
-
 from apps.files import admin  # noqa: F401
-
 from apps.files import simple_views  # noqa: F401
-
 from apps.files.models import File, Folder  # noqa: F401
-
 from apps.files.serializers import FileSerializer, FolderSerializer  # noqa: F401
-
 from apps.files.services import FileUploadService, FileValidationService  # noqa: F401
-
 from apps.files.views import FilesViewSet  # noqa: F401
-
 
 """Files app coverage booster - targets views, services, and models."""
 

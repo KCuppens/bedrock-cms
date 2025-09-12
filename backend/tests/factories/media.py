@@ -6,23 +6,13 @@
 
 from django.core.files.base import ContentFile
 
-
-
 import factory
-
 import factory.django
-
 from faker import Faker
-
-
 
 from apps.media.models import MediaItem
 
-
-
 from .base import BaseFactory, UserFactory
-
-
 
 fake = Faker()
 
@@ -161,4 +151,3 @@ class DocumentFactory(MediaItemFactory):
 
 
 __all__ = ["MediaItemFactory", "ImageFactory", "DocumentFactory"]
-

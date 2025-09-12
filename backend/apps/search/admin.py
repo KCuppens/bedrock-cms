@@ -1,14 +1,8 @@
 from django.contrib import admin
-
 from django.urls import reverse
-
 from django.utils.html import format_html
 
-
-
 from .models import SearchIndex, SearchQuery, SearchSuggestion
-
-
 
 """Admin interface for search functionality."""
 
@@ -387,4 +381,3 @@ class SearchSuggestionAdmin(admin.ModelAdmin):
         ),
 
     )
-

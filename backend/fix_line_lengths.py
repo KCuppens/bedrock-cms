@@ -214,6 +214,7 @@ def split_long_line(line, max_length=79):
     # If no good split point found, just break at 79 chars
     return [line[:79], indent_str + "    " + line[79:].strip()]
 
+
 def fix_file_line_lengths(filepath):
     """Fix all E501 line length issues in a file."""
     try:
@@ -246,6 +247,7 @@ def fix_file_line_lengths(filepath):
         print(f"Error processing {filepath}: {e}")
         return False
 
+
 def main():
     """Main function to fix all line length issues."""
     files_to_fix = [
@@ -274,6 +276,7 @@ def main():
             print(f"File not found: {filepath}")
 
     print(f"\nFixed {fixed_count} files")
+
 
 if __name__ == "__main__":
     main()

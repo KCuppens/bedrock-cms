@@ -1,8 +1,6 @@
 from django.urls import include, path
 
-
 from rest_framework.routers import DefaultRouter
-
 
 from .views import (
     AnalyticsAPIViewSet,
@@ -14,7 +12,6 @@ from .views import (
     ThreatViewSet,
     UserActivityViewSet,
 )
-
 
 # Create router and register viewsets
 

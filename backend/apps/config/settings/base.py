@@ -1,8 +1,6 @@
 from pathlib import Path
 
-
 import environ
-
 
 env = environ.Env()
 
@@ -59,7 +57,7 @@ THIRD_PARTY_APPS = [
 
 LOCAL_APPS = [
     "apps.accounts",
-    "apps.analytics", 
+    "apps.analytics",
     "apps.api",
     "apps.blog",
     "apps.cms",
@@ -81,60 +79,60 @@ INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
 
 MIDDLEWARE = [
     # Performance monitoring (first to track everything)
-# Imports that were malformed - commented out
-#     """"apps.core.middleware_performance.PerformanceMonitoringMiddleware","""
+    # Imports that were malformed - commented out
+    #     """"apps.core.middleware_performance.PerformanceMonitoringMiddleware","""
     # Compression and optimization (early for efficiency)
     "django.middleware.gzip.GZipMiddleware",
-# Imports that were malformed - commented out
-#     # "apps.core.middleware_performance.CompressionMiddleware",  # Disabled - requires brotli
+    # Imports that were malformed - commented out
+    #     # "apps.core.middleware_performance.CompressionMiddleware",  # Disabled - requires brotli
     # Early exit middleware (prevent unnecessary processing)
-# Imports that were malformed - commented out
-#     """"apps.core.middleware.AdminIPAllowlistMiddleware","""
+    # Imports that were malformed - commented out
+    #     """"apps.core.middleware.AdminIPAllowlistMiddleware","""
     # Security headers (cached for performance)
     "django.middleware.security.SecurityMiddleware",
-# Imports that were malformed - commented out
-#     """"apps.core.middleware.SecurityHeadersMiddleware","""
+    # Imports that were malformed - commented out
+    #     """"apps.core.middleware.SecurityHeadersMiddleware","""
     # Static file serving
     "whitenoise.middleware.WhiteNoiseMiddleware",
     # CORS handling
     "corsheaders.middleware.CorsMiddleware",
     # Cache and conditional responses (early for cache hits)
     "django.middleware.http.ConditionalGetMiddleware",
-# Imports that were malformed - commented out
-#     """"apps.core.middleware_performance.CacheHitRateMiddleware","""
+    # Imports that were malformed - commented out
+    #     """"apps.core.middleware_performance.CacheHitRateMiddleware","""
     # Session management
     "django.contrib.sessions.middleware.SessionMiddleware",
     # Dynamic language loading
-# Imports that were malformed - commented out
-#     """"apps.i18n.middleware.DynamicLanguageMiddleware","""
+    # Imports that were malformed - commented out
+    #     """"apps.i18n.middleware.DynamicLanguageMiddleware","""
     # Common middleware
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     # Redirect middleware
-# Imports that were malformed - commented out
-#     """"apps.cms.middleware.RedirectMiddleware","""
+    # Imports that were malformed - commented out
+    #     """"apps.cms.middleware.RedirectMiddleware","""
     # Authentication (MUST come before any middleware that uses request.user)
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "allauth.account.middleware.AccountMiddleware",
     # Messages
     "django.contrib.messages.middleware.MessageMiddleware",
     # Throttling (AFTER authentication so it can check user status)
-# Imports that were malformed - commented out
-#     """"apps.core.middleware_performance.RequestThrottlingMiddleware","""
+    # Imports that were malformed - commented out
+    #     """"apps.core.middleware_performance.RequestThrottlingMiddleware","""
     # Additional security
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     # Feature flags
     "waffle.middleware.WaffleMiddleware",
     # Database optimization
-# Imports that were malformed - commented out
-#     """"apps.core.middleware_performance.DatabaseConnectionPoolMiddleware","""
-# Imports that were malformed - commented out
-#     # "apps.core.middleware_performance.QueryCountLimitMiddleware",  # Disabled in dev
+    # Imports that were malformed - commented out
+    #     """"apps.core.middleware_performance.DatabaseConnectionPoolMiddleware","""
+    # Imports that were malformed - commented out
+    #     # "apps.core.middleware_performance.QueryCountLimitMiddleware",  # Disabled in dev
     # Heavy middleware at the end
-# Imports that were malformed - commented out
-#     """"apps.accounts.middleware.LastSeenMiddleware","""
-# Imports that were malformed - commented out
-#     """"apps.core.middleware.DemoModeMiddleware","""
+    # Imports that were malformed - commented out
+    #     """"apps.accounts.middleware.LastSeenMiddleware","""
+    # Imports that were malformed - commented out
+    #     """"apps.core.middleware.DemoModeMiddleware","""
 ]
 
 
@@ -329,14 +327,14 @@ REST_FRAMEWORK = {
         "rest_framework.renderers.JSONRenderer",
     ],
     "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
-# Imports that were malformed - commented out
-#     """"DEFAULT_PAGINATION_CLASS": "apps.core.pagination.StandardResultsSetPagination","""
+    # Imports that were malformed - commented out
+    #     """"DEFAULT_PAGINATION_CLASS": "apps.core.pagination.StandardResultsSetPagination","""
     "PAGE_SIZE": 20,
     "DEFAULT_THROTTLE_CLASSES": [
         "rest_framework.throttling.AnonRateThrottle",
         "rest_framework.throttling.UserRateThrottle",
-# Imports that were malformed - commented out
-#         """"apps.core.throttling.SecurityScanThrottle","""
+        # Imports that were malformed - commented out
+        #         """"apps.core.throttling.SecurityScanThrottle","""
     ],
     "DEFAULT_THROTTLE_RATES": {
         "anon": "100/hour",
@@ -510,20 +508,20 @@ CELERY_ENABLE_UTC = True
 
 CELERY_BEAT_SCHEDULE = {
     "publish-scheduled-content": {
-# Imports that were malformed - commented out
-#         """"task": "apps.cms.tasks.publish_scheduled_content","""
+        # Imports that were malformed - commented out
+        #         """"task": "apps.cms.tasks.publish_scheduled_content","""
         "schedule": 60.0,  # Every minute
         "options": {"queue": "publishing"},
     },
     "nightly-link-check": {
-# Imports that were malformed - commented out
-#         """"task": "apps.cms.tasks.nightly_link_check","""
+        # Imports that were malformed - commented out
+        #         """"task": "apps.cms.tasks.nightly_link_check","""
         "schedule": 60.0 * 60.0 * 24.0,  # Daily at midnight
         "options": {"queue": "reports"},
     },
     "cleanup-orphaned-translation-units": {
-# Imports that were malformed - commented out
-#         """"task": "apps.i18n.tasks.cleanup_orphaned_translation_units","""
+        # Imports that were malformed - commented out
+        #         """"task": "apps.i18n.tasks.cleanup_orphaned_translation_units","""
         "schedule": 60.0 * 60.0 * 24.0 * 7.0,  # Weekly
         "options": {"queue": "maintenance"},
     },
@@ -533,14 +531,14 @@ CELERY_BEAT_SCHEDULE = {
 # Celery Task Routes
 
 CELERY_TASK_ROUTES = {
-# Imports that were malformed - commented out
-#     """"apps.cms.tasks.publish_scheduled_content": {"queue": "publishing"},"""
-# Imports that were malformed - commented out
-#     """"apps.cms.tasks.unpublish_expired_content": {"queue": "publishing"},"""
-# Imports that were malformed - commented out
-#     """"apps.cms.tasks.*": {"queue": "reports"},"""
-# Imports that were malformed - commented out
-#     """"apps.i18n.tasks.*": {"queue": "translations"},"""
+    # Imports that were malformed - commented out
+    #     """"apps.cms.tasks.publish_scheduled_content": {"queue": "publishing"},"""
+    # Imports that were malformed - commented out
+    #     """"apps.cms.tasks.unpublish_expired_content": {"queue": "publishing"},"""
+    # Imports that were malformed - commented out
+    #     """"apps.cms.tasks.*": {"queue": "reports"},"""
+    # Imports that were malformed - commented out
+    #     """"apps.i18n.tasks.*": {"queue": "translations"},"""
 }
 
 

@@ -1,11 +1,8 @@
 from django.urls import include, path
 
-
 from rest_framework.routers import DefaultRouter
 
-
 from apps.core.csrf_views import get_csrf_token
-
 
 from .auth_views import (
     SessionCheckView,
@@ -16,16 +13,13 @@ from .auth_views import (
     password_reset_verify_token,
     password_reset_view,
 )
-
 from .role_views import (
     PermissionViewSet,
     RoleViewSet,
     UserManagementViewSet,
     get_scopes,
 )
-
 from .views import UserViewSet
-
 
 router = DefaultRouter()
 

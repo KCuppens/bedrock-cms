@@ -1,47 +1,25 @@
 import os
-
 from unittest.mock import Mock, patch
 
-
-
 import django
-
 from django.utils import timezone  # noqa: F401
-
-
 
 from rest_framework.response import Response
 
-
-
 import apps.cms.views
-
 from apps.cms import signals  # noqa: F401
-
 from apps.cms import tasks  # noqa: F401
 
 # Ultra-targeted coverage booster - targets specific missing lines identified by coverage report
 
-# Configure minimal Django  
+# Configure minimal Django
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "apps.config.settings.base")
 
 from apps.cms.models import Category, Page, SeoSettings  # noqa: F401
-
 from apps.cms.serializers.category import CategorySerializer  # noqa: F401
-
-from apps.cms.serializers.pages import (
-
-    PageReadSerializer,
-
-    PageWriteSerializer,
-
-)
-
+from apps.cms.serializers.pages import PageReadSerializer, PageWriteSerializer
 from apps.cms.views import sitemap_view  # noqa: F401
-
 from apps.cms.views.pages import PagesViewSet  # noqa: F401
-
-
 
 try:
 
@@ -732,4 +710,3 @@ if __name__ == "__main__":
     """test_management_commands()"""
 
     """test_versioning_coverage()"""
-

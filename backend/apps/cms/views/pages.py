@@ -1,95 +1,44 @@
 from django.conf import settings
-
 from django.db import transaction
-
 from django.http import HttpResponse
 
-
-
 from drf_spectacular.utils import OpenApiParameter, extend_schema
-
 from rest_framework import permissions, status, viewsets
-
 from rest_framework.decorators import action
-
 from rest_framework.response import Response
-
 from rest_framework.throttling import UserRateThrottle
 
-
-
-from apps.cms.serializers import (
-
+from apps.cms.serializers import (  # Imports that were malformed - commented out; """apps.cms.serializers.public,"""; """apps.core.throttling,"""; """apps.i18n.models,"""
     AuditEntry,
-
     Case,
-
     Count,
-
     IntegerField,
-
     Locale,
-
     Page,
-
     PageReadSerializer,
-
     PageTreeItemSerializer,
-
     PageWriteSerializer,
-
     PublicPageSerializer,
-
     Value,
-
     VersioningMixin,
-
     When,
-
     ..models,
-
     ..seo_utils,
-
     ..versioning,
-
     ..versioning_views,
-
-# Imports that were malformed - commented out
-#     """apps.cms.serializers.public,"""
-
-# Imports that were malformed - commented out
-#     """apps.core.throttling,"""
-
-# Imports that were malformed - commented out
-#     """apps.i18n.models,"""
-
     cache_page,
-
     copy,
-
     django.db.models,
-
     django.shortcuts,
-
     django.utils,
-
     django.views.decorators.cache,
-
     django_ratelimit.decorators,
-
     generate_hreflang_alternates,
-
     ratelimit,
-
     redirect,
-
     timezone,
-
     uuid,
-
 )
-
-
 
     BurstWriteThrottle,
 
@@ -1824,4 +1773,3 @@ def sitemap_view(request, locale_code):
     response["Cache-Control"] = "public, max-age=300"  # 5 minutes cache
 
     return response
-

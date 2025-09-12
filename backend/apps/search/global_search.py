@@ -1,44 +1,23 @@
-from typing import Any
-
-
-
-from django.contrib.auth import get_user_model
-
-from django.db.models import Count, Q
-
-
-
-from drf_spectacular.utils import OpenApiParameter, extend_schema
-
-from rest_framework.decorators import api_view, permission_classes
-
-from rest_framework.permissions import IsAuthenticated
-
-from rest_framework.response import Response
-
-
-
-from apps.blog.models import BlogPost
-
-from apps.blog.models import Category as BlogCategory
-
-from apps.blog.models import Tag as BlogTag
-
-from apps.cms.model_parts.category import Collection
-
-from apps.cms.models import Page, Redirect
-
-from apps.files.models import FileUpload
-
-from apps.i18n.models import TranslationUnit
-
-from apps.search.models import SearchQuery
-
-
-
 """Global search functionality for the dashboard search bar."""
 
+from typing import Any
 
+from django.contrib.auth import get_user_model
+from django.db.models import Count, Q
+
+from drf_spectacular.utils import OpenApiParameter, extend_schema
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
+
+from apps.blog.models import BlogPost
+from apps.blog.models import Category as BlogCategory
+from apps.blog.models import Tag as BlogTag
+from apps.cms.model_parts.category import Collection
+from apps.cms.models import Page, Redirect
+from apps.files.models import FileUpload
+from apps.i18n.models import TranslationUnit
+from apps.search.models import SearchQuery
 
 User = get_user_model()
 
@@ -717,4 +696,3 @@ def search_suggestions(request):
         {"query": query, "suggestions": suggestions[:10]}  # Limit total suggestions
 
     )
-

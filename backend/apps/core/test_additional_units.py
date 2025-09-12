@@ -1,82 +1,49 @@
 import unittest
-
 from unittest.mock import Mock
 
-
-
 from apps.core import (
-
     cache,
-
     circuit_breaker,
-
     decorators,
-
     enums,
-
     middleware,
-
     mixins,
-
     permissions,
-
     storage,
-
     throttling,
-
     utils,
-
     validators,
-
 )
-
-
 
 """Additional unit tests for core app to boost coverage."""
 
 
-
 class TestCoreUtilityFunctions(unittest.TestCase):
-
     """Test core utility functions."""
 
-
-
     def test_core_utils_import(self):
-
         """Test that core utils can be imported."""
 
         try:
-
-
 
             self.assertTrue(hasattr(utils, "__name__"))
 
         except ImportError:
             pass
 
-
-
     def test_core_validators_import(self):
-
         """Test that core validators can be imported."""
 
         try:
 
-
-
             self.assertTrue(hasattr(validators, "__name__"))
-
-
 
             # Test validator functions if they exist
 
             for attr_name in dir(validators):
 
                 if callable(
-
                     getattr(validators, attr_name)
-
                 ) and not attr_name.startswith("_"):
 
                     validator = getattr(validators, attr_name)
@@ -104,15 +71,10 @@ class TestCoreUtilityFunctions(unittest.TestCase):
         except ImportError:
             pass
 
-
-
     def test_core_enums_access(self):
-
         """Test accessing core enums."""
 
         try:
-
-
 
             # Access all enum classes
 
@@ -139,15 +101,10 @@ class TestCoreUtilityFunctions(unittest.TestCase):
         except ImportError:
             pass
 
-
-
     def test_core_mixins_classes(self):
-
         """Test core mixin classes."""
 
         try:
-
-
 
             for attr_name in dir(mixins):
 
@@ -178,28 +135,19 @@ class TestCoreUtilityFunctions(unittest.TestCase):
                                 if hasattr(attr, "get_serializer_class"):
 
                                     instance.get_serializer_class = Mock(
-
                                         return_value=Mock
-
                                     )
 
                             except Exception:
                                 pass
 
-
-
         except ImportError:
             pass
 
-
-
     def test_core_permissions_classes(self):
-
         """Test core permission classes."""
 
         try:
-
-
 
             for attr_name in dir(permissions):
 
@@ -215,8 +163,6 @@ class TestCoreUtilityFunctions(unittest.TestCase):
 
                             perm = attr()
 
-
-
                             # Test permission methods
 
                             if hasattr(perm, "has_permission"):
@@ -230,9 +176,7 @@ class TestCoreUtilityFunctions(unittest.TestCase):
                                 try:
 
                                     result = perm.has_permission(
-
                                         mock_request, mock_view
-
                                     )
 
                                     self.assertIsInstance(result, bool)
@@ -240,31 +184,20 @@ class TestCoreUtilityFunctions(unittest.TestCase):
                                 except Exception:
                                     pass
 
-
-
                         except Exception:
                             pass
-
-
 
         except ImportError:
             pass
 
 
-
 class TestCoreMiddleware(unittest.TestCase):
-
     """Test core middleware classes."""
 
-
-
     def test_middleware_import(self):
-
         """Test middleware import and basic functionality."""
 
         try:
-
-
 
             for attr_name in dir(middleware):
 
@@ -281,8 +214,6 @@ class TestCoreMiddleware(unittest.TestCase):
                             get_response = Mock()
 
                             middleware_instance = attr(get_response)
-
-
 
                             # Test middleware call
 
@@ -304,31 +235,20 @@ class TestCoreMiddleware(unittest.TestCase):
 
                                     pass  # Middleware may require specific setup
 
-
-
                         except Exception:
                             pass
-
-
 
         except ImportError:
             pass
 
 
-
 class TestCoreCache(unittest.TestCase):
-
     """Test core cache functionality."""
 
-
-
     def test_cache_import(self):
-
         """Test cache utilities import."""
 
         try:
-
-
 
             # Test cache functions
 
@@ -368,20 +288,13 @@ class TestCoreCache(unittest.TestCase):
             pass
 
 
-
 class TestCoreThrottling(unittest.TestCase):
-
     """Test core throttling functionality."""
 
-
-
     def test_throttling_import(self):
-
         """Test throttling classes import."""
 
         try:
-
-
 
             for attr_name in dir(throttling):
 
@@ -394,8 +307,6 @@ class TestCoreThrottling(unittest.TestCase):
                         try:
 
                             throttle = attr()
-
-
 
                             # Test throttle methods
 
@@ -412,17 +323,13 @@ class TestCoreThrottling(unittest.TestCase):
                                 try:
 
                                     result = throttle.allow_request(
-
                                         mock_request, mock_view
-
                                     )
 
                                     self.assertIsInstance(result, bool)
 
                                 except Exception:
                                     pass
-
-
 
                             if hasattr(throttle, "get_rate"):
 
@@ -433,31 +340,20 @@ class TestCoreThrottling(unittest.TestCase):
                                 except Exception:
                                     pass
 
-
-
                         except Exception:
                             pass
-
-
 
         except ImportError:
             pass
 
 
-
 class TestCoreDecorators(unittest.TestCase):
-
     """Test core decorators."""
 
-
-
     def test_decorators_import(self):
-
         """Test decorators import and basic functionality."""
 
         try:
-
-
 
             for attr_name in dir(decorators):
 
@@ -472,12 +368,9 @@ class TestCoreDecorators(unittest.TestCase):
                             # Test decorator application
 
                             @attr
-
                             def test_function():
                                 """Test function."""
                                 return "test"
-
-
 
                             # Try calling decorated function
 
@@ -488,8 +381,6 @@ class TestCoreDecorators(unittest.TestCase):
                             except Exception:
 
                                 pass  # Decorator may require specific parameters
-
-
 
                         except Exception:
 
@@ -506,26 +397,17 @@ class TestCoreDecorators(unittest.TestCase):
                             except Exception:
                                 pass
 
-
-
         except ImportError:
             pass
 
 
-
 class TestCoreCircuitBreaker(unittest.TestCase):
-
     """Test core circuit breaker functionality."""
 
-
-
     def test_circuit_breaker_import(self):
-
         """Test circuit breaker import and basic functionality."""
 
         try:
-
-
 
             # Test circuit breaker classes and functions
 
@@ -545,8 +427,6 @@ class TestCoreCircuitBreaker(unittest.TestCase):
 
                                 cb = attr(failure_threshold=5, timeout=60)
 
-
-
                                 # Test circuit breaker methods
 
                                 if hasattr(cb, "call"):
@@ -558,43 +438,28 @@ class TestCoreCircuitBreaker(unittest.TestCase):
                                     except Exception:
                                         pass
 
-
-
                                 if hasattr(cb, "record_success"):
 
                                     cb.record_success()
-
-
 
                                 if hasattr(cb, "record_failure"):
 
                                     cb.record_failure()
 
-
-
                         except Exception:
                             pass
-
-
 
         except ImportError:
             pass
 
 
-
 class TestCoreStorage(unittest.TestCase):
-
     """Test core storage utilities."""
 
-
-
     def test_storage_import(self):
-
         """Test storage utilities import."""
 
         try:
-
-
 
             # Test storage functions
 
@@ -636,8 +501,6 @@ class TestCoreStorage(unittest.TestCase):
             pass
 
 
-
 if __name__ == "__main__":
 
     """unittest.main()"""
-

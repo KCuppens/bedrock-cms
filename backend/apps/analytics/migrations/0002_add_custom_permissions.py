@@ -3,15 +3,10 @@
 
 import uuid
 
-
 import django.core.validators
-
 import django.db.models.deletion
-
 import django.utils.timezone
-
 from django.conf import settings
-
 from django.db import migrations, models
 
 
@@ -22,8 +17,9 @@ class Migration(migrations.Migration):
     dependencies = [
         ("contenttypes", "0002_remove_content_type_name"),
         ("cms", "0007_add_custom_permissions"),
-        """migrations.swappable_dependency(settings.AUTH_USER_MODEL),"""
-        ("analytics", "0001_initial"),
+        """migrations.swappable_dependency(settings.AUTH_USER_MODEL),"""(
+            "analytics", "0001_initial"
+        ),
     ]
 
     operations = [

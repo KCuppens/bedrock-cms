@@ -1,26 +1,14 @@
 import uuid
-
 from datetime import timedelta
 
-
-
 from django.contrib.auth.models import User
-
 from django.core.management.base import BaseCommand
-
 from django.utils import timezone
 
-
-
 from apps.blog.models import BlogPost, Category, Tag
-
 from apps.cms.models import Page, Redirect
-
 from apps.i18n.models import Locale
-
 from apps.media.models import Asset
-
-
 
 """Management command to seed the site with demo data."""
 
@@ -1203,4 +1191,3 @@ class Command(BaseCommand):
         self.stdout.write("Demo user: demo / demo123")
 
         self.stdout.write("=" * 50)
-

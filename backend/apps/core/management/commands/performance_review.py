@@ -1,31 +1,18 @@
 import json
-
 import statistics
-
 import time
 
-
 from django.conf import settings
-
 from django.core.cache import cache
-
 from django.core.management.base import BaseCommand
-
 from django.db import connection, reset_queries
-
 from django.test import Client
-
 from django.utils import timezone
 
-
 from apps.blog.models import BlogPost
-
 from apps.cms.blocks.validation import validate_blocks
-
 from apps.cms.models import Page
-
 from apps.media.models import Asset
-
 
 """Management command for comprehensive performance review of Bedrock CMS."""
 

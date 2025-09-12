@@ -1,12 +1,8 @@
 import logging
 
-
 from django.apps import AppConfig
-
 from django.conf import settings
-
 from django.db import connection
-
 
 # Import moved to method to avoid circular import during Django setup
 

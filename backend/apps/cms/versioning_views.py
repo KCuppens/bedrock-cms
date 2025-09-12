@@ -1,53 +1,27 @@
 from django.utils import timezone
 
-
-
 from django_filters.rest_framework import DjangoFilterBackend
-
 from drf_spectacular.utils import OpenApiParameter, extend_schema
-
 from rest_framework import filters, status, viewsets
-
 from rest_framework.decorators import action
-
 from rest_framework.permissions import IsAuthenticated
-
 from rest_framework.response import Response
 
-
-
 from .versioning import AuditEntry, PageRevision, RevisionDiffer
-
 from .versioning_serializers import (  # functionality
-
     API,
-
     AuditEntrySerializer,
-
     AutosaveSerializer,
-
     PageRevisionDetailSerializer,
-
     PageRevisionSerializer,
-
     PublishPageSerializer,
-
     RevertRevisionSerializer,
-
     RevisionDiffSerializer,
-
     UnpublishPageSerializer,
-
     audit,
-
     versioning,
-
     views,
-
 )
-
-
-
 
 
 class PageRevisionViewSet(viewsets.ReadOnlyModelViewSet):
@@ -713,4 +687,3 @@ class VersioningMixin:
         serializer = AuditEntrySerializer(audit_entries, many=True)
 
         return Response(serializer.data)
-

@@ -1,12 +1,8 @@
 import os
-
 from datetime import datetime
-
 from unittest.mock import Mock, patch
 
-
 import django
-
 
 # Configure minimal Django
 
@@ -17,16 +13,13 @@ import django
 try:
 
     from apps.blog import admin, versioning
-
     from apps.blog.models import Author, BlogPost, Category, Tag
-
     from apps.blog.serializers import (
         AuthorSerializer,
         BlogPostSerializer,
         CategorySerializer,
         TagSerializer,
     )
-
     from apps.blog.views import BlogPostViewSet, CategoryViewSet, TagViewSet
 
 except ImportError:
@@ -268,18 +261,18 @@ def test_blog_serializers():  # noqa: C901
                 if "BlogPost" in serializer_class.__name__:
 
                     mock_data = {
-                        """"title": "Test Blog Post","""
-                        """"slug": "test-blog-post","""
-                        """"content": "Test content","""
+                        "title": "Test Blog Post",
+                        "slug": "test-blog-post",
+                        "content": "Test content",
                         "status": "draft",
                     }
 
                 elif "Category" in serializer_class.__name__:
 
                     mock_data = {
-                        """"name": "Test Category","""
-                        """"slug": "test-category","""
-                        """"description": "Test description","""
+                        "name": "Test Category",
+                        "slug": "test-category",
+                        "description": "Test description",
                     }
 
                 elif "Tag" in serializer_class.__name__:

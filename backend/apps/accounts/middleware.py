@@ -1,19 +1,12 @@
 import logging
 
-
 from django.conf import settings
-
 from django.contrib.auth import get_user_model
-
 from django.core.cache import cache
-
 from django.utils import timezone
-
 from django.utils.deprecation import MiddlewareMixin
 
-
 from .tasks import update_user_last_seen
-
 
 logger = logging.getLogger(__name__)
 

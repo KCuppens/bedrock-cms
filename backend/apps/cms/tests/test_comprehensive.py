@@ -1,92 +1,50 @@
 from datetime import datetime, timedelta
 
-
-
 from django.contrib.auth import get_user_model
-
 from django.core.exceptions import ValidationError
-
 from django.test import TestCase, TransactionTestCase
-
 from django.urls import reverse
 
-
-
 from rest_framework import status
-
 from rest_framework.test import APIClient, APITestCase
 
-
-
 from apps.cms import tasks
-
 from apps.cms.models import Group, Page
-
-
-
-# ContentBlock doesn't exist yet, so we'll mock it if needed
-
 from apps.cms.serializers.pages import PageDetailSerializer, PageSerializer
-
-from apps.cms.versioning import (
-
-    create_page_version,
-
-    revert_page_to_version,
-
-)
-
+from apps.cms.versioning import create_page_version, revert_page_to_version
 from apps.i18n.models import Locale
 
+# ContentBlock doesn't exist yet, so we'll mock it if needed
 
 
 User = get_user_model()
 
 
-
 class CMSModelTests(TestCase):
-
     """Comprehensive tests for CMS models."""
-
-
 
     def setUp(self):
 
         self.user = User.objects.create_user(
-
             username="testuser", email="test@example.com", password="testpass123"
-
         )
 
         self.locale = Locale.objects.create(code="en", name="English", is_default=True)
 
         self.category = Group.objects.create(name="Test Group", slug="test-category")
 
-
-
     def test_page_creation(self):
-
         """Test page creation with all fields."""
 
         page = Page.objects.create(
-
             title="Test Page",
-
             slug="test-page",
-
             content="<p>Test content</p>",
-
             status="draft",
-
             author=self.user,
-
             locale=self.locale,
-
             category=self.category,
-
         )
-
-
 
         """self.assertEqual(page.title, "Test Page")"""
 
@@ -100,30 +58,20 @@ class CMSModelTests(TestCase):
 
         self.assertIsNotNone(page.updated_at)
 
-
-
     def test_page_str_representation(self):
-
         """Test page string representation."""
 
         page = Page.objects.create(
-
             title="Test Page", author=self.user, locale=self.locale
-
         )
 
         """self.assertEqual(str(page), "Test Page")"""
 
-
-
     def test_page_slug_generation(self):
-
         """Test automatic slug generation."""
 
         page = Page.objects.create(
-
             title="Test Page With Spaces", author=self.user, locale=self.locale
-
         )
 
         if hasattr(page, "save"):
@@ -134,19 +82,12 @@ class CMSModelTests(TestCase):
 
         self.assertTrue(page.slug)
 
-
-
     def test_page_publication(self):
-
         """Test page publication workflow."""
 
         page = Page.objects.create(
-
             title="Test Page", status="draft", author=self.user, locale=self.locale
-
         )
-
-
 
         # Test publish method if it exists
 
@@ -160,27 +101,16 @@ class CMSModelTests(TestCase):
 
             self.assertIsNotNone(page.published_at)
 
-
-
     def test_page_unpublication(self):
-
         """Test page unpublication."""
 
         page = Page.objects.create(
-
             title="Test Page",
-
             status="published",
-
             published_at=datetime.now(),
-
             author=self.user,
-
             locale=self.locale,
-
         )
-
-
 
         if hasattr(page, "unpublish"):
 
@@ -190,19 +120,12 @@ class CMSModelTests(TestCase):
 
             self.assertEqual(page.status, "draft")
 
-
-
     def test_page_scheduling(self):
-
         """Test page scheduling functionality."""
 
         page = Page.objects.create(
-
             title="Test Page", status="scheduled", author=self.user, locale=self.locale
-
         )
-
-
 
         future_time = datetime.now() + timedelta(days=1)
 
@@ -214,23 +137,14 @@ class CMSModelTests(TestCase):
 
             self.assertEqual(page.status, "scheduled")
 
-
-
     def test_page_validation(self):
-
         """Test page model validation."""
 
         page = Page(
-
             title="",  # Empty title should fail validation
-
             author=self.user,
-
             locale=self.locale,
-
         )
-
-
 
         if hasattr(page, "clean"):
 
@@ -238,19 +152,12 @@ class CMSModelTests(TestCase):
 
                 page.clean()
 
-
-
     def test_page_get_absolute_url(self):
-
         """Test page URL generation."""
 
         page = Page.objects.create(
-
             title="Test Page", slug="test-page", author=self.user, locale=self.locale
-
         )
-
-
 
         if hasattr(page, "get_absolute_url"):
 
@@ -258,19 +165,12 @@ class CMSModelTests(TestCase):
 
             """self.assertIn("test-page", url)"""
 
-
-
     def test_category_creation(self):
-
         """Test category creation and methods."""
 
         category = Group.objects.create(
-
             name="Test Group", slug="test-category", description="Test description"
-
         )
-
-
 
         """self.assertEqual(category.name, "Test Group")"""
 
@@ -278,25 +178,16 @@ class CMSModelTests(TestCase):
 
         """self.assertEqual(str(category), "Test Group")"""
 
-
-
     def test_category_page_count(self):
-
         """Test category page counting."""
 
         Page.objects.create(
-
             title="Page 1", author=self.user, locale=self.locale, category=self.category
-
         )
 
         Page.objects.create(
-
             title="Page 2", author=self.user, locale=self.locale, category=self.category
-
         )
-
-
 
         if hasattr(self.category, "get_page_count"):
 
@@ -305,39 +196,25 @@ class CMSModelTests(TestCase):
             self.assertEqual(count, 2)
 
 
-
 class CMSVersioningTests(TestCase):
-
     """Test CMS versioning functionality."""
-
-
 
     def setUp(self):
 
         self.user = User.objects.create_user(
-
             username="testuser", email="test@example.com", password="testpass123"
-
         )
 
         self.locale = Locale.objects.create(code="en", name="English", is_default=True)
 
         self.page = Page.objects.create(
-
             title="Test Page",
-
             content="Original content",
-
             author=self.user,
-
             locale=self.locale,
-
         )
 
-
-
     def test_create_version(self):
-
         """Test creating page versions."""
 
         try:
@@ -357,23 +234,15 @@ class CMSVersioningTests(TestCase):
             if hasattr(self.page, "versions"):
 
                 version = Page.objects.create(
-
                     page=self.page,
-
                     title=self.page.title,
-
                     content=self.page.content,
-
                     created_by=self.user,
-
                 )
 
                 self.assertIsNotNone(version)
 
-
-
     def test_version_manager(self):
-
         """Test version manager functionality."""
 
         try:
@@ -383,10 +252,7 @@ class CMSVersioningTests(TestCase):
 
             pass  # Version manager may not exist
 
-
-
     def test_revert_to_version(self):
-
         """Test reverting to previous version."""
 
         # Create initial version
@@ -395,25 +261,16 @@ class CMSVersioningTests(TestCase):
 
         self.page.save()
 
-
-
         try:
 
             # Create version before change
 
             version = Page.objects.create(
-
                 page=self.page,
-
                 title="Test Page",
-
                 content="Original content",
-
                 created_by=self.user,
-
             )
-
-
 
             # Test revert function
 
@@ -428,52 +285,35 @@ class CMSVersioningTests(TestCase):
             pass  # Revert function may not exist
 
 
-
 class CMSAPITests(APITestCase):
-
     """Comprehensive API tests for CMS endpoints."""
-
-
 
     def setUp(self):
 
         self.user = User.objects.create_user(
-
             username="testuser", email="test@example.com", password="testpass123"
-
         )
 
         self.client = APIClient()
 
         self.client.force_authenticate(user=self.user)
 
-
-
         self.locale = Locale.objects.create(code="en", name="English", is_default=True)
 
         self.category = Group.objects.create(name="Test Group", slug="test-category")
 
-
-
     def test_page_list_api(self):
-
         """Test page list API endpoint."""
 
         # Create test pages
 
         Page.objects.create(
-
             title="Page 1", status="published", author=self.user, locale=self.locale
-
         )
 
         Page.objects.create(
-
             title="Page 2", status="draft", author=self.user, locale=self.locale
-
         )
-
-
 
         try:
 
@@ -493,27 +333,16 @@ class CMSAPITests(APITestCase):
 
             pass  # URL may not exist
 
-
-
     def test_page_creation_api(self):
-
         """Test page creation via API."""
 
         page_data = {
-
             "title": "New Page",
-
             "content": "<p>New content</p>",
-
             "status": "draft",
-
             "locale": self.locale.id,
-
             "category": self.category.id,
-
         }
-
-
 
         try:
 
@@ -524,9 +353,7 @@ class CMSAPITests(APITestCase):
             if response.status_code in [201, 200]:
 
                 self.assertIn(
-
                     response.status_code, [status.HTTP_201_CREATED, status.HTTP_200_OK]
-
                 )
 
                 data = response.json()
@@ -537,19 +364,12 @@ class CMSAPITests(APITestCase):
 
             pass  # URL may not exist
 
-
-
     def test_page_detail_api(self):
-
         """Test page detail API endpoint."""
 
         page = Page.objects.create(
-
             title="Detail Page", author=self.user, locale=self.locale
-
         )
-
-
 
         try:
 
@@ -569,19 +389,12 @@ class CMSAPITests(APITestCase):
 
             pass  # URL may not exist
 
-
-
     def test_page_update_api(self):
-
         """Test page update via API."""
 
         page = Page.objects.create(
-
             title="Original Title", author=self.user, locale=self.locale
-
         )
-
-
 
         update_data = {"title": "Updated Title", "content": "<p>Updated content</p>"}
 
@@ -601,19 +414,12 @@ class CMSAPITests(APITestCase):
 
             pass  # URL may not exist
 
-
-
     def test_page_publish_api(self):
-
         """Test page publish API action."""
 
         page = Page.objects.create(
-
             title="Draft Page", status="draft", author=self.user, locale=self.locale
-
         )
-
-
 
         try:
 
@@ -632,68 +438,42 @@ class CMSAPITests(APITestCase):
             pass  # URL may not exist
 
 
-
 class CMSSerializerTests(TestCase):
-
     """Test CMS serializers."""
-
-
 
     def setUp(self):
 
         self.user = User.objects.create_user(
-
             username="testuser", email="test@example.com", password="testpass123"
-
         )
 
         self.locale = Locale.objects.create(code="en", name="English", is_default=True)
 
-
-
     def test_page_serializer(self):
-
         """Test PageSerializer functionality."""
 
         page = Page.objects.create(
-
             title="Test Page",
-
             content="Test content",
-
             author=self.user,
-
             locale=self.locale,
-
         )
-
-
 
         serializer = PageSerializer(page)
 
         data = serializer.data
 
-
-
         """self.assertEqual(data["title"], "Test Page")"""
 
         """self.assertEqual(data["content"], "Test content")"""
 
-
-
     def test_page_serializer_validation(self):
-
         """Test page serializer validation."""
 
         invalid_data = {
-
             "title": "",  # Empty title should fail
-
             "content": "Test content",
-
         }
-
-
 
         serializer = PageSerializer(data=invalid_data)
 
@@ -701,52 +481,34 @@ class CMSSerializerTests(TestCase):
 
         self.assertIn("title", serializer.errors)
 
-
-
     def test_page_detail_serializer(self):
-
         """Test PageDetailSerializer with nested data."""
 
         page = Page.objects.create(
-
             title="Test Page", author=self.user, locale=self.locale
-
         )
-
-
 
         serializer = PageDetailSerializer(page)
 
         data = serializer.data
-
-
 
         """self.assertEqual(data["title"], "Test Page")"""
 
         self.assertIn("author", data)
 
 
-
 class CMSTaskTests(TestCase):
-
     """Test CMS background tasks."""
-
-
 
     def setUp(self):
 
         self.user = User.objects.create_user(
-
             username="testuser", email="test@example.com", password="testpass123"
-
         )
 
         self.locale = Locale.objects.create(code="en", name="English", is_default=True)
 
-
-
     def test_publish_scheduled_pages(self):
-
         """Test scheduled page publishing task."""
 
         # Create scheduled page
@@ -754,20 +516,12 @@ class CMSTaskTests(TestCase):
         past_time = datetime.now() - timedelta(hours=1)
 
         page = Page.objects.create(
-
             title="Scheduled Page",
-
             status="scheduled",
-
             publish_at=past_time,
-
             author=self.user,
-
             locale=self.locale,
-
         )
-
-
 
         try:
 
@@ -785,19 +539,12 @@ class CMSTaskTests(TestCase):
 
             pass  # Task may not exist
 
-
-
     def test_cleanup_old_versions(self):
-
         """Test old version cleanup task."""
 
         page = Page.objects.create(
-
             title="Test Page", author=self.user, locale=self.locale
-
         )
-
-
 
         # Create old versions
 
@@ -808,20 +555,12 @@ class CMSTaskTests(TestCase):
             for i in range(5):
 
                 Page.objects.create(
-
                     page=page,
-
                     title=f"Version {i}",
-
                     content="Old content",
-
                     created_by=self.user,
-
                     created_at=old_date,
-
                 )
-
-
 
         try:
 
@@ -838,48 +577,31 @@ class CMSTaskTests(TestCase):
             pass  # Task may not exist
 
 
-
 class CMSSecurityTests(TestCase):
-
     """Test CMS security features."""
-
-
 
     def setUp(self):
 
         self.user = User.objects.create_user(
-
             username="testuser", email="test@example.com", password="testpass123"
-
         )
 
         self.superuser = User.objects.create_superuser(
-
             username="admin", email="admin@example.com", password="adminpass123"
-
         )
 
         self.locale = Locale.objects.create(code="en", name="English", is_default=True)
 
-
-
     def test_page_security_manager(self):
-
         """Test page security checks."""
 
         page = Page.objects.create(
-
             title="Secure Page", author=self.user, locale=self.locale
-
         )
-
-
 
         try:
 
             # PageSecurityManager doesn't exist, skip this test
-
-
 
             # Test user permissions
 
@@ -891,8 +613,6 @@ class CMSSecurityTests(TestCase):
 
             self.assertTrue(can_edit)
 
-
-
             # Superuser should have all permissions
 
             can_edit_admin = security_manager.can_edit(self.superuser, page)
@@ -903,55 +623,35 @@ class CMSSecurityTests(TestCase):
 
             self.assertTrue(can_publish_admin)
 
-
-
         except (AttributeError, NameError):
 
             pass  # Security manager may not exist
 
 
-
 class CMSSEOTests(TestCase):
-
     """Test CMS SEO functionality."""
-
-
 
     def setUp(self):
 
         self.user = User.objects.create_user(
-
             username="testuser", email="test@example.com", password="testpass123"
-
         )
 
         self.locale = Locale.objects.create(code="en", name="English", is_default=True)
 
-
-
     def test_seo_manager(self):
-
         """Test SEO manager functionality."""
 
         page = Page.objects.create(
-
             title="SEO Test Page",
-
             content="<p>This is test content for SEO.</p>",
-
             author=self.user,
-
             locale=self.locale,
-
         )
-
-
 
         try:
 
             # SEOManager doesn't exist, skip this test
-
-
 
             # Test meta description generation
 
@@ -969,27 +669,16 @@ class CMSSEOTests(TestCase):
 
             pass  # SEO manager may not exist
 
-
-
     def test_page_seo_fields(self):
-
         """Test page SEO field functionality."""
 
         page = Page.objects.create(
-
             title="SEO Page",
-
             meta_description="Custom meta description",
-
             meta_keywords="test, seo, keywords",
-
             author=self.user,
-
             locale=self.locale,
-
         )
-
-
 
         # Test SEO field access
 
@@ -1002,46 +691,29 @@ class CMSSEOTests(TestCase):
             """self.assertEqual(page.meta_keywords, "test, seo, keywords")"""
 
 
-
 class CMSIntegrationTests(TransactionTestCase):
-
     """Integration tests for CMS workflows."""
-
-
 
     def setUp(self):
 
         self.user = User.objects.create_user(
-
             username="testuser", email="test@example.com", password="testpass123"
-
         )
 
         self.locale = Locale.objects.create(code="en", name="English", is_default=True)
 
-
-
     def test_complete_page_workflow(self):
-
         """Test complete page creation to publication workflow."""
 
         # Create draft page
 
         page = Page.objects.create(
-
             title="Workflow Page",
-
             content="<p>Test workflow content</p>",
-
             status="draft",
-
             author=self.user,
-
             locale=self.locale,
-
         )
-
-
 
         # Create version
 
@@ -1053,8 +725,6 @@ class CMSIntegrationTests(TransactionTestCase):
 
         except Exception:
             pass
-
-
 
         # Publish page
 
@@ -1076,8 +746,6 @@ class CMSIntegrationTests(TransactionTestCase):
 
             page.refresh_from_db()
 
-
-
         # Unpublish page
 
         if hasattr(page, "unpublish"):
@@ -1088,45 +756,27 @@ class CMSIntegrationTests(TransactionTestCase):
 
             self.assertEqual(page.status, "draft")
 
-
-
     def test_page_with_blocks(self):
-
         """Test page with block content."""
 
         page = Page.objects.create(
-
             title="Page with Blocks", author=self.user, locale=self.locale
-
         )
-
-
 
         # Create blocks if ContentBlock model exists
 
         try:
 
             ContentBlock.objects.create(
-
                 page=page, type="text", content={"text": "Test block content"}, order=1
-
             )
-
-
 
             ContentBlock.objects.create(
-
                 page=page,
-
                 type="image",
-
                 content={"url": "/media/test.jpg", "alt": "Test image"},
-
                 order=2,
-
             )
-
-
 
             # Test block relationships
 
@@ -1140,10 +790,7 @@ class CMSIntegrationTests(TransactionTestCase):
 
             pass  # ContentBlock model may not exist
 
-
-
     def test_multilingual_pages(self):
-
         """Test multilingual page functionality."""
 
         # Create additional locale
@@ -1153,34 +800,20 @@ class CMSIntegrationTests(TransactionTestCase):
         # Create English page
 
         en_page = Page.objects.create(
-
             title="English Page",
-
             content="English content",
-
             author=self.user,
-
             locale=self.locale,
-
         )
-
-
 
         # Create Spanish translation
 
         es_page = Page.objects.create(
-
             title="Página en Español",
-
             content="Contenido en español",
-
             author=self.user,
-
             locale=spanish_locale,
-
         )
-
-
 
         # Test locale relationships
 
@@ -1193,4 +826,3 @@ class CMSIntegrationTests(TransactionTestCase):
         self.assertEqual(en_page.locale.code, "en")
 
         self.assertEqual(es_page.locale.code, "es")
-

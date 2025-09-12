@@ -1,45 +1,24 @@
 import io
-
 import logging
 
-
-
 from django.core.cache import cache
-
 from django.core.mail import send_mail
-
 from django.db import connection
-
 from django.db.models import Count
-
 from django.template.loader import render_to_string
-
 from django.utils import timezone
 
-
-
 from celery import shared_task
-
 from PIL import Image
 
-
-
 from apps.analytics.models import PageView
-
 from apps.blog.models import BlogPost
-
 from apps.blog.versioning import BlogPostRevision, BlogPostViewTracker
-
 from apps.cms.models import Page
-
 from apps.cms.versioning import PageRevision
-
 from apps.core.cache import cache_manager
-
 from apps.files.models import File
-
 from apps.search.services import search_service
-
 
 """
 Async tasks for heavy operations using Celery.
@@ -579,4 +558,3 @@ def optimize_database_async():  # noqa: C901
         logger.error(f"Error optimizing database: {e}")
 
         return {"status": "error", "error": str(e)}
-

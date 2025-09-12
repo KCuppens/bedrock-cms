@@ -1,59 +1,23 @@
 from rest_framework import generics, status
-
 from rest_framework.decorators import api_view, permission_classes
-
 from rest_framework.permissions import IsAdminUser
-
 from rest_framework.response import Response
-
 from rest_framework.throttling import AnonRateThrottle, UserRateThrottle
-
-
 
 from apps.core.decorators import cache_response
 
-
-
+from . import services
 from .models import SearchIndex, SearchQuery, SearchSuggestion
-
-from .serializers import (  # functionality; views
-
-    API,
-
-    REST,
-
+from .serializers import (
     AutocompleteSerializer,
-
     BulkIndexSerializer,
-
-    Provides,
-
-    Search,
-
     SearchAnalyticsSerializer,
-
     SearchIndexSerializer,
-
     SearchQueryLogSerializer,
-
     SearchRequestSerializer,
-
     SearchResponseSerializer,
-
     SearchSuggestionSerializer,
-
-    .services,
-
-    endpoints,
-
-    search,
-
-    search_service,
-
 )
-
-
-
 
 
 class SearchThrottle(UserRateThrottle):
@@ -381,4 +345,3 @@ def search_categories_view(request):  # noqa: C901
 
 
     return Response({"categories": list(categories)})
-

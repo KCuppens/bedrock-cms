@@ -5,90 +5,46 @@
 
 
 import io
-
 import logging
 
-
-
 from django.conf import settings
-
 from django.contrib.contenttypes.models import ContentType
-
 from django.core.management import call_command
-
 from django.core.management.base import CommandError
-
 from django.db import models
 
-
-
 from django_filters.rest_framework import DjangoFilterBackend
-
 from drf_spectacular.utils import OpenApiParameter, extend_schema
-
 from rest_framework import filters, permissions, status, viewsets
-
 from rest_framework.decorators import action
-
 from rest_framework.response import Response
 
-
-
 from .models import (
-
     Locale,
-
     TranslationGlossary,
-
     TranslationHistory,
-
     TranslationQueue,
-
     TranslationUnit,
-
     UiMessage,
-
     UiMessageTranslation,
-
 )
-
-from .serializers import (
-
+from .serializers import (  # TranslationApprovalSerializer,
     BulkAssignmentSerializer,
-
     BulkTranslationUpdateSerializer,
-
     BulkUiMessageUpdateSerializer,
-
     GlossarySearchSerializer,
-
     LocaleSerializer,
-
     MachineTranslationSuggestionSerializer,
-
-    # TranslationApprovalSerializer,
-
     TranslationAssignmentSerializer,
-
     TranslationGlossarySerializer,
-
     TranslationHistorySerializer,
-
     TranslationQueueSerializer,
-
     TranslationUnitSerializer,
-
     TranslationUnitUpdateSerializer,
-
     UiMessageSerializer,
-
     UiMessageTranslationSerializer,
-
 )
-
 from .tasks import bulk_auto_translate_ui_messages
-
-
 
 logger = logging.getLogger(__name__)
 
@@ -337,13 +293,10 @@ class TranslationUnitViewSet(viewsets.ModelViewSet):
 
 
 
-    ViewSet for managing translation units.
+    """ViewSet for managing translation units.
 
-
-
-    Provides CRUD operations for translation units with filtering and bulk oper
-
-        ations.
+    Provides CRUD operations for translation units with filtering and bulk operations.
+    """
 
 
 
@@ -601,8 +554,7 @@ class TranslationUnitViewSet(viewsets.ModelViewSet):
 
 
 
-            """status_data.append("""
-
+            status_data.append(
                 {
 
                     "locale": LocaleSerializer(locale).data,
@@ -707,15 +659,13 @@ class TranslationUnitViewSet(viewsets.ModelViewSet):
 
             except TranslationUnit.DoesNotExist:
 
-                """errors.append("""
-
+                errors.append(
                     {"id": unit_data["id"], "error": "Translation unit not found"}
-
                 )
 
             except Exception as e:
 
-                """errors.append({"id": unit_data["id"], "error": str(e)})"""
+                errors.append({"id": unit_data["id"], "error": str(e)})
 
         return Response(
 
@@ -766,11 +716,8 @@ class TranslationUnitViewSet(viewsets.ModelViewSet):
         if not translation_unit.target_text.strip():
 
             return Response(
-
-                """{"error": "Cannot approve translation without target text"},"""
-
+                {"error": "Cannot approve translation without target text"},
                 status=status.HTTP_400_BAD_REQUEST,
-
             )
 
 
@@ -2119,7 +2066,6 @@ class UiMessageViewSet(viewsets.ModelViewSet):
         if created or updated:
 
             from django.contrib.admin.models import ADDITION, LogEntry
-
             from django.contrib.contenttypes.models import ContentType
 
 
@@ -2208,8 +2154,6 @@ class UiMessageViewSet(viewsets.ModelViewSet):
 
         from datetime import datetime
 
-
-
         from django.core.cache import cache
 
 
@@ -2290,13 +2234,8 @@ class UiMessageViewSet(viewsets.ModelViewSet):
 
         from datetime import datetime, timedelta
 
-
-
         from django.core.cache import cache
-
         from django.db.models import Count
-
-
 
         # Get counts
 
@@ -2449,10 +2388,7 @@ class UiMessageViewSet(viewsets.ModelViewSet):
         """Import translations from a JSON file."""
 
         import json
-
         from datetime import datetime
-
-
 
         # Get file from request
 
@@ -3900,10 +3836,7 @@ class TranslationQueueViewSet(viewsets.ModelViewSet):
         """Get translation queue summary with locale breakdown."""
 
         from django.db.models import Count
-
         from django.utils import timezone
-
-
 
         # Get all active locales except the default source locale
 
@@ -4138,4 +4071,3 @@ class TranslationHistoryViewSet(viewsets.ReadOnlyModelViewSet):
     ordering_fields = ["created_at"]
 
     ordering = ["-created_at"]
-

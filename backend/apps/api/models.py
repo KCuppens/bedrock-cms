@@ -1,10 +1,7 @@
 from django.contrib.auth import get_user_model
-
 from django.db import models
 
-
 from apps.core.mixins import TimestampMixin, UserTrackingMixin
-
 
 User = get_user_model()
 

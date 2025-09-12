@@ -1,30 +1,17 @@
+"""Dynamic URL routing for registered content models."""
+
 import logging
-
-
 
 from django.urls import include, path
 
-
-
 from rest_framework.routers import DefaultRouter
 
-
-
 from .registry import content_registry
-
 from .viewsets import RegistryViewSet, get_viewset_for_config
 
 
-
-Dynamic URL routing for registered content models.
-
-
-
 def create_dynamic_router():
-
-
-
-    Create a dynamic router with routes for all registered content models.
+    """Create a dynamic router with routes for all registered content models."""
 
 
 
@@ -93,4 +80,3 @@ urlpatterns = [
     path("api/", include(dynamic_router.urls)),
 
 ]
-

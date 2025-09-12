@@ -1,15 +1,10 @@
 import io
-
 import json
-
 import sys
-
 
 from django.core.management.base import BaseCommand
 
-
 from apps.core.security_audit import print_security_audit_report, run_security_audit
-
 
 """Management command to run security audit on all API endpoints."""
 

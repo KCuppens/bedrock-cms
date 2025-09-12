@@ -1,10 +1,7 @@
 import uuid
 
-
 from django.contrib.auth import get_user_model
-
 from django.db import models
-
 from django.db.models import (
     BooleanField,
     CharField,
@@ -14,18 +11,12 @@ from django.db.models import (
     TextField,
     UUIDField,
 )
-
 from django.utils import timezone
 
-
 from apps.core.enums import FileType
-
 from apps.core.mixins import TimestampMixin, UserTrackingMixin
-
 from apps.core.utils import format_file_size
-
 from apps.files.services import FileService
-
 
 User = get_user_model()
 

@@ -633,4 +633,3 @@ def get_all_custom_permissions():
         "api.apikey": API_PERMISSIONS,
 
     }
-

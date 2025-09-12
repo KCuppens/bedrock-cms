@@ -1,64 +1,21 @@
 import io
-
 import os
-
 from datetime import datetime
-
 from unittest.mock import Mock, patch
-
-
 
 import django
 
-
-
 from apps.files import services  # noqa: F401
-
 from apps.files.models import File, FileCategory, FileTag, FileVersion  # noqa: F401
 
 # Configure minimal Django
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "apps.config.settings.base")
 
 try:
-    from apps.files.serializers import (
-
-# Imports that were malformed - commented out
-#     """"apps.config.settings.base","""
-
-    """advanced,"""
-
-    """app,"""
-
-# Imports that were malformed - commented out
-#     """apps.files,"""
-
-    booster,
-
-    """coverage,"""
-
-    deep,
-
-    file,
-
-    os.environ.setdefault,
-
-    permissions,
-
-    tasks,
-
-    """testing,"""
-
-)
-
-from apps.files.views import (
-
-    FileBulkOperationView,
-
-    FileUploadView,
-
-    FileViewSet,
-
-)
+    from apps.files.serializers import FileUploadCreateSerializer, FileUploadSerializer
+    from apps.files.views import FileBulkOperationView, FileUploadView, FileViewSet
+except ImportError:
+    pass
 
 
 
@@ -784,4 +741,3 @@ if __name__ == "__main__":
 
 
     """print("Files advanced coverage booster completed")"""
-

@@ -1,34 +1,22 @@
 from django.contrib.auth import get_user_model
-
 from django.contrib.auth.models import Permission
-
 from django.core.management import call_command
-
 from django.test import TestCase
-
 from django.urls import reverse
 
-
 from rest_framework import status
-
 from rest_framework.test import APITestCase
 
-
 from apps.cms.blocks.validation import validate_blocks
-
 from apps.cms.models import Page, Redirect
-
 from apps.cms.seo import SeoSettings
-
 from apps.cms.seo_utils import (
     deep_merge_dicts,
     generate_canonical_url,
     generate_hreflang_alternates,
     resolve_seo,
 )
-
 from apps.i18n.models import Locale
-
 
 User = get_user_model()
 

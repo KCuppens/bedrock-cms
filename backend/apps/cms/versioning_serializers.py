@@ -1,14 +1,8 @@
 from django.contrib.auth import get_user_model
 
-
-
 from rest_framework import serializers
 
-
-
 from .versioning import AuditEntry, PageRevision
-
-
 
 """Serializers for versioning and audit functionality."""
 
@@ -287,4 +281,3 @@ class UnpublishPageSerializer(serializers.Serializer):
         help_text="Optional comment about unpublishing",
 
     )
-

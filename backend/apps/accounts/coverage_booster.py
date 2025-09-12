@@ -1,15 +1,10 @@
 import os
-
 from unittest.mock import Mock, patch
-
 
 import django
 
-
 from apps.accounts import signals  # noqa: F401
-
 from apps.accounts.auth_backends import CustomEmailBackend, RBACBackend  # noqa: F401
-
 from apps.accounts.auth_views import (  # LoginThrottle,; PasswordResetThrottle,; SessionCheckView,
     current_user_view,
     login_view,
@@ -18,17 +13,11 @@ from apps.accounts.auth_views import (  # LoginThrottle,; PasswordResetThrottle,
     password_reset_verify_token,
     password_reset_view,
 )
-
 from apps.accounts.management.commands import seed_demo, sync_groups  # noqa: F401
-
 from apps.accounts.models import Role, User, UserProfile  # noqa: F401
-
 from apps.accounts.rbac import RoleBasedAccessControl, has_permission  # noqa: F401
-
 from apps.accounts.role_views import RoleViewSet, UserRoleViewSet  # noqa: F401
-
 from apps.accounts.serializers import RoleSerializer, UserSerializer  # noqa: F401
-
 
 """Accounts app coverage booster - targets auth, views, and models."""
 
@@ -121,11 +110,7 @@ def test_accounts_auth_views():  # noqa: C901
 
     try:
 
-        from apps.accounts.auth_views import (
-            LoginView,
-            LogoutView,
-            PasswordResetView,
-        )
+        from apps.accounts.auth_views import LoginView, LogoutView, PasswordResetView
 
         # Test CustomLoginView
 

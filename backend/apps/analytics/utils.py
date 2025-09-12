@@ -1,33 +1,19 @@
 """Utility functions for analytics functionality."""
 
 import re
-
 from datetime import date, datetime, timedelta
-
 from urllib.parse import parse_qs, urlencode, urlparse, urlunparse
 
-
-
 from django.contrib.contenttypes.models import ContentType
-
 from django.contrib.gis.geoip2 import GeoIP2
-
 from django.utils import timezone
 
-
-
 from user_agents import parse
-
-
 
 from .models import PageView
 
 
-
 def parse_user_agent(user_agent_string: str) -> dict[str, str]:
-
-
-
     """Parse user agent string to extract browser and OS information.
 
     Args:
@@ -37,14 +23,7 @@ def parse_user_agent(user_agent_string: str) -> dict[str, str]:
         Dict containing browser, os, and device_type information
     """
 
-
-
-
-
-
     user_agent = parse(user_agent_string)
-
-
 
     device_type = "other"
 
@@ -60,24 +39,14 @@ def parse_user_agent(user_agent_string: str) -> dict[str, str]:
 
         device_type = "desktop"
 
-
-
     return {
-
         "browser": f"{user_agent.browser.family} {user_agent.browser.version_string}",
-
         "os": f"{user_agent.os.family} {user_agent.os.version_string}",
-
         "device_type": device_type,
-
     }
 
 
-
 def get_client_ip(request) -> str:
-
-
-
     """Extract client IP address from request, handling proxies.
 
     Args:
@@ -86,11 +55,6 @@ def get_client_ip(request) -> str:
     Returns:
         Client IP address as string
     """
-
-
-
-
-
 
     x_forwarded_for = request.META.get("HTTP_X_FORWARDED_FOR")
 
@@ -104,16 +68,10 @@ def get_client_ip(request) -> str:
 
         ip = request.META.get("REMOTE_ADDR", "127.0.0.1")
 
-
-
     return ip
 
 
-
 def get_geo_data(ip_address: str) -> dict[str, str | None]:
-
-
-
     """Get geographic data from IP address.
 
     Args:
@@ -123,32 +81,21 @@ def get_geo_data(ip_address: str) -> dict[str, str | None]:
         Dict containing country and city information
     """
 
-
-
-
-
-
     try:
 
         # Skip local/private IPs
 
         if ip_address in ["127.0.0.1", "localhost"] or ip_address.startswith(
-
             "192.168."
-
         ):
 
             return {"country": None, "city": None}
-
-
 
         g = GeoIP2()
 
         country = g.country(ip_address)
 
         city = g.city(ip_address)
-
-
 
         return {"country": country.get("country_code"), "city": city.get("city")}
 
@@ -159,11 +106,7 @@ def get_geo_data(ip_address: str) -> dict[str, str | None]:
         return {"country": None, "city": None}
 
 
-
 def sanitize_url(url: str, max_length: int = 1024) -> str:
-
-
-
     """Sanitize and truncate URL for storage.
 
     Args:
@@ -174,82 +117,48 @@ def sanitize_url(url: str, max_length: int = 1024) -> str:
         Sanitized URL string
     """
 
-
-
-
-
-
     if not url:
 
         return ""
-
-
 
     # Remove query parameters that might contain sensitive data
 
     sensitive_params = ["password", "token", "key", "secret", "auth"]
 
-
-
     try:
-
-
 
         parsed = urlparse(url)
 
         query_params = parse_qs(parsed.query)
 
-
-
         # Filter out sensitive parameters
 
         filtered_params = {
-
             k: v
-
             for k, v in query_params.items()
-
             if not any(sensitive in k.lower() for sensitive in sensitive_params)
-
         }
-
-
 
         # Rebuild query string
 
         new_query = urlencode(filtered_params, doseq=True)
 
-
-
         # Reconstruct URL
 
         sanitized_url = urlunparse(
-
             (
-
                 parsed.scheme,
-
                 parsed.netloc,
-
                 parsed.path,
-
                 parsed.params,
-
                 new_query,
-
                 parsed.fragment,
-
             )
-
         )
-
-
 
         # Truncate if too long
 
         return sanitized_url[:max_length]
-
-
 
     except Exception:
 
@@ -258,11 +167,7 @@ def sanitize_url(url: str, max_length: int = 1024) -> str:
         return url[:max_length]
 
 
-
 def calculate_session_duration(session_id: str, end_time: datetime = None) -> int:
-
-
-
     """Calculate session duration in seconds.
 
     Args:
@@ -273,53 +178,32 @@ def calculate_session_duration(session_id: str, end_time: datetime = None) -> in
         Session duration in seconds
     """
 
-
-
-
-
-
     if end_time is None:
 
         end_time = timezone.now()
 
-
-
     try:
 
         session_views = PageView.objects.filter(session_id=session_id).order_by(
-
             "viewed_at"
-
         )
-
-
 
         if not session_views.exists():
 
             return 0
 
-
-
         first_view = session_views.first().viewed_at
 
         last_view = session_views.last().viewed_at
 
-
-
         return int((last_view - first_view).total_seconds())
-
-
 
     except Exception:
 
         return 0
 
 
-
 def get_content_type_and_id(obj) -> tuple[int, int]:
-
-
-
     """Get ContentType ID and object ID for any Django model instance.
 
     Args:
@@ -329,21 +213,12 @@ def get_content_type_and_id(obj) -> tuple[int, int]:
         Tuple of (content_type_id, object_id)
     """
 
-
-
-
-
-
     content_type = ContentType.objects.get_for_model(obj)
 
     return content_type.id, obj.id
 
 
-
 def format_duration(seconds: int) -> str:
-
-
-
     """Format duration in seconds to human-readable string.
 
     Args:
@@ -352,11 +227,6 @@ def format_duration(seconds: int) -> str:
     Returns:
         Formatted duration string
     """
-
-
-
-
-
 
     if seconds < 60:
 
@@ -379,11 +249,7 @@ def format_duration(seconds: int) -> str:
         return f"{hours}h {remaining_minutes}m"
 
 
-
 def get_date_range(period: str, date_param: str = None) -> tuple[date, date]:
-
-
-
     """Get date range for analytics queries.
 
     Args:
@@ -393,11 +259,6 @@ def get_date_range(period: str, date_param: str = None) -> tuple[date, date]:
     Returns:
         Tuple of (start_date, end_date)
     """
-
-
-
-
-
 
     if date_param:
 
@@ -413,13 +274,9 @@ def get_date_range(period: str, date_param: str = None) -> tuple[date, date]:
 
         target_date = timezone.now().date()
 
-
-
     if period == "day":
 
         return target_date, target_date
-
-
 
     elif period == "week":
 
@@ -430,8 +287,6 @@ def get_date_range(period: str, date_param: str = None) -> tuple[date, date]:
         end_date = start_date + timedelta(days=6)
 
         return start_date, end_date
-
-
 
     elif period == "month":
 
@@ -444,14 +299,10 @@ def get_date_range(period: str, date_param: str = None) -> tuple[date, date]:
         else:
 
             end_date = date(target_date.year, target_date.month + 1, 1) - timedelta(
-
                 days=1
-
             )
 
         return start_date, end_date
-
-
 
     elif period == "quarter":
 
@@ -461,8 +312,6 @@ def get_date_range(period: str, date_param: str = None) -> tuple[date, date]:
 
         start_date = date(target_date.year, start_month, 1)
 
-
-
         if quarter == 4:
 
             end_date = date(target_date.year, 12, 31)
@@ -471,11 +320,7 @@ def get_date_range(period: str, date_param: str = None) -> tuple[date, date]:
 
             end_date = date(target_date.year, start_month + 3, 1) - timedelta(days=1)
 
-
-
         return start_date, end_date
-
-
 
     elif period == "year":
 
@@ -484,8 +329,6 @@ def get_date_range(period: str, date_param: str = None) -> tuple[date, date]:
         end_date = date(target_date.year, 12, 31)
 
         return start_date, end_date
-
-
 
     else:
 
@@ -498,11 +341,7 @@ def get_date_range(period: str, date_param: str = None) -> tuple[date, date]:
         return start_date, end_date
 
 
-
 def is_bot_user_agent(user_agent_string: str) -> bool:
-
-
-
     """Check if user agent string indicates a bot or crawler.
 
     Args:
@@ -512,62 +351,31 @@ def is_bot_user_agent(user_agent_string: str) -> bool:
         True if appears to be a bot
     """
 
-
-
-
-
-
     bot_patterns = [
-
         r"bot",
-
         r"crawl",
-
         r"spider",
-
         r"scraper",
-
         r"search",
-
         r"facebook",
-
         r"twitter",
-
         r"linkedin",
-
         r"google",
-
         r"bing",
-
         r"yahoo",
-
         r"duckduckgo",
-
         r"yandex",
-
         r"curl",
-
         r"wget",
-
         r"python",
-
         r"requests",
-
         r"monitoring",
-
         r"uptime",
-
         r"pingdom",
-
         r"datadog",
-
     ]
 
-
-
     user_agent_lower = user_agent_string.lower()
-
-
 
     for pattern in bot_patterns:
 
@@ -575,16 +383,10 @@ def is_bot_user_agent(user_agent_string: str) -> bool:
 
             return True
 
-
-
     return False
 
 
-
 def clean_referrer(referrer: str) -> str:
-
-
-
     """Clean and normalize referrer URL.
 
     Args:
@@ -594,30 +396,17 @@ def clean_referrer(referrer: str) -> str:
         Cleaned referrer URL
     """
 
-
-
-
-
-
     if not referrer:
 
         return ""
 
-
-
     try:
 
-
-
         parsed = urlparse(referrer)
-
-
 
         # Remove query parameters and fragments
 
         clean_url = f"{parsed.scheme}://{parsed.netloc}{parsed.path}"
-
-
 
         # Remove trailing slash
 
@@ -625,22 +414,14 @@ def clean_referrer(referrer: str) -> str:
 
             clean_url = clean_url.rstrip("/")
 
-
-
         return clean_url
-
-
 
     except Exception:
 
         return referrer
 
 
-
 def get_analytics_context(request) -> dict:
-
-
-
     """Extract analytics context from Django request.
 
     Args:
@@ -650,11 +431,6 @@ def get_analytics_context(request) -> dict:
         Dict containing analytics context data
     """
 
-
-
-
-
-
     user_agent_string = request.META.get("HTTP_USER_AGENT", "")
 
     user_agent_data = parse_user_agent(user_agent_string)
@@ -663,29 +439,15 @@ def get_analytics_context(request) -> dict:
 
     geo_data = get_geo_data(ip_address)
 
-
-
     return {
-
         "ip_address": ip_address,
-
         "user_agent": user_agent_string,
-
         "browser": user_agent_data["browser"],
-
         "os": user_agent_data["os"],
-
         "device_type": user_agent_data["device_type"],
-
         "country": geo_data["country"],
-
         "city": geo_data["city"],
-
         "referrer": clean_referrer(request.META.get("HTTP_REFERER", "")),
-
         "is_bot": is_bot_user_agent(user_agent_string),
-
         "session_key": request.session.session_key or "",
-
     }
-

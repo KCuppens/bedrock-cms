@@ -1,19 +1,9 @@
 from django.contrib.auth.models import Group
-
 from django.core.exceptions import ValidationError
-
 from django.db import models
-
-from django.db.models import (
-    CharField,
-    DateTimeField,
-    ForeignKey,
-    TextField,
-)
-
+from django.db.models import CharField, DateTimeField, ForeignKey, TextField
 
 from apps.i18n.models import Locale
-
 
 """Role-Based Access Control (RBAC) models and utilities.
 

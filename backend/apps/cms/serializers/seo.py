@@ -1,13 +1,9 @@
 import uuid
 
-
 from rest_framework import serializers
 
-
 from apps.cms.seo import SeoSettings
-
 from apps.files.models import FileUpload
-
 from apps.i18n.models import Locale
 
 

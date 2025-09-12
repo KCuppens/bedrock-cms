@@ -1,22 +1,13 @@
 from django.contrib.auth import get_user_model
 
-
 from allauth.account import app_settings as allauth_settings
-
 from drf_spectacular.utils import extend_schema, extend_schema_view
-
 from rest_framework import permissions, status
-
 from rest_framework.decorators import action
-
 from rest_framework.mixins import RetrieveModelMixin, UpdateModelMixin
-
 from rest_framework.response import Response
-
 from rest_framework.throttling import AnonRateThrottle, UserRateThrottle
-
 from rest_framework.viewsets import GenericViewSet
-
 
 from .serializers import (
     PasswordChangeSerializer,
@@ -24,7 +15,6 @@ from .serializers import (
     UserSerializer,
     UserUpdateSerializer,
 )
-
 
 User = get_user_model()
 

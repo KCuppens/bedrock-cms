@@ -1,32 +1,18 @@
 import sentry_sdk
-
 from opentelemetry import trace
-
 from opentelemetry.exporter.otlp.proto.grpc.trace_exporter import OTLPSpanExporter
-
 from opentelemetry.instrumentation.django import DjangoInstrumentor
-
 from opentelemetry.instrumentation.psycopg2 import Psycopg2Instrumentor
-
 from opentelemetry.instrumentation.redis import RedisInstrumentor
-
 from opentelemetry.sdk.trace import TracerProvider
-
 from opentelemetry.sdk.trace.export import BatchSpanProcessor
-
 from sentry_sdk.integrations.celery import CeleryIntegration
-
 from sentry_sdk.integrations.django import DjangoIntegration
-
 from sentry_sdk.integrations.redis import RedisIntegration
 
-
 from .base import DATABASES  # noqa: F405
-
 from .base import LOGGING  # noqa: F405
-
 from .base import env  # noqa: F403; noqa: F405
-
 
 # SECURITY WARNING: don't run with debug turned on in production!
 

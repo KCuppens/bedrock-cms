@@ -1,37 +1,21 @@
 from django.contrib.auth import authenticate, get_user_model, login, logout
-
 from django.contrib.auth.password_validation import validate_password
-
 from django.contrib.auth.tokens import default_token_generator as django_token_generator
-
 from django.core.exceptions import ValidationError
-
 from django.core.validators import validate_email
-
 from django.utils.encoding import force_str
-
 from django.utils.http import urlsafe_base64_decode
 
-
 from allauth.account.forms import ResetPasswordForm, default_token_generator
-
 from drf_spectacular.utils import extend_schema
-
 from rest_framework import status
-
 from rest_framework.decorators import api_view, permission_classes, throttle_classes
-
 from rest_framework.permissions import AllowAny, IsAuthenticated
-
 from rest_framework.response import Response
-
 from rest_framework.throttling import AnonRateThrottle
-
 from rest_framework.views import APIView
 
-
 from .serializers import UserSerializer
-
 
 User = get_user_model()
 

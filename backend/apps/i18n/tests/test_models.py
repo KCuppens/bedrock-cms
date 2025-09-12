@@ -1,11 +1,7 @@
 from django.contrib.auth import get_user_model
-
 from django.contrib.contenttypes.models import ContentType
-
 from django.core.exceptions import ValidationError
-
 from django.test import TestCase
-
 
 from apps.i18n.models import (  # models
     Locale,
@@ -16,7 +12,6 @@ from apps.i18n.models import (  # models
     UiMessage,
     UiMessageTranslation,
 )
-
 
 User = get_user_model()
 
@@ -374,8 +369,7 @@ class TranslationUnitModelTest(TestCase):
             "pending",
             "in_progress",
             "needs_review",
-            """"approved","""
-            "rejected",
+            """"approved",""" "rejected",
         ]
 
         for status in valid_statuses:

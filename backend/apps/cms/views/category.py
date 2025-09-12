@@ -1,43 +1,22 @@
 from django.db.models import Count, Q
 
-
-
 from drf_spectacular.utils import extend_schema, extend_schema_view
-
 from rest_framework import viewsets
-
 from rest_framework.decorators import action
-
 from rest_framework.permissions import IsAuthenticated
-
 from rest_framework.response import Response
 
-
-
 from apps.blog.models import Category, Tag
-
 from apps.cms.model_parts.category import Collection
-
 from apps.cms.serializers.category import (
-
     CategorySerializer,
-
     CollectionSerializer,
-
     TagSerializer,
-
     datetime,
-
     django.utils,
-
     timedelta,
-
     timezone,
-
 )
-
-
-
 
 
 @extend_schema_view(
@@ -467,4 +446,3 @@ class CollectionViewSet(viewsets.ModelViewSet):
             }
 
         )
-

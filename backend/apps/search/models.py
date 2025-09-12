@@ -1,56 +1,32 @@
 
+"""Search models for the CMS.
 
-Search models for the CMS.
-
-
-
-"""This module provides search functionality including indexing, analytics, and query logging."""
+This module provides search functionality including indexing, analytics, and query logging.
+"""
 
 
 
 import uuid
 
-
-
 from django.contrib.auth import get_user_model
-
 from django.contrib.contenttypes.fields import GenericForeignKey
-
 from django.contrib.contenttypes.models import ContentType
-
 from django.core.exceptions import ValidationError
-
 from django.db import models
-
 from django.db.models import (
-
     BooleanField,
-
     CharField,
-
     DateTimeField,
-
     ForeignKey,
-
     GenericIPAddressField,
-
     PositiveIntegerField,
-
     TextField,
-
     URLField,
-
     UUIDField,
-
 )
-
 from django.utils import timezone
 
-
-
 from apps.registry.registry import content_registry
-
-
 
 # PostgreSQL search functionality (optional)
 
@@ -707,4 +683,3 @@ class SearchSuggestion(models.Model):
 
 
         self.save(update_fields=["search_count", "last_searched_at", "result_count"])
-

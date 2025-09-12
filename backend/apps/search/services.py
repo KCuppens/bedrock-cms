@@ -1,42 +1,22 @@
+"""Search services for CMS content.
+
+Provides search functionality including indexing, querying, and analytics.
+"""
 import time
-
 from datetime import timedelta
-
 from typing import Any
 
-
-
 from django.contrib.contenttypes.models import ContentType
-
 from django.contrib.postgres.search import SearchQuery, SearchRank, SearchVector
-
 from django.core.paginator import Paginator
-
 from django.db.models import Avg, Count, F, Q
-
 from django.utils import timezone
-
-
 
 from apps.registry.registry import content_registry
 
-
-
 from .models import SearchIndex
-
 from .models import SearchQuery as SearchQueryLog
-
 from .models import SearchSuggestion
-
-
-
-Search services for CMS content.
-
-
-
-"""Provides search functionality including indexing, querying, and analytics."""
-
-
 
 # PostgreSQL search functionality (optional)
 
@@ -763,4 +743,3 @@ class SearchService:
 # Global search service instance
 
 search_service = SearchService()
-

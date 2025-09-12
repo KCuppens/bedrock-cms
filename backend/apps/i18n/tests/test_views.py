@@ -1,16 +1,10 @@
 from django.contrib.auth import get_user_model
-
 from django.contrib.contenttypes.models import ContentType
-
 from django.test import TestCase
-
 from django.urls import reverse
 
-
 from rest_framework import status
-
 from rest_framework.test import APIClient
-
 
 from apps.i18n.models import (
     Locale,
@@ -20,7 +14,6 @@ from apps.i18n.models import (
     UiMessage,
     UiMessageTranslation,
 )
-
 
 User = get_user_model()
 

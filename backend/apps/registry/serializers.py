@@ -1,26 +1,15 @@
+"""Auto-generated serializers for registered content models."""
+
 from typing import Any
-
-
 
 from rest_framework import serializers
 
-
-
 from .config import ContentConfig
-
 from .registry import content_registry
 
 
-
-Auto-generated serializers for registered content models.
-
-
-
 class ContentSerializerFactory:
-
-
-
-    Factory for creating serializers for registered content models.
+    """Factory for creating serializers for registered content models."""
 
 
 
@@ -379,4 +368,3 @@ def get_serializer_for_config(
 
 
     return ContentSerializerFactory.create_serializer(config)
-

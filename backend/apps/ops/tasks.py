@@ -1,27 +1,16 @@
 import datetime
-
 import glob
-
 import logging
-
 import os
-
 import shutil
-
 import subprocess  # nosec B404
 
-
 from django.conf import settings
-
 from django.core.cache import cache
-
 from django.core.management import call_command
-
 from django.db import connection
 
-
 from celery import shared_task
-
 
 logger = logging.getLogger(__name__)
 

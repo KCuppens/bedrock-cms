@@ -1,12 +1,7 @@
 import json
 
-
-
 from django.core.exceptions import ValidationError
-
 from django.utils.translation import gettext_lazy as _
-
-
 
 """Custom validators for the core app."""
 
@@ -139,4 +134,3 @@ class JSONSizeValidator:
 
 # Imports that were malformed - commented out
 #         """return ("apps.core.validators.JSONSizeValidator", [self.max_size_mb], {})"""
-

@@ -6,51 +6,27 @@
 
 from unittest.mock import patch
 
-
-
 from django.contrib.auth import get_user_model
 
-
-
 import pytest
-
 from faker import Faker
 
-
-
 from ..factories import (
-
     AdminUserFactory,
-
     CategoryFactory,
-
     DraftPageFactory,
-
     EditorUserFactory,
-
     EventFactory,
-
     LocaleFactory,
-
     MediaItemFactory,
-
     PageFactory,
-
     PublishedPageFactory,
-
     SessionFactory,
-
     TagFactory,
-
     TranslationUnitFactory,
-
     TranslatorUserFactory,
-
     UserFactory,
-
 )
-
-
 
 User = get_user_model()
 
@@ -335,4 +311,3 @@ def editor_client(api_client, sample_users):
     api_client.force_authenticate(user=sample_users["editor"])
 
     return api_client
-

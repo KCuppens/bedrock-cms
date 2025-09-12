@@ -3,7 +3,6 @@
 
 from django.db import migrations, models
 
-
 import apps.core.validators
 
 
@@ -21,10 +20,10 @@ class Migration(migrations.Migration):
                 default=list,
                 help_text="Structured content blocks",
                 validators=[
-# Imports that were malformed - commented out
-#                     """apps.core.validators.JSONSizeValidator(5),"""
-# Imports that were malformed - commented out
-#                     """apps.core.validators.validate_json_structure,"""
+                    # Imports that were malformed - commented out
+                    #                     """apps.core.validators.JSONSizeValidator(5),"""
+                    # Imports that were malformed - commented out
+                    #                     """apps.core.validators.validate_json_structure,"""
                 ],
             ),
         ),

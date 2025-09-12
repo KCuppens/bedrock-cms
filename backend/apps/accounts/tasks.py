@@ -1,19 +1,12 @@
 import logging
-
 from datetime import timedelta
 
-
 from django.contrib.auth import get_user_model
-
 from django.contrib.sessions.models import Session
-
 from django.core.cache import cache
-
 from django.utils import timezone
 
-
 from celery import shared_task
-
 
 """Celery tasks for accounts app."""
 

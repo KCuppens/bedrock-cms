@@ -2,13 +2,9 @@
 
 
 import django.core.validators
-
 import django.db.models.deletion
-
 import django.utils.timezone
-
 from django.conf import settings
-
 from django.db import migrations, models
 
 

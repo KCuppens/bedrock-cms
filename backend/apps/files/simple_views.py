@@ -1,22 +1,14 @@
 import logging
 
-
 from django.core.files.storage import default_storage
 
-
 from drf_spectacular.utils import extend_schema, extend_schema_view
-
 from rest_framework import permissions, status, viewsets
-
 from rest_framework.parsers import FormParser, MultiPartParser
-
 from rest_framework.response import Response
 
-
 from .models import FileUpload
-
 from .serializers import FileUploadSerializer
-
 
 logger = logging.getLogger(__name__)
 

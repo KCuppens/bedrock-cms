@@ -2,7 +2,6 @@
 
 
 import django.db.models.deletion
-
 from django.db import migrations, models
 
 
@@ -97,8 +96,7 @@ class Migration(migrations.Migration):
                 choices=[
                     ("summary", "Summary"),
                     ("summary_large_image", "Summary with Large Image"),
-                    """("app", "App"),"""
-                    ("player", "Player"),
+                    """("app", "App"),"""("player", "Player"),
                 ],
                 default="summary_large_image",
                 help_text="Default Twitter card type",

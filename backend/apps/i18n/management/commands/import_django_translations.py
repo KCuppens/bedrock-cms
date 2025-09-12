@@ -1,14 +1,8 @@
 from django.core.management.base import BaseCommand
-
 from django.utils import translation
-
 from django.utils.translation import gettext_lazy as _
 
-
-
 from apps.i18n.models import Locale, UiMessage, UiMessageTranslation
-
-
 
 """Import Django's built-in translation strings into the database.
 
@@ -468,4 +462,3 @@ class Command(BaseCommand):
                 f"  {locale.code}: {translated}/{total_messages} ({percentage:.1f}%)"
 
             )
-

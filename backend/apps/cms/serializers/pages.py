@@ -1,76 +1,43 @@
 from datetime import datetime, timedelta
 
-
-
 from rest_framework import serializers
 
-
-
 from apps.cms.models import Page
-
 from apps.cms.seo_utils import generate_seo_links, resolve_seo
-
 from apps.i18n.models import Locale
-
 from apps.i18n.serializers import LocaleSerializer
 
 
-
-
-
 class PageTreeItemSerializer(serializers.ModelSerializer):
-
     """Serializer for page tree items"""
-
-
 
     locale_name = serializers.CharField(source="locale.name", read_only=True)
 
     children_count = serializers.SerializerMethodField()
-
-
 
     class Meta:
 
         model = Page
 
         fields = [
-
             "id",
-
             "title",
-
             "slug",
-
             "path",
-
             "status",
-
             "locale",
-
             "locale_name",
-
             "parent",
-
             "position",
-
             "created_at",
-
             "updated_at",
-
             "children_count",
-
             "in_main_menu",
-
             "in_footer",
-
             "is_homepage",
-
         ]
 
         read_only_fields = ["id", "path", "created_at", "updated_at", "locale_name"]
-
-
 
     def get_children_count(self, obj):
 
@@ -83,12 +50,8 @@ class PageTreeItemSerializer(serializers.ModelSerializer):
         return obj.children.count()
 
 
-
 class PageReadSerializer(serializers.ModelSerializer):
-
     """Serializer for reading page data"""
-
-
 
     locale = LocaleSerializer(read_only=True)
 
@@ -104,100 +67,57 @@ class PageReadSerializer(serializers.ModelSerializer):
 
     recent_revisions = serializers.SerializerMethodField()
 
-
-
     class Meta:
 
         model = Page
 
         fields = [
-
             "id",
-
             "group_id",
-
             "parent",
-
             "position",
-
             "locale",
-
             "title",
-
             "slug",
-
             "path",
-
             "blocks",
-
             "seo",
-
             "status",
-
             "published_at",
-
             "created_at",
-
             "updated_at",
-
             "preview_token",
-
             "children",
-
             "updated_by",
-
             "updated_by_name",
-
             "resolved_seo",
-
             "seo_links",
-
             "in_main_menu",
-
             "in_footer",
-
             "is_homepage",
-
             "recent_revisions",
-
         ]
 
         read_only_fields = [
-
             "id",
-
             "group_id",
-
             "path",
-
             "created_at",
-
             "updated_at",
-
             "preview_token",
-
             "updated_by",
-
             "updated_by_name",
-
         ]
 
-
-
     def get_updated_by(self, obj):
-
         """Get user ID who last updated this page"""
 
         try:
 
             latest_revision = (
-
                 obj.revisions.select_related("created_by")
-
                 .order_by("-created_at")
-
                 .first()
-
             )
 
             if latest_revision and latest_revision.created_by:
@@ -208,22 +128,15 @@ class PageReadSerializer(serializers.ModelSerializer):
 
         return None
 
-
-
     def get_updated_by_name(self, obj):
-
         """Get name of user who last updated this page"""
 
         try:
 
             latest_revision = (
-
                 obj.revisions.select_related("created_by")
-
                 .order_by("-created_at")
-
                 .first()
-
             )
 
             if latest_revision and latest_revision.created_by:
@@ -250,10 +163,7 @@ class PageReadSerializer(serializers.ModelSerializer):
 
         return "System"
 
-
-
     def get_resolved_seo(self, obj):
-
         """Get resolved SEO settings for the page"""
 
         # Only include SEO data if with_seo parameter is provided
@@ -264,11 +174,7 @@ class PageReadSerializer(serializers.ModelSerializer):
 
             return None
 
-
-
         try:
-
-
 
             return resolve_seo(obj)
 
@@ -279,19 +185,12 @@ class PageReadSerializer(serializers.ModelSerializer):
             seo_data = obj.seo or {}
 
             return {
-
                 "title": seo_data.get("title") or obj.title,
-
                 "description": seo_data.get("description", ""),
-
                 "robots": seo_data.get("robots", "index,follow"),
-
             }
 
-
-
     def get_seo_links(self, obj):
-
         """Get SEO-related links for the page"""
 
         # Only include SEO links if with_seo parameter is provided
@@ -302,11 +201,7 @@ class PageReadSerializer(serializers.ModelSerializer):
 
             return None
 
-
-
         try:
-
-
 
             return generate_seo_links(obj)
 
@@ -315,82 +210,42 @@ class PageReadSerializer(serializers.ModelSerializer):
             # Fallback to basic link generation
 
             return {
-
                 "canonical": obj.seo.get("canonical_url") if obj.seo else None,
-
                 "alternates": [],
-
             }
 
-
-
     def get_recent_revisions(self, obj):
-
         """Get the 5 most recent revisions for this page"""
 
         try:
 
-
-
-
             # Return mock revision data for demonstration
-
-
 
             now = datetime.now()
 
-
-
             mock_revisions = [
-
                 {
-
                     "id": f"rev-{obj.id}-1",
-
                     "created_at": (now - timedelta(hours=2)).isoformat(),
-
                     "created_by_email": "john.doe@example.com",
-
                     "created_by_name": "John Doe",
-
                     "is_published_snapshot": True,
-
                     "is_autosave": False,
-
-                    """"comment": "Published latest changes","""
-
-                    "block_count": 5,
-
+                    """"comment": "Published latest changes",""" "block_count": 5,
                     "revision_type": "published",
-
                 },
-
                 {
-
                     "id": f"rev-{obj.id}-2",
-
                     "created_at": (now - timedelta(days=1)).isoformat(),
-
                     "created_by_email": "jane.smith@example.com",
-
                     "created_by_name": "Jane Smith",
-
                     "is_published_snapshot": False,
-
                     "is_autosave": True,
-
                     "comment": "",
-
                     "block_count": 5,
-
                     "revision_type": "autosave",
-
                 },
-
             ]
-
-
-
 
             return mock_revisions
 
@@ -400,135 +255,72 @@ class PageReadSerializer(serializers.ModelSerializer):
 
             return []
 
-
-
     def to_representation(self, instance):
-
         """Override to ensure recent_revisions data appears"""
 
         data = super().to_representation(instance)
 
-
-
-
         # Force add recent revisions since SerializerMethodField isn't working
-
-
 
         now = datetime.now()
 
-
-
         data["recent_revisions"] = [
-
             {
-
                 "id": f"rev-{instance.id}-1",
-
                 "created_at": (now - timedelta(hours=2)).isoformat(),
-
                 "created_by_email": "john.doe@example.com",
-
                 "created_by_name": "John Doe",
-
                 "is_published_snapshot": True,
-
                 "is_autosave": False,
-
-                """"comment": "Published latest changes","""
-
-                "block_count": 5,
-
+                """"comment": "Published latest changes",""" "block_count": 5,
                 "revision_type": "published",
-
             },
-
             {
-
                 "id": f"rev-{instance.id}-2",
-
                 "created_at": (now - timedelta(days=1)).isoformat(),
-
                 "created_by_email": "jane.smith@example.com",
-
                 "created_by_name": "Jane Smith",
-
                 "is_published_snapshot": False,
-
                 "is_autosave": True,
-
                 "comment": "",
-
                 "block_count": 5,
-
                 "revision_type": "autosave",
-
             },
-
         ]
-
-
-
 
         return data
 
 
-
 class PageWriteSerializer(serializers.ModelSerializer):
-
     """Serializer for writing page data"""
-
-
 
     locale = serializers.CharField()  # Accept locale code as string
 
     slug = serializers.CharField(
-
         required=False, allow_blank=True
-
     )  # Allow empty slug for homepage
-
-
 
     class Meta:
 
         model = Page
 
         fields = [
-
             "parent",
-
             "position",
-
             "locale",
-
             "title",
-
             "slug",
-
             "blocks",
-
             "seo",
-
             "status",
-
             "published_at",
-
             "in_main_menu",
-
             "in_footer",
-
             "is_homepage",
-
         ]
 
-
-
     def validate_locale(self, value):
-
         """Convert locale code to locale instance"""
-
-
 
         try:
 
@@ -551,20 +343,13 @@ class PageWriteSerializer(serializers.ModelSerializer):
             except Locale.DoesNotExist:
 
                 raise serializers.ValidationError(
-
                     f"Locale with code '{value}' does not exist."
-
                 )
 
-
-
     def validate_slug(self, value):
-
         """Validate slug uniqueness within parent and locale"""
 
         instance = getattr(self, "instance", None)
-
-
 
         # Allow empty slug for homepage (will be handled in save method)
 
@@ -572,40 +357,26 @@ class PageWriteSerializer(serializers.ModelSerializer):
 
             return value
 
-
-
         # Get parent and locale from initial data or instance
 
         parent = self.initial_data.get("parent") or (
-
             instance.parent if instance else None
-
         )
 
         locale_code = self.initial_data.get("locale") or (
-
             instance.locale.code if instance else None
-
         )
 
-
-
         # Convert locale code to locale instance if needed
-
-
 
         if locale_code:
 
             try:
 
                 locale = (
-
                     Locale.objects.get(code=locale_code.lower())
-
                     if isinstance(locale_code, str)
-
                     else locale_code
-
                 )
 
             except Locale.DoesNotExist:
@@ -618,13 +389,9 @@ class PageWriteSerializer(serializers.ModelSerializer):
 
             locale = None
 
-
-
         # Check for existing page with same slug, parent, and locale
 
         queryset = Page.objects.filter(slug=value, parent=parent, locale=locale)
-
-
 
         # Exclude current instance if updating
 
@@ -632,24 +399,15 @@ class PageWriteSerializer(serializers.ModelSerializer):
 
             queryset = queryset.exclude(pk=instance.pk)
 
-
-
         if queryset.exists():
 
             raise serializers.ValidationError(
-
                 "A page with this slug already exists at this location."
-
             )
-
-
 
         return value
 
-
-
     def create(self, validated_data):
-
         """Create page with special handling for homepage"""
 
         # For homepage, keep slug empty - the path computation will handle it
@@ -657,4 +415,3 @@ class PageWriteSerializer(serializers.ModelSerializer):
         # No need to set a default slug value
 
         return super().create(validated_data)
-

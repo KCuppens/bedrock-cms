@@ -1,25 +1,15 @@
 from datetime import timedelta
 
-
 from django.contrib.auth import get_user_model
-
 from django.db.models import Avg, Count
-
 from django.db.models.functions import TruncDate, TruncMonth, TruncWeek
-
 from django.utils import timezone
 
-
 from drf_spectacular.utils import OpenApiParameter, extend_schema, extend_schema_view
-
 from rest_framework import permissions, viewsets
-
 from rest_framework.decorators import action
-
 from rest_framework.response import Response
-
 from rest_framework.throttling import UserRateThrottle
-
 
 from .models import (
     AnalyticsSummary,
@@ -30,7 +20,6 @@ from .models import (
     Threat,
     UserActivity,
 )
-
 from .serializers import (
     AnalyticsSummarySerializer,
     AssessmentCreateSerializer,
@@ -49,7 +38,6 @@ from .serializers import (
     UserActivityCreateSerializer,
     UserActivitySerializer,
 )
-
 
 User = get_user_model()
 

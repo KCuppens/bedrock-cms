@@ -1,27 +1,16 @@
 import hashlib
-
 import hmac
-
 import json
 
-
 from django.conf import settings
-
 from django.contrib.admin.views.decorators import staff_member_required
-
 from django.http import HttpResponse, JsonResponse
-
 from django.shortcuts import get_object_or_404
-
 from django.utils.decorators import method_decorator
-
 from django.views.decorators.csrf import csrf_exempt
-
 from django.views.generic import DetailView, TemplateView
 
-
 from .models import EmailMessageLog, EmailTemplate
-
 from .services import EmailService
 
 

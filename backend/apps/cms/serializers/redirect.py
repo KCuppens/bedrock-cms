@@ -1,11 +1,8 @@
 from django.contrib.auth import get_user_model
 
-
 from rest_framework import serializers
 
-
 from apps.cms.models import Redirect
-
 
 User = get_user_model()
 

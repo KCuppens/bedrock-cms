@@ -1,16 +1,15 @@
 from django.urls import path
 
-
 from .views import (
     EmailLogListView,
     EmailTemplateListView,
     EmailTemplatePreviewView,
+    """,
+    """send_test_email,
     email_preview_html,
     email_preview_text,
     email_webhook,
-    """send_test_email,"""
 )
-
 
 # Development URLs for email templates
 

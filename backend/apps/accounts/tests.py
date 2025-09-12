@@ -1,17 +1,11 @@
 from django.contrib.auth import get_user_model
-
 from django.urls import reverse
 
-
 import pytest
-
 from rest_framework import status
-
 from rest_framework.test import APIClient, APITestCase
 
-
 from apps.accounts.models import UserProfile
-
 
 User = get_user_model()
 
@@ -97,6 +91,8 @@ class UserAPITest(APITestCase):
 
 
 """@pytest.fixture"""
+
+
 def user():
     """Create a test user"""
 
@@ -106,6 +102,8 @@ def user():
 
 
 """@pytest.fixture"""
+
+
 def admin_user():
     """Create an admin user"""
 
@@ -121,6 +119,8 @@ def admin_user():
 
 
 """@pytest.fixture"""
+
+
 def auth_client(user):
     """Create an authenticated API client"""
 
@@ -132,6 +132,8 @@ def auth_client(user):
 
 
 """@pytest.fixture"""
+
+
 def celery_eager(settings):
     """Configure Celery to execute tasks synchronously"""
 

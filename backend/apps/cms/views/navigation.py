@@ -1,23 +1,12 @@
 from django.core.cache import cache
 
-
-
 from drf_spectacular.utils import extend_schema
-
 from rest_framework import views
-
 from rest_framework.permissions import AllowAny
-
 from rest_framework.response import Response
 
-
-
 from apps.cms.models import Page
-
 from apps.i18n.models import Locale
-
-
-
 
 
 class NavigationView(views.APIView):
@@ -684,4 +673,3 @@ class SiteSettingsView(views.APIView):
 
 
         return Response(settings)
-

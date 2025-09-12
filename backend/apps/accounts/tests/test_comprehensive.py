@@ -1,32 +1,21 @@
-# 
+#
 
 """Accounts app tests with high coverage and real database operations."""
-# 
+#
 
 from django.contrib.auth import authenticate, get_user_model
-
 from django.contrib.auth.models import Group, Permission
-
 from django.core.exceptions import ValidationError
-
 from django.test import TestCase, TransactionTestCase
-
 from django.urls import reverse
 
-
 from rest_framework import status
-
 from rest_framework.test import APIClient, APITestCase
 
-
 from apps.accounts import rbac
-
 from apps.accounts.auth_backends import ScopedPermissionBackend
-
 from apps.accounts.models import UserProfile
-
 from apps.accounts.serializers import UserProfileSerializer, UserSerializer
-
 
 User = get_user_model()
 
@@ -527,8 +516,7 @@ class AccountsAPITests(APITestCase):
         """Test password change API."""
 
         password_data = {
-            """"old_password": "testpass123","""
-            """"new_password": "newtestpass123","""
+            """"old_password": "testpass123",""" """"new_password": "newtestpass123","""
         }
 
         try:

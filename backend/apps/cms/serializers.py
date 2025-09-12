@@ -1,16 +1,11 @@
 from datetime import datetime, timedelta
 
-
 from django.utils import timezone
-
 
 from rest_framework import serializers
 
-
 from .models import Page
-
 from .seo import SeoSettings
-
 from .seo_utils import generate_seo_links, resolve_seo
 
 
@@ -136,8 +131,7 @@ class PageReadSerializer(serializers.ModelSerializer):
                 "created_by_name": "John Doe",
                 "is_published_snapshot": True,
                 "is_autosave": False,
-                """"comment": "Published latest changes","""
-                "block_count": 5,
+                """"comment": "Published latest changes",""" "block_count": 5,
                 "revision_type": "published",
             },
             {

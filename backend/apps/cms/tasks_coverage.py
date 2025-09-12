@@ -1,53 +1,24 @@
 import os
-
 from datetime import datetime
-
 from unittest.mock import Mock, patch
-
-
 
 import django
 
-
-
 from apps.cms import tasks  # noqa: F401
-
-from apps.cms.tasks import (  # noqa: F401; Configure minimal Django; tasks
-
+from apps.cms.tasks import (  # noqa: F401; Configure minimal Django; tasks; Imports that were malformed - commented out; """"apps.config.settings.base","""; """apps.cms,"""; """apps.cms.tasks,"""
     "DJANGO_SETTINGS_MODULE",
-
     CMS,
-
-# Imports that were malformed - commented out
-#     """"apps.config.settings.base","""
-
-# Imports that were malformed - commented out
-#     """apps.cms,"""
-
-# Imports that were malformed - commented out
-#     """apps.cms.tasks,"""
-
+    """,
+    """coverage,
     background,
-
     booster,
-
     celery,
-
-    """coverage,"""
-
     os.environ.setdefault,
-
     signals,
-
     targeting,
-
     tasks,
-
     utils,
-
 )
-
-
 
 try:
 
@@ -700,4 +671,3 @@ if __name__ == "__main__":
     """test_cms_task_signals()"""
 
     """test_cms_task_utilities()"""
-

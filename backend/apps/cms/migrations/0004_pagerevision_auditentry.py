@@ -3,19 +3,17 @@
 
 import uuid
 
-
 import django.db.models.deletion
-
 from django.conf import settings
-
 from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
 
     dependencies = [
-        """migrations.swappable_dependency(settings.AUTH_USER_MODEL),"""
-        ("contenttypes", "0002_remove_content_type_name"),
+        """migrations.swappable_dependency(settings.AUTH_USER_MODEL),"""(
+            "contenttypes", "0002_remove_content_type_name"
+        ),
         ("cms", "0003_seosettings_default_og_asset"),
     ]
 

@@ -1,33 +1,56 @@
+"""Minimal Django settings for testing without problematic apps."""
+
+import os
 import tempfile
 from pathlib import Path
 
-# Import base settings but override problematic apps
-from .base import *  # noqa: F403, F401
-from .base import env  # noqa: F401
+# Build paths inside the project like this: BASE_DIR / 'subdir'.
+BASE_DIR = Path(__file__).resolve().parent.parent.parent.parent
 
-# Temporarily disable problematic apps for basic Django setup test
-INSTALLED_APPS = [
-    # Django apps
+# Security settings
+SECRET_KEY = "test-secret-key-not-for-production"
+DEBUG = True
+ALLOWED_HOSTS = ["*"]
+
+# Minimal app configuration
+DJANGO_APPS = [
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-    # Third party apps
-    "rest_framework",
-    "corsheaders",
-    "drf_spectacular",
-    "allauth",
-    "allauth.account",
-    "waffle",
-    # Only essential local apps
-    "apps.accounts",
-    "apps.core",
-    "apps.i18n",  # Required by accounts.rbac
 ]
 
-# Test database configuration
+THIRD_PARTY_APPS = [
+    "rest_framework",
+]
+
+LOCAL_APPS = [
+    "apps.core",
+    "apps.accounts",
+    "apps.files",
+    # Exclude problematic apps for now
+    # "apps.search",
+    # "apps.registry",
+]
+
+INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
+
+# Middleware
+MIDDLEWARE = [
+    "django.middleware.security.SecurityMiddleware",
+    "django.contrib.sessions.middleware.SessionMiddleware",
+    "django.middleware.common.CommonMiddleware",
+    "django.middleware.csrf.CsrfViewMiddleware",
+    "django.contrib.auth.middleware.AuthenticationMiddleware",
+    "django.contrib.messages.middleware.MessageMiddleware",
+    "django.middleware.clickjacking.XFrameOptionsMiddleware",
+]
+
+ROOT_URLCONF = "apps.config.urls"
+
+# Database
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.sqlite3",
@@ -35,16 +58,27 @@ DATABASES = {
     }
 }
 
-# Disable migrations for local tests
+
+# Disable migrations for tests
 class DisableMigrations:
     def __contains__(self, item):
         return True
+
     def __getitem__(self, item):
         return None
 
+
 MIGRATION_MODULES = DisableMigrations()
 
-# Fast password hasher for tests
+# Cache
+CACHES = {
+    "default": {
+        "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
+        "LOCATION": "test-cache",
+    }
+}
+
+# Password hashers for faster tests
 PASSWORD_HASHERS = [
     "django.contrib.auth.hashers.MD5PasswordHasher",
 ]
@@ -52,40 +86,48 @@ PASSWORD_HASHERS = [
 # Email backend for tests
 EMAIL_BACKEND = "django.core.mail.backends.locmem.EmailBackend"
 
-# Celery settings for tests
-CELERY_TASK_ALWAYS_EAGER = True
-CELERY_TASK_EAGER_PROPAGATES = True
-
-# Logging disabled for tests
-LOGGING_CONFIG = None
-
-# Media files - use temp directory
+# Static/Media files
+STATIC_URL = "/static/"
+STATIC_ROOT = Path(tempfile.mkdtemp(prefix="test_static_"))
+MEDIA_URL = "/media/"
 MEDIA_ROOT = Path(tempfile.mkdtemp(prefix="test_media_"))
 
-# Static files - use temp directory  
-STATIC_ROOT = Path(tempfile.mkdtemp(prefix="test_static_"))
-
-# Security settings
-SECRET_KEY = "test-secret-key-not-for-production"  # nosec B105
-
-# Cache settings
-CACHES = {
-    "default": {
-        "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
-        "LOCATION": "unique-snowflake",
-    }
-}
-
-# REST Framework test settings
+# REST Framework
 REST_FRAMEWORK = {
-    **REST_FRAMEWORK,  # noqa: F405
     "DEFAULT_AUTHENTICATION_CLASSES": [
         "rest_framework.authentication.SessionAuthentication",
+    ],
+    "DEFAULT_PERMISSION_CLASSES": [
+        "rest_framework.permissions.IsAuthenticated",
     ],
     "TEST_REQUEST_DEFAULT_FORMAT": "json",
 }
 
-# Waffle settings for tests
-WAFFLE_FLAG_DEFAULT = False
-WAFFLE_SWITCH_DEFAULT = False
-WAFFLE_SAMPLE_DEFAULT = False
+# Templates
+TEMPLATES = [
+    {
+        "BACKEND": "django.template.backends.django.DjangoTemplates",
+        "DIRS": [],
+        "APP_DIRS": True,
+        "OPTIONS": {
+            "context_processors": [
+                "django.template.context_processors.debug",
+                "django.template.context_processors.request",
+                "django.contrib.auth.context_processors.auth",
+                "django.contrib.messages.context_processors.messages",
+            ],
+        },
+    },
+]
+
+# Internationalization
+LANGUAGE_CODE = "en-us"
+TIME_ZONE = "UTC"
+USE_I18N = True
+USE_TZ = True
+
+# Default primary key field type
+DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+# Disable logging during tests
+LOGGING_CONFIG = None

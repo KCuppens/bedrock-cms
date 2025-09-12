@@ -7,7 +7,6 @@ Provides helper functions to work with block types and metadata.
 """
 
 
-
 def get_block_metadata():
     """
     Get metadata for all active block types for API responses.
@@ -19,10 +18,7 @@ def get_block_metadata():
         QuerySet: Block type metadata for active blocks
     """
 
-
-
     return BlockType.get_block_metadata()
-
 
 
 def get_block_registry():
@@ -33,10 +29,7 @@ def get_block_registry():
         QuerySet: Full block registry data
     """
 
-
-
     return BlockType.get_registry()
-
 
 
 def get_block_by_type(block_type):
@@ -50,8 +43,6 @@ def get_block_by_type(block_type):
         BlockType: The block type instance or None if not found
     """
 
-
-
     try:
 
         return BlockType.objects.get(type=block_type, is_active=True)
@@ -59,7 +50,6 @@ def get_block_by_type(block_type):
     except BlockType.DoesNotExist:
 
         return None
-
 
 
 def is_block_type_active(block_type):
@@ -73,7 +63,4 @@ def is_block_type_active(block_type):
         bool: True if the block type is active, False otherwise
     """
 
-
-
     return BlockType.objects.filter(type=block_type, is_active=True).exists()
-

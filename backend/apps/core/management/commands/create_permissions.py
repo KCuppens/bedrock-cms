@@ -1,7 +1,5 @@
 from django.core.management import call_command
-
 from django.core.management.base import BaseCommand
-
 
 """Management command to create all model permissions.
 

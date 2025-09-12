@@ -1,25 +1,15 @@
 import logging
 
-
 from django.core.cache import cache
-
 from django.core.management.base import BaseCommand
-
 from django.db.models.signals import post_delete, post_save
-
 from django.dispatch import receiver
 
-
 from apps.blog.models import BlogPost
-
 from apps.cms.models import Page
-
 from apps.core.cache import cache_manager
-
 from apps.core.tasks import bulk_warm_cache, warm_cache_async
-
 from apps.i18n.models import Locale
-
 
 """Cache warming and invalidation strategies."""
 

@@ -1,36 +1,24 @@
 from pathlib import Path
 
-
-
 from django.apps import apps
-
 from django.core.management.base import BaseCommand, CommandError
-
 from django.template import Context, Template
-
 from django.utils import timezone
 
-
-
 import inflection
-
 from django_filters.rest_framework import DjangoFilterBackend
-
 from drf_spectacular.utils import OpenApiParameter, extend_schema
-
 from rest_framework import filters, serializers, status, viewsets
-
 from rest_framework.decorators import action
-
 from rest_framework.permissions import IsAuthenticated
-
 from rest_framework.response import Response
+
+from apps.registry.registry import content_registry
 
 # from {{app_label}}.models import {{ model_class }}  # Template line for code generation
 
 
 
-from apps.registry.registry import content_registry
 
 
 
@@ -1205,4 +1193,3 @@ curl "/api/content/{{ model_label }}/?search=example{% if config.locale_field %}
             f"\nAPI endpoints for {context['model_label']} are ready to use!"
 
         )
-

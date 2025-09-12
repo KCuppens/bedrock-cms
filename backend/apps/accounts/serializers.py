@@ -1,17 +1,11 @@
 from django.contrib.auth import get_user_model
-
 from django.contrib.auth.password_validation import validate_password
 
-
 from allauth.account.adapter import get_adapter
-
 from allauth.account.utils import setup_user_email
-
 from rest_framework import serializers
 
-
 from .models import UserProfile
-
 
 User = get_user_model()
 

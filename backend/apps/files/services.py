@@ -1,38 +1,20 @@
 import hashlib
-
 import logging
-
 import os
-
 import uuid
-
 from typing import Any
 
-
-
 from django.conf import settings
-
 from django.core.files.base import ContentFile
-
 from django.core.files.storage import default_storage
-
 from django.db import transaction
-
 from django.urls import reverse
-
 from django.utils import timezone
 
-
-
 from apps.core.circuit_breaker import storage_circuit_breaker
-
 from apps.core.enums import FileType
 
-
-
 from .models import FileUpload
-
-
 
 logger = logging.getLogger(__name__)
 
@@ -58,11 +40,11 @@ class FileService:
 
         "image/svg+xml": FileType.IMAGE,
 
-        """"application/pdf": FileType.DOCUMENT,"""
+        "application/pdf": FileType.DOCUMENT,
 
-        """"application/msword": FileType.DOCUMENT,"""
+        "application/msword": FileType.DOCUMENT,
 
-        """"application/vnd.openxmlformats-officedocument.wordprocessingml.document": FileType.DOCUMENT,"""
+        "application/vnd.openxmlformats-officedocument.wordprocessingml.document": FileType.DOCUMENT,
 
         "text/plain": FileType.DOCUMENT,
 
@@ -141,8 +123,7 @@ class FileService:
             chunk = file.read(chunk_size)
 
             if not chunk:
-
-
+                break
 
             hasher.update(chunk)
 
@@ -414,10 +395,8 @@ class FileService:
 
         if file.size > max_size_bytes:
 
-            """errors.append("""
-
+            errors.append(
                 f"File size ({file.size} bytes) exceeds maximum allowed ({max_size_bytes} bytes)"
-
             )
 
 
@@ -651,4 +630,3 @@ class FileService:
         logger.info("Cleaned up %s expired files, {error_count} errors", deleted_count)
 
         return {"deleted": deleted_count, "errors": error_count}
-

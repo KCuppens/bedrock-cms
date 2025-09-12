@@ -1,42 +1,24 @@
 import unittest
-
 from unittest.mock import Mock
 
-
-
 from apps.cms import middleware, presentation, security, seo
-
 from apps.cms import serializers as cms_serializers
-
 from apps.cms import tasks, versioning
-
 from apps.cms import views as cms_views
-
 from apps.cms.blocks import validation
-
 from apps.cms.serializers import pages
-
 from apps.cms.views import pages
-
-
 
 """Additional unit tests for CMS app to boost coverage."""
 
 
-
 class TestCMSModelUtilities(unittest.TestCase):
-
     """Test CMS model utilities and helper functions."""
 
-
-
     def test_cms_seo_import(self):
-
         """Test CMS SEO module import and functionality."""
 
         try:
-
-
 
             # Test SEO utility functions
 
@@ -65,9 +47,7 @@ class TestCMSModelUtilities(unittest.TestCase):
                             elif "validate" in attr_name.lower():
 
                                 attr(
-
                                     """{"title": "Test", "description": "Test description"}"""
-
                                 )
 
                             elif "extract" in attr_name.lower():
@@ -77,8 +57,6 @@ class TestCMSModelUtilities(unittest.TestCase):
                         except Exception:
                             pass
 
-
-
                     elif hasattr(attr, "__init__"):
 
                         # Test SEO class instantiation
@@ -86,8 +64,6 @@ class TestCMSModelUtilities(unittest.TestCase):
                         try:
 
                             instance = attr()
-
-
 
                             # Test common SEO methods
 
@@ -98,9 +74,7 @@ class TestCMSModelUtilities(unittest.TestCase):
                             if hasattr(instance, "generate_description"):
 
                                 instance.generate_description(
-
                                     """Test content for description generation"""
-
                                 )
 
                             if hasattr(instance, "analyze"):
@@ -110,20 +84,13 @@ class TestCMSModelUtilities(unittest.TestCase):
                         except Exception:
                             pass
 
-
-
         except ImportError:
             pass
 
-
-
     def test_cms_security_import(self):
-
         """Test CMS security module functionality."""
 
         try:
-
-
 
             # Test security functions and classes
 
@@ -158,8 +125,6 @@ class TestCMSModelUtilities(unittest.TestCase):
                         except Exception:
                             pass
 
-
-
                     elif hasattr(attr, "__init__"):
 
                         # Test security manager classes
@@ -167,8 +132,6 @@ class TestCMSModelUtilities(unittest.TestCase):
                         try:
 
                             instance = attr()
-
-
 
                             # Test security methods
 
@@ -189,20 +152,13 @@ class TestCMSModelUtilities(unittest.TestCase):
                         except Exception:
                             pass
 
-
-
         except ImportError:
             pass
 
-
-
     def test_cms_presentation_import(self):
-
         """Test CMS presentation module functionality."""
 
         try:
-
-
 
             # Test presentation functions
 
@@ -233,8 +189,6 @@ class TestCMSModelUtilities(unittest.TestCase):
                         except Exception:
                             pass
 
-
-
                     elif hasattr(attr, "__init__"):
 
                         # Test presentation classes
@@ -243,24 +197,16 @@ class TestCMSModelUtilities(unittest.TestCase):
 
                             instance = attr()
 
-
-
                             # Test presentation methods
 
                             if hasattr(instance, "render_blocks"):
 
                                 blocks = [
-
                                     {"type": "text", "content": "Text content"},
-
                                     {
-
                                         "type": "image",
-
                                         "content": {"src": "/test.jpg", "alt": "Test"},
-
                                     },
-
                                 ]
 
                                 instance.render_blocks(blocks)
@@ -272,20 +218,13 @@ class TestCMSModelUtilities(unittest.TestCase):
                         except Exception:
                             pass
 
-
-
         except ImportError:
             pass
 
-
-
     def test_cms_versioning_import(self):
-
         """Test CMS versioning module functionality."""
 
         try:
-
-
 
             # Test versioning functions
 
@@ -302,11 +241,8 @@ class TestCMSModelUtilities(unittest.TestCase):
                             # Test versioning functions
 
                             if (
-
                                 "create" in attr_name.lower()
-
                                 and "version" in attr_name.lower()
-
                             ):
 
                                 mock_object = Mock()
@@ -322,11 +258,8 @@ class TestCMSModelUtilities(unittest.TestCase):
                                 attr(mock_object, 1, Mock())  # object, version_id, user
 
                             elif (
-
                                 "get" in attr_name.lower()
-
                                 and "version" in attr_name.lower()
-
                             ):
 
                                 attr(1)  # version_id
@@ -338,8 +271,6 @@ class TestCMSModelUtilities(unittest.TestCase):
                         except Exception:
                             pass
 
-
-
                     elif hasattr(attr, "__init__"):
 
                         # Test versioning manager classes
@@ -349,8 +280,6 @@ class TestCMSModelUtilities(unittest.TestCase):
                             mock_object = Mock()
 
                             instance = attr(mock_object)
-
-
 
                             # Test versioning methods
 
@@ -369,20 +298,13 @@ class TestCMSModelUtilities(unittest.TestCase):
                         except Exception:
                             pass
 
-
-
         except ImportError:
             pass
 
-
-
     def test_cms_tasks_import(self):
-
         """Test CMS tasks module functionality."""
 
         try:
-
-
 
             # Test task functions
 
@@ -425,26 +347,17 @@ class TestCMSModelUtilities(unittest.TestCase):
                         except Exception:
                             pass
 
-
-
         except ImportError:
             pass
 
 
-
 class TestCMSSerializers(unittest.TestCase):
-
     """Test CMS serializers functionality."""
 
-
-
     def test_cms_serializers_import(self):
-
         """Test CMS serializers import and basic functionality."""
 
         try:
-
-
 
             # Test serializer classes
 
@@ -461,22 +374,13 @@ class TestCMSSerializers(unittest.TestCase):
                             # Test serializer instantiation with mock data
 
                             mock_data = {
-
                                 "title": "Test Title",
-
                                 "content": "Test content",
-
                                 "slug": "test-slug",
-
                                 "status": "draft",
-
                             }
 
-
-
                             serializer = attr(data=mock_data)
-
-
 
                             # Test serializer methods
 
@@ -491,25 +395,16 @@ class TestCMSSerializers(unittest.TestCase):
                                 except Exception:
                                     pass
 
-
-
                         except Exception:
                             pass
-
-
 
         except ImportError:
             pass
 
-
-
     def test_cms_page_serializers(self):
-
         """Test CMS page-specific serializers."""
 
         try:
-
-
 
             # Test page serializer classes
 
@@ -526,32 +421,20 @@ class TestCMSSerializers(unittest.TestCase):
                             # Test with page-specific mock data
 
                             mock_data = {
-
                                 "title": "Test Page",
-
                                 "slug": "test-page",
-
                                 "blocks": [{"type": "text", "content": "Hello"}],
-
                                 "seo": {"title": "SEO Title"},
-
                                 "status": "draft",
-
                             }
 
-
-
                             serializer = attr(data=mock_data)
-
-
 
                             # Test validation
 
                             if hasattr(serializer, "is_valid"):
 
                                 serializer.is_valid()
-
-
 
                             # Test field access
 
@@ -561,40 +444,27 @@ class TestCMSSerializers(unittest.TestCase):
 
                                 self.assertIsInstance(fields, dict)
 
-
-
                         except Exception:
                             pass
-
-
 
         except ImportError:
             pass
 
 
-
 class TestCMSViews(unittest.TestCase):
-
     """Test CMS views functionality."""
 
-
-
     def test_cms_views_import(self):
-
         """Test CMS views import and basic functionality."""
 
         try:
-
-
 
             # Test view classes
 
             for attr_name in dir(cms_views):
 
                 if not attr_name.startswith("_") and any(
-
                     suffix in attr_name for suffix in ["View", "ViewSet"]
-
                 ):
 
                     attr = getattr(cms_views, attr_name)
@@ -607,8 +477,6 @@ class TestCMSViews(unittest.TestCase):
 
                             view = attr()
 
-
-
                             # Test common view methods
 
                             if hasattr(view, "get_queryset"):
@@ -620,8 +488,6 @@ class TestCMSViews(unittest.TestCase):
                                 except Exception:
                                     pass
 
-
-
                             if hasattr(view, "get_serializer_class"):
 
                                 try:
@@ -630,8 +496,6 @@ class TestCMSViews(unittest.TestCase):
 
                                 except Exception:
                                     pass
-
-
 
                             if hasattr(view, "get_permissions"):
 
@@ -644,34 +508,23 @@ class TestCMSViews(unittest.TestCase):
                                 except Exception:
                                     pass
 
-
-
                         except Exception:
                             pass
-
-
 
         except ImportError:
             pass
 
-
-
     def test_cms_page_views(self):
-
         """Test CMS page views functionality."""
 
         try:
-
-
 
             # Test page view classes
 
             for attr_name in dir(pages):
 
                 if not attr_name.startswith("_") and any(
-
                     suffix in attr_name for suffix in ["View", "ViewSet"]
-
                 ):
 
                     attr = getattr(pages, attr_name)
@@ -688,8 +541,6 @@ class TestCMSViews(unittest.TestCase):
 
                             view.request.query_params = {}
 
-
-
                             # Test page-specific methods
 
                             if hasattr(view, "get_object"):
@@ -701,20 +552,13 @@ class TestCMSViews(unittest.TestCase):
                                 except Exception:
                                     pass
 
-
-
                             # Test custom actions
 
                             for method_name in [
-
                                 "publish",
-
                                 "unpublish",
-
                                 "schedule",
-
                                 "preview",
-
                             ]:
 
                                 if hasattr(view, method_name):
@@ -728,31 +572,20 @@ class TestCMSViews(unittest.TestCase):
                                     except Exception:
                                         pass
 
-
-
                         except Exception:
                             pass
-
-
 
         except ImportError:
             pass
 
 
-
 class TestCMSBlocksValidation(unittest.TestCase):
-
     """Test CMS blocks validation functionality."""
 
-
-
     def test_blocks_validation_import(self):
-
         """Test blocks validation import and functionality."""
 
         try:
-
-
 
             # Test validation functions
 
@@ -771,19 +604,12 @@ class TestCMSBlocksValidation(unittest.TestCase):
                             if "validate" in attr_name.lower():
 
                                 test_blocks = [
-
                                     {"type": "text", "content": "Hello world"},
-
                                     {
-
                                         "type": "image",
-
                                         "content": {"src": "/test.jpg", "alt": "Test"},
-
                                     },
-
                                     {"type": "heading", "content": "Page Title"},
-
                                 ]
 
                                 """attr(test_blocks)"""
@@ -791,15 +617,10 @@ class TestCMSBlocksValidation(unittest.TestCase):
                             elif "sanitize" in attr_name.lower():
 
                                 attr(
-
                                     {
-
                                         "type": "text",
-
                                         "content": '<script>alert("test")</script>',
-
                                     }
-
                                 )
 
                             elif "process" in attr_name.lower():
@@ -809,8 +630,6 @@ class TestCMSBlocksValidation(unittest.TestCase):
                         except Exception:
                             pass
 
-
-
                     elif hasattr(attr, "__init__"):
 
                         # Test validation classes
@@ -818,8 +637,6 @@ class TestCMSBlocksValidation(unittest.TestCase):
                         try:
 
                             validator = attr()
-
-
 
                             # Test validator methods
 
@@ -832,11 +649,8 @@ class TestCMSBlocksValidation(unittest.TestCase):
                             if hasattr(validator, "is_valid"):
 
                                 test_block = {
-
                                     "type": "text",
-
                                     "content": "Valid content",
-
                                 }
 
                                 result = validator.is_valid(test_block)
@@ -846,26 +660,17 @@ class TestCMSBlocksValidation(unittest.TestCase):
                         except Exception:
                             pass
 
-
-
         except ImportError:
             pass
 
 
-
 class TestCMSMiddleware(unittest.TestCase):
-
     """Test CMS middleware functionality."""
 
-
-
     def test_cms_middleware_import(self):
-
         """Test CMS middleware import and functionality."""
 
         try:
-
-
 
             # Test middleware classes
 
@@ -883,8 +688,6 @@ class TestCMSMiddleware(unittest.TestCase):
 
                             middleware_instance = attr(get_response)
 
-
-
                             # Test middleware call
 
                             if callable(middleware_instance):
@@ -899,16 +702,12 @@ class TestCMSMiddleware(unittest.TestCase):
 
                                 mock_request.META = {"HTTP_HOST": "example.com"}
 
-
-
                                 try:
 
                                     middleware_instance(mock_request)
 
                                 except Exception:
                                     pass
-
-
 
                             # Test process methods
 
@@ -921,8 +720,6 @@ class TestCMSMiddleware(unittest.TestCase):
                                 except Exception:
                                     pass
 
-
-
                             if hasattr(middleware_instance, "process_response"):
 
                                 mock_response = Mock()
@@ -930,27 +727,19 @@ class TestCMSMiddleware(unittest.TestCase):
                                 try:
 
                                     middleware_instance.process_response(
-
                                         mock_request, mock_response
-
                                     )
 
                                 except Exception:
                                     pass
 
-
-
                         except Exception:
                             pass
-
-
 
         except ImportError:
             pass
 
 
-
 if __name__ == "__main__":
 
     """unittest.main()"""
-

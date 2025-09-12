@@ -1,18 +1,10 @@
 from django.core.management.base import BaseCommand, CommandError
-
 from django.db import models, transaction
-
 from django.db.models import Count
 
-
-
 from apps.registry.registry import content_registry
-
 from apps.search.models import SearchIndex
-
 from apps.search.services import search_service
-
-
 
 """Django management command for search indexing."""
 
@@ -525,4 +517,3 @@ class Command(BaseCommand):
         response = input(f"{message} (y/N): ")
 
         return response.lower() in ["y", "yes"]
-

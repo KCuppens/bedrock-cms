@@ -1,20 +1,11 @@
 from pathlib import Path
 
-
-
 from django.apps import apps
-
 from django.core.management.base import BaseCommand
-
-
 
 import polib
 
-
-
 from apps.i18n.models import Locale, UiMessage, UiMessageTranslation
-
-
 
 """Management command to sync .po files with database translations.
 
@@ -22,68 +13,42 @@ Imports Django's .po files into the database and exports database translations b
 """
 
 
-
 class Command(BaseCommand):
 
     help = "Sync .po files with database translations (bidirectional)"
 
-
-
     def add_arguments(self, parser):
 
         parser.add_argument(
-
             "--direction",
-
             type=str,
-
             choices=["import", "export", "sync"],
-
             default="sync",
-
             help="Direction of sync: import (po->db), export (db->po), sync (bidirectional)",
-
         )
 
         parser.add_argument(
-
             "--locale",
-
             type=str,
-
             help="Specific locale code to sync (e.g., es, fr). If not specified, syncs all active locales",
-
         )
 
         parser.add_argument(
-
             "--namespace",
-
             type=str,
-
             default="django",
-
             help="Namespace for imported messages (default: django)",
-
         )
 
         parser.add_argument(
-
             "--app", type=str, help="Specific Django app to sync translations for"
-
         )
 
         parser.add_argument(
-
             "--create-missing",
-
             action="store_true",
-
             help="Create .po files for locales that don't have them",
-
         )
-
-
 
     def handle(self, *args, **options):
 
@@ -97,8 +62,6 @@ class Command(BaseCommand):
 
         create_missing = options.get("create_missing", False)
 
-
-
         # Get locales to process
 
         if locale_code:
@@ -108,18 +71,12 @@ class Command(BaseCommand):
             if not locales.exists():
 
                 self.stdout.write(
-
                     self.style.ERROR(f"Locale {locale_code} not found or not active")
-
                 )
-
-
 
         else:
 
             locales = Locale.objects.filter(is_active=True)
-
-
 
         # Get apps to process
         if app_name:
@@ -133,31 +90,20 @@ class Command(BaseCommand):
 
             app_configs = apps.get_app_configs()
 
-
-
         if direction in ["import", "sync"]:
 
             self.import_from_po_files(locales, app_configs, namespace)
-
-
 
         if direction in ["export", "sync"]:
 
             self.export_to_po_files(locales, app_configs, namespace, create_missing)
 
-
-
     def import_from_po_files(self, locales, app_configs, namespace):
-
         """Import translations from .po files into database."""
-
-
 
         imported_count = 0
 
         updated_count = 0
-
-
 
         for app_config in app_configs:
             # Check for locale directory in app
@@ -166,8 +112,6 @@ class Command(BaseCommand):
                 continue
 
             self.stdout.write(f"Processing app: {app_config.name}")
-
-
 
             for locale in locales:
 
@@ -188,8 +132,6 @@ class Command(BaseCommand):
 
                 self.stdout.write(f"  Importing {locale.code} from {po_file_path}")
 
-
-
                 # Parse .po file
 
                 try:
@@ -199,9 +141,7 @@ class Command(BaseCommand):
                 except Exception as e:
 
                     self.stdout.write(
-
                         self.style.WARNING(f"    Failed to parse {po_file_path}: {e}")
-
                     )
                     continue
 
@@ -216,33 +156,20 @@ class Command(BaseCommand):
 
                     message_key = f"{app_config.label}.{entry.msgid[:100]}"
 
-
-
                     # Get or create UiMessage
 
                     ui_message, created = UiMessage.objects.get_or_create(
-
                         key=message_key,
-
                         defaults={
-
                             "namespace": namespace,
-
                             "default_value": entry.msgid,
-
                             "description": f"Imported from {app_config.name}",
-
                         },
-
                     )
-
-
 
                     if created:
 
                         imported_count += 1
-
-
 
                     # Skip if no translation
                     if not entry.msgstr:
@@ -251,58 +178,33 @@ class Command(BaseCommand):
                     # Create or update translation
 
                     translation, trans_created = (
-
                         UiMessageTranslation.objects.update_or_create(
-
                             message=ui_message,
-
                             locale=locale,
-
                             defaults={
-
                                 "value": entry.msgstr,
-
                                 "status": (
                                     "approved" if not entry.fuzzy else "needs_review"
                                 ),
-
                             },
-
                         )
-
                     )
-
-
 
                     if not trans_created:
 
                         updated_count += 1
 
-
-
         self.stdout.write(
-
             self.style.SUCCESS(
-
                 f"Import complete: {imported_count} messages imported, "
-
                 f"{updated_count} translations updated"
-
             )
-
         )
 
-
-
     def export_to_po_files(self, locales, app_configs, namespace, create_missing):
-
         """Export database translations to .po files."""
 
-
-
         exported_count = 0
-
-
 
         # Group messages by app
 
@@ -319,8 +221,6 @@ class Command(BaseCommand):
                 if app_label not in messages_by_app:
                     messages_by_app[app_label] = []
                 messages_by_app[app_label].append(ui_message)
-
-
 
         for app_config in app_configs:
             app_label = app_config.label
@@ -340,8 +240,6 @@ class Command(BaseCommand):
 
             self.stdout.write(f"Exporting translations for app: {app_config.name}")
 
-
-
             for locale in locales:
 
                 # Skip default locale (usually 'en')
@@ -354,15 +252,11 @@ class Command(BaseCommand):
 
                 po_file_path = po_dir / "django.po"
 
-
-
                 # Create directory if needed
 
                 if create_missing and not po_dir.exists():
 
                     po_dir.mkdir(parents=True)
-
-
 
                 # Load existing .po file or create new one
 
@@ -375,23 +269,16 @@ class Command(BaseCommand):
                     po = polib.POFile()
 
                     po.metadata = {
-
                         "Project-Id-Version": "1.0",
-
                         "Language": locale.code,
-
                         "Content-Type": "text/plain; charset=UTF-8",
-
                         "Content-Transfer-Encoding": "8bit",
-
                     }
 
                 else:
                     continue
 
                 self.stdout.write(f"  Exporting {locale.code} to {po_file_path}")
-
-
 
                 # Export translations
                 for ui_message in messages_by_app[app_label]:
@@ -403,21 +290,13 @@ class Command(BaseCommand):
                     except UiMessageTranslation.DoesNotExist:
                         continue
 
-
-
                     # Extract msgid from key (remove app prefix)
 
                     msgid = (
-
                         ui_message.key.split(".", 1)[1]
-
                         if "." in ui_message.key
-
                         else ui_message.key
-
                     )
-
-
 
                     # Find or create entry in .po file
 
@@ -433,11 +312,8 @@ class Command(BaseCommand):
                     else:
 
                         entry = polib.POEntry(
-
                             msgid=msgid,
-
                             msgstr=translation.value,
-
                         )
 
                         if translation.status == "needs_review":
@@ -446,17 +322,11 @@ class Command(BaseCommand):
 
                         po.append(entry)
 
-
-
                     exported_count += 1
-
-
 
                 # Save .po file
 
                 po.save(str(po_file_path))
-
-
 
                 # Compile to .mo file
 
@@ -464,15 +334,8 @@ class Command(BaseCommand):
 
                 po.save_as_mofile(str(mo_file_path))
 
-
-
         self.stdout.write(
-
             self.style.SUCCESS(
-
                 f"Export complete: {exported_count} translations exported"
-
             )
-
         )
-

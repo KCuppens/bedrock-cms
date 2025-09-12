@@ -1,28 +1,17 @@
 import json
-
 from typing import Any, Optional
 
-
-
 from django.contrib.contenttypes.models import ContentType
-
 from django.db.models import QuerySet
 
-
-
 from .models import Locale, TranslationUnit, UiMessage, UiMessageTranslation
-
-
 
 """Translation utilities for content fallback and resolution."""
 
 
 
 class TranslationResolver:
-
-
-
-    Utility for resolving translated content with fallback support.
+    """Utility for resolving translated content with fallback support."""
 
 
 
@@ -40,23 +29,16 @@ class TranslationResolver:
 
 
 
-        Resolve a translated field with fallback.
-
-
+        """Resolve a translated field with fallback.
 
         Args:
-
             obj: Object to get translation for
-
             field: Field name to translate
-
             default_value: Default if no translation found
 
-
-
         Returns:
-
             Translated text or fallback
+        """
 
 
 
@@ -138,21 +120,15 @@ class TranslationResolver:
 
 
 
-        Resolve multiple fields for an object.
-
-
+        """Resolve multiple fields for an object.
 
         Args:
-
             obj: Object to translate
-
             fields: List of field names to translate
 
-
-
         Returns:
-
-            """Dict mapping field names to translated values"""
+            Dict mapping field names to translated values
+        """
 
 
 
@@ -174,21 +150,15 @@ class TranslationResolver:
 
 
 
-        Get translation status for multiple fields.
-
-
+        """Get translation status for multiple fields.
 
         Args:
-
             obj: Object to check
-
             fields: List of field names
 
-
-
         Returns:
-
             Dict with translation status info for each field
+        """
 
 
 
@@ -285,7 +255,7 @@ class TranslationManager:
 
 
 
-    Manager for handling content translation operations.
+    """Manager for handling content translation operations."""
 
 
 
@@ -335,7 +305,7 @@ class TranslationManager:
 
 
 
-        Create translation units for an object's translatable fields.
+        """Create translation units for an object's translatable fields."""
 
 
 
@@ -1115,4 +1085,3 @@ class UiMessageResolver:
 
 
         return self.get_message_bundle(namespace)
-

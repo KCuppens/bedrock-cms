@@ -1,8 +1,6 @@
 from typing import Any
 
-
 from django.conf import settings
-
 
 import bleach  # type: ignore
 

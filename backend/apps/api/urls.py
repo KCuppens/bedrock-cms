@@ -1,16 +1,11 @@
 from django.urls import include, path
 
-
 from rest_framework.routers import DefaultRouter
-
 
 from apps.cms.views.redirect import RedirectViewSet
 
-
 from .blocks import BlockSchemaAPIView, BlockTypesAPIView
-
 from .views import HealthCheckViewSet, NoteViewSet
-
 
 # Create router and register viewsets
 
@@ -34,14 +29,14 @@ urlpatterns = [
         name="api-block-schema",
     ),
     # Include other app APIs
-# Imports that were malformed - commented out
-#     """path("auth/", include("apps.accounts.urls")),"""
-# Imports that were malformed - commented out
-#     """path("", include("apps.files.urls")),  # Files API"""
-# Imports that were malformed - commented out
-#     # path("cms/", include("apps.cms.urls")),  # CMS API - temporarily disabled due to import issues
-# Imports that were malformed - commented out
-#     """path("search/", include("apps.search.urls")),  # Search API"""
-# Imports that were malformed - commented out
-#     """path("system/", include("apps.core.urls")),  # System/Core API"""
+    # Imports that were malformed - commented out
+    #     """path("auth/", include("apps.accounts.urls")),"""
+    # Imports that were malformed - commented out
+    #     """path("", include("apps.files.urls")),  # Files API"""
+    # Imports that were malformed - commented out
+    #     # path("cms/", include("apps.cms.urls")),  # CMS API - temporarily disabled due to import issues
+    # Imports that were malformed - commented out
+    #     """path("search/", include("apps.search.urls")),  # Search API"""
+    # Imports that were malformed - commented out
+    #     """path("system/", include("apps.core.urls")),  # System/Core API"""
 ]

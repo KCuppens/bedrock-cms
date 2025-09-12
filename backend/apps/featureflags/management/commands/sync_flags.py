@@ -1,8 +1,6 @@
 from django.core.management.base import BaseCommand
 
-
 from waffle.models import Flag, Switch
-
 
 from apps.featureflags.helpers import FeatureFlags
 

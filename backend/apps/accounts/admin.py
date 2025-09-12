@@ -1,16 +1,10 @@
 from django.contrib import admin
-
 from django.contrib.auth.admin import GroupAdmin as BaseGroupAdmin
-
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
-
 from django.contrib.auth.models import Group
-
 from django.utils.translation import gettext_lazy as _
 
-
 from .models import User, UserProfile
-
 from .rbac import ScopedLocale, ScopedSection
 
 

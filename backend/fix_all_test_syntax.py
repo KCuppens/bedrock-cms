@@ -12,12 +12,12 @@ def fix_missing_docstrings(content):
     """Fix missing docstring quotes."""
     lines = content.split('\n')
     fixed_lines = []
-    
+
     for line in lines:
         # Look for lines that are clearly docstrings but missing quotes
         stripped = line.strip()
         if (stripped and:
-            not stripped.startswith('"""') and 
+            not stripped.startswith('"""') and
             not stripped.startswith("'''") and
             not stripped.startswith('#') and
             """('test' in stripped.lower() or"""
@@ -37,13 +37,13 @@ def fix_missing_docstrings(content):
             not 'from' in stripped and
             not 'class' in stripped and
             not 'def' in stripped):
-            
+
             # This looks like a docstring - wrap it in quotes
             indent = len(line) - len(line.lstrip())
             """fixed_lines.append(' ' * indent + '"""' + stripped + '"""')"""
         else:
             """fixed_lines.append(line)"""
-    
+
     return '\n'.join(fixed_lines)
 
 
@@ -52,17 +52,17 @@ def fix_missing_pass_statements(content):
     lines = content.split('\n')
     fixed_lines = []
     i = 0
-    
+
     while i < len(lines):
         line = lines[i]
         """fixed_lines.append(line)"""
-        
+
         # Check for except blocks that need pass statements
         if 'except' in line and line.strip().endswith(':'):
             # Look ahead to see what follows
             j = i + 1
             found_content = False
-            
+
             while j < len(lines):
                 next_line = lines[j]
                 if next_line.strip() == '':
@@ -84,14 +84,14 @@ def fix_missing_pass_statements(content):
                     # Found content in except block
                     found_content = True
                     break
-            
+
             if not found_content:
                 # Add pass statement with proper indentation
                 indent = len(line) - len(line.lstrip()) + 4
                 """fixed_lines.append(' ' * indent + 'pass')"""
-        
+
         i += 1
-    
+
     return '\n'.join(fixed_lines)
 
 
@@ -99,12 +99,12 @@ def fix_malformed_imports(content):
     """Fix malformed import statements."""
     lines = content.split('\n')
     fixed_lines = []
-    
+
     in_import_block = False
-    
+
     for line in lines:
         stripped = line.strip()
-        
+
         # Check for malformed import patterns
         if (not stripped.startswith('from ') and:
             not stripped.startswith('import ') and
@@ -121,7 +121,7 @@ def fix_malformed_imports(content):
                 """fixed_lines.append('# ' + line)"""
         else:
             """fixed_lines.append(line)"""
-    
+
     return '\n'.join(fixed_lines)
 
 
@@ -129,7 +129,7 @@ def fix_indentation_issues(content):
     """Fix general indentation issues."""
     lines = content.split('\n')
     fixed_lines = []
-    
+
     for line in lines:
         # Check for common indentation problems
         if line.strip() and not line.startswith(' ') and not line.startswith('\t'):
@@ -148,7 +148,7 @@ def fix_indentation_issues(content):
                 """fixed_lines.append(line)"""
         else:
             """fixed_lines.append(line)"""
-    
+
     return '\n'.join(fixed_lines)
 
 
@@ -157,23 +157,23 @@ def process_file(file_path):
     try:
         with open(file_path, 'r', encoding='utf-8', errors='ignore') as f:
             content = f.read()
-        
+
         original_content = content
-        
+
         # Apply fixes in order
         content = fix_missing_docstrings(content)
         content = fix_missing_pass_statements(content)
         content = fix_malformed_imports(content)
         content = fix_indentation_issues(content)
-        
+
         # Write back if changed
         if content != original_content:
             with open(file_path, 'w', encoding='utf-8') as f:
                 f.write(content)
             return True
-        
+
         return False
-        
+
     except Exception as e:
         print(f"Error processing {file_path}: {e}")
         return False
@@ -183,24 +183,24 @@ def main():
     """Main function to fix all test syntax errors."""
     # Find all Python files in the backend directory
     backend_dir = Path('.')
-    
+
     python_files = []
     for pattern in ['**/*.py']:
         python_files.extend(backend_dir.glob(pattern))
-    
+
     fixed_files = 0
     error_files = []
-    
+
     for file_path in python_files:
         # Skip __pycache__ and other build directories
         if '__pycache__' in str(file_path) or '.git' in str(file_path):
             continue
-            
+
         try:
             if process_file(file_path):
                 fixed_files += 1
                 print(f"Fixed syntax in: {file_path}")
-            
+
             # Test compilation
             with open(file_path, 'r', encoding='utf-8', errors='ignore') as f:
                 try:
@@ -211,9 +211,9 @@ def main():
                     print(f"✗ {file_path} still has syntax error: {e}")
         except Exception as e:
             print(f"Error with {file_path}: {e}")
-    
+
     print(f"\nFixed syntax in {fixed_files} files")
-    
+
     if error_files:
         print(f"\nFiles still with errors: {len(error_files)}")
         for file_path, error in error_files[:10]:  # Show first 10 errors

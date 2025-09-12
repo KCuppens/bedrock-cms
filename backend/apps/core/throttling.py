@@ -1,15 +1,9 @@
 import logging
-
 import time
-
-
 
 from django.core.cache import cache
 
-
-
 from rest_framework.throttling import AnonRateThrottle, UserRateThrottle
-
 
 """
 Custom throttling classes for enhanced API security.
@@ -469,4 +463,3 @@ def get_rate_limit_status(request, throttle_classes=None):
 
 
     return status
-

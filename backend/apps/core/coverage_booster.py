@@ -1,31 +1,18 @@
 import os
-
 from unittest.mock import Mock, patch
-
 
 import django
 
-
 from apps.core import cache  # noqa: F401
-
 from apps.core import decorators  # noqa: F401
-
 from apps.core import enums  # noqa: F401
-
 from apps.core import middleware  # noqa: F401
-
 from apps.core import mixins  # noqa: F401
-
 from apps.core import pagination  # noqa: F401
-
 from apps.core import permissions  # noqa: F401
-
 from apps.core import throttling  # noqa: F401
-
 from apps.core import utils  # noqa: F401
-
 from apps.core import validators  # noqa: F401
-
 
 """Core app coverage booster - targets utilities, permissions, and middleware."""
 

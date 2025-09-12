@@ -1,56 +1,27 @@
 from django.core.cache import cache
-
 from django.db.models import Count, Q
 
-
-
 from django_filters.rest_framework import DjangoFilterBackend
-
 from drf_spectacular.utils import extend_schema, extend_schema_view
-
 from rest_framework import filters, status, viewsets
-
 from rest_framework.decorators import action
-
 from rest_framework.permissions import IsAuthenticated
-
 from rest_framework.response import Response
 
-
-
 from apps.cms.models import BlockType, BlockTypeCategory
-
-from apps.cms.serializers.block_types import (
-
+from apps.cms.serializers.block_types import (  # Imports that were malformed - commented out; """apps.core.permissions,"""
     BlockTypeCategorySerializer,
-
     BlockTypeCreateSerializer,
-
     BlockTypeListSerializer,
-
     BlockTypeSerializer,
-
     BlockTypeUpdateSerializer,
-
     Q,
-
     RBACPermission,
-
-# Imports that were malformed - commented out
-#     """apps.core.permissions,"""
-
     django.db.models,
-
     json,
-
     rest_framework,
-
     serializers,
-
 )
-
-
-
 
 
 @extend_schema_view(
@@ -1162,4 +1133,3 @@ class BlockTypeViewSet(viewsets.ModelViewSet):
             {"block_types": block_types_data, "categories": categories, "stats": stats}
 
         )
-

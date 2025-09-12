@@ -14,15 +14,15 @@ def fix_docstring_in_content(content):
     lines = content.split('\n')
     result_lines = []
     i = 0
-    
+
     while i < len(lines):
         line = lines[i]
-        
+
         # Check if this line starts a malformed docstring pattern
         # Pattern 1: Module-level docstring (no indentation, description line)
-        if (i == 0 or 
-            (i > 0 and lines[i-1].strip() == '' and 
-             not line.startswith(' ') and 
+        if (i == 0 or
+            (i > 0 and lines[i-1].strip() == '' and
+             not line.startswith(' ') and
              not line.startswith('#') and
              not line.startswith('from ') and
              not line.startswith('import ') and
@@ -32,17 +32,17 @@ def fix_docstring_in_content(content):
              line.strip() != '' and
              line.endswith('.') and
              len(line.split()) > 2)):
-            
+
             # Found potential module docstring
             docstring_lines = [line]
             i += 1
-            
+
             # Collect following lines that are part of the docstring
             while i < len(lines):
                 if lines[i].strip() == '':
                     docstring_lines.append(lines[i])
                     i += 1
-                elif (lines[i].strip().endswith('.') or 
+                elif (lines[i].strip().endswith('.') or
                       lines[i].strip().endswith(':') or
                       not lines[i].startswith((' ', '\t')) and
                       not lines[i].startswith(('def ', 'class ', '@', 'from ', 'import '))):
@@ -50,7 +50,7 @@ def fix_docstring_in_content(content):
                     i += 1
                 else:
                     break
-            
+
             # Convert to proper docstring
             if docstring_lines:
                 result_lines.append('"""')
@@ -61,23 +61,23 @@ def fix_docstring_in_content(content):
                         result_lines.append('')
                 result_lines.append('"""')
             continue
-            
+
         # Pattern 2: Function docstring (indented, after function def)
-        elif (line.strip() != '' and 
+        elif (line.strip() != '' and
               not line.startswith('#') and
               i > 0 and
               (lines[i-1].strip() == '' or lines[i-1].strip().endswith(':')) and
               line.strip().endswith('.') and
               len(line.split()) > 2 and
               '    ' in line and not line.lstrip().startswith(('def ', 'class ', '@', 'return ', 'if ', 'for ', 'while ', 'try:', 'except'))):
-            
+
             # Found potential function docstring
             base_indent = len(line) - len(line.lstrip())
             indent = ' ' * base_indent
-            
+
             docstring_lines = [line.lstrip()]
             i += 1
-            
+
             # Collect following lines
             while i < len(lines):
                 if lines[i].strip() == '':
@@ -91,7 +91,7 @@ def fix_docstring_in_content(content):
                     i += 1
                 else:
                     break
-            
+
             # Convert to proper docstring
             if docstring_lines:
                 result_lines.append(f'{indent}"""')
@@ -102,10 +102,10 @@ def fix_docstring_in_content(content):
                         result_lines.append('')
                 result_lines.append(f'{indent}"""')
             continue
-        
+
         result_lines.append(line)
         i += 1
-    
+
     return '\n'.join(result_lines)
 
 
@@ -114,35 +114,35 @@ def fix_empty_except_blocks(content):
     lines = content.split('\n')
     result_lines = []
     i = 0
-    
+
     while i < len(lines):
         line = lines[i]
         result_lines.append(line)
-        
+
         # Check if this is an except line
         if line.strip().startswith('except') and line.strip().endswith(':'):
             # Look ahead for empty block
             j = i + 1
             found_empty = True
             indent_level = len(line) - len(line.lstrip()) + 4
-            
+
             while j < len(lines):
                 next_line = lines[j]
                 if next_line.strip() == '':
                     j += 1
                     continue
-                
+
                 # If we find content at the expected indent level, not empty
                 if len(next_line) - len(next_line.lstrip()) >= indent_level:
                     found_empty = False
                 break
-            
+
             # If empty except block, add pass
             if found_empty:
                 result_lines.append(' ' * indent_level + 'pass')
-        
+
         i += 1
-    
+
     return '\n'.join(result_lines)
 
 
@@ -151,12 +151,12 @@ def fix_file(file_path):
     try:
         with open(file_path, 'r', encoding='utf-8') as f:
             original_content = f.read()
-        
+
         # Apply fixes
         content = original_content
         content = fix_docstring_in_content(content)
         content = fix_empty_except_blocks(content)
-        
+
         # Only write if content changed
         if content != original_content:
             with open(file_path, 'w', encoding='utf-8') as f:
@@ -164,7 +164,7 @@ def fix_file(file_path):
             print(f"Fixed: {file_path}")
             return True
         return False
-        
+
     except Exception as e:
         print(f"Error processing {file_path}: {e}")
         return False
@@ -175,9 +175,9 @@ def main():
     if len(sys.argv) < 2:
         print("Usage: python fix_docstrings.py <directory_or_file>")
         sys.exit(1)
-    
+
     path = sys.argv[1]
-    
+
     if os.path.isfile(path):
         fix_file(path)
     elif os.path.isdir(path):

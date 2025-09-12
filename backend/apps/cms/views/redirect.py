@@ -1,26 +1,16 @@
 import csv
-
 import io
 
-
 from django.db.models import Q
-
 from django.http import HttpResponse
 
-
 from drf_spectacular.utils import extend_schema, extend_schema_view
-
 from rest_framework import status, viewsets
-
 from rest_framework.decorators import action
-
 from rest_framework.permissions import IsAuthenticated
-
 from rest_framework.response import Response
 
-
 from apps.cms.models import Redirect
-
 from apps.cms.serializers.redirect import RedirectSerializer
 
 

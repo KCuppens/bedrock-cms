@@ -1,38 +1,16 @@
 import os
-
 from datetime import datetime
-
 from unittest.mock import Mock, patch
-
-
 
 import django
 
-
-
 from apps.cms.views import filters  # noqa: F401
-
 from apps.cms.views import mixins  # noqa: F401
-
 from apps.cms.views import pagination  # noqa: F401
-
 from apps.cms.views import permissions  # noqa: F401
-
-from apps.cms.views import (  # noqa: F401
-
-    blocks,
-
-    pages,
-
-    registry,
-
-)
-
+from apps.cms.views import blocks, pages, registry  # noqa: F401
 from apps.cms.views.blocks import BlockViewSet  # noqa: F401
-
 from apps.cms.views.registry import RegistryViewSet  # noqa: F401
-
-
 
 """CMS views deep coverage booster - targeting untested view methods."""
 
@@ -755,4 +733,3 @@ if __name__ == "__main__":
     """test_cms_view_filters()"""
 
     """test_cms_view_pagination()"""
-

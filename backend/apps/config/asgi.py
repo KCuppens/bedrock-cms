@@ -1,9 +1,3 @@
-import os
-
-
-
-from django.core.asgi import get_asgi_application
-
 """
 ASGI config for django-saas-boilerplate project.
 
@@ -13,12 +7,11 @@ For more information on this file, see
 https://docs.djangoproject.com/en/4.2/howto/deployment/asgi/
 """
 
+import os
 
+from django.core.asgi import get_asgi_application
 
-# Imports that were malformed - commented out
-# os.environ.setdefault("DJANGO_SETTINGS_MODULE", "apps.config.settings.prod")
-
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "apps.config.settings.development")
 
 
 application = get_asgi_application()
-

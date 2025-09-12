@@ -1,24 +1,13 @@
 import time
 
-
-
 from django.core.cache import cache
-
 from django.core.management.base import BaseCommand
 
-
-
 from apps.blog.models import BlogPost
-
 from apps.cms.models import Page
-
 from apps.core.cache import CACHE_PREFIXES, cache_manager
-
 from apps.core.signals import invalidate_all_cache, invalidate_content_type_cache
-
 from apps.i18n.models import Locale
-
-
 
 """Django management command for cache management.
 
@@ -682,4 +671,3 @@ class Command(BaseCommand):
         self.stdout.write("")
 
         """self.stdout.write(self.style.SUCCESS("All cache key tests completed"))"""
-

@@ -1,17 +1,10 @@
 import logging
-
 from typing import Any
 
-
-
 from django.conf import settings
-
 from django.urls import get_resolver
 
-
-
 from rest_framework.viewsets import ModelViewSet, ViewSet
-
 
 """
 Security audit utilities for verifying permission enforcement.
@@ -663,4 +656,3 @@ def print_security_audit_report(report=None):
     if report is None:
 
         report = run_security_audit()
-

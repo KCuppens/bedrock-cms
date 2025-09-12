@@ -1,20 +1,11 @@
 from typing import Any
 
-
-
 from django.core.exceptions import ValidationError
-
 from django.http import Http404
 
-
-
 from apps.blog.models import BlogPost, BlogSettings
-
 from apps.core.cache import cache_manager
-
 from apps.registry.registry import get_all_configs
-
-
 
 """
 Presentation page resolver for content_detail blocks.
@@ -24,22 +15,15 @@ registered content models, with support for precedence and caching.
 """
 
 
-
 # mypy: ignore-errors
 
 
-
 class PresentationPageResolver:
-
     """Resolves presentation pages for content detail rendering."""
-
-
 
     def __init__(self):
 
         self.registry_configs = get_all_configs()
-
-
 
     def resolve_from_route(self, path: str, locale_code: str) -> dict[str, Any]:
         """
@@ -68,8 +52,6 @@ class PresentationPageResolver:
 
         path_parts = path.strip("/").split("/")
 
-
-
         # Handle blog posts: /blog/{slug} or /{locale}/blog/{slug}
 
         if len(path_parts) >= 2:
@@ -88,28 +70,18 @@ class PresentationPageResolver:
 
                 slug = path_parts[1]
 
-
-
             if base_path == "blog":
 
                 return self._resolve_blog_post(slug, locale_code)
-
-
 
         # Could extend this for other registered content types
 
         # by checking registry configurations and their route patterns
 
-
-
         raise Http404(f"No content found for path: {path}")
 
-
-
     def resolve_by_id(
-
         self, content_label: str, content_id: int, locale_code: str
-
     ) -> dict[str, Any]:
         """
         Resolve content and presentation page by explicit ID.
@@ -132,78 +104,50 @@ class PresentationPageResolver:
         """
         if content_label == "blog.blogpost":
 
-
-
             try:
 
                 post = BlogPost.objects.select_related("category", "locale").get(
-
                     id=content_id, locale__code=locale_code
-
                 )
-
-
 
                 return self._resolve_blog_post_from_instance(post)
 
             except BlogPost.DoesNotExist:
 
                 raise Http404(
-
                     f"BlogPost {content_id} not found for locale {locale_code}"
-
                 )
-
-
 
         # Could extend for other registered content types
 
         raise Http404(f"Content type {content_label} not supported")
 
-
-
     def _resolve_blog_post(self, slug: str, locale_code: str) -> dict[str, Any]:
-
         """Resolve blog post by slug."""
-
-
 
         try:
 
             post = BlogPost.objects.select_related("category", "locale").get(
-
                 slug=slug, locale__code=locale_code, status="published"
-
             )
-
-
 
             return self._resolve_blog_post_from_instance(post)
 
         except BlogPost.DoesNotExist:
 
             raise Http404(
-
                 f"Published blog post '{slug}' not found for locale {locale_code}"
-
             )
 
-
-
     def _resolve_blog_post_from_instance(self, post) -> dict[str, Any]:
-
         """Resolve presentation page and options for a blog post instance."""
-
-
 
         # Get blog settings for this locale
 
         try:
 
             blog_settings = BlogSettings.objects.select_related(
-
                 "default_presentation_page"
-
             ).get(locale=post.locale)
 
         except BlogSettings.DoesNotExist:
@@ -211,60 +155,34 @@ class PresentationPageResolver:
             # No settings configured, return basic structure
 
             return {
-
                 "content": post,
-
                 "presentation_page": None,
-
                 "display_options": {
-
                     "show_toc": True,
-
                     "show_author": True,
-
                     "show_dates": True,
-
                     "show_share": True,
-
                     "show_reading_time": True,
-
                 },
-
             }
-
-
 
         # Resolve presentation page with precedence
 
         presentation_page = blog_settings.get_presentation_page(
-
             category=post.category, post=post
-
         )
-
-
 
         # Get display options with precedence
 
         display_options = blog_settings.get_display_options(
-
             category=post.category, post=post
-
         )
 
-
-
         return {
-
             "content": post,
-
             "presentation_page": presentation_page,
-
             "display_options": display_options,
-
         }
-
-
 
     def build_cache_key(self, content, presentation_page=None) -> str:
         """
@@ -282,8 +200,6 @@ class PresentationPageResolver:
 
             post_rev = post_rev.timestamp()
 
-
-
         # Get presentation page revision ID
 
         page_rev = None
@@ -296,20 +212,12 @@ class PresentationPageResolver:
 
                 page_rev = page_rev.timestamp()
 
-
-
         return cache_manager.key_builder.blog_key(
-
             content.locale.code, content.slug, post_rev, page_rev
-
         )
 
-
-
     def validate_content_detail_block(
-
         self, blocks: list, allowed_labels: list | None = None
-
     ) -> None:
         """
         Validate that a page has exactly one content_detail block for presentation pages.
@@ -323,36 +231,22 @@ class PresentationPageResolver:
             allowed_labels: Optional list of allowed content labels
         """
         content_detail_blocks = [
-
             block
-
             for block in blocks
-
             if isinstance(block, dict) and block.get("type") == "content_detail"
-
         ]
-
-
 
         if len(content_detail_blocks) == 0:
 
             raise ValidationError(
-
                 "Presentation pages must include exactly one content_detail block"
-
             )
-
-
 
         if len(content_detail_blocks) > 1:
 
             raise ValidationError(
-
                 "Presentation pages can only have one content_detail block"
-
             )
-
-
 
         # Validate the content_detail block configuration
 
@@ -362,22 +256,15 @@ class PresentationPageResolver:
 
         label = props.get("label", "")
 
-
-
         if not label:
 
             raise ValidationError("content_detail block must specify a content label")
 
-
-
         if allowed_labels and label not in allowed_labels:
 
             raise ValidationError(
-
                 f"content_detail block label '{label}' not in allowed list: {allowed_labels}"
-
             )
-
 
 
 # Global resolver instance
@@ -385,17 +272,11 @@ class PresentationPageResolver:
 presentation_resolver = PresentationPageResolver()
 
 
-
 def resolve_presentation_page(
-
     path: str = None,
-
     content_label: str = None,
-
     content_id: int = None,
-
     locale_code: str = "en",
-
 ) -> dict[str, Any]:
     """
     Convenience function to resolve presentation pages.
@@ -425,12 +306,9 @@ def resolve_presentation_page(
     elif content_label and content_id:
 
         return presentation_resolver.resolve_by_id(
-
             content_label, content_id, locale_code
-
         )
 
     else:
 
         raise ValueError("Must provide either path or (content_label, content_id)")
-

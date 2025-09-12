@@ -9,28 +9,16 @@ Analyzes database queries, caching, API performance, and identifies bottlenecks.
 
 
 import json
-
 import os
-
 import statistics
-
 import sys
-
 import time
 
-
-
 from django.conf import settings
-
 from django.core.cache import cache
-
 from django.db import connection, reset_queries
-
 from django.test import Client
-
 from django.utils import timezone
-
-
 
 # Add the project root to Python path
 
@@ -43,22 +31,14 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
 import django  # noqa: E402
 
-
-
 django.setup()
 
 
 
 from apps.blog.models import BlogPost  # noqa: E402
-
 from apps.cms.blocks.validation import validate_blocks  # noqa: E402
-
 from apps.cms.models import Page  # noqa: E402
-
 from apps.media.models import Asset  # noqa: E402
-
-
-
 
 
 class PerformanceReviewer:
@@ -1284,4 +1264,3 @@ def main():
 if __name__ == "__main__":
 
     main()
-

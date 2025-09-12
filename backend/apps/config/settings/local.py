@@ -1,18 +1,11 @@
 from typing import Any
 
-
 from .base import BASE_DIR  # noqa: F405
-
 from .base import DATABASES  # noqa: F405
-
 from .base import INSTALLED_APPS  # noqa: F405
-
 from .base import LOGGING  # noqa: F405
-
 from .base import REST_FRAMEWORK  # noqa: F405
-
 from .base import env  # noqa: F403; noqa: F405
-
 
 # SECURITY WARNING: don't run with debug turned on in production!
 

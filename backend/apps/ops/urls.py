@@ -1,10 +1,7 @@
 from django.urls import path
 
-
 from .metrics import health_metrics, prometheus_metrics
-
 from .views import health_check, liveness_check, readiness_check, version_info
-
 
 urlpatterns = [
     # Health check endpoints

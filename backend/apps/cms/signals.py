@@ -1,21 +1,11 @@
 from django.db.models.signals import post_delete, post_save, pre_save
-
 from django.dispatch import receiver
-
 from django.utils import timezone
-
-
 
 from apps.media.usage import cleanup_usage_for_instance, update_usage_for_instance
 
-
-
 from .models import Page
-
 from .versioning import AuditEntry, PageRevision
-
-
-
 
 
 @receiver(post_save, sender=Page)
@@ -284,4 +274,3 @@ def detect_publish_status_change(sender, instance, **kwargs):
 
         except Page.DoesNotExist:
             pass
-

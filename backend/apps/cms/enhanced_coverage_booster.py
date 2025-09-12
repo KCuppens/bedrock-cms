@@ -1,29 +1,17 @@
 import os
-
 import sys
-
 from unittest.mock import Mock, patch
-
 
 import django
 
-
 import apps.cms.views as views_module
-
 from apps.cms import models  # noqa: F401
-
 from apps.cms.serializers import category, pages, redirect, seo  # noqa: F401
-
 from apps.cms.views.blocks import BlocksViewSet  # noqa: F401
-
 from apps.cms.views.category import CategoryViewSet  # noqa: F401
-
 from apps.cms.views.pages import PagesViewSet  # noqa: F401
-
 from apps.cms.views.redirect import RedirectViewSet  # noqa: F401
-
 from apps.cms.views.seo import SeoViewSet  # noqa: F401
-
 
 """Enhanced coverage booster - targets specific uncovered lines in high-impact files."""
 

@@ -1,25 +1,15 @@
 import os
-
 from unittest.mock import patch
-
 
 import django
 
-
 from apps.cms import models  # noqa: F401
-
 from apps.cms import serializers  # noqa: F401
-
 from apps.cms.views import blocks  # noqa: F401
-
 from apps.cms.views import category  # noqa: F401
-
 from apps.cms.views import redirect  # noqa: F401
-
 from apps.cms.views import seo  # noqa: F401
-
 from apps.cms.views.pages import PagesViewSet  # noqa: F401
-
 
 """Coverage booster script - directly imports and exercises code paths to increase coverage.
 

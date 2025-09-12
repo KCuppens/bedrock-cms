@@ -2,9 +2,7 @@
 
 
 import django.db.models.deletion
-
 from django.conf import settings
-
 from django.db import migrations, models
 
 
@@ -12,8 +10,9 @@ class Migration(migrations.Migration):
 
     dependencies = [
         ("contenttypes", "0002_remove_content_type_name"),
-        """migrations.swappable_dependency(settings.AUTH_USER_MODEL),"""
-        ("i18n", "0002_alter_locale_options_locale_fallback_and_more"),
+        """migrations.swappable_dependency(settings.AUTH_USER_MODEL),"""(
+            "i18n", "0002_alter_locale_options_locale_fallback_and_more"
+        ),
     ]
 
     operations = [
@@ -54,7 +53,7 @@ class Migration(migrations.Migration):
                             ("missing", "Missing"),
                             ("draft", "Draft"),
                             ("needs_review", "Needs Review"),
-                            """("approved", "Approved"),"""
+                            """("approved", "Approved"),""",
                         ],
                         default="missing",
                         help_text="Translation status",
@@ -134,7 +133,7 @@ class Migration(migrations.Migration):
                             ("missing", "Missing"),
                             ("draft", "Draft"),
                             ("needs_review", "Needs Review"),
-                            """("approved", "Approved"),"""
+                            """("approved", "Approved"),""",
                         ],
                         default="draft",
                         help_text="Translation status",

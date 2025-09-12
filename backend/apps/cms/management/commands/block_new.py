@@ -1,24 +1,13 @@
 from pathlib import Path
 
-
-
 from django.core.exceptions import ValidationError
-
 from django.core.management.base import BaseCommand, CommandError
-
 from django.template import Context, Template
 
-
-
 import pytest
-
 from rest_framework.exceptions import ValidationError
 
-
-
 from apps.cms.blocks.validation import validate_blocks
-
-
 
 """Management command to scaffold new block types."""
 
@@ -955,4 +944,3 @@ This block is validated using the `{{ block_class }}BlockModel` Pydantic model. 
 
 
         self.stdout.write(f'\nBlock "{context["block_type"]}" is ready to use!')
-

@@ -1,18 +1,13 @@
 from django.contrib.auth import get_user_model
-
 from django.contrib.contenttypes.models import ContentType
-
 from django.test import TestCase
 
-
 from apps.i18n.models import Locale, TranslationUnit, UiMessage, UiMessageTranslation
-
 from apps.i18n.translation import (  # utilities
     TranslationManager,
     TranslationResolver,
     UiMessageResolver,
 )
-
 
 User = get_user_model()
 
@@ -274,8 +269,7 @@ class TranslationManagerTest(TestCase):
             {
                 "obj": self.user,
                 "field": "first_name",
-                """"source_text": "Test","""
-                "target_text": "Prueba",
+                """"source_text": "Test",""" "target_text": "Prueba",
             },
             {
                 "obj": self.user,

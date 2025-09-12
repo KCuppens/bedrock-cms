@@ -1,83 +1,38 @@
 from datetime import datetime, timedelta
 
-
-
 from django.conf import settings
-
 from django.contrib.auth import get_user_model
-
 from django.contrib.contenttypes.models import ContentType
-
 from django.core.exceptions import ValidationError
-
 from django.db import transaction
-
 from django.db.models import Case, Count, IntegerField, Prefetch, Q, Value, When
-
 from django.http import HttpResponse
-
 from django.utils import timezone
-
 from django.utils.dateparse import parse_datetime
-
 from django.views.decorators.cache import cache_page
 
-
-
 from django_ratelimit.decorators import ratelimit
-
 from drf_spectacular.utils import OpenApiParameter, extend_schema
-
 from rest_framework import permissions, status, viewsets
-
 from rest_framework.decorators import action
-
 from rest_framework.response import Response
-
 from rest_framework.throttling import UserRateThrottle
 
-
-
 from apps.blog.models import BlogPost, BlogSettings
-
 from apps.blog.serializers import BlogPostSerializer
-
 from apps.core.decorators import cache_method_response
-
 from apps.core.throttling import (
-
     BurstWriteThrottle,
-
     PublishOperationThrottle,
-
     WriteOperationThrottle,
-
 )
-
 from apps.i18n.models import Locale
 
-
-
 from .models import Page
-
 from .seo_utils import generate_hreflang_alternates
-
-from .serializers import (
-
-    PageReadSerializer,
-
-    PageTreeItemSerializer,
-
-    PageWriteSerializer,
-
-)
-
+from .serializers import PageReadSerializer, PageTreeItemSerializer, PageWriteSerializer
 from .services.scheduling import SchedulingService
-
 from .versioning_views import VersioningMixin
-
-
-
 
 
 class PagesViewSet(VersioningMixin, viewsets.ModelViewSet):
@@ -2125,4 +2080,3 @@ def sitemap_view(request, locale_code):  # noqa: C901
     response["Cache-Control"] = "public, max-age=300"  # 5 minutes cache
 
     return response
-

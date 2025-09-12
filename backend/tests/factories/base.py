@@ -5,18 +5,11 @@ Base factory classes and utilities for test data generation.
 
 
 from django.contrib.auth import get_user_model
-
 from django.utils import timezone
 
-
-
 import factory
-
 import factory.django
-
 from faker import Faker
-
-
 
 fake = Faker()
 
@@ -111,4 +104,3 @@ class StaffUserFactory(UserFactory):
     is_staff = True
 
     email = factory.Sequence(lambda n: f"staff{n}@example.com")
-

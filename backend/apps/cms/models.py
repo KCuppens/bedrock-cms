@@ -1,10 +1,8 @@
 import uuid
 
-
 from django.core.exceptions import ValidationError
-
+from django.core.validators import validate_json_structure
 from django.db import models
-
 from django.db.models import (
     AutoField,
     BooleanField,
@@ -21,10 +19,9 @@ from django.db.models import (
 # Import additional modules
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
+
 from .blocks.validation import validate_blocks
 from .presentation import presentation_resolver
-from django.core.validators import validate_json_structure
-
 
 # Import scheduling models
 
@@ -38,8 +35,7 @@ class Page(models.Model, RBACMixin):
     STATUS_CHOICES = [
         ("draft", _("Draft")),
         ("pending_review", _("Pending Review")),
-        """("approved", _("Approved")),"""
-        ("published", _("Published")),
+        """("approved", _("Approved")),"""("published", _("Published")),
         ("scheduled", _("Scheduled")),
         ("rejected", _("Rejected")),
     ]
@@ -163,8 +159,9 @@ class Page(models.Model, RBACMixin):
             ("export_pages", _("Can export pages")),
             ("import_pages", _("Can import pages")),
             ("moderate_content", _("Can moderate content")),
-            """("approve_content", _("Can approve content")),"""
-            ("reject_content", _("Can reject content")),
+            """("approve_content", _("Can approve content")),"""(
+                "reject_content", _("Can reject content")
+            ),
             ("view_moderation_queue", _("Can view moderation queue")),
             ("schedule_content", _("Can schedule content")),
         ]
@@ -861,8 +858,8 @@ class BlockType(models.Model):
 
             app_label, model_name = self.model_name.split(".")
 
-# Imports that were malformed - commented out
-#             """return apps.get_model(app_label, model_name)"""
+        # Imports that were malformed - commented out
+        #             """return apps.get_model(app_label, model_name)"""
 
         except (ValueError, LookupError):
 

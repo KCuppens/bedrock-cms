@@ -1,10 +1,7 @@
 import os
-
 from unittest.mock import Mock
 
-
 import django
-
 
 # Configure minimal Django
 
@@ -14,15 +11,7 @@ import django
 
 try:
 
-    from apps.i18n import (
-        admin,
-        models,
-        serializers,
-        services,
-        signals,
-        tasks,
-        views,
-    )
+    from apps.i18n import admin, models, serializers, services, signals, tasks, views
 
 except ImportError:
     pass
@@ -340,6 +329,7 @@ def test_i18n_translation_services():  # noqa: C901
     """Target i18n translation services."""
 
     try:
+        from apps.i18n import services
 
         # Access all service classes and functions
 
@@ -413,6 +403,7 @@ def test_i18n_tasks():  # noqa: C901
     """Target i18n tasks.py."""
 
     try:
+        from apps.i18n import tasks
 
         # Access all task functions
 
@@ -451,6 +442,7 @@ def test_i18n_signals():  # noqa: C901
     """Target i18n signals.py."""
 
     try:
+        from apps.i18n import signals
 
         # Access all signal functions
 
@@ -499,6 +491,7 @@ def test_i18n_admin():  # noqa: C901
     """Target i18n admin.py."""
 
     try:
+        from apps.i18n import admin
 
         # Access all admin classes
 
@@ -542,18 +535,16 @@ def test_i18n_admin():  # noqa: C901
 
 if __name__ == "__main__":
 
-    """test_i18n_views()"""
+    test_i18n_views()
 
-    """test_i18n_models()"""
+    test_i18n_models()
 
-    """test_i18n_serializers()"""
+    test_i18n_serializers()
 
-    """test_i18n_translation_services()"""
+    test_i18n_translation_services()
 
-    """test_i18n_tasks()"""
+    test_i18n_tasks()
 
-    """test_i18n_signals()"""
+    test_i18n_signals()
 
-    """test_i18n_admin()"""
-
-    pass
+    test_i18n_admin()

@@ -1,34 +1,18 @@
 import logging
-
 import re
-
 from typing import Any
-
 from urllib.parse import urljoin
 
-
-
 from django.db import transaction
-
 from django.utils import timezone
 
-
-
 import requests
-
 from celery import shared_task
-
-
 
 from apps.blog.models import BlogPost
 
-
-
 from .models import Page
-
 from .scheduling import ScheduledTask
-
-
 
 Background tasks for CMS operations.
 
@@ -879,4 +863,3 @@ def process_scheduled_publishing(self):  # noqa: C901
         logger.error(error_msg, exc_info=True)
 
         raise self.retry(exc=e)
-

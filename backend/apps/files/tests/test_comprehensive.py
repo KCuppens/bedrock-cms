@@ -1,94 +1,53 @@
-import tempfile
-
-from io import BytesIO
-
-
-
-from django.contrib.auth import get_user_model
-
-from django.core.exceptions import ValidationError
-
-from django.core.files.uploadedfile import SimpleUploadedFile
-
-from django.test import TestCase, override_settings
-
-from django.urls import reverse
-
-
-
-from PIL import Image
-
-from rest_framework import status
-
-from rest_framework.test import APIClient, APITestCase
-
-
-
-from apps.files import services
-
-from apps.files.models import File, FileTag, FileVersion, MediaCategory
-
-from apps.files.serializers import FileSerializer, FileUploadSerializer
-
-from apps.files.views import FileViewSet
-
-
-
 """Files app tests with high coverage and real database operations."""
 
+import tempfile
+from io import BytesIO
 
+from django.contrib.auth import get_user_model
+from django.core.exceptions import ValidationError
+from django.core.files.uploadedfile import SimpleUploadedFile
+from django.test import TestCase, override_settings
+from django.urls import reverse
+
+from PIL import Image
+from rest_framework import status
+from rest_framework.test import APIClient, APITestCase
+
+from apps.files import services
+from apps.files.models import File, FileTag, FileVersion, MediaCategory
+from apps.files.serializers import FileSerializer, FileUploadSerializer
+from apps.files.views import FileViewSet
 
 User = get_user_model()
 
 
-
 class FilesModelTests(TestCase):
-
     """Comprehensive tests for Files models."""
-
-
 
     def setUp(self):
 
         self.user = User.objects.create_user(
-
             username="testuser", email="test@example.com", password="testpass123"
-
         )
 
         self.category = MediaCategory.objects.create(
-
             name="Test Group", slug="test-category"
-
         )
 
         self.tag = FileTag.objects.create(name="test-tag")
 
-
-
     def test_file_creation(self):
-
         """Test file creation with all fields."""
 
         file_obj = File.objects.create(
-
             name="test.pdf",
-
             original_name="Test Document.pdf",
-
             mime_type="application/pdf",
-
             size=1024000,
-
             path="/media/files/test.pdf",
-
             uploaded_by=self.user,
-
             category=self.category,
-
         )
-
-
 
         """self.assertEqual(file_obj.name, "test.pdf")"""
 
@@ -104,33 +63,21 @@ class FilesModelTests(TestCase):
 
         self.assertIsNotNone(file_obj.created_at)
 
-
-
     def test_file_str_representation(self):
-
         """Test file string representation."""
 
         file_obj = File.objects.create(name="test.pdf", uploaded_by=self.user)
 
         """self.assertEqual(str(file_obj), "test.pdf")"""
 
-
-
     def test_file_size_display(self):
-
         """Test file size formatting."""
 
         file_obj = File.objects.create(
-
             name="test.pdf",
-
             size=1024,
-
             uploaded_by=self.user,  # 1 KB
-
         )
-
-
 
         if hasattr(file_obj, "get_size_display"):
 
@@ -148,32 +95,20 @@ class FilesModelTests(TestCase):
 
             self.assertIn("MB", size_display.upper())
 
-
-
     def test_file_type_detection(self):
-
         """Test file type detection based on MIME type."""
 
         test_cases = [
-
             ("image.jpg", "image/jpeg", "image"),
-
             ("document.pdf", "application/pdf", "document"),
-
             ("video.mp4", "video/mp4", "video"),
-
             ("audio.mp3", "audio/mpeg", "audio"),
-
         ]
-
-
 
         for filename, mime_type, expected_type in test_cases:
             file_obj = File.objects.create(
                 name=filename, mime_type=mime_type, uploaded_by=self.user
             )
-
-
 
             if hasattr(file_obj, "get_file_type"):
 
@@ -181,39 +116,25 @@ class FilesModelTests(TestCase):
 
                 self.assertEqual(file_type, expected_type)
 
-
-
     def test_file_validation(self):
-
         """Test file model validation."""
 
         file_obj = File(name="", uploaded_by=self.user)
 
         # Empty name should fail
 
-
-
         if hasattr(file_obj, "clean"):
-
-
 
             with self.assertRaises(ValidationError):
 
                 file_obj.clean()
 
-
-
     def test_file_category_relationship(self):
-
         """Test file-category relationship."""
 
         file_obj = File.objects.create(
-
             name="test.pdf", uploaded_by=self.user, category=self.category
-
         )
-
-
 
         self.assertEqual(file_obj.category, self.category)
 
@@ -225,10 +146,7 @@ class FilesModelTests(TestCase):
 
             self.assertEqual(files_in_category, 1)
 
-
-
     def test_file_tags_relationship(self):
-
         """Test file-tags many-to-many relationship."""
 
         file_obj = File.objects.create(name="test.pdf", uploaded_by=self.user)
@@ -237,18 +155,13 @@ class FilesModelTests(TestCase):
 
             file_obj.tags.add(self.tag)
 
-
-
             tags = file_obj.tags.all()
 
             self.assertEqual(tags.count(), 1)
 
             self.assertEqual(tags.first(), self.tag)
 
-
-
     def test_file_version_creation(self):
-
         """Test file versioning."""
 
         file_obj = File.objects.create(name="test.pdf", uploaded_by=self.user)
@@ -256,20 +169,12 @@ class FilesModelTests(TestCase):
         try:
 
             version = FileVersion.objects.create(
-
                 file=file_obj,
-
                 version_number=1,
-
                 size=1024,
-
                 path="/media/files/test_v1.pdf",
-
                 created_by=self.user,
-
             )
-
-
 
             self.assertEqual(version.file, file_obj)
 
@@ -281,10 +186,7 @@ class FilesModelTests(TestCase):
 
             pass  # FileVersion model may not exist
 
-
-
     def test_file_category_methods(self):
-
         """Test MediaCategory model methods."""
 
         """self.assertEqual(str(self.category), "Test Group")"""
@@ -292,18 +194,12 @@ class FilesModelTests(TestCase):
         # Test get_file_count method
 
         File.objects.create(
-
             name="file1.pdf", uploaded_by=self.user, category=self.category
-
         )
 
         File.objects.create(
-
             name="file2.pdf", uploaded_by=self.user, category=self.category
-
         )
-
-
 
         if hasattr(self.category, "get_file_count"):
 
@@ -311,10 +207,7 @@ class FilesModelTests(TestCase):
 
             self.assertEqual(count, 2)
 
-
-
     def test_file_tag_methods(self):
-
         """Test FileTag model methods."""
 
         """self.assertEqual(str(self.tag), "test-tag")"""
@@ -331,8 +224,6 @@ class FilesModelTests(TestCase):
 
             file2.tags.add(self.tag)
 
-
-
             if hasattr(self.tag, "get_usage_count"):
 
                 usage_count = self.tag.get_usage_count()
@@ -340,54 +231,35 @@ class FilesModelTests(TestCase):
                 self.assertEqual(usage_count, 2)
 
 
-
 class FilesAPITests(APITestCase):
-
     """Comprehensive API tests for Files endpoints."""
-
-
 
     def setUp(self):
 
         self.user = User.objects.create_user(
-
             username="testuser", email="test@example.com", password="testpass123"
-
         )
 
         self.client = APIClient()
 
         self.client.force_authenticate(user=self.user)
 
-
-
         self.category = MediaCategory.objects.create(
-
             name="Test Group", slug="test-category"
-
         )
 
-
-
     def test_file_list_api(self):
-
         """Test file list API endpoint."""
 
         # Create test files
 
         File.objects.create(
-
             name="file1.pdf", mime_type="application/pdf", uploaded_by=self.user
-
         )
 
         File.objects.create(
-
             name="file2.jpg", mime_type="image/jpeg", uploaded_by=self.user
-
         )
-
-
 
         try:
 
@@ -407,33 +279,20 @@ class FilesAPITests(APITestCase):
 
             pass  # URL may not exist
 
-
-
     def test_file_upload_api(self):
-
         """Test file upload via API."""
 
         # Create a simple test file
 
         test_file = SimpleUploadedFile(
-
             "test.txt", b"Test file content", content_type="text/plain"
-
         )
 
-
-
         upload_data = {
-
             """"file": test_file,"""
-
             """"name": "test.txt","""
-
             "category": self.category.id,
-
         }
-
-
 
         try:
 
@@ -444,12 +303,8 @@ class FilesAPITests(APITestCase):
             if response.status_code in [201, 200]:
 
                 self.assertIn(
-
                     response.status_code, [status.HTTP_201_CREATED, status.HTTP_200_OK]
-
                 )
-
-
 
                 # Verify file was created
 
@@ -463,19 +318,12 @@ class FilesAPITests(APITestCase):
 
             pass  # URL may not exist
 
-
-
     def test_file_detail_api(self):
-
         """Test file detail API endpoint."""
 
         file_obj = File.objects.create(
-
             name="detail.pdf", mime_type="application/pdf", uploaded_by=self.user
-
         )
-
-
 
         try:
 
@@ -495,19 +343,12 @@ class FilesAPITests(APITestCase):
 
             pass  # URL may not exist
 
-
-
     def test_file_download_api(self):
-
         """Test file download API endpoint."""
 
         file_obj = File.objects.create(
-
             name="download.pdf", path="/media/files/download.pdf", uploaded_by=self.user
-
         )
-
-
 
         try:
 
@@ -523,25 +364,16 @@ class FilesAPITests(APITestCase):
 
             pass  # URL may not exist
 
-
-
     def test_file_search_api(self):
-
         """Test file search API."""
 
         File.objects.create(
-
             name="searchable.pdf", mime_type="application/pdf", uploaded_by=self.user
-
         )
 
         File.objects.create(
-
             name="another.txt", mime_type="text/plain", uploaded_by=self.user
-
         )
-
-
 
         try:
 
@@ -559,10 +391,7 @@ class FilesAPITests(APITestCase):
 
             pass  # URL may not exist
 
-
-
     def test_file_bulk_operations_api(self):
-
         """Test bulk file operations."""
 
         file1 = File.objects.create(name="bulk1.pdf", uploaded_by=self.user)
@@ -590,54 +419,33 @@ class FilesAPITests(APITestCase):
             pass  # URL may not exist
 
 
-
 class FilesSerializerTests(TestCase):
-
     """Test Files app serializers."""
-
-
 
     def setUp(self):
 
         self.user = User.objects.create_user(
-
             username="testuser", email="test@example.com", password="testpass123"
-
         )
 
         self.category = MediaCategory.objects.create(
-
             name="Test Group", slug="test-category"
-
         )
 
-
-
     def test_file_serializer(self):
-
         """Test FileSerializer functionality."""
 
         file_obj = File.objects.create(
-
             name="test.pdf",
-
             mime_type="application/pdf",
-
             size=1024,
-
             uploaded_by=self.user,
-
             category=self.category,
-
         )
-
-
 
         serializer = FileSerializer(file_obj)
 
         data = serializer.data
-
-
 
         """self.assertEqual(data["name"], "test.pdf")"""
 
@@ -645,39 +453,24 @@ class FilesSerializerTests(TestCase):
 
         self.assertEqual(data["size"], 1024)
 
-
-
     def test_file_upload_serializer(self):
-
         """Test FileUploadSerializer validation."""
 
         # Test valid data
 
         test_file = SimpleUploadedFile(
-
             "test.txt", b"Test content", content_type="text/plain"
-
         )
 
-
-
         valid_data = {
-
             """"file": test_file,"""
-
             """"name": "test.txt","""
-
             "category": self.category.id,
-
         }
-
-
 
         serializer = FileUploadSerializer(data=valid_data)
 
         self.assertTrue(serializer.is_valid())
-
-
 
         # Test invalid data
 
@@ -687,10 +480,7 @@ class FilesSerializerTests(TestCase):
 
         self.assertFalse(serializer.is_valid())
 
-
-
     def test_file_serializer_validation(self):
-
         """Test file serializer field validation."""
 
         # Test file size validation
@@ -699,21 +489,13 @@ class FilesSerializerTests(TestCase):
 
             serializer = FileUploadSerializer()
 
-
-
             # Test oversized file
 
             large_file = SimpleUploadedFile(
-
                 "large.txt",
-
                 b"x" * (100 * 1024 * 1024),  # 100MB
-
                 content_type="text/plain",
-
             )
-
-
 
             try:
 
@@ -724,32 +506,21 @@ class FilesSerializerTests(TestCase):
                 self.assertIsInstance(e, Exception)
 
 
-
 class FilesServiceTests(TestCase):
-
     """Test Files app services."""
-
-
 
     def setUp(self):
 
         self.user = User.objects.create_user(
-
             username="testuser", email="test@example.com", password="testpass123"
-
         )
 
-
-
     def test_file_storage_service(self):
-
         """Test FileStorageService functionality."""
 
         try:
 
             storage_service = services.FileStorageService()
-
-
 
             # Test file saving
 
@@ -783,17 +554,12 @@ class FilesServiceTests(TestCase):
 
             pass  # Service may not exist
 
-
-
     def test_file_processing_service(self):
-
         """Test FileProcessingService functionality."""
 
         try:
 
             processing_service = services.FileProcessingService()
-
-
 
             # Create test image
 
@@ -807,8 +573,6 @@ class FilesServiceTests(TestCase):
 
                 self.assertIsNotNone(processed)
 
-
-
             # Test thumbnail generation
 
             if hasattr(processing_service, "generate_thumbnail"):
@@ -817,33 +581,22 @@ class FilesServiceTests(TestCase):
 
                 self.assertIsNotNone(thumbnail)
 
-
-
         except (AttributeError, ImportError):
 
             pass  # Service may not exist
 
-
-
     def test_file_validation_service(self):
-
         """Test FileValidationService functionality."""
 
         try:
 
             validation_service = services.FileValidationService()
 
-
-
             # Test file validation
 
             test_file = SimpleUploadedFile(
-
                 "test.txt", b"Test content", content_type="text/plain"
-
             )
-
-
 
             if hasattr(validation_service, "validate"):
 
@@ -864,25 +617,16 @@ class FilesServiceTests(TestCase):
             pass  # Service may not exist
 
 
-
 class FilesViewTests(TestCase):
-
     """Test Files app views."""
-
-
 
     def setUp(self):
 
         self.user = User.objects.create_user(
-
             username="testuser", email="test@example.com", password="testpass123"
-
         )
 
-
-
     def test_file_viewset_methods(self):
-
         """Test FileViewSet methods."""
 
         try:
@@ -890,16 +634,10 @@ class FilesViewTests(TestCase):
             viewset = FileViewSet()
 
             viewset.request = type(
-
                 "MockRequest",
-
                 (),
-
                 {"user": self.user, "query_params": {}, "data": {}, "FILES": {}},
-
             )()
-
-
 
             # Test get_queryset
 
@@ -909,8 +647,6 @@ class FilesViewTests(TestCase):
 
                 self.assertIsNotNone(queryset)
 
-
-
             # Test get_serializer_class
 
             if hasattr(viewset, "get_serializer_class"):
@@ -918,8 +654,6 @@ class FilesViewTests(TestCase):
                 serializer_class = viewset.get_serializer_class()
 
                 self.assertIsNotNone(serializer_class)
-
-
 
             # Test permissions
 
@@ -934,56 +668,36 @@ class FilesViewTests(TestCase):
             pass  # ViewSet may not exist
 
 
-
 class FilesIntegrationTests(TestCase):
-
     """Integration tests for Files app workflows."""
-
-
 
     def setUp(self):
 
         self.user = User.objects.create_user(
-
             username="testuser", email="test@example.com", password="testpass123"
-
         )
 
         self.category = MediaCategory.objects.create(name="Documents", slug="documents")
 
-
-
     def test_complete_file_upload_workflow(self):
-
         """Test complete file upload and management workflow."""
 
         # Create file
 
         file_obj = File.objects.create(
-
             name="workflow_test.pdf",
-
             original_name="Workflow Test Document.pdf",
-
             mime_type="application/pdf",
-
             size=2048,
-
             uploaded_by=self.user,
-
             category=self.category,
-
         )
-
-
 
         # Add tags
 
         tag1 = FileTag.objects.create(name="important")
 
         tag2 = FileTag.objects.create(name="document")
-
-
 
         if hasattr(file_obj, "tags"):
 
@@ -1000,9 +714,7 @@ class FilesIntegrationTests(TestCase):
         try:
 
             version = FileVersion.objects.create(
-
                 file=file_obj, version_number=1, size=2048, created_by=self.user
-
             )
 
             self.assertEqual(version.file, file_obj)
@@ -1010,8 +722,6 @@ class FilesIntegrationTests(TestCase):
         except Exception:
 
             pass  # FileVersion may not exist
-
-
 
         # Test file metadata updates
 
@@ -1023,10 +733,7 @@ class FilesIntegrationTests(TestCase):
 
         """self.assertEqual(file_obj.name, "updated_workflow_test.pdf")"""
 
-
-
     def test_file_organization_workflow(self):
-
         """Test file organization with categories and tags."""
 
         # Create multiple files
@@ -1036,14 +743,10 @@ class FilesIntegrationTests(TestCase):
         for i in range(3):
 
             file_obj = File.objects.create(
-
                 name=f"test_file_{i}.pdf", uploaded_by=self.user, category=self.category
-
             )
 
             """files.append(file_obj)"""
-
-
 
         # Test category relationship
 
@@ -1055,15 +758,11 @@ class FilesIntegrationTests(TestCase):
 
         tag = FileTag.objects.create(name="batch-uploaded")
 
-
-
         for file_obj in files:
 
             if hasattr(file_obj, "tags"):
 
                 file_obj.tags.add(tag)
-
-
 
         # Verify tag assignments
 
@@ -1073,35 +772,22 @@ class FilesIntegrationTests(TestCase):
 
             self.assertEqual(tagged_files.count(), 3)
 
-
-
     @override_settings(MEDIA_ROOT=tempfile.mkdtemp())
-
     def test_file_storage_workflow(self):
-
         """Test file storage and retrieval workflow."""
 
         # Create file with storage path
 
         file_obj = File.objects.create(
-
             name="storage_test.txt",
-
             path="files/storage_test.txt",
-
             size=100,
-
             uploaded_by=self.user,
-
         )
-
-
 
         # Test file path handling
 
         self.assertTrue(file_obj.path)
-
-
 
         # Test file URL generation if method exists
 
@@ -1118,4 +804,3 @@ class FilesIntegrationTests(TestCase):
             download_data = file_obj.prepare_download()
 
             self.assertIsInstance(download_data, dict)
-

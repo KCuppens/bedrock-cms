@@ -1,17 +1,11 @@
 import hashlib
-
 import json
-
 from functools import wraps
 
-
 from django.core.cache import cache
-
 from django.http import HttpRequest
 
-
 from rest_framework.response import Response
-
 
 from apps.core.cache import cache_manager
 

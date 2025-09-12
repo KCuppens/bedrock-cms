@@ -1,8 +1,6 @@
 from rest_framework import serializers
 
-
 from apps.blog.models import Category, Tag
-
 from apps.cms.model_parts.category import Collection
 
 

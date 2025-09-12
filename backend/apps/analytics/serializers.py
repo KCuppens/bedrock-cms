@@ -1,8 +1,6 @@
 from django.contrib.auth import get_user_model
 
-
 from rest_framework import serializers
-
 
 from .models import (
     AnalyticsSummary,
@@ -13,7 +11,6 @@ from .models import (
     Threat,
     UserActivity,
 )
-
 
 User = get_user_model()
 

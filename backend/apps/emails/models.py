@@ -1,21 +1,13 @@
 import json
 
-
 from django.contrib.auth import get_user_model
-
 from django.core.cache import cache
-
 from django.db import models
-
 from django.template import Context, Template
-
 from django.utils import timezone
 
-
 from apps.core.enums import EmailStatus
-
 from apps.core.mixins import TimestampMixin, UserTrackingMixin
-
 
 User = get_user_model()
 
