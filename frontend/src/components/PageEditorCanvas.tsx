@@ -3,9 +3,9 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Card } from "@/components/ui/card";
-import { 
-  Plus, 
-  GripVertical, 
+import {
+  Plus,
+  GripVertical,
   Edit,
   Image as ImageIcon,
   Type,
@@ -54,11 +54,11 @@ export const PageEditorCanvas = ({
 
     const isSelected = selectedBlock === block.id;
     const isEditing = editingText === block.id;
-    
-    const blockClasses = editMode 
+
+    const blockClasses = editMode
       ? `relative group border-2 transition-colors ${
           isSelected ? 'border-blue-500' : 'border-transparent hover:border-blue-300'
-        } ${isDragging ? 'opacity-50 z-50' : ''}` 
+        } ${isDragging ? 'opacity-50 z-50' : ''}`
       : '';
 
     const handleTextEdit = (field: string, value: string) => {
@@ -88,7 +88,7 @@ export const PageEditorCanvas = ({
                   />
                 </div>
               ) : (
-                <div 
+                <div
                   onClick={() => editMode && setEditingText(block.id)}
                   className={editMode ? "cursor-text" : ""}
                 >
@@ -98,7 +98,7 @@ export const PageEditorCanvas = ({
               )}
             </div>
           );
-          
+
         case 'richtext':
           return (
             <div className="prose prose-lg max-w-none py-8 px-4">
@@ -111,7 +111,7 @@ export const PageEditorCanvas = ({
                   autoFocus
                 />
               ) : (
-                <div 
+                <div
                   onClick={() => editMode && setEditingText(block.id)}
                   className={editMode ? "cursor-text" : ""}
                   dangerouslySetInnerHTML={{ __html: block.content.html }}
@@ -119,7 +119,7 @@ export const PageEditorCanvas = ({
               )}
             </div>
           );
-          
+
         case 'image':
           return (
             <div className="py-8 text-center">
@@ -132,7 +132,7 @@ export const PageEditorCanvas = ({
               </div>
             </div>
           );
-          
+
         case 'columns':
           return (
             <div className="grid grid-cols-2 gap-8 py-8 px-4">
@@ -144,7 +144,7 @@ export const PageEditorCanvas = ({
               ))}
             </div>
           );
-          
+
         case 'cta':
           return (
             <div className="bg-primary text-primary-foreground py-12 px-8 text-center">
@@ -154,7 +154,7 @@ export const PageEditorCanvas = ({
               </Button>
             </div>
           );
-          
+
         default:
           return (
             <div className="py-8 px-4">
@@ -176,16 +176,16 @@ export const PageEditorCanvas = ({
             >
               <Plus className="w-4 h-4" />
             </Button>
-            
+
             {/* Drag handle - positioned inside the block */}
-            <div 
+            <div
               className="absolute left-2 top-2 opacity-0 group-hover:opacity-100 transition-opacity z-10 cursor-grab active:cursor-grabbing bg-white/90 dark:bg-black/90 p-1 rounded border shadow-sm"
               {...attributes}
               {...listeners}
             >
               <GripVertical className="w-4 h-4 text-muted-foreground" />
             </div>
-            
+
             {/* Control buttons */}
             <div className="absolute top-2 right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity z-10">
               <Button
@@ -207,11 +207,11 @@ export const PageEditorCanvas = ({
             </div>
           </>
         )}
-        
+
         <div onClick={() => editMode && onBlockSelect(block.id)}>
           {renderBlockContent()}
         </div>
-        
+
         {editMode && (
           <Button
             variant="ghost"
@@ -233,7 +233,7 @@ export const PageEditorCanvas = ({
             Edit mode enabled - Drag blocks to reorder, click to edit, trash icon to delete
           </div>
         )}
-        
+
         <div className="space-y-0">
           {page.blocks
             .sort((a, b) => a.position - b.position)
@@ -241,7 +241,7 @@ export const PageEditorCanvas = ({
               <SortableBlock key={block.id} block={block} />
             ))}
         </div>
-        
+
         {page.blocks.length === 0 && (
           <div className="py-20 text-center">
             <Layout className="w-16 h-16 mx-auto mb-4 text-muted-foreground" />

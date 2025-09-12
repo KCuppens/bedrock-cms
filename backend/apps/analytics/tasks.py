@@ -5,10 +5,9 @@ Celery tasks for analytics data processing and aggregation.
 import logging
 from datetime import date, datetime, timedelta
 
+from celery import shared_task
 from django.contrib.auth import get_user_model
 from django.utils import timezone
-
-from celery import shared_task
 
 from .aggregation import AnalyticsAggregator
 from .models import PageView, UserActivity

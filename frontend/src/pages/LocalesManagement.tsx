@@ -100,7 +100,7 @@ const LocalesManagement = () => {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
-  
+
   const [formData, setFormData] = useState<LocaleFormData>({
     code: "",
     name: "",
@@ -181,26 +181,26 @@ const LocalesManagement = () => {
       });
       return;
     }
-    
+
     setDeleteLocale(locale);
     setShowDeleteConfirm(true);
   };
 
   const confirmDelete = async () => {
     if (!deleteLocale) return;
-    
+
     setIsDeleting(true);
     try {
       await api.i18n.locales.delete(deleteLocale.id);
-      
+
       // Remove the deleted locale from state
       setLocales(prev => prev.filter(l => l && l.id !== deleteLocale.id));
-      
+
       toast({
         title: "Locale deleted",
         description: `${deleteLocale.name} has been removed.`,
       });
-      
+
       // Close dialog and reset state
       setShowDeleteConfirm(false);
       setDeleteLocale(null);
@@ -221,39 +221,39 @@ const LocalesManagement = () => {
     if (!formData.code.trim()) return "Locale code is required";
     if (!formData.name.trim()) return "Locale name is required";
     if (!formData.native_name.trim()) return "Native name is required";
-    
+
     // Check for duplicate codes (excluding current locale when editing)
-    const existingLocale = locales.find(l => 
-      l && l.code && l.code.toLowerCase() === formData.code.toLowerCase() && 
+    const existingLocale = locales.find(l =>
+      l && l.code && l.code.toLowerCase() === formData.code.toLowerCase() &&
       l.id !== editingLocale?.id
     );
-    
+
     if (existingLocale) return "Locale code already exists";
-    
-    // Check for fallback cycles  
+
+    // Check for fallback cycles
     if (formData.fallback) {
       const fallbackLocale = locales.find(l => l && l.id === formData.fallback);
       if (fallbackLocale?.code === formData.code) {
         return "A locale cannot fallback to itself";
       }
-      
+
       // Check for circular fallbacks
       const checkCircular = (id: number, visited: Set<number> = new Set()): boolean => {
         if (visited.has(id)) return true;
         visited.add(id);
-        
+
         const locale = locales.find(l => l && l.id === id);
         if (locale?.fallback) {
           return checkCircular(locale.fallback, visited);
         }
         return false;
       };
-      
+
       if (checkCircular(formData.fallback)) {
         return "Fallback creates a circular dependency";
       }
     }
-    
+
     return null;
   };
 
@@ -275,20 +275,20 @@ const LocalesManagement = () => {
         const response = await api.i18n.locales.update(editingLocale.id, formData);
         // Handle response - ensure we have a valid locale object
         const updatedLocale = response?.data || response;
-        
+
         if (!updatedLocale || typeof updatedLocale !== 'object') {
           throw new Error('Invalid response from server');
         }
-        
-        setLocales(prev => prev.map(locale => 
+
+        setLocales(prev => prev.map(locale =>
           locale && locale.id === editingLocale.id ? { ...updatedLocale, id: editingLocale.id } : locale
         ));
-        
+
         toast({
           title: "Locale updated",
           description: `${formData.name} has been updated successfully.`,
         });
-        
+
         // Close modal and reset form after successful update
         setShowAddModal(false);
         setEditingLocale(null);
@@ -298,18 +298,18 @@ const LocalesManagement = () => {
         const response = await api.i18n.locales.create(formData);
         // Handle response - ensure we have a valid locale object
         const newLocale = response?.data || response;
-        
+
         if (!newLocale || typeof newLocale !== 'object') {
           throw new Error('Invalid response from server');
         }
-        
+
         setLocales(prev => [...prev.filter(l => l !== null && l !== undefined), newLocale]);
 
         toast({
           title: "Locale created",
           description: `${formData.name} has been added successfully.`,
         });
-        
+
         // Close modal and reset form after successful creation
         setShowAddModal(false);
         resetForm();
@@ -339,9 +339,9 @@ const LocalesManagement = () => {
 
     try {
       const response = await api.i18n.locales.toggleActive(locale.id);
-      
+
       // Update local state with the response
-      setLocales(prev => prev.map(l => 
+      setLocales(prev => prev.map(l =>
         l.id === locale.id ? response.locale : l
       ));
 
@@ -362,7 +362,7 @@ const LocalesManagement = () => {
   const handleSetDefault = async (locale: Locale) => {
     try {
       const response = await api.i18n.locales.setDefault(locale.id);
-      
+
       // Update local state with the response - ensure we handle null/undefined
       setLocales(prev => prev.map(l => {
         if (!l) return l; // Skip null/undefined entries
@@ -372,7 +372,7 @@ const LocalesManagement = () => {
           is_active: l.id === locale.id ? true : l.is_active // Auto-activate if setting as default
         };
       }));
-      
+
       toast({
         title: "Default locale updated",
         description: `${locale.name} is now the default locale.`,
@@ -388,7 +388,7 @@ const LocalesManagement = () => {
   };
 
 
-  const availableFallbacks = locales.filter(l => 
+  const availableFallbacks = locales.filter(l =>
     l && l.is_active && l.code !== formData.code
   );
 
@@ -396,13 +396,13 @@ const LocalesManagement = () => {
     <div className="min-h-screen">
       <div className="flex">
         <Sidebar />
-        
+
         <div className="flex-1 flex flex-col ml-72">
           <TopNavbar />
-          
+
           <main className="flex-1 p-8">
             <div className="max-w-7xl mx-auto space-y-6">
-              
+
               {/* Header */}
               <div className="flex items-center justify-between">
                 <div>
@@ -430,7 +430,7 @@ const LocalesManagement = () => {
                     </div>
                   </CardContent>
                 </Card>
-                
+
                 <Card>
                   <CardContent className="p-4">
                     <div className="flex items-center gap-3">
@@ -442,7 +442,7 @@ const LocalesManagement = () => {
                     </div>
                   </CardContent>
                 </Card>
-                
+
                 <Card>
                   <CardContent className="p-4">
                     <div className="flex items-center gap-3">
@@ -454,7 +454,7 @@ const LocalesManagement = () => {
                     </div>
                   </CardContent>
                 </Card>
-                
+
                 <Card>
                   <CardContent className="p-4">
                     <div className="flex items-center gap-3">
@@ -495,17 +495,17 @@ const LocalesManagement = () => {
                               {locale.code}
                             </code>
                           </TableCell>
-                          
+
                           <TableCell>
                             <div className="font-medium">{locale.name}</div>
                           </TableCell>
-                          
+
                           <TableCell>
                             <div className="font-medium" dir={locale.rtl ? 'rtl' : 'ltr'}>
                               {locale.native_name}
                             </div>
                           </TableCell>
-                          
+
                           <TableCell>
                             <Switch
                               checked={locale.is_active}
@@ -513,7 +513,7 @@ const LocalesManagement = () => {
                               disabled={locale.is_default}
                             />
                           </TableCell>
-                          
+
                           <TableCell>
                             <RadioGroup
                               value={locale.is_default ? locale.id : ""}
@@ -524,7 +524,7 @@ const LocalesManagement = () => {
                               </div>
                             </RadioGroup>
                           </TableCell>
-                          
+
                           <TableCell>
                             {locale.fallback ? (
                               <Badge variant="outline">
@@ -534,7 +534,7 @@ const LocalesManagement = () => {
                               <span className="text-muted-foreground">None</span>
                             )}
                           </TableCell>
-                          
+
                           <TableCell>
                             {locale.rtl ? (
                               <Badge variant="secondary">RTL</Badge>
@@ -542,8 +542,8 @@ const LocalesManagement = () => {
                               <span className="text-muted-foreground">LTR</span>
                             )}
                           </TableCell>
-                          
-                          
+
+
                           <TableCell>
                             <div className="text-sm space-y-1">
                               <div>-</div>
@@ -552,7 +552,7 @@ const LocalesManagement = () => {
                               </div>
                             </div>
                           </TableCell>
-                          
+
                           <TableCell>
                             <DropdownMenu>
                               <DropdownMenuTrigger asChild>
@@ -565,7 +565,7 @@ const LocalesManagement = () => {
                                   <Edit className="w-4 h-4 mr-2" />
                                   Edit
                                 </DropdownMenuItem>
-                                <DropdownMenuItem 
+                                <DropdownMenuItem
                                   onClick={() => handleDeleteLocale(locale)}
                                   disabled={locale.is_default}
                                   className="text-destructive"
@@ -602,13 +602,13 @@ const LocalesManagement = () => {
               {editingLocale ? "Edit Locale" : "Add New Locale"}
             </DialogTitle>
             <DialogDescription>
-              {editingLocale 
+              {editingLocale
                 ? "Update the locale settings below."
                 : "Create a new locale for your application."
               }
             </DialogDescription>
           </DialogHeader>
-          
+
           <div className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
               <div>
@@ -621,7 +621,7 @@ const LocalesManagement = () => {
                   className="text-base min-h-[40px]"
                 />
               </div>
-              
+
               <div>
                 <Label htmlFor="name">Name *</Label>
                 <Input
@@ -647,11 +647,11 @@ const LocalesManagement = () => {
 
             <div>
               <Label htmlFor="fallback">Fallback Locale</Label>
-              <Select 
-                value={formData.fallback ? String(formData.fallback) : "none"} 
-                onValueChange={(value) => setFormData(prev => ({ 
-                  ...prev, 
-                  fallback: value === "none" ? undefined : Number(value) 
+              <Select
+                value={formData.fallback ? String(formData.fallback) : "none"}
+                onValueChange={(value) => setFormData(prev => ({
+                  ...prev,
+                  fallback: value === "none" ? undefined : Number(value)
                 }))}
               >
                 <SelectTrigger>
@@ -691,14 +691,14 @@ const LocalesManagement = () => {
           </div>
 
           <DialogFooter>
-            <Button 
-              variant="outline" 
+            <Button
+              variant="outline"
               onClick={() => setShowAddModal(false)}
               disabled={isSaving}
             >
               Cancel
             </Button>
-            <Button 
+            <Button
               onClick={handleSaveLocale}
               disabled={isSaving}
             >

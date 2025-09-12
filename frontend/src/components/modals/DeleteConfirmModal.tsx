@@ -14,18 +14,18 @@ interface DeleteConfirmModalProps {
   isLoading?: boolean;
 }
 
-const DeleteConfirmModal = ({ 
-  open, 
-  onOpenChange, 
-  title, 
-  description, 
-  itemName, 
-  onConfirm, 
+const DeleteConfirmModal = ({
+  open,
+  onOpenChange,
+  title,
+  description,
+  itemName,
+  onConfirm,
   isDestructive = true,
   warningMessage,
   isLoading = false
 }: DeleteConfirmModalProps) => {
-  
+
   const handleConfirm = () => {
     onConfirm();
     // Don't close here - let the parent handle it after async operation completes
@@ -57,15 +57,15 @@ const DeleteConfirmModal = ({
         </div>
 
         <div className="flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2 pt-4">
-          <Button 
-            variant="outline" 
+          <Button
+            variant="outline"
             onClick={() => onOpenChange(false)}
             disabled={isLoading}
           >
             Cancel
           </Button>
-          <Button 
-            variant={isDestructive ? "destructive" : "default"} 
+          <Button
+            variant={isDestructive ? "destructive" : "default"}
             onClick={handleConfirm}
             disabled={isLoading}
             className="sm:ml-2"

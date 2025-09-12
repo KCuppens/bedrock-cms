@@ -32,11 +32,11 @@ export function SimpleDialog({ open, onOpenChange, children }: SimpleDialogProps
   return createPortal(
     <div className="fixed inset-0 z-50">
       {/* Overlay */}
-      <div 
+      <div
         className="fixed inset-0 bg-black/80"
         onClick={() => onOpenChange(false)}
       />
-      
+
       {/* Dialog Content */}
       <div className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-lg bg-background border rounded-lg shadow-lg p-6 max-h-[90vh] overflow-y-auto">
         <button

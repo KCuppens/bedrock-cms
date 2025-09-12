@@ -88,7 +88,7 @@ export const ContentActions: React.FC<ContentActionsProps> = ({
 
       // Check locale access
       if (action.locales && action.locales.length > 0) {
-        const hasLocaleAccess = action.locales.some(locale => 
+        const hasLocaleAccess = action.locales.some(locale =>
           permissions.canAccessLocale(locale)
         );
         if (!hasLocaleAccess) {
@@ -130,10 +130,10 @@ export const ContentActions: React.FC<ContentActionsProps> = ({
     return null;
   }
 
-  const isActionLoading = (actionId: string) => 
+  const isActionLoading = (actionId: string) =>
     isLoading === actionId || loading.includes(actionId);
 
-  const isActionDisabled = (action: ActionItem) => 
+  const isActionDisabled = (action: ActionItem) =>
     disabled || action.disabled || isActionLoading(action.id);
 
   if (inline) {

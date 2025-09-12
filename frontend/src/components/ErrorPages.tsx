@@ -2,7 +2,7 @@ import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { PermissionErrorState } from '@/components/EmptyStates';
-import { 
+import {
   Lock,
   AlertTriangle,
   RefreshCw,
@@ -19,15 +19,15 @@ interface ErrorPageProps {
 export const PermissionErrorPage: React.FC<ErrorPageProps & {
   action?: string;
   resource?: string;
-}> = ({ 
-  action = "access this content", 
+}> = ({
+  action = "access this content",
   resource = "resource",
   onRetry,
   onGoHome = () => window.location.href = '/',
   onContactSupport
 }) => (
   <div className="min-h-screen bg-background flex items-center justify-center p-4">
-    <PermissionErrorState 
+    <PermissionErrorState
       action={action}
       resource={resource}
       onRequestAccess={onContactSupport}
@@ -47,7 +47,7 @@ export const ServerErrorPage: React.FC<ErrorPageProps> = ({
           <div className="rounded-full bg-destructive/10 p-4">
             <AlertTriangle className="h-12 w-12 text-destructive" />
           </div>
-          
+
           <div className="space-y-2">
             <h1 className="text-2xl font-semibold text-foreground">Server Error</h1>
             <p className="text-muted-foreground">
@@ -67,8 +67,8 @@ export const ServerErrorPage: React.FC<ErrorPageProps> = ({
               Go Home
             </Button>
             {onContactSupport && (
-              <Button 
-                variant="outline" 
+              <Button
+                variant="outline"
                 onClick={onContactSupport}
                 className="w-full"
               >
@@ -94,7 +94,7 @@ export const MaintenanceErrorPage: React.FC<ErrorPageProps> = ({
           <div className="rounded-full bg-blue-100 p-4">
             <RefreshCw className="h-12 w-12 text-blue-600" />
           </div>
-          
+
           <div className="space-y-2">
             <h1 className="text-2xl font-semibold text-foreground">Under Maintenance</h1>
             <p className="text-muted-foreground">
@@ -110,8 +110,8 @@ export const MaintenanceErrorPage: React.FC<ErrorPageProps> = ({
               </Button>
             )}
             {onContactSupport && (
-              <Button 
-                variant="outline" 
+              <Button
+                variant="outline"
                 onClick={onContactSupport}
                 className="w-full"
               >

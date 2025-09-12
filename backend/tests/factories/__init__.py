@@ -6,12 +6,12 @@ all test suites with realistic, varied data generation.
 """
 
 try:
-    from .base import *
     from .accounts import *
+    from .analytics import *
+    from .base import *
     from .cms import *
     from .i18n import *
     from .media import *
-    from .analytics import *
 except ImportError:
     # Handle missing dependencies gracefully
     pass

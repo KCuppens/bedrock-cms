@@ -8,11 +8,11 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
-import { 
-  Copy, 
-  Download, 
-  Key, 
-  Play, 
+import {
+  Copy,
+  Download,
+  Key,
+  Play,
   Search,
   Lock,
   Unlock,
@@ -79,13 +79,13 @@ interface ParsedEndpoint {
 
 const APIDocs = () => {
   const { toast } = useToast();
-  
+
   // State
   const [schema, setSchema] = useState<OpenAPISchema | null>(null);
   const [endpoints, setEndpoints] = useState<ParsedEndpoint[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  
+
   // UI State
   const [activeTag, setActiveTag] = useState<string>('all');
   const [selectedEndpoint, setSelectedEndpoint] = useState<ParsedEndpoint | null>(null);
@@ -101,27 +101,27 @@ const APIDocs = () => {
       try {
         setLoading(true);
         setError(null);
-        
+
         const response = await fetch('http://localhost:8000/api/schema/', {
           headers: {
             'Accept': 'application/json',
           },
           credentials: 'include'
         });
-        
+
         if (!response.ok) {
           throw new Error(`HTTP ${response.status}: ${response.statusText}`);
         }
-        
+
         const schemaData: OpenAPISchema = await response.json();
-        
+
         setSchema(schemaData);
-        
+
         // Parse endpoints from schema
         const parsedEndpoints = parseEndpointsFromSchema(schemaData);
-        
+
         setEndpoints(parsedEndpoints);
-        
+
       } catch (err: any) {
         console.error('Failed to fetch API schema:', err);
         setError(err.message || 'Failed to load API documentation');
@@ -141,11 +141,11 @@ const APIDocs = () => {
   // Parse endpoints from OpenAPI schema
   const parseEndpointsFromSchema = (schema: OpenAPISchema): ParsedEndpoint[] => {
     const parsedEndpoints: ParsedEndpoint[] = [];
-    
+
     Object.entries(schema.paths).forEach(([path, methods]) => {
       Object.entries(methods).forEach(([method, spec]: [string, any]) => {
         if (method === 'parameters' || typeof spec !== 'object') return;
-        
+
         const endpoint: ParsedEndpoint = {
           id: `${method}-${path}`.replace(/[{}]/g, '-').replace(/\//g, '-'),
           method: method.toUpperCase(),
@@ -173,52 +173,52 @@ const APIDocs = () => {
           })),
           security: !!(spec.security && spec.security.length > 0)
         };
-        
+
         parsedEndpoints.push(endpoint);
       });
     });
-    
+
     return parsedEndpoints;
   };
 
   // Helper to get request body example
   const getRequestBodyExample = (requestBody: any) => {
     if (!requestBody?.content) return null;
-    
+
     const contentTypes = Object.keys(requestBody.content);
     const firstContentType = contentTypes[0];
     const content = requestBody.content[firstContentType];
-    
+
     if (content?.example) return content.example;
     if (content?.examples) {
       const firstExample = Object.values(content.examples)[0] as any;
       return firstExample?.value || firstExample;
     }
-    
+
     return null;
   };
 
   // Helper to get response example
   const getResponseExample = (response: any) => {
     if (!response?.content) return null;
-    
+
     const contentTypes = Object.keys(response.content);
     const firstContentType = contentTypes[0];
     const content = response.content[firstContentType];
-    
+
     if (content?.example) return content.example;
     if (content?.examples) {
       const firstExample = Object.values(content.examples)[0] as any;
       return firstExample?.value || firstExample;
     }
-    
+
     return null;
   };
 
   // Get available tags
   const availableTags = useMemo(() => {
     const tagCounts: Record<string, number> = {};
-    
+
     endpoints.forEach(endpoint => {
       endpoint.tags.forEach(tag => {
         tagCounts[tag] = (tagCounts[tag] || 0) + 1;
@@ -241,23 +241,23 @@ const APIDocs = () => {
   // Filter endpoints
   const filteredEndpoints = useMemo(() => {
     let filtered = endpoints;
-    
+
     // Filter by active tag
     if (activeTag && activeTag !== 'all') {
       filtered = filtered.filter(ep => ep.tags.includes(activeTag));
     }
-    
+
     // Filter by search query
     if (searchQuery) {
       const query = searchQuery.toLowerCase();
-      filtered = filtered.filter(ep => 
+      filtered = filtered.filter(ep =>
         ep.path.toLowerCase().includes(query) ||
         ep.summary.toLowerCase().includes(query) ||
         ep.description.toLowerCase().includes(query) ||
         ep.method.toLowerCase().includes(query)
       );
     }
-    
+
     return filtered.sort((a, b) => a.path.localeCompare(b.path));
   }, [endpoints, activeTag, searchQuery]);
 
@@ -285,34 +285,34 @@ const APIDocs = () => {
   // Generate cURL command
   const generateCurl = (endpoint: ParsedEndpoint) => {
     let curl = `curl -X ${endpoint.method} '${window.location.origin}${endpoint.path}'`;
-    
+
     // Add headers
     const headers = ['-H "Accept: application/json"'];
-    
+
     if (authToken) {
       headers.push(`-H "Authorization: Bearer ${authToken}"`);
     }
-    
+
     if (endpoint.requestBody) {
       headers.push('-H "Content-Type: application/json"');
     }
-    
+
     if (headers.length > 0) {
       curl += ' \\\n  ' + headers.join(' \\\n  ');
     }
-    
+
     // Add request body for non-GET methods
     if (endpoint.requestBody && endpoint.method !== 'GET' && endpoint.requestBody.example) {
       curl += ` \\\n  -d '${JSON.stringify(endpoint.requestBody.example, null, 2)}'`;
     }
-    
+
     return curl;
   };
 
   // Test endpoint
   const tryEndpoint = async (endpoint: ParsedEndpoint) => {
     let url = `${window.location.origin}${endpoint.path}`;
-    
+
     // Replace path parameters
     endpoint.parameters
       .filter(param => param.in === 'path' && testParams[param.name])
@@ -327,7 +327,7 @@ const APIDocs = () => {
       .forEach(param => {
         queryParams.set(param.name, testParams[param.name]);
       });
-    
+
     if (queryParams.toString()) {
       url += `?${queryParams.toString()}`;
     }
@@ -358,7 +358,7 @@ const APIDocs = () => {
     try {
       const response = await fetch(url, options);
       const contentType = response.headers.get('content-type');
-      
+
       let data;
       if (contentType?.includes('application/json')) {
         data = await response.json();
@@ -384,7 +384,7 @@ const APIDocs = () => {
         status: 0,
         statusText: 'Network Error'
       });
-      
+
       toast({
         title: 'Request Failed',
         description: error.message || 'Failed to send API request',
@@ -400,19 +400,19 @@ const APIDocs = () => {
     try {
       const url = format === 'json' ? '/api/schema/' : '/api/schema.yaml';
       const response = await fetch(url, { credentials: 'include' });
-      
+
       if (!response.ok) throw new Error('Failed to download schema');
-      
+
       const content = await response.text();
-      const blob = new Blob([content], { 
-        type: format === 'json' ? 'application/json' : 'text/yaml' 
+      const blob = new Blob([content], {
+        type: format === 'json' ? 'application/json' : 'text/yaml'
       });
-      
+
       const link = document.createElement('a');
       link.href = URL.createObjectURL(blob);
       link.download = `openapi-schema.${format}`;
       link.click();
-      
+
       toast({
         title: 'Schema Downloaded',
         description: `OpenAPI schema downloaded as ${format.toUpperCase()}`,
@@ -477,10 +477,10 @@ const APIDocs = () => {
     <div className="min-h-screen">
       <div className="flex">
         <Sidebar />
-        
+
         <div className="flex-1 flex flex-col ml-72">
           <TopNavbar />
-          
+
           <main className="flex-1 p-8">
             <div className="max-w-7xl mx-auto">
               {/* Header */}
@@ -498,9 +498,9 @@ const APIDocs = () => {
                     <Badge variant="secondary" className="text-lg px-3 py-1">
                       {schema?.info?.version || 'v1.0'}
                     </Badge>
-                    <Button 
-                      variant="outline" 
-                      size="sm" 
+                    <Button
+                      variant="outline"
+                      size="sm"
                       onClick={() => downloadSchema('json')}
                     >
                       <Download className="w-4 h-4 mr-2" />
@@ -541,7 +541,7 @@ const APIDocs = () => {
                         <div className="p-3 space-y-1">
                           {availableTags.map((tag) => {
                             const isActive = activeTag === tag.name;
-                            
+
                             return (
                               <Button
                                 key={tag.name}
@@ -651,8 +651,8 @@ const APIDocs = () => {
                     <div className="space-y-6">
                       {/* Header */}
                       <div className="flex items-center gap-4">
-                        <Button 
-                          variant="outline" 
+                        <Button
+                          variant="outline"
                           size="sm"
                           onClick={() => setSelectedEndpoint(null)}
                         >
@@ -691,7 +691,7 @@ const APIDocs = () => {
                               <TabsTrigger value="code">Code</TabsTrigger>
                               <TabsTrigger value="try">Try It</TabsTrigger>
                             </TabsList>
-                            
+
                             <TabsContent value="parameters" className="mt-4">
                               <div className="space-y-4">
                                 {selectedEndpoint.parameters.length > 0 && (
@@ -773,7 +773,7 @@ const APIDocs = () => {
                                       ) : (
                                         <XCircle className="w-4 h-4 text-red-600" />
                                       )}
-                                      <Badge 
+                                      <Badge
                                         variant={parseInt(response.status) < 400 ? "default" : "destructive"}
                                         className="font-mono"
                                       >
@@ -783,8 +783,8 @@ const APIDocs = () => {
                                     </div>
                                     {response.example && (
                                       <pre className="bg-muted p-3 rounded-lg text-sm overflow-auto">
-                                        {typeof response.example === 'string' 
-                                          ? response.example 
+                                        {typeof response.example === 'string'
+                                          ? response.example
                                           : JSON.stringify(response.example, null, 2)}
                                       </pre>
                                     )}
@@ -797,8 +797,8 @@ const APIDocs = () => {
                               <div>
                                 <div className="flex items-center justify-between mb-2">
                                   <h3 className="font-medium text-sm">cURL</h3>
-                                  <Button 
-                                    size="sm" 
+                                  <Button
+                                    size="sm"
                                     variant="outline"
                                     onClick={() => copyToClipboard(generateCurl(selectedEndpoint))}
                                   >
@@ -815,7 +815,7 @@ const APIDocs = () => {
                             <TabsContent value="try" className="mt-4">
                               <div className="space-y-4">
                                 <h3 className="font-medium text-sm">Test Endpoint</h3>
-                                
+
                                 {/* Parameters Input */}
                                 {selectedEndpoint.parameters.length > 0 && (
                                   <div className="space-y-3">
@@ -868,7 +868,7 @@ const APIDocs = () => {
 
                                 {/* Action Buttons */}
                                 <div className="flex gap-3">
-                                  <Button 
+                                  <Button
                                     onClick={() => tryEndpoint(selectedEndpoint)}
                                     disabled={isTestLoading}
                                   >
@@ -884,7 +884,7 @@ const APIDocs = () => {
                                       </>
                                     )}
                                   </Button>
-                                  <Button 
+                                  <Button
                                     variant="outline"
                                     onClick={() => {
                                       setTestParams({});
@@ -900,9 +900,9 @@ const APIDocs = () => {
                                   <div className="space-y-3">
                                     <Separator />
                                     <h4 className="text-sm font-medium">Response</h4>
-                                    
+
                                     <div className="flex items-center gap-2">
-                                      <Badge 
+                                      <Badge
                                         variant={testResponse.status < 400 ? "default" : "destructive"}
                                       >
                                         {testResponse.status} {testResponse.statusText}
@@ -913,15 +913,15 @@ const APIDocs = () => {
                                         </Badge>
                                       )}
                                     </div>
-                                    
+
                                     {testResponse.error ? (
                                       <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4">
                                         <p className="text-sm text-red-800 dark:text-red-200">{testResponse.error}</p>
                                       </div>
                                     ) : (
                                       <pre className="bg-muted p-4 rounded-lg text-sm overflow-auto max-h-96">
-                                        {typeof testResponse.data === 'string' 
-                                          ? testResponse.data 
+                                        {typeof testResponse.data === 'string'
+                                          ? testResponse.data
                                           : JSON.stringify(testResponse.data, null, 2)}
                                       </pre>
                                     )}

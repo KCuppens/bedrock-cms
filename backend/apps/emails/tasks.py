@@ -1,8 +1,8 @@
 import logging
-
-from django.conf import settings
+from typing import Dict, List, Optional
 
 from celery import shared_task
+from django.conf import settings
 
 from .models import EmailMessageLog
 
@@ -106,7 +106,7 @@ def cleanup_old_email_logs(days_to_keep: int = 30):
 
 @shared_task(name="apps.emails.tasks.send_bulk_email_task")
 def send_bulk_email_task(
-    template_key: str, recipient_emails: list, context: dict | None = None
+    template_key: str, recipient_emails: List[str], context: Optional[Dict] = None
 ):
     """
     Celery task to send bulk emails with batch processing

@@ -35,7 +35,7 @@ const AccessDeniedPage = () => (
     <Alert variant="destructive" className="max-w-md">
       <ShieldX className="h-4 w-4" />
       <AlertDescription>
-        You don't have permission to access this page. 
+        You don't have permission to access this page.
         Please contact your administrator if you believe this is an error.
       </AlertDescription>
     </Alert>
@@ -43,7 +43,7 @@ const AccessDeniedPage = () => (
 );
 
 const checkRouteAccess = (
-  pathname: string, 
+  pathname: string,
   permissions: ReturnType<typeof usePermissions>
 ): boolean => {
   // Find matching route permission config
@@ -82,7 +82,7 @@ const checkRouteAccess = (
 
   // Check locales
   if (config.locales && config.locales.length > 0) {
-    const hasLocaleAccess = config.locales.some(locale => 
+    const hasLocaleAccess = config.locales.some(locale =>
       permissions.canAccessLocale(locale)
     );
     if (!hasLocaleAccess) {

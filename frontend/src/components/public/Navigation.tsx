@@ -11,8 +11,8 @@ interface NavigationProps {
   homeUrl?: string;
 }
 
-const Navigation: React.FC<NavigationProps> = ({ 
-  menuItems, 
+const Navigation: React.FC<NavigationProps> = ({
+  menuItems,
   siteName = 'Your Site',
   homeUrl = '/'
 }) => {
@@ -43,8 +43,8 @@ const Navigation: React.FC<NavigationProps> = ({
         <div className="flex justify-between h-16">
           {/* Logo/Site Name */}
           <div className="flex items-center">
-            <Link 
-              to={homeUrl} 
+            <Link
+              to={homeUrl}
               className="flex-shrink-0 font-bold text-xl text-gray-900 hover:text-gray-700"
             >
               {siteName}
@@ -69,7 +69,7 @@ const Navigation: React.FC<NavigationProps> = ({
                       <span>{item.title}</span>
                       <ChevronDown className="h-4 w-4" />
                     </button>
-                    
+
                     {/* Dropdown Menu */}
                     <div className="absolute left-0 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200">
                       <div className="py-1">
@@ -105,7 +105,7 @@ const Navigation: React.FC<NavigationProps> = ({
                 )}
               </div>
             ))}
-            
+
             {/* Language Selector */}
             <div className="ml-4">
               <SimpleLanguageSelector />
@@ -142,14 +142,14 @@ const Navigation: React.FC<NavigationProps> = ({
                         )}
                       >
                         <span>{item.title}</span>
-                        <ChevronDown 
+                        <ChevronDown
                           className={cn(
                             "h-4 w-4 transition-transform",
                             openDropdown === item.id ? "rotate-180" : ""
-                          )} 
+                          )}
                         />
                       </button>
-                      
+
                       {openDropdown === item.id && item.children && (
                         <div className="ml-4 space-y-1">
                           {item.children.map((child) => (

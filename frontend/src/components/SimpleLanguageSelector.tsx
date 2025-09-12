@@ -10,10 +10,10 @@ import {
 
 const SimpleLanguageSelector = memo(() => {
   const { activeLocales, currentLocale, setCurrentLocale } = useLocale();
-  
+
   // Don't show if only one or no languages available
   if (activeLocales.length <= 1) return null;
-  
+
   // Always show as dropdown with flags
   return (
     <Select

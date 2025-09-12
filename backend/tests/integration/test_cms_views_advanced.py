@@ -5,22 +5,16 @@ Tests publishing workflows, moderation system, scheduled content,
 block operations, and all remaining CMS view functionality.
 """
 
-import json
-from datetime import datetime, timedelta
-from unittest.mock import patch, Mock
+from datetime import timedelta
 
-import pytest
-from django.test import TestCase
 from django.contrib.auth import get_user_model
-from django.urls import reverse
 from django.utils import timezone
 from rest_framework import status
-from rest_framework.test import APITestCase, APIClient
+from rest_framework.test import APIClient, APITestCase
 
 from apps.cms.models import Page
-from apps.i18n.models import Locale
-from tests.fixtures.sample_data import *
 from tests.factories import *
+from tests.fixtures.sample_data import *
 
 User = get_user_model()
 

@@ -3,7 +3,6 @@ Serializers for versioning and audit functionality.
 """
 
 from django.contrib.auth import get_user_model
-
 from rest_framework import serializers
 
 from .versioning import AuditEntry, PageRevision

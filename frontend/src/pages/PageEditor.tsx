@@ -166,7 +166,7 @@ const mockPage: PageData = {
       position: 0
     },
     {
-      id: "block-2", 
+      id: "block-2",
       type: "content_detail",
       content: {
         label: "blog.blogpost",
@@ -194,7 +194,7 @@ const PageEditor = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { toast } = useToast();
-  
+
   const [page, setPage] = useState<PageData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -215,7 +215,7 @@ const PageEditor = () => {
   // Create autosave function
   const autosaveFunction = useCallback(async (data: PageData) => {
     if (!data || !id) return;
-    
+
     const pageId = parseInt(id);
     // Map frontend blocks back to API format
     const apiBlocks = data.blocks.map(block => ({
@@ -225,7 +225,7 @@ const PageEditor = () => {
       position: block.position,
       props: block.props || null
     }));
-    
+
     await api.cms.pages.update(pageId, {
       title: data.title,
       slug: data.slug,
@@ -242,11 +242,11 @@ const PageEditor = () => {
   // Manual save function for save buttons
   const handleSave = useCallback(async () => {
     if (!page || !id || isSaving) return;
-    
+
     setIsSaving(true);
     try {
       const pageId = parseInt(id);
-      
+
       // Map frontend blocks back to API format
       const apiBlocks = page.blocks.map(block => ({
         id: parseInt(block.id) || null,
@@ -255,7 +255,7 @@ const PageEditor = () => {
         position: block.position,
         props: block.props || null
       }));
-      
+
       // Make API call with all required fields including locale
       await api.cms.pages.update(pageId, {
         title: page.title,
@@ -269,7 +269,7 @@ const PageEditor = () => {
         is_homepage: page.isHomepage,
         schedule: page.schedule
       });
-      
+
       // Success feedback
       setHasUnsavedChanges(false);
       setLastSaved(new Date());
@@ -277,17 +277,17 @@ const PageEditor = () => {
         title: "Page saved",
         description: "Your changes have been saved successfully.",
       });
-      
+
     } catch (error: any) {
       console.error('Save failed:', error);
-      
+
       // Handle validation errors
       if (error?.response?.data && typeof error.response.data === 'object') {
         const validationErrors = error.response.data;
         const errorMessages = Object.entries(validationErrors)
           .map(([field, messages]) => `${field}: ${Array.isArray(messages) ? messages.join(', ') : messages}`)
           .join('; ');
-          
+
         toast({
           title: "Validation Error",
           description: errorMessages,
@@ -319,7 +319,7 @@ const PageEditor = () => {
     if (!apiPage) {
       throw new Error('API page data is null or undefined');
     }
-    
+
     if (!apiPage.id) {
       throw new Error('API page missing required id field');
     }
@@ -351,17 +351,17 @@ const PageEditor = () => {
   const detectPageType = (apiPage: Page): 'normal' | 'presentation' => {
     // Check if page has content_detail blocks
     const hasContentDetail = apiPage.blocks?.some((block: any) => block.type === 'content_detail');
-    
+
     // Additional logic: check for specific presentation patterns
-    const hasTemplateVariables = apiPage.title?.includes('{{') || 
+    const hasTemplateVariables = apiPage.title?.includes('{{') ||
                                 apiPage.seo?.title?.includes('{{') ||
                                 apiPage.seo?.description?.includes('{{');
-    
+
     // Check if slug suggests it's a template (contains parameters or is generic)
-    const isTemplateSlug = apiPage.slug?.includes('[') || 
-                          apiPage.slug === 'blog-detail' || 
+    const isTemplateSlug = apiPage.slug?.includes('[') ||
+                          apiPage.slug === 'blog-detail' ||
                           apiPage.slug === 'post-detail';
-    
+
     return (hasContentDetail || hasTemplateVariables || isTemplateSlug) ? 'presentation' : 'normal';
   };
 
@@ -371,12 +371,12 @@ const PageEditor = () => {
     if (contentDetailBlock?.content?.label) {
       return contentDetailBlock.content.label as 'blog.blogpost' | 'page.page';
     }
-    
+
     // Fallback to slug-based detection
     if (apiPage.slug?.includes('blog') || apiPage.slug?.includes('post')) {
       return 'blog.blogpost';
     }
-    
+
     // Default to page if it's a presentation page, otherwise undefined for normal pages
     return detectPageType(apiPage) === 'presentation' ? 'page.page' : undefined;
   };
@@ -394,15 +394,15 @@ const PageEditor = () => {
   const loadPageData = useCallback(async (pageId: number) => {
     setIsLoading(true);
     setError(null);
-    
+
     try {
       const response = await api.cms.pages.get(pageId);
       console.log('API Response:', response); // Debug log
-      
+
       if (!response) {
         throw new Error('API response is empty or malformed');
       }
-      
+
       // The API returns the page data directly, not wrapped in a 'data' property
       const pageData = mapApiPageToPageData(response);
       setPage(pageData);
@@ -415,9 +415,9 @@ const PageEditor = () => {
         response: error?.response?.data,
         status: error?.response?.status
       });
-      
-      const errorMessage = error?.response?.data?.detail || 
-                         error?.response?.data?.message || 
+
+      const errorMessage = error?.response?.data?.detail ||
+                         error?.response?.data?.message ||
                          error?.message ||
                          'Failed to load page data';
       setError(errorMessage);
@@ -459,7 +459,7 @@ const PageEditor = () => {
       publishedAt: '2024-01-15'
     },
     {
-      id: 'sample-2', 
+      id: 'sample-2',
       title: 'Advanced SEO Techniques',
       excerpt: 'Discover powerful SEO strategies to boost your content visibility...',
       content: '<p>Here we explore advanced SEO techniques and best practices...</p>',
@@ -470,17 +470,17 @@ const PageEditor = () => {
 
   const isPresentationMode = page?.isPresentationPage && page?.contentType === 'blog.blogpost';
   const postsUsingThisTemplate = 24; // Mock count
-  const hasContentDetailBlock = page?.blocks.some(block => 
+  const hasContentDetailBlock = page?.blocks.some(block =>
     block.type === 'content_detail'
   ) || false;
-  const contentDetailBlockCount = page?.blocks.filter(block => 
+  const contentDetailBlockCount = page?.blocks.filter(block =>
     block.type === 'content_detail'
   ).length || 0;
 
   // Auto-save functionality with debouncing
   const savePageData = useCallback(async () => {
     if (!page || !id) return;
-    
+
     setIsSaving(true);
     try {
       const pageId = parseInt(id);
@@ -492,7 +492,7 @@ const PageEditor = () => {
         position: block.position,
         props: block.props || null
       }));
-      
+
       await api.cms.pages.update(pageId, {
         title: page.title,
         slug: page.slug,
@@ -531,7 +531,7 @@ const PageEditor = () => {
   // Individual block operations
   const createBlockOnServer = useCallback(async (block: Block) => {
     if (!id) return null;
-    
+
     try {
       const pageId = parseInt(id);
       const apiBlock = {
@@ -540,10 +540,10 @@ const PageEditor = () => {
         position: block.position,
         id: block.id
       };
-      
+
       // Use the page's insertBlock endpoint
       const response = await api.cms.pages.insertBlock(pageId, apiBlock, block.position);
-      
+
       // Return the full updated page data with transformed blocks
       if (response.data) {
         return transformPageData(response.data);
@@ -562,22 +562,22 @@ const PageEditor = () => {
 
   const updateBlockOnServer = useCallback(async (block: Block) => {
     if (!id || !page) return null;
-    
+
     try {
       // Skip if it's a temporary ID
       if (block.id.startsWith('temp-')) return null;
-      
+
       // Find the block index in the page's blocks array
       const blockIndex = page.blocks.findIndex(b => b.id === block.id);
       if (blockIndex === -1) return null;
-      
+
       // Use the specific update block endpoint
       const pageId = parseInt(id);
       const response = await api.cms.pages.updateBlock(pageId, {
         block_index: blockIndex,
         props: block.content || {}
       });
-      
+
       // Return the full updated page data with transformed blocks
       if (response.data) {
         return transformPageData(response.data);
@@ -596,15 +596,15 @@ const PageEditor = () => {
 
   const deleteBlockOnServer = useCallback(async (blockId: string) => {
     if (!id || !page) return;
-    
+
     try {
       // Skip if it's a temporary ID
       if (blockId.startsWith('temp-')) return;
-      
+
       // Find the block index in the page's blocks array
       const blockIndex = page.blocks.findIndex(b => b.id === blockId);
       if (blockIndex === -1) return;
-      
+
       // Use the page's deleteBlock endpoint with the block index
       await api.cms.pages.deleteBlock(parseInt(id), blockIndex);
     } catch (error: any) {
@@ -702,17 +702,17 @@ const PageEditor = () => {
 
   const handleBlockUpdate = useCallback(async (blockId: string, updates: Partial<Block>) => {
     if (!page) return;
-    
+
     // Optimistically update UI
     const updatedBlocks = page.blocks.map(block =>
       block.id === blockId ? { ...block, ...updates } : block
     );
-    
+
     setPage(prev => prev ? ({
       ...prev,
       blocks: updatedBlocks
     }) : null);
-    
+
     // Find the updated block and save it to server immediately
     const updatedBlock = updatedBlocks.find(block => block.id === blockId);
     if (updatedBlock) {
@@ -730,7 +730,7 @@ const PageEditor = () => {
 
   const handleAddBlock = async (type: Block['type'], position: number) => {
     if (!page) return;
-    
+
     // Validate content_detail blocks for presentation pages
     if (type === 'content_detail' && isPresentationMode) {
       const existingContentDetailBlocks = page.blocks.filter(b => b.type === 'content_detail').length;
@@ -739,29 +739,29 @@ const PageEditor = () => {
         return;
       }
     }
-    
+
     const newBlock: Block = {
       id: `temp-${Date.now()}`, // Temporary ID until server responds
       type,
       content: getDefaultContent(type),
       position
     };
-    
+
     // Update positions of existing blocks
-    const updatedBlocks = page.blocks.map(block => 
-      block.position >= position 
+    const updatedBlocks = page.blocks.map(block =>
+      block.position >= position
         ? { ...block, position: block.position + 1 }
         : block
     );
-    
+
     // Optimistically update UI
     setPage(prev => prev ? ({
       ...prev,
       blocks: [...updatedBlocks, newBlock].sort((a, b) => a.position - b.position)
     }) : null);
-    
+
     setAddBlockModalOpen(false);
-    
+
     // Create block on server and update with full page data
     const updatedPageData = await createBlockOnServer(newBlock);
     if (updatedPageData) {
@@ -779,12 +779,12 @@ const PageEditor = () => {
 
   const handleDeleteBlock = (blockId: string) => {
     if (!page) return;
-    
+
     setPage(prev => prev ? ({
       ...prev,
       blocks: prev.blocks.filter(block => block.id !== blockId)
     }) : null);
-    
+
     setHasUnsavedChanges(true);
     setSelectedBlock(null);
   };
@@ -796,20 +796,20 @@ const PageEditor = () => {
 
   const handleDuplicateBlock = async (blockId: string) => {
     if (!page || !id) return;
-    
+
     const blockIndex = page.blocks.findIndex(b => b.id === blockId);
     if (blockIndex === -1) return;
-    
+
     try {
       const pageId = parseInt(id);
       const response = await api.cms.pages.duplicateBlock(pageId, { block_index: blockIndex });
-      
+
       // Update the page with the transformed server response
       if (response.data) {
         const updatedPageData = transformPageData(response.data);
         setPage(updatedPageData);
         setHasUnsavedChanges(false); // Server is now in sync
-        
+
         toast({
           title: "Block duplicated",
           description: "The block has been successfully duplicated.",
@@ -833,15 +833,15 @@ const PageEditor = () => {
         ...prev,
         blocks: prev.blocks.filter(block => block.id !== blockToDelete)
       }) : null);
-      
+
       setSelectedBlock(null);
       setBlockToDelete(null);
       setDeleteConfirmOpen(false);
-      
+
       try {
         // Delete on server
         await deleteBlockOnServer(blockToDelete);
-        
+
         // Reload page data to get the updated state from server
         const pageId = parseInt(id);
         await loadPageData(pageId);
@@ -859,14 +859,14 @@ const PageEditor = () => {
   // Handle publishing a page
   const handlePublishPage = async () => {
     if (!page || !id) return;
-    
+
     try {
       const pageId = parseInt(id);
       await api.cms.pages.publish(pageId);
-      
+
       // Update page status locally
       setPage(prev => prev ? { ...prev, status: 'published' } : null);
-      
+
       toast({
         title: "Page published",
         description: `"${page.title}" has been published successfully.`,
@@ -884,14 +884,14 @@ const PageEditor = () => {
   // Handle unpublishing a page (set to draft)
   const handleUnpublishPage = async () => {
     if (!page || !id) return;
-    
+
     try {
       const pageId = parseInt(id);
       await api.cms.pages.unpublish(pageId);
-      
+
       // Update page status locally
       setPage(prev => prev ? { ...prev, status: 'draft' } : null);
-      
+
       toast({
         title: "Page unpublished",
         description: `"${page.title}" has been set to draft.`,
@@ -909,22 +909,22 @@ const PageEditor = () => {
   // Handle exporting page as JSON
   const handleExportJSON = () => {
     if (!page) return;
-    
+
     const exportData = {
       ...page,
       exportedAt: new Date().toISOString(),
     };
-    
+
     const dataStr = JSON.stringify(exportData, null, 2);
     const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
-    
+
     const exportFileDefaultName = `page-${page.slug}-${Date.now()}.json`;
-    
+
     const linkElement = document.createElement('a');
     linkElement.setAttribute('href', dataUri);
     linkElement.setAttribute('download', exportFileDefaultName);
     linkElement.click();
-    
+
     toast({
       title: "Page exported",
       description: `Downloaded as ${exportFileDefaultName}`,
@@ -937,7 +937,7 @@ const PageEditor = () => {
     if (active.id !== over?.id && page) {
       setPage(prev => {
         if (!prev) return null;
-        
+
         const blocks = [...prev.blocks];
         const oldIndex = blocks.findIndex(block => block.id === active.id);
         const newIndex = blocks.findIndex(block => block.id === over?.id);
@@ -970,7 +970,7 @@ const PageEditor = () => {
       case 'columns':
         return { columns: [], gap: "md" };  // Backend expects gap field
       case 'cta':
-        return { 
+        return {
           title: "Ready to get started?",
           description: "",
           primaryButtonText: "",
@@ -981,7 +981,7 @@ const PageEditor = () => {
       case 'faq':
         return { items: [{ question: "Question?", answer: "Answer here." }] };
       case 'collection_list':
-        return { 
+        return {
           source: "blog.blogpost",
           mode: "query",
           filters: { tags: [], category: null, author: null, dateRange: null },
@@ -1040,14 +1040,14 @@ const PageEditor = () => {
         if (!addBlockModalOpen) {
           return; // Don't load if modal is not open
         }
-        
+
         try {
           setLoading(true);
           console.log('Fetching block types from API...');
-          
+
           const response = await api.blocks.list();
           console.log('Block types API response:', response);
-          
+
           if (response && response.block_types) {
             setBlockTypes(response.block_types);
             setError(null);
@@ -1057,7 +1057,7 @@ const PageEditor = () => {
         } catch (err: any) {
           console.error('Failed to load block types:', err);
           setError('Failed to load block types');
-          
+
           // Fallback to hardcoded blocks if API fails
           setBlockTypes([
             { type: "hero", label: "Hero Section", icon: "star", description: "Large banner with title and subtitle", category: "layout" },
@@ -1186,7 +1186,7 @@ const PageEditor = () => {
               )}
             </DialogTitle>
           </DialogHeader>
-          
+
           {isPresentationMode && (
             <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
               <h4 className="font-medium text-blue-900 mb-2">Recommended for Blog Posts</h4>
@@ -1215,7 +1215,7 @@ const PageEditor = () => {
               </div>
             </div>
           )}
-          
+
           {loading ? (
             <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
               {Array.from({ length: 6 }).map((_, i) => (
@@ -1246,7 +1246,7 @@ const PageEditor = () => {
                   <div className="grid grid-cols-2 lg:grid-cols-3 gap-3">
                     {categoryBlocks.map((block) => {
                       const Icon = iconMap[block.icon] || Layout; // Fallback to Layout icon
-                      
+
                       return (
                         <Button
                           key={block.type}
@@ -1293,11 +1293,11 @@ const PageEditor = () => {
     };
 
     const isSelected = selectedBlock === block.id;
-    
-    const blockClasses = editMode 
+
+    const blockClasses = editMode
       ? `relative group border-2 transition-colors ${
           isSelected ? 'border-primary' : 'border-transparent hover:border-primary/30'
-        } ${isDragging ? 'opacity-50 z-50' : ''}` 
+        } ${isDragging ? 'opacity-50 z-50' : ''}`
       : '';
 
     // Block content is now rendered using DynamicBlockRenderer
@@ -1305,24 +1305,24 @@ const PageEditor = () => {
       switch (block.type) {
         case 'hero':
           // Check if backgroundImage is a valid URL (not a CSS gradient)
-          const hasValidBackgroundImage = block.content.backgroundImage && 
+          const hasValidBackgroundImage = block.content.backgroundImage &&
             !block.content.backgroundImage.startsWith('linear-gradient') &&
             !block.content.backgroundImage.startsWith('radial-gradient') &&
-            (block.content.backgroundImage.startsWith('http') || 
+            (block.content.backgroundImage.startsWith('http') ||
              block.content.backgroundImage.startsWith('/') ||
              block.content.backgroundImage.startsWith('data:'));
-          
+
           return (
-            <div 
+            <div
               className="text-primary-foreground py-16 px-8 text-center rounded-lg"
               style={{
-                backgroundImage: hasValidBackgroundImage 
+                backgroundImage: hasValidBackgroundImage
                   ? `url(${block.content.backgroundImage})`
                   : undefined,
                 backgroundSize: 'cover',
                 backgroundPosition: 'center',
-                background: hasValidBackgroundImage 
-                  ? undefined 
+                background: hasValidBackgroundImage
+                  ? undefined
                   : 'linear-gradient(135deg, rgb(59, 130, 246) 0%, rgba(59, 130, 246, 0.8) 100%)'
               }}
             >
@@ -1330,14 +1330,14 @@ const PageEditor = () => {
               <p className="text-lg opacity-90">{block.content.subtitle}</p>
             </div>
           );
-          
+
         case 'richtext':
           return (
             <div className="prose prose-lg max-w-none py-6 px-4">
               <div dangerouslySetInnerHTML={{ __html: block.content.html }} />
             </div>
           );
-          
+
         case 'image':
           return (
             <div className="py-6 text-center">
@@ -1347,7 +1347,7 @@ const PageEditor = () => {
               </div>
             </div>
           );
-          
+
         case 'gallery':
           return (
             <div className="py-6 px-4">
@@ -1372,7 +1372,7 @@ const PageEditor = () => {
               </div>
             </div>
           );
-          
+
         case 'columns':
           return (
             <div className="grid grid-cols-2 gap-6 py-6 px-4">
@@ -1395,7 +1395,7 @@ const PageEditor = () => {
               )}
             </div>
           );
-          
+
         case 'cta':
           return (
             <div className="bg-accent text-accent-foreground py-10 px-8 text-center rounded-lg">
@@ -1405,7 +1405,7 @@ const PageEditor = () => {
               </Button>
             </div>
           );
-          
+
         case 'collection_list':
           return (
             <div className="py-6 px-4">
@@ -1433,7 +1433,7 @@ const PageEditor = () => {
               </div>
             </div>
           );
-          
+
         case 'content_detail':
           return (
             <div className="py-6 px-4">
@@ -1484,7 +1484,7 @@ const PageEditor = () => {
               </div>
             </div>
           );
-          
+
         case 'faq':
           return (
             <div className="py-6 px-4">
@@ -1507,7 +1507,7 @@ const PageEditor = () => {
               </div>
             </div>
           );
-          
+
         default:
           return (
             <div className="py-6 px-4 text-center">
@@ -1542,14 +1542,14 @@ const PageEditor = () => {
             {editMode && (
               <>
                 {/* Drag handle */}
-                <div 
+                <div
                   className="absolute left-2 top-2 opacity-0 group-hover:opacity-100 transition-opacity z-10 cursor-grab active:cursor-grabbing bg-card border rounded p-1 shadow-sm"
                   {...attributes}
                   {...listeners}
                 >
                   <GripVertical className="w-4 h-4 text-muted-foreground" />
                 </div>
-                
+
                 {/* Control buttons */}
                 <div className="absolute top-2 right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity z-10">
                   <Button
@@ -1582,7 +1582,7 @@ const PageEditor = () => {
                 </div>
               </>
             )}
-            
+
             <div className={editMode ? "cursor-pointer" : ""}>
               <DynamicBlockRenderer
                 block={{
@@ -1643,7 +1643,7 @@ const PageEditor = () => {
           <AlertTriangle className="h-12 w-12 text-destructive mx-auto mb-4" />
           <h1 className="text-2xl font-bold mb-2">Page Not Found</h1>
           <p className="text-muted-foreground mb-4">{error || 'The requested page could not be loaded.'}</p>
-          <Button 
+          <Button
             onClick={() => navigate('/dashboard/pages')}
             variant="outline"
           >
@@ -1659,7 +1659,7 @@ const PageEditor = () => {
       <div className="flex flex-col">
         <main className="flex-1 p-8">
           <div className="max-w-7xl mx-auto">
-            
+
             {/* Header */}
             <div className="mb-8">
               <Breadcrumb className="mb-4">
@@ -1692,7 +1692,7 @@ const PageEditor = () => {
                     </Badge>
                   )}
                 </div>
-                
+
                 <div className="flex items-center gap-3">
                   <span className="text-sm text-muted-foreground">
                     {isSaving ? (
@@ -1717,9 +1717,9 @@ const PageEditor = () => {
                       </span>
                     )}
                   </span>
-                  
-                  <Button 
-                    variant="outline" 
+
+                  <Button
+                    variant="outline"
                     size="sm"
                     onClick={() => {
                       if (page) {
@@ -1735,10 +1735,10 @@ const PageEditor = () => {
                     <Eye className="w-4 h-4 mr-2" />
                     Preview
                   </Button>
-                  
+
                   {page?.status === 'published' ? (
-                    <Button 
-                      size="sm" 
+                    <Button
+                      size="sm"
                       variant="outline"
                       onClick={handleUnpublishPage}
                       className="text-orange-600 border-orange-200 hover:bg-orange-50"
@@ -1763,24 +1763,24 @@ const PageEditor = () => {
                       {isPresentationMode ? 'Publish & Purge Cache' : 'Publish'}
                     </Button>
                   )}
-                  
+
                   <Button variant="outline" size="sm" onClick={handleExportJSON}>
                     <Download className="w-4 h-4 mr-2" />
                     Export JSON
                   </Button>
-                  
-                  <Button 
-                    variant="outline" 
+
+                  <Button
+                    variant="outline"
                     size="sm"
                     onClick={() => setDetailsDrawerOpen(true)}
                   >
                     <Settings className="w-4 h-4 mr-2" />
                     Details
                   </Button>
-                  
+
                   {isPresentationMode && (
-                    <Button 
-                      variant="outline" 
+                    <Button
+                      variant="outline"
                       size="sm"
                       onClick={() => setPresentationDrawerOpen(true)}
                     >
@@ -1798,14 +1798,14 @@ const PageEditor = () => {
                 <CardContent className="p-4">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-4">
-                      <Button 
+                      <Button
                         variant={editMode ? "default" : "outline"}
                         onClick={() => setEditMode(!editMode)}
                       >
                         {editMode ? <Eye className="w-4 h-4 mr-2" /> : <Edit className="w-4 h-4 mr-2" />}
                         {editMode ? "Preview Mode" : "Edit Mode"}
                       </Button>
-                      
+
                       {editMode && (
                         <div className="flex items-center gap-2">
                           <Button variant="ghost" size="sm" disabled>
@@ -1819,7 +1819,7 @@ const PageEditor = () => {
                         </div>
                       )}
                     </div>
-                    
+
                     {editMode && (
                       <div className="text-sm text-muted-foreground">
                         Drag blocks to reorder • Click to edit • Trash to delete
@@ -1846,8 +1846,8 @@ const PageEditor = () => {
                       collisionDetection={closestCenter}
                       onDragEnd={handleDragEnd}
                     >
-                      <SortableContext 
-                        items={page?.blocks.map(block => block.id) || []} 
+                      <SortableContext
+                        items={page?.blocks.map(block => block.id) || []}
                         strategy={verticalListSortingStrategy}
                       >
                         <div className="space-y-0">
@@ -1857,7 +1857,7 @@ const PageEditor = () => {
                               <SortableBlock key={block.id} block={block} index={index} />
                             )) || []}
                         </div>
-                        
+
                         {(!page?.blocks || page.blocks.length === 0) && (
                           <div className="py-20 text-center">
                             <Layout className="w-16 h-16 mx-auto mb-4 text-muted-foreground" />
@@ -1888,8 +1888,8 @@ const PageEditor = () => {
       </div>
 
       {/* Block Settings Drawer */}
-      <Sheet 
-        open={!!selectedBlock} 
+      <Sheet
+        open={!!selectedBlock}
         onOpenChange={(open) => {
           if (!open) {
             setSelectedBlock(null);
@@ -1908,25 +1908,25 @@ const PageEditor = () => {
             {(() => {
               const block = tempBlockSettings || page?.blocks.find(b => b.id === selectedBlock);
               if (!block || !page) return null;
-              
+
               const originalBlock = page.blocks.find(b => b.id === selectedBlock);
-              const hasBlockChanges = tempBlockSettings && originalBlock && 
+              const hasBlockChanges = tempBlockSettings && originalBlock &&
                 JSON.stringify(tempBlockSettings.content) !== JSON.stringify(originalBlock.content);
-              
+
               const handleBlockSettingsUpdate = (updates: Partial<Block>) => {
                 setTempBlockSettings(prev => prev ? ({ ...prev, ...updates }) : null);
               };
-              
+
               const handleSaveBlockSettings = async () => {
                 if (!hasBlockChanges || !tempBlockSettings) return;
-                
+
                 setIsSavingBlockSettings(true);
                 await handleBlockUpdate(tempBlockSettings.id, tempBlockSettings);
                 setIsSavingBlockSettings(false);
                 setSelectedBlock(null);
                 setTempBlockSettings(null);
               };
-              
+
               return (
                 <div className="flex flex-col h-full">
                   <div className="flex-1 space-y-4 overflow-y-auto pr-2">
@@ -1936,7 +1936,7 @@ const PageEditor = () => {
                         ID: {block.id.slice(-6)}
                       </Badge>
                     </div>
-                    
+
                     {block.type === 'hero' && (
                     <>
                       <div>
@@ -1959,7 +1959,7 @@ const PageEditor = () => {
                       </div>
                     </>
                   )}
-                  
+
                   {block.type === 'richtext' && (
                     <div>
                       <Label>Content</Label>
@@ -1972,7 +1972,7 @@ const PageEditor = () => {
                       />
                     </div>
                   )}
-                  
+
                   {block.type === 'image' && (
                     <>
                       <div>
@@ -1997,7 +1997,7 @@ const PageEditor = () => {
                       </div>
                     </>
                   )}
-                  
+
                   {block.type === 'cta' && (
                     <>
                       <div>
@@ -2071,7 +2071,7 @@ const PageEditor = () => {
                       </div>
                     </>
                   )}
-                  
+
                   {block.type === 'collection_list' && (
                     <>
                       <Card className="mb-4">
@@ -2101,8 +2101,8 @@ const PageEditor = () => {
                             </Select>
                           </div>
                           <div className="flex items-center gap-2">
-                            <Button 
-                              variant={block.content.mode === 'query' ? 'default' : 'outline'} 
+                            <Button
+                              variant={block.content.mode === 'query' ? 'default' : 'outline'}
                               size="sm"
                               onClick={() => handleBlockSettingsUpdate({
                                 content: { ...block.content, mode: 'query' }
@@ -2110,8 +2110,8 @@ const PageEditor = () => {
                             >
                               Query
                             </Button>
-                            <Button 
-                              variant={block.content.mode === 'curated' ? 'default' : 'outline'} 
+                            <Button
+                              variant={block.content.mode === 'curated' ? 'default' : 'outline'}
                               size="sm"
                               onClick={() => handleBlockSettingsUpdate({
                                 content: { ...block.content, mode: 'curated' }
@@ -2122,7 +2122,7 @@ const PageEditor = () => {
                           </div>
                         </CardContent>
                       </Card>
-                      
+
                       <Card className="mb-4">
                         <CardHeader>
                           <CardTitle className="text-sm flex items-center gap-2">
@@ -2161,7 +2161,7 @@ const PageEditor = () => {
                           </div>
                         </CardContent>
                       </Card>
-                      
+
                       <Card className="mb-4">
                         <CardHeader>
                           <CardTitle className="text-sm flex items-center gap-2">
@@ -2173,8 +2173,8 @@ const PageEditor = () => {
                           <div>
                             <Label>Layout</Label>
                             <div className="flex gap-2 mt-2">
-                              <Button 
-                                variant={block.content.layout === 'grid' ? 'default' : 'outline'} 
+                              <Button
+                                variant={block.content.layout === 'grid' ? 'default' : 'outline'}
                                 size="sm"
                                 onClick={() => handleBlockSettingsUpdate({
                                   content: { ...block.content, layout: 'grid' }
@@ -2183,8 +2183,8 @@ const PageEditor = () => {
                                 <LayoutGrid className="w-4 h-4 mr-1" />
                                 Grid
                               </Button>
-                              <Button 
-                                variant={block.content.layout === 'list' ? 'default' : 'outline'} 
+                              <Button
+                                variant={block.content.layout === 'list' ? 'default' : 'outline'}
                                 size="sm"
                                 onClick={() => handleBlockSettingsUpdate({
                                   content: { ...block.content, layout: 'list' }
@@ -2197,8 +2197,8 @@ const PageEditor = () => {
                           </div>
                           <div>
                             <Label>Limit (per page)</Label>
-                            <Input 
-                              type="number" 
+                            <Input
+                              type="number"
                               value={block.content.limit || 10}
                               onChange={(e) => handleBlockSettingsUpdate({
                                 content: { ...block.content, limit: parseInt(e.target.value) }
@@ -2236,7 +2236,7 @@ const PageEditor = () => {
                       </Card>
                     </>
                   )}
-                  
+
                   {block.type === 'content_detail' && (
                     <>
                       <Card className="mb-4">
@@ -2268,8 +2268,8 @@ const PageEditor = () => {
                           <div>
                             <Label>Source</Label>
                             <div className="flex gap-2 mt-2">
-                              <Button 
-                                variant={block.content.source === 'route' ? 'default' : 'outline'} 
+                              <Button
+                                variant={block.content.source === 'route' ? 'default' : 'outline'}
                                 size="sm"
                                 onClick={() => handleBlockSettingsUpdate({
                                   content: { ...block.content, source: 'route' }
@@ -2277,8 +2277,8 @@ const PageEditor = () => {
                               >
                                 Route (Default)
                               </Button>
-                              <Button 
-                                variant={block.content.source === 'specific' ? 'default' : 'outline'} 
+                              <Button
+                                variant={block.content.source === 'specific' ? 'default' : 'outline'}
                                 size="sm"
                                 onClick={() => handleBlockSettingsUpdate({
                                   content: { ...block.content, source: 'specific' }
@@ -2291,7 +2291,7 @@ const PageEditor = () => {
                           {block.content.source === 'specific' && (
                             <div>
                               <Label>Post ID</Label>
-                              <Input 
+                              <Input
                                 placeholder="Enter specific post ID..."
                                 value={block.content.specificId || ""}
                                 onChange={(e) => handleBlockSettingsUpdate({
@@ -2302,7 +2302,7 @@ const PageEditor = () => {
                           )}
                         </CardContent>
                       </Card>
-                      
+
                       <Card className="mb-4">
                         <CardHeader>
                           <CardTitle className="text-sm flex items-center gap-2">
@@ -2336,7 +2336,7 @@ const PageEditor = () => {
                           ))}
                         </CardContent>
                       </Card>
-                      
+
                       {isPresentationMode && (
                         <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
                           <div className="flex items-start gap-2">
@@ -2352,9 +2352,9 @@ const PageEditor = () => {
                       )}
                     </>
                   )}
-                  
+
                   </div>
-                  
+
                   {/* Save Button */}
                   <div className="pt-4 border-t sticky bottom-0 bg-background">
                     <div className="flex justify-between items-center gap-2">
@@ -2366,8 +2366,8 @@ const PageEditor = () => {
                           </Badge>
                         )}
                       </div>
-                      <Button 
-                        onClick={handleSaveBlockSettings} 
+                      <Button
+                        onClick={handleSaveBlockSettings}
                         disabled={isSavingBlockSettings || !hasBlockChanges}
                         variant={hasBlockChanges ? "default" : "outline"}
                       >
@@ -2404,9 +2404,9 @@ const PageEditor = () => {
                     Unsaved changes
                   </Badge>
                 )}
-                <Button 
-                  size="sm" 
-                  onClick={handleSave} 
+                <Button
+                  size="sm"
+                  onClick={handleSave}
                   disabled={isSaving || !hasUnsavedChanges}
                   variant={hasUnsavedChanges ? "default" : "outline"}
                 >
@@ -2433,15 +2433,15 @@ const PageEditor = () => {
               <CardContent className="space-y-4">
                 <div>
                   <Label>Title</Label>
-                  <Input 
-                    value={page?.title || ''} 
+                  <Input
+                    value={page?.title || ''}
                     onChange={(e) => {
                       if (page) {
                         const newTitle = e.target.value;
-                        const newSlug = page.slug === '' || page.slug === generateSlug(page.title) 
-                          ? generateSlug(newTitle) 
+                        const newSlug = page.slug === '' || page.slug === generateSlug(page.title)
+                          ? generateSlug(newTitle)
                           : page.slug;
-                        
+
                         setPage(prev => prev ? ({
                           ...prev,
                           title: newTitle,
@@ -2456,7 +2456,7 @@ const PageEditor = () => {
                 <div>
                   <Label>Slug</Label>
                   <div className="flex gap-2">
-                    <Input 
+                    <Input
                       value={page?.isHomepage ? '/' : (page?.slug || '')}
                       onChange={(e) => {
                         if (page && !page.isHomepage) {
@@ -2495,7 +2495,7 @@ const PageEditor = () => {
                 </div>
                 <div>
                   <Label>Status</Label>
-                  <select 
+                  <select
                     value={page?.status || 'draft'}
                     onChange={(e) => {
                       if (page) {
@@ -2516,7 +2516,7 @@ const PageEditor = () => {
                 {page?.status === 'scheduled' && (
                   <div>
                     <Label>Publish At</Label>
-                    <Input 
+                    <Input
                       type="datetime-local"
                       value={page.schedule?.publishAt || ''}
                       onChange={(e) => {
@@ -2531,17 +2531,17 @@ const PageEditor = () => {
                     />
                   </div>
                 )}
-                
+
                 {/* Separator for page options */}
                 <div className="border-t pt-4">
                   <Label className="text-base font-medium">Page Options</Label>
                 </div>
-                
+
                 <div className="space-y-3">
                   <div className="flex items-center justify-between">
                     <Label className="flex items-center gap-2">
-                      <input 
-                        type="checkbox" 
+                      <input
+                        type="checkbox"
                         checked={page?.isHomepage || false}
                         onChange={(e) => {
                           if (page) {
@@ -2564,11 +2564,11 @@ const PageEditor = () => {
                       </Badge>
                     )}
                   </div>
-                  
+
                   <div className="flex items-center justify-between">
                     <Label className="flex items-center gap-2">
-                      <input 
-                        type="checkbox" 
+                      <input
+                        type="checkbox"
                         checked={page?.inMainMenu || false}
                         onChange={(e) => {
                           if (page) {
@@ -2584,11 +2584,11 @@ const PageEditor = () => {
                       Include in Main Menu
                     </Label>
                   </div>
-                  
+
                   <div className="flex items-center justify-between">
                     <Label className="flex items-center gap-2">
-                      <input 
-                        type="checkbox" 
+                      <input
+                        type="checkbox"
                         checked={page?.inFooter || false}
                         onChange={(e) => {
                           if (page) {
@@ -2607,7 +2607,7 @@ const PageEditor = () => {
                 </div>
               </CardContent>
             </Card>
-            
+
             <Card>
               <CardHeader>
                 <CardTitle className="text-base flex items-center gap-2">
@@ -2618,8 +2618,8 @@ const PageEditor = () => {
               <CardContent className="space-y-4">
                 <div>
                   <Label>SEO Title</Label>
-                  <Input 
-                    value={page?.seo?.title || ''} 
+                  <Input
+                    value={page?.seo?.title || ''}
                     onChange={(e) => {
                       if (page) {
                         setPage(prev => prev ? ({
@@ -2638,8 +2638,8 @@ const PageEditor = () => {
                 </div>
                 <div>
                   <Label>Meta Description</Label>
-                  <Textarea 
-                    value={page?.seo?.description || ''} 
+                  <Textarea
+                    value={page?.seo?.description || ''}
                     onChange={(e) => {
                       if (page) {
                         setPage(prev => prev ? ({
@@ -2659,8 +2659,8 @@ const PageEditor = () => {
                 </div>
                 <div>
                   <Label>Canonical URL</Label>
-                  <Input 
-                    value={page?.seo?.canonical || ''} 
+                  <Input
+                    value={page?.seo?.canonical || ''}
                     onChange={(e) => {
                       if (page) {
                         setPage(prev => prev ? ({
@@ -2675,8 +2675,8 @@ const PageEditor = () => {
                 </div>
                 <div>
                   <Label>Open Graph Image</Label>
-                  <Input 
-                    value={page?.seo?.ogImage || ''} 
+                  <Input
+                    value={page?.seo?.ogImage || ''}
                     onChange={(e) => {
                       if (page) {
                         setPage(prev => prev ? ({
@@ -2692,8 +2692,8 @@ const PageEditor = () => {
                 <div className="space-y-2">
                   <div className="flex items-center justify-between">
                     <Label className="flex items-center gap-2">
-                      <input 
-                        type="checkbox" 
+                      <input
+                        type="checkbox"
                         checked={page?.seo?.noindex || false}
                         onChange={(e) => {
                           if (page) {
@@ -2711,8 +2711,8 @@ const PageEditor = () => {
                   </div>
                   <div className="flex items-center justify-between">
                     <Label className="flex items-center gap-2">
-                      <input 
-                        type="checkbox" 
+                      <input
+                        type="checkbox"
                         checked={page?.seo?.nofollow || false}
                         onChange={(e) => {
                           if (page) {
@@ -2731,8 +2731,8 @@ const PageEditor = () => {
                 </div>
                 <div>
                   <Label>JSON-LD Schema</Label>
-                  <Textarea 
-                    value={page?.seo?.jsonLd || ''} 
+                  <Textarea
+                    value={page?.seo?.jsonLd || ''}
                     onChange={(e) => {
                       if (page) {
                         setPage(prev => prev ? ({
@@ -2751,7 +2751,7 @@ const PageEditor = () => {
                 </div>
               </CardContent>
             </Card>
-            
+
             {/* Bottom Save Button */}
             <div className="flex justify-between items-center gap-2 pt-4 border-t sticky bottom-0 bg-background">
               <div className="flex items-center gap-2">
@@ -2762,8 +2762,8 @@ const PageEditor = () => {
                   </Badge>
                 )}
               </div>
-              <Button 
-                onClick={handleSave} 
+              <Button
+                onClick={handleSave}
                 disabled={isSaving || !hasUnsavedChanges}
                 variant={hasUnsavedChanges ? "default" : "outline"}
               >
@@ -2815,7 +2815,7 @@ const PageEditor = () => {
                 </CardHeader>
                 <CardContent className="space-y-3">
                   <Label>Sample Object</Label>
-                  <select 
+                  <select
                     className="w-full p-2 border rounded-md"
                     value={selectedSamplePost}
                     onChange={(e) => setSelectedSamplePost(e.target.value)}
@@ -2928,7 +2928,7 @@ const PageEditor = () => {
             }}>
               Cancel
             </AlertDialogCancel>
-            <AlertDialogAction 
+            <AlertDialogAction
               onClick={executeDeleteBlock}
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
             >

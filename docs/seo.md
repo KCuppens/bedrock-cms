@@ -25,12 +25,12 @@ page = Page.objects.create(
     meta_title="About Us - Learn About Our Mission | Company Name",
     meta_description="Discover our company's mission, values, and team. Learn how we're making a difference in the industry.",
     meta_keywords="company, about us, mission, values, team",
-    
+
     # Open Graph tags
     social_title="About Our Amazing Company",
     social_description="Meet the team behind the innovation. Learn our story.",
     social_image="/media/images/about-og-image.jpg",
-    
+
     # Additional SEO fields
     canonical_url="https://example.com/about/",
     robots_meta="index, follow",
@@ -94,11 +94,11 @@ def truncate_meta_description(value, length=160):
     """Truncate meta description to optimal length."""
     if not value:
         return ""
-    
+
     clean_text = strip_tags(value)
     if len(clean_text) <= length:
         return clean_text
-    
+
     return clean_text[:length-3] + "..."
 
 @register.filter
@@ -127,19 +127,19 @@ class Page(models.Model):
     title = models.CharField(max_length=200)
     slug = models.SlugField(max_length=200, unique=True)
     path = models.CharField(max_length=500, unique=True)
-    
+
     def save(self, *args, **kwargs):
         if not self.slug:
             self.slug = generate_unique_slug(self.title, Page)
-        
+
         # Generate hierarchical path
         if self.parent:
             self.path = f"{self.parent.path.rstrip('/')}/{self.slug}/"
         else:
             self.path = f"/{self.slug}/" if self.slug else "/"
-        
+
         super().save(*args, **kwargs)
-        
+
         # Update child paths if needed
         self._update_children_paths()
 ```
@@ -153,27 +153,27 @@ from apps.seo.models import URLRedirect
 
 class SEOMiddleware:
     """Middleware for SEO-related URL processing."""
-    
+
     def __init__(self, get_response):
         self.get_response = get_response
-    
+
     def __call__(self, request):
         # Check for URL redirects
         redirect_url = self.check_redirects(request.path)
         if redirect_url:
             return HttpResponsePermanentRedirect(redirect_url)
-        
+
         # Add trailing slash if needed
         if not request.path.endswith('/') and not request.path.startswith('/api/'):
             return HttpResponsePermanentRedirect(request.path + '/')
-        
+
         response = self.get_response(request)
-        
+
         # Add SEO headers
         response = self.add_seo_headers(request, response)
-        
+
         return response
-    
+
     def check_redirects(self, path):
         """Check for configured redirects."""
         try:
@@ -226,14 +226,14 @@ def update_page_links(page):
     """Extract and track internal links from page content."""
     # Clear existing links
     InternalLink.objects.filter(source_page=page).delete()
-    
+
     # Extract links from blocks
     links = []
     for block in page.blocks:
         if block.get('type') == 'rich_text':
             content = block.get('props', {}).get('content', '')
             links.extend(extract_internal_links(content))
-    
+
     # Create link records
     for link_url in links:
         try:
@@ -262,7 +262,7 @@ from apps.seo.tasks import validate_internal_links
 def validate_internal_links():
     """Validate all internal links and update status."""
     invalid_links = []
-    
+
     for link in InternalLink.objects.all():
         try:
             if link.target_page:
@@ -279,14 +279,14 @@ def validate_internal_links():
                 except Page.DoesNotExist:
                     link.is_valid = False
                     invalid_links.append(link)
-            
+
             link.save()
-            
+
         except Exception as e:
             link.is_valid = False
             link.save()
             invalid_links.append(link)
-    
+
     return f"Validated links. Found {len(invalid_links)} invalid links."
 ```
 
@@ -328,7 +328,7 @@ def generate_page_structured_data(page):
         "datePublished": page.created_at.isoformat(),
         "dateModified": page.updated_at.isoformat(),
     }
-    
+
     # Add organization data
     if hasattr(page, 'organization'):
         base_data["publisher"] = {
@@ -336,7 +336,7 @@ def generate_page_structured_data(page):
             "name": page.organization.name,
             "url": page.organization.website,
         }
-    
+
     # Add breadcrumb navigation
     breadcrumbs = get_page_breadcrumbs(page)
     if len(breadcrumbs) > 1:
@@ -352,7 +352,7 @@ def generate_page_structured_data(page):
                 for i, crumb in enumerate(breadcrumbs)
             ]
         }
-    
+
     return base_data
 ```
 
@@ -363,7 +363,7 @@ def generate_block_structured_data(block):
     """Generate structured data for specific block types."""
     block_type = block.get('type')
     props = block.get('props', {})
-    
+
     if block_type == 'faq':
         return {
             "@type": "FAQPage",
@@ -379,7 +379,7 @@ def generate_block_structured_data(block):
                 for item in props.get('items', [])
             ]
         }
-    
+
     elif block_type == 'gallery':
         return {
             "@type": "ImageGallery",
@@ -393,7 +393,7 @@ def generate_block_structured_data(block):
                 for img in props.get('images', [])
             ]
         }
-    
+
     return None
 ```
 
@@ -410,7 +410,7 @@ class PageSitemap(Sitemap):
     changefreq = "weekly"
     priority = 0.5
     protocol = "https"
-    
+
     def items(self):
         return Page.objects.filter(
             status='published',
@@ -418,10 +418,10 @@ class PageSitemap(Sitemap):
         ).exclude(
             robots_meta__icontains='noindex'
         )
-    
+
     def lastmod(self, obj):
         return obj.updated_at
-    
+
     def priority(self, obj):
         if obj.path == '/':
             return 1.0
@@ -429,7 +429,7 @@ class PageSitemap(Sitemap):
             return 0.8
         else:
             return 0.6
-    
+
     def changefreq(self, obj):
         if obj.path == '/':
             return 'daily'
@@ -463,27 +463,27 @@ urlpatterns = [
 # apps/seo/performance.py
 class PerformanceMiddleware:
     """Middleware to track Core Web Vitals and performance metrics."""
-    
+
     def __init__(self, get_response):
         self.get_response = get_response
-    
+
     def __call__(self, request):
         start_time = time.time()
-        
+
         response = self.get_response(request)
-        
+
         # Calculate server response time
         response_time = (time.time() - start_time) * 1000
-        
+
         # Add performance headers
         response['Server-Timing'] = f'app;dur={response_time:.2f}'
-        
+
         # Track slow pages
         if response_time > 1000:  # 1 second threshold
             self.log_slow_page(request.path, response_time)
-        
+
         return response
-    
+
     def log_slow_page(self, path, response_time):
         """Log slow page loads for optimization."""
         # Log to monitoring system
@@ -507,7 +507,7 @@ def optimize_page_images(page):
                 # Add appropriate dimensions
                 props['width'] = props.get('width', 'auto')
                 props['height'] = props.get('height', 'auto')
-        
+
         elif block.get('type') == 'rich_text':
             content = block.get('props', {}).get('content', '')
             optimized_content = optimize_images_in_content(content)
@@ -524,7 +524,7 @@ from apps.seo.analyzer import SEOAnalyzer
 def calculate_seo_score(page):
     """Calculate SEO score for a page."""
     analyzer = SEOAnalyzer(page)
-    
+
     score_components = {
         'title': analyzer.check_title(),
         'meta_description': analyzer.check_meta_description(),
@@ -535,9 +535,9 @@ def calculate_seo_score(page):
         'content_length': analyzer.check_content_length(),
         'keyword_density': analyzer.check_keyword_density(),
     }
-    
+
     total_score = sum(score_components.values()) / len(score_components)
-    
+
     return {
         'total_score': round(total_score, 2),
         'components': score_components,
@@ -551,7 +551,7 @@ def calculate_seo_score(page):
 def generate_seo_audit():
     """Generate comprehensive SEO audit report."""
     pages = Page.objects.filter(status='published')
-    
+
     audit_results = {
         'total_pages': pages.count(),
         'issues': {
@@ -565,7 +565,7 @@ def generate_seo_audit():
         'top_performing_pages': get_top_performing_pages(),
         'improvement_opportunities': get_improvement_opportunities()
     }
-    
+
     return audit_results
 ```
 
@@ -585,7 +585,7 @@ class SearchConsoleIntegration:
         )
         self.service = build('webmasters', 'v3', credentials=credentials)
         self.site_url = site_url
-    
+
     def get_search_analytics(self, start_date, end_date):
         """Get search analytics data."""
         request = {
@@ -594,23 +594,23 @@ class SearchConsoleIntegration:
             'dimensions': ['page', 'query'],
             'rowLimit': 1000
         }
-        
+
         response = self.service.searchanalytics().query(
             siteUrl=self.site_url,
             body=request
         ).execute()
-        
+
         return response.get('rows', [])
-    
+
     def get_indexing_status(self, url):
         """Check indexing status of a URL."""
         request_body = {'inspectionUrl': url}
-        
+
         response = self.service.urlInspection().index().inspect(
             siteUrl=self.site_url,
             body=request_body
         ).execute()
-        
+
         return response
 ```
 
@@ -735,12 +735,12 @@ python manage.py seo_audit --output=report.json
 def find_duplicate_content():
     """Find pages with duplicate title or meta description."""
     duplicates = []
-    
+
     # Check duplicate titles
     title_counts = Page.objects.values('title').annotate(
         count=Count('id')
     ).filter(count__gt=1)
-    
+
     for item in title_counts:
         pages = Page.objects.filter(title=item['title'])
         duplicates.append({
@@ -748,7 +748,7 @@ def find_duplicate_content():
             'value': item['title'],
             'pages': list(pages.values('id', 'path'))
         })
-    
+
     return duplicates
 ```
 

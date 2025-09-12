@@ -4,19 +4,17 @@ Performance review script for Bedrock CMS.
 Analyzes database queries, caching, API performance, and identifies bottlenecks.
 """
 
+import json
 import os
+import statistics
 import sys
 import time
-import json
-import statistics
-from django.core.management.base import BaseCommand
-from django.test import TestCase, Client
-from django.db import connection, reset_queries
-from django.core.cache import cache
+
 from django.conf import settings
-from django.contrib.auth.models import User
+from django.core.cache import cache
+from django.db import connection, reset_queries
+from django.test import Client
 from django.utils import timezone
-from datetime import timedelta
 
 # Add the project root to Python path
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
@@ -26,11 +24,10 @@ import django
 
 django.setup()
 
-from apps.cms.models import Page
 from apps.blog.models import BlogPost
-from apps.media.models import Asset
 from apps.cms.blocks.validation import validate_blocks
-from apps.i18n.models import Locale
+from apps.cms.models import Page
+from apps.media.models import Asset
 
 
 class PerformanceReviewer:
@@ -502,7 +499,7 @@ class PerformanceReviewer:
 
         if "page_tree" in db:
             pt = db["page_tree"]
-            print(f"Page Tree Queries:")
+            print("Page Tree Queries:")
             print(
                 f"  • Naive: {pt['naive']['queries']} queries, {pt['naive']['time']*1000:.1f}ms"
             )
@@ -513,7 +510,7 @@ class PerformanceReviewer:
 
         if "blog_posts" in db:
             bp = db["blog_posts"]
-            print(f"Blog Post Queries:")
+            print("Blog Post Queries:")
             print(
                 f"  • Naive: {bp['naive']['queries']} queries, {bp['naive']['time']*1000:.1f}ms"
             )

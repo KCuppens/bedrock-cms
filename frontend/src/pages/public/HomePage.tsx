@@ -15,7 +15,7 @@ const StaticHomePage = React.lazy(() => import('./StaticHomePage'));
 const HomePage: React.FC = () => {
   // Sync URL locale with locale context
   useLocaleSync();
-  
+
   const { page, loading, error } = usePage('/');
 
   // Loading state
@@ -30,7 +30,7 @@ const HomePage: React.FC = () => {
   // If we found a CMS page at "/", render it dynamically
   if (page && !error) {
     const seoData = page.resolved_seo;
-    
+
     return (
       <>
         {/* SEO Head with resolved data */}
@@ -40,14 +40,14 @@ const HomePage: React.FC = () => {
             {seoData.description && <meta name="description" content={seoData.description} />}
             {seoData.keywords && <meta name="keywords" content={seoData.keywords} />}
             {seoData.canonical_url && <link rel="canonical" href={seoData.canonical_url} />}
-            
+
             {/* Open Graph */}
             <meta property="og:title" content={seoData.title} />
             {seoData.description && <meta property="og:description" content={seoData.description} />}
             <meta property="og:type" content={seoData.og_type || 'website'} />
             <meta property="og:url" content={window.location.href} />
             {seoData.og_image && <meta property="og:image" content={seoData.og_image} />}
-            
+
             {/* Language */}
             <html lang={seoData.locale_code || 'en'} />
           </Helmet>
@@ -64,16 +64,16 @@ const HomePage: React.FC = () => {
           localeCode={seoData?.locale_code || 'en'}
           jsonLd={seoData?.json_ld}
         >
-          <main 
+          <main
             className="dynamic-homepage"
             data-page-id={page.id}
             data-page-status={page.status}
           >
-            <DynamicBlocksRenderer 
-              blocks={page.blocks || []} 
+            <DynamicBlocksRenderer
+              blocks={page.blocks || []}
               className="homepage-blocks"
             />
-            
+
             {/* Fallback if no blocks */}
             {(!page.blocks || page.blocks.length === 0) && (
               <div className="container mx-auto px-4 py-12">

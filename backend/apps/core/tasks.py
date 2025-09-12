@@ -4,10 +4,9 @@ Async tasks for heavy operations using Celery.
 
 import logging
 
+from celery import shared_task
 from django.core.cache import cache
 from django.utils import timezone
-
-from celery import shared_task
 
 logger = logging.getLogger(__name__)
 

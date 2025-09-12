@@ -39,7 +39,7 @@ export default function PasswordResetConfirm() {
       extractedUid = uid;
       extractedToken = token;
     }
-    
+
     if (!extractedUid || !extractedToken) {
       setError('Invalid password reset link. Please request a new password reset.');
       setIsValidating(false);
@@ -66,7 +66,7 @@ export default function PasswordResetConfirm() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!password) {
       setError('Please enter a password');
       return;
@@ -92,14 +92,14 @@ export default function PasswordResetConfirm() {
       // Convert base36 to base64 for the API
       const userId = parseInt(uidb36, 36);
       const uidBase64 = btoa(String(userId));
-      
+
       await api.auth.resetPasswordConfirm(uidBase64, resetToken, password, confirmPassword);
       setSuccess(true);
-      
+
       // Redirect to login after 3 seconds
       setTimeout(() => {
-        navigate('/sign-in', { 
-          state: { message: 'Password reset successful. Please login with your new password.' } 
+        navigate('/sign-in', {
+          state: { message: 'Password reset successful. Please login with your new password.' }
         });
       }, 3000);
     } catch (err: any) {

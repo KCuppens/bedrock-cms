@@ -53,7 +53,7 @@ export const GlobalSearchBar = () => {
   const [searchResults, setSearchResults] = useState<SearchResults>({});
   const [isSearching, setIsSearching] = useState(false);
   const navigate = useNavigate();
-  
+
   // Debounce search query
   const debouncedSearchValue = useDebounce(searchValue, 300);
 
@@ -76,7 +76,7 @@ export const GlobalSearchBar = () => {
             },
           }
         );
-        
+
         if (response.ok) {
           const data = await response.json();
           setSearchResults(data.results || {});
@@ -110,7 +110,7 @@ export const GlobalSearchBar = () => {
 
   // Get total results count
   const totalResults = useMemo(() => {
-    return Object.values(searchResults).reduce((total, items) => 
+    return Object.values(searchResults).reduce((total, items) =>
       total + (Array.isArray(items) ? items.length : 0), 0
     );
   }, [searchResults]);
@@ -163,8 +163,8 @@ export const GlobalSearchBar = () => {
             )}
           </div>
         </PopoverTrigger>
-        <PopoverContent 
-          className="w-[400px] p-0 bg-card border border-border/40 shadow-xl rounded-lg" 
+        <PopoverContent
+          className="w-[400px] p-0 bg-card border border-border/40 shadow-xl rounded-lg"
           align="start"
           onOpenAutoFocus={(e) => e.preventDefault()}
         >
@@ -177,14 +177,14 @@ export const GlobalSearchBar = () => {
                   Searching...
                 </div>
               )}
-              
+
               {/* Minimum characters message */}
               {!isSearching && searchValue.length > 0 && searchValue.length < 2 && (
                 <div className="p-4 text-sm text-muted-foreground text-center">
                   Type at least 2 characters to search
                 </div>
               )}
-              
+
               {/* No results */}
               {!isSearching && totalResults === 0 && searchValue.length >= 2 && (
                 <CommandEmpty>
@@ -194,11 +194,11 @@ export const GlobalSearchBar = () => {
                   </div>
                 </CommandEmpty>
               )}
-              
+
               {/* Search results by group */}
               {!isSearching && Object.entries(searchResults).map(([groupKey, items]) => {
                 if (!Array.isArray(items) || items.length === 0) return null;
-                
+
                 return (
                   <CommandGroup key={groupKey} heading={groupLabels[groupKey] || groupKey}>
                     {items.map((item) => (

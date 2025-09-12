@@ -66,15 +66,15 @@ const SchedulingDashboard: React.FC = () => {
   const loadScheduledContent = async () => {
     try {
       setLoading(true);
-      
+
       // Load scheduled pages
       const pagesResponse = await api.request<ScheduledContent[]>({
         method: 'GET',
         url: '/api/v1/cms/pages/scheduled_content/'
       });
-      
+
       let allContent: ScheduledContent[] = pagesResponse || [];
-      
+
       // Try to load scheduled blog posts if available
       try {
         const postsResponse = await api.request<ScheduledContent[]>({
@@ -85,7 +85,7 @@ const SchedulingDashboard: React.FC = () => {
       } catch (error) {
         // Blog posts might not be available or endpoint doesn't exist
       }
-      
+
       setScheduledContent(allContent);
     } catch (error) {
       console.error('Failed to load scheduled content:', error);
@@ -101,23 +101,23 @@ const SchedulingDashboard: React.FC = () => {
 
   const handleUnschedule = async (contentId: number, contentType: 'page' | 'blogpost') => {
     try {
-      const endpoint = contentType === 'page' 
+      const endpoint = contentType === 'page'
         ? `/api/v1/cms/pages/${contentId}/unschedule/`
         : `/api/v1/blog/posts/${contentId}/unschedule/`;
-      
+
       await api.request({
         method: 'POST',
         url: endpoint
       });
-      
+
       toast({
         title: "Content Unscheduled",
         description: "Content scheduling has been removed",
       });
-      
+
       // Reload the content list
       loadScheduledContent();
-      
+
     } catch (error: any) {
       console.error('Failed to unschedule content:', error);
       toast({
@@ -129,20 +129,20 @@ const SchedulingDashboard: React.FC = () => {
   };
 
   const getContentForDate = (date: Date) => {
-    return scheduledContent.filter(content => 
+    return scheduledContent.filter(content =>
       isSameDay(new Date(content.published_at), date)
     );
   };
 
   const getFilteredContent = () => {
     let filtered = scheduledContent;
-    
+
     if (filterType !== 'all') {
       // This is a simplified filter - in a real app you'd have content type info
       // For now, we'll assume all content from CMS pages endpoint are pages
       filtered = scheduledContent; // Could implement proper filtering based on API response structure
     }
-    
+
     return filtered.sort((a, b) => new Date(a.published_at).getTime() - new Date(b.published_at).getTime());
   };
 
@@ -150,7 +150,7 @@ const SchedulingDashboard: React.FC = () => {
     const monthStart = startOfMonth(currentMonth);
     const monthEnd = endOfMonth(currentMonth);
     const days = eachDayOfInterval({ start: monthStart, end: monthEnd });
-    
+
     return (
       <div className="space-y-4">
         <div className="flex items-center justify-between">
@@ -181,19 +181,19 @@ const SchedulingDashboard: React.FC = () => {
             </Button>
           </div>
         </div>
-        
+
         <div className="grid grid-cols-7 gap-2">
           {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => (
             <div key={day} className="p-2 text-center text-sm font-medium text-muted-foreground">
               {day}
             </div>
           ))}
-          
+
           {days.map(day => {
             const dayContent = getContentForDate(day);
             const isToday = isSameDay(day, new Date());
             const isPast = isBefore(day, new Date());
-            
+
             return (
               <div
                 key={day.toISOString()}
@@ -209,7 +209,7 @@ const SchedulingDashboard: React.FC = () => {
                 }`}>
                   {format(day, 'd')}
                 </div>
-                
+
                 {dayContent.length > 0 && (
                   <div className="mt-1 space-y-1">
                     {dayContent.slice(0, 2).map(content => (
@@ -232,7 +232,7 @@ const SchedulingDashboard: React.FC = () => {
             );
           })}
         </div>
-        
+
         {selectedDate && (
           <Card className="mt-4">
             <CardHeader>
@@ -284,7 +284,7 @@ const SchedulingDashboard: React.FC = () => {
 
   const renderTimelineView = () => {
     const filteredContent = getFilteredContent();
-    
+
     return (
       <div className="space-y-4">
         {filteredContent.length === 0 ? (
@@ -299,7 +299,7 @@ const SchedulingDashboard: React.FC = () => {
             {filteredContent.map(content => {
               const publishDate = new Date(content.published_at);
               const isPast = isBefore(publishDate, new Date());
-              
+
               return (
                 <Card key={content.id} className={isPast ? 'opacity-60' : ''}>
                   <CardContent className="p-4">
@@ -310,13 +310,13 @@ const SchedulingDashboard: React.FC = () => {
                           <Badge variant="secondary">{content.locale.code}</Badge>
                           {isPast && <Badge variant="outline">Overdue</Badge>}
                         </div>
-                        
+
                         <div className="flex items-center gap-4 text-sm text-muted-foreground">
                           <span className="flex items-center gap-1">
                             <Clock className="w-4 h-4" />
                             {format(publishDate, 'MMM d, yyyy h:mm a')}
                           </span>
-                          
+
                           {content.path && (
                             <span className="flex items-center gap-1">
                               <Eye className="w-4 h-4" />
@@ -325,7 +325,7 @@ const SchedulingDashboard: React.FC = () => {
                           )}
                         </div>
                       </div>
-                      
+
                       <div className="flex items-center gap-2">
                         <Button
                           variant="outline"
@@ -335,7 +335,7 @@ const SchedulingDashboard: React.FC = () => {
                           <Edit className="w-4 h-4" />
                           Edit
                         </Button>
-                        
+
                         <Button
                           variant="outline"
                           size="sm"
@@ -385,7 +385,7 @@ const SchedulingDashboard: React.FC = () => {
               Timeline
             </Button>
           </div>
-          
+
           <div className="flex items-center gap-2">
             <Filter className="w-4 h-4" />
             <Select value={filterType} onValueChange={(value: FilterType) => setFilterType(value)}>
@@ -400,7 +400,7 @@ const SchedulingDashboard: React.FC = () => {
             </Select>
           </div>
         </div>
-        
+
         <Button
           variant="outline"
           onClick={loadScheduledContent}

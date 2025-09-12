@@ -60,22 +60,22 @@ export default defineConfig(({ mode }) => ({
         manualChunks: {
           // React core (always loaded)
           'react-core': ['react', 'react-dom'],
-          
+
           // Router (loaded on navigation)
           'react-router': ['react-router-dom'],
-          
+
           // Forms (lazy loaded)
           'forms': ['react-hook-form', '@hookform/resolvers', 'zod'],
-          
+
           // Date utilities (lazy loaded)
           'date': ['date-fns'],
-          
+
           // Charts (lazy loaded)
           'charts': ['recharts'],
-          
+
           // DND (lazy loaded for editor)
           'dnd': ['@dnd-kit/core', '@dnd-kit/sortable', '@dnd-kit/utilities'],
-          
+
           // Radix UI - Split into smaller chunks
           'radix-dialog': [
             '@radix-ui/react-dialog',
@@ -114,7 +114,7 @@ export default defineConfig(({ mode }) => ({
             '@radix-ui/react-tooltip',
             '@radix-ui/react-slot',
           ],
-          
+
           // Utilities
           'utils': [
             'clsx',
@@ -122,7 +122,7 @@ export default defineConfig(({ mode }) => ({
             'tailwind-merge',
             'tailwindcss-animate',
           ],
-          
+
           // Heavy libraries (lazy loaded)
           'heavy': [
             'embla-carousel-react',
@@ -132,26 +132,26 @@ export default defineConfig(({ mode }) => ({
             'vaul',
             'input-otp',
           ],
-          
+
           // Icons (separate chunk)
           'icons': ['lucide-react'],
-          
+
           // Data fetching
           'query': ['@tanstack/react-query'],
-          
+
           // Themes and styling
           'themes': ['next-themes'],
-          
+
           // Notifications
           'notifications': ['sonner'],
-          
+
           // Virtualization (lazy loaded)
           'virtual': ['react-window'],
-          
+
           // Performance monitoring
           'monitoring': ['web-vitals'],
         },
-        
+
         // Better chunk naming for caching
         chunkFileNames: (chunkInfo) => {
           const name = chunkInfo.name || 'chunk';
@@ -164,7 +164,7 @@ export default defineConfig(({ mode }) => ({
           return `assets/${folder}/[name]-[hash:8][extname]`;
         },
       },
-      
+
       // Tree shaking
       treeshake: {
         moduleSideEffects: false,
@@ -172,22 +172,22 @@ export default defineConfig(({ mode }) => ({
         tryCatchDeoptimization: false,
       },
     },
-    
+
     // Chunk size limits
     chunkSizeWarningLimit: 200, // Warn at 200kb
-    
+
     // Performance improvements
     reportCompressedSize: false,
     sourcemap: mode === 'development',
-    
+
     // CSS optimizations
     cssCodeSplit: true,
     cssMinify: 'lightningcss',
-    
+
     // Asset inlining
     assetsInlineLimit: 4096, // Inline assets < 4kb
   },
-  
+
   // Optimize dependencies
   optimizeDeps: {
     include: [
@@ -207,7 +207,7 @@ export default defineConfig(({ mode }) => ({
       target: 'es2018',
     },
   },
-  
+
   // CSS optimizations
   css: {
     modules: {
@@ -223,14 +223,14 @@ export default defineConfig(({ mode }) => ({
       },
     },
   },
-  
+
   // Preview optimizations
   preview: {
     headers: {
       'Cache-Control': 'public, max-age=31536000, immutable',
     },
   },
-  
+
   // Experimental features
   experimental: {
     renderBuiltUrl(filename) {

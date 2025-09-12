@@ -4,11 +4,12 @@ Account-specific factories for users, roles, and permissions.
 
 import factory
 import factory.django
-from faker import Faker
 from django.contrib.auth import get_user_model
-from django.contrib.auth.models import Group, Permission
+from django.contrib.auth.models import Group
+from faker import Faker
 
-from apps.accounts.models import UserProfile, ScopedSection, ScopedLocale
+from apps.accounts.models import ScopedLocale, ScopedSection, UserProfile
+
 from .base import BaseFactory, UserFactory
 from .cms import LocaleFactory
 

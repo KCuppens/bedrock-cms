@@ -36,7 +36,7 @@ const TextBlock: React.FC<TextBlockProps> = React.memo(({ props }) => {
   }), []);
 
   return (
-    <div 
+    <div
       className={`text-block ${alignmentClasses[alignment]} ${sizeClasses[size]} ${className}`.trim()}
       dangerouslySetInnerHTML={{ __html: content }}
     />

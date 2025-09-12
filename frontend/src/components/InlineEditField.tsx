@@ -39,7 +39,7 @@ export const InlineEditField = ({
   const debouncedSave = useDebouncedCallback(
     async (valueToSave: string) => {
       if (!autoSave || valueToSave === value) return;
-      
+
       if (validation) {
         const validationError = validation(valueToSave);
         if (validationError) {
@@ -89,7 +89,7 @@ export const InlineEditField = ({
         return;
       }
     }
-    
+
     setError(null);
     onSave(editValue);
     setIsEditing(false);

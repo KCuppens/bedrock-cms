@@ -58,8 +58,8 @@ const TagModal = ({ open, onOpenChange, mode, tag, onSave }: TagModalProps) => {
             {mode === 'add' ? 'Create New Tag' : 'Edit Tag'}
           </DialogTitle>
           <DialogDescription>
-            {mode === 'add' 
-              ? 'Add a new tag to label your content.' 
+            {mode === 'add'
+              ? 'Add a new tag to label your content.'
               : 'Make changes to your tag here.'
             }
           </DialogDescription>

@@ -38,11 +38,11 @@ const EDITING_MODES = [
   { value: 'sidebar', label: 'Sidebar' }
 ];
 
-export default function CreateBlockModal({ 
-  open, 
-  onOpenChange, 
-  onSubmit, 
-  categories 
+export default function CreateBlockModal({
+  open,
+  onOpenChange,
+  onSubmit,
+  categories
 }: CreateBlockModalProps) {
   const [formData, setFormData] = useState({
     type: "",
@@ -85,7 +85,7 @@ export default function CreateBlockModal({
             Add a new block type to your library. Make sure the component exists in your frontend.
           </DialogDescription>
         </DialogHeader>
-        
+
         <div className="space-y-4">
           <div className="grid grid-cols-2 gap-4">
             <div>
@@ -107,7 +107,7 @@ export default function CreateBlockModal({
               />
             </div>
           </div>
-          
+
           <div>
             <Label htmlFor="label">Label</Label>
             <Input
@@ -117,7 +117,7 @@ export default function CreateBlockModal({
               placeholder="Hero Section"
             />
           </div>
-          
+
           <div>
             <Label htmlFor="description">Description</Label>
             <Textarea
@@ -127,12 +127,12 @@ export default function CreateBlockModal({
               placeholder="Large banner section with title and CTA"
             />
           </div>
-          
+
           <div className="grid grid-cols-2 gap-4">
             <div>
               <Label htmlFor="category">Category</Label>
-              <Select 
-                value={formData.category} 
+              <Select
+                value={formData.category}
                 onValueChange={(value) => setFormData(prev => ({ ...prev, category: value }))}
               >
                 <SelectTrigger>
@@ -149,8 +149,8 @@ export default function CreateBlockModal({
             </div>
             <div>
               <Label htmlFor="editing_mode">Editing Mode</Label>
-              <Select 
-                value={formData.editing_mode} 
+              <Select
+                value={formData.editing_mode}
                 onValueChange={(value) => setFormData(prev => ({ ...prev, editing_mode: value }))}
               >
                 <SelectTrigger>
@@ -166,7 +166,7 @@ export default function CreateBlockModal({
               </Select>
             </div>
           </div>
-          
+
           <div>
             <Label htmlFor="icon">Icon</Label>
             <Input
@@ -176,7 +176,7 @@ export default function CreateBlockModal({
               placeholder="layout, type, image, etc."
             />
           </div>
-          
+
           <div className="flex items-center space-x-4">
             <div className="flex items-center space-x-2">
               <Switch

@@ -52,7 +52,7 @@ const BlogIndex: React.FC = () => {
     const search = searchParams.get('search') || '';
     const category = searchParams.get('category') || '';
     const page = parseInt(searchParams.get('page') || '1');
-    
+
     setSearchQuery(search);
     setSelectedCategory(category);
     setCurrentPage(page);
@@ -69,21 +69,21 @@ const BlogIndex: React.FC = () => {
   const loadContent = async () => {
     try {
       setLoading(true);
-      
+
       const params: any = {
         page: currentPage,
         limit: 12,
         status: 'published'
       };
-      
+
       if (searchQuery) params.search = searchQuery;
       if (selectedCategory) params.category = selectedCategory;
 
       const response = await api.blog.posts.list(params);
-      
+
       setPosts(response.data?.results || []);
       setTotalPages(Math.ceil((response.data?.count || 0) / 12));
-      
+
     } catch (error) {
       console.error('Failed to load blog posts:', error);
       setPosts([]);
@@ -180,7 +180,7 @@ const BlogIndex: React.FC = () => {
                 />
               </div>
             </div>
-            
+
             <div className="flex flex-wrap gap-2">
               <Button
                 variant={selectedCategory === '' ? "default" : "outline"}
@@ -205,7 +205,7 @@ const BlogIndex: React.FC = () => {
                 </Button>
               ))}
             </div>
-            
+
             {(searchQuery || selectedCategory) && (
               <Button variant="ghost" size="sm" onClick={clearFilters}>
                 <Filter className="h-4 w-4 mr-2" />
@@ -222,8 +222,8 @@ const BlogIndex: React.FC = () => {
                   <Card key={post.id} className="hover:shadow-lg transition-shadow h-full flex flex-col">
                     {post.featured_image && (
                       <div className="aspect-video bg-muted overflow-hidden rounded-t-lg">
-                        <img 
-                          src={post.featured_image} 
+                        <img
+                          src={post.featured_image}
                           alt={post.title}
                           className="w-full h-full object-cover"
                         />
@@ -238,7 +238,7 @@ const BlogIndex: React.FC = () => {
                         ))}
                       </div>
                       <CardTitle className="line-clamp-2">
-                        <Link 
+                        <Link
                           to={`/blog/${post.slug}`}
                           className="hover:text-primary transition-colors"
                         >
@@ -275,11 +275,11 @@ const BlogIndex: React.FC = () => {
                   >
                     Previous
                   </Button>
-                  
+
                   {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
                     const pageNum = i + Math.max(1, currentPage - 2);
                     if (pageNum > totalPages) return null;
-                    
+
                     return (
                       <Button
                         key={pageNum}
@@ -290,7 +290,7 @@ const BlogIndex: React.FC = () => {
                       </Button>
                     );
                   })}
-                  
+
                   <Button
                     variant="outline"
                     disabled={currentPage === totalPages}
@@ -305,8 +305,8 @@ const BlogIndex: React.FC = () => {
             <div className="text-center py-12">
               <h3 className="text-xl font-semibold mb-2">No posts found</h3>
               <p className="text-muted-foreground mb-4">
-                {searchQuery || selectedCategory 
-                  ? "Try adjusting your search or filter criteria." 
+                {searchQuery || selectedCategory
+                  ? "Try adjusting your search or filter criteria."
                   : "There are no published posts yet."
                 }
               </p>

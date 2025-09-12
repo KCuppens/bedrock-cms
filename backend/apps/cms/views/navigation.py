@@ -1,5 +1,4 @@
 from django.core.cache import cache
-
 from drf_spectacular.utils import extend_schema
 from rest_framework import views
 from rest_framework.permissions import AllowAny

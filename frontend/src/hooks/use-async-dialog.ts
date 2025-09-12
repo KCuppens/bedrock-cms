@@ -75,7 +75,7 @@ export function useAsyncDialog<T = any>(
 
     try {
       await asyncFn();
-      
+
       if (closeOnSuccess) {
         // Defer state updates to avoid React batching issues
         setTimeout(() => {

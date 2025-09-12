@@ -6,8 +6,9 @@ import factory
 import factory.django
 from faker import Faker
 
-from apps.i18n.models import TranslationUnit, UiMessage, UiMessageTranslation
 from apps.cms.models import Page
+from apps.i18n.models import TranslationUnit, UiMessage, UiMessageTranslation
+
 from .base import BaseFactory, UserFactory
 from .cms import LocaleFactory, PageFactory
 
@@ -32,13 +33,11 @@ class TranslationUnitFactory(BaseFactory):
     @factory.lazy_attribute
     def content_type(self):
         from django.contrib.contenttypes.models import ContentType
-        from apps.cms.models import Page
 
         return ContentType.objects.get_for_model(Page)
 
     @factory.lazy_attribute
     def object_id(self):
-        from .cms import PageFactory
 
         page = PageFactory()
         return page.id

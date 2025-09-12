@@ -62,28 +62,28 @@ export const useAuthState = () => {
 
   const signIn = useCallback(async (email: string, password: string): Promise<{ success: boolean; error?: string }> => {
     setIsLoading(true);
-    
+
     // Simulate API delay
     await new Promise(resolve => setTimeout(resolve, 800));
-    
+
     const users = getDemoUsers();
     const foundUser = users.find(u => u.email === email);
-    
+
     if (!foundUser) {
       setIsLoading(false);
       return { success: false, error: 'User not found' };
     }
-    
+
     // For demo purposes, any password works
     if (password.length < 1) {
       setIsLoading(false);
       return { success: false, error: 'Password required' };
     }
-    
+
     localStorage.setItem(CURRENT_USER_KEY, JSON.stringify(foundUser));
     setUser(foundUser);
     setIsLoading(false);
-    
+
     return { success: true };
   }, [getDemoUsers]);
 
@@ -94,50 +94,50 @@ export const useAuthState = () => {
 
   const resetPassword = useCallback(async (email: string): Promise<{ success: boolean; error?: string }> => {
     setIsLoading(true);
-    
+
     // Simulate API delay
     await new Promise(resolve => setTimeout(resolve, 1000));
-    
+
     const users = getDemoUsers();
     const foundUser = users.find(u => u.email === email);
-    
+
     setIsLoading(false);
-    
+
     if (!foundUser) {
       return { success: false, error: 'No account found with this email' };
     }
-    
+
     // For demo purposes, always succeed
     return { success: true };
   }, [getDemoUsers]);
 
   const signUp = useCallback(async (email: string, password: string, name: string): Promise<{ success: boolean; error?: string }> => {
     setIsLoading(true);
-    
+
     // Simulate API delay
     await new Promise(resolve => setTimeout(resolve, 800));
-    
+
     const users = getDemoUsers();
     const existingUser = users.find(u => u.email === email);
-    
+
     if (existingUser) {
       setIsLoading(false);
       return { success: false, error: 'User already exists with this email' };
     }
-    
+
     const newUser: User = {
       id: Date.now().toString(),
       email,
       name
     };
-    
+
     users.push(newUser);
     saveDemoUsers(users);
-    
+
     localStorage.setItem(CURRENT_USER_KEY, JSON.stringify(newUser));
     setUser(newUser);
     setIsLoading(false);
-    
+
     return { success: true };
   }, [getDemoUsers, saveDemoUsers]);
 

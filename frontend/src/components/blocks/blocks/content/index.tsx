@@ -7,8 +7,8 @@ export const ContentBlock: React.FC<BlockComponentProps> = ({
   onChange,
   className = ''
 }) => {
-  const { 
-    title = '', 
+  const {
+    title = '',
     content: textContent = '',
     alignment = 'left',
     imageUrl = '',
@@ -48,7 +48,7 @@ export const ContentBlock: React.FC<BlockComponentProps> = ({
                   {title}
                 </h2>
               ) : null}
-              
+
               {isEditing ? (
                 <textarea
                   value={textContent}
@@ -58,14 +58,14 @@ export const ContentBlock: React.FC<BlockComponentProps> = ({
                   className="w-full text-base text-gray-600 border border-gray-200 rounded-lg outline-none focus:border-blue-500 px-4 py-3 resize-none"
                 />
               ) : (
-                <div 
+                <div
                   className="prose prose-lg text-gray-600 max-w-none"
                   dangerouslySetInnerHTML={{ __html: textContent }}
                 />
               )}
             </div>
           </div>
-          
+
           {/* Image Section */}
           {hasImage && (
             <div className={`mt-10 lg:mt-0 ${imagePosition === 'left' ? 'lg:order-1' : ''}`}>
@@ -125,7 +125,7 @@ export const ContentBlock: React.FC<BlockComponentProps> = ({
             </div>
           )}
         </div>
-        
+
         {/* Alignment Controls in Edit Mode */}
         {isEditing && (
           <div className="mt-6 flex justify-center gap-4">

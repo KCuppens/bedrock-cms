@@ -1,6 +1,6 @@
-import { 
-  Home, 
-  FileText, 
+import {
+  Home,
+  FileText,
   Users,
   FileCheck,
   ChevronDown,
@@ -55,7 +55,7 @@ const Sidebar = memo(() => {
     {
       id: "translations",
       icon: Globe,
-      label: t('dashboard.menu.translations', 'Translations'), 
+      label: t('dashboard.menu.translations', 'Translations'),
       expandable: true,
       children: [
         { label: t('dashboard.menu.queue', 'Queue'), href: "/dashboard/translations/queue" },
@@ -104,21 +104,21 @@ const Sidebar = memo(() => {
     setExpandedItems(prev => {
       const newExpanded = [...prev];
       let changed = false;
-      
+
       requiredExpansions.forEach(itemId => {
         if (!newExpanded.includes(itemId)) {
           newExpanded.push(itemId);
           changed = true;
         }
       });
-      
+
       return changed ? newExpanded : prev;
     });
   }, [getRequiredExpansions]);
 
   const toggleExpanded = useCallback((item: string) => {
-    setExpandedItems(prev => 
-      prev.includes(item) 
+    setExpandedItems(prev =>
+      prev.includes(item)
         ? prev.filter(i => i !== item)
         : [...prev, item]
     );
@@ -135,19 +135,19 @@ const Sidebar = memo(() => {
   // Get user display name with fallback to email
   const getUserDisplayName = useCallback(() => {
     if (!user) return "User";
-    
+
     // Try to use first name and last name
     if (user.first_name || user.last_name) {
       const firstName = user.first_name || "";
       const lastName = user.last_name || "";
       return `${firstName} ${lastName}`.trim();
     }
-    
+
     // Fallback to name field if available
     if (user.name) {
       return user.name;
     }
-    
+
     // Final fallback to email
     return user.email;
   }, [user]);
@@ -155,14 +155,14 @@ const Sidebar = memo(() => {
   // Get user initials for avatar
   const getUserInitials = useCallback(() => {
     if (!user) return "U";
-    
+
     // Try to use first name and last name initials
     if (user.first_name || user.last_name) {
       const firstInitial = user.first_name ? user.first_name[0].toUpperCase() : "";
       const lastInitial = user.last_name ? user.last_name[0].toUpperCase() : "";
       return `${firstInitial}${lastInitial}` || "U";
     }
-    
+
     // Try to use name field
     if (user.name) {
       const nameParts = user.name.split(" ");
@@ -171,7 +171,7 @@ const Sidebar = memo(() => {
       }
       return user.name[0].toUpperCase();
     }
-    
+
     // Fallback to email initial
     return user.email[0].toUpperCase();
   }, [user]);
@@ -189,7 +189,7 @@ const Sidebar = memo(() => {
         console.error('Failed to fetch version info:', error);
       }
     };
-    
+
     fetchVersionInfo();
   }, []);
 
@@ -197,9 +197,9 @@ const Sidebar = memo(() => {
     <div className="w-72 h-screen overflow-y-auto fixed left-0 top-0 z-10">
       <div className="p-6 h-full flex flex-col">
         <div className="flex items-center gap-2 mb-8 bg-transparent relative">
-          <img 
-            src="/bedrock-logo.png" 
-            alt="Bedrock" 
+          <img
+            src="/bedrock-logo.png"
+            alt="Bedrock"
             className="h-16 w-auto"
             style={{ background: 'transparent' }}
           />
@@ -228,17 +228,17 @@ const Sidebar = memo(() => {
                   <span>{item.label}</span>
                 </div>
                 {item.expandable && (
-                  expandedItems.includes(item.id) ? 
-                    <ChevronDown className="w-4 h-4" /> : 
+                  expandedItems.includes(item.id) ?
+                    <ChevronDown className="w-4 h-4" /> :
                     <ChevronRight className="w-4 h-4" />
                 )}
               </div>
-              
+
               {item.expandable && item.children && expandedItems.includes(item.id) && (
                 <div className="ml-7 mt-1 space-y-1 relative">
                   {/* Main vertical line connecting all items */}
                   <div className="absolute left-[-16px] top-[-4px] bottom-[14px] w-px bg-foreground/30"></div>
-                  
+
                   {item.children.map((child, idx) => (
                     <div key={idx} className="relative">
                       {/* Rounded corner connector for each item */}
@@ -273,7 +273,7 @@ const Sidebar = memo(() => {
         </nav>
 
         <div className="mt-8 relative">
-          <div 
+          <div
             className="flex items-center justify-between px-1 py-0.5 rounded-full bg-card cursor-pointer hover:bg-muted transition-colors shadow-subtle border border-border"
             onClick={handleProfileMenuToggle}
           >
@@ -345,8 +345,8 @@ const Sidebar = memo(() => {
                 <>
                   <span className={cn(
                     "w-2 h-2 rounded-full animate-pulse",
-                    versionInfo.environment === 'production' ? 'bg-green-500' : 
-                    versionInfo.environment === 'staging' ? 'bg-yellow-500' : 
+                    versionInfo.environment === 'production' ? 'bg-green-500' :
+                    versionInfo.environment === 'staging' ? 'bg-yellow-500' :
                     versionInfo.environment === 'development' ? 'bg-blue-500' : 'bg-gray-500'
                   )} />
                   <span className="font-medium">
@@ -371,9 +371,9 @@ const Sidebar = memo(() => {
           </div>
         </div>
       </div>
-      
+
       {/* Sign Out Confirmation Modal */}
-      <SignOutConfirmModal 
+      <SignOutConfirmModal
         open={showSignOutModal}
         onOpenChange={setShowSignOutModal}
       />

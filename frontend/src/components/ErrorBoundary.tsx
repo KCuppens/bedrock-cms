@@ -24,7 +24,7 @@ const ErrorFallback = React.memo<ErrorFallbackProps>(({ error, resetErrorBoundar
             <p className="text-sm">
               An unexpected error occurred. The application encountered a problem and couldn't recover.
             </p>
-            
+
             {isDev && error.message && (
               <div className="mt-4 p-4 bg-muted rounded-lg">
                 <p className="font-mono text-xs text-muted-foreground mb-2">
@@ -55,7 +55,7 @@ const ErrorFallback = React.memo<ErrorFallbackProps>(({ error, resetErrorBoundar
                 <RefreshCw className="h-4 w-4" />
                 Try again
               </Button>
-              
+
               <Button
                 onClick={() => window.location.href = '/'}
                 variant="outline"
@@ -87,8 +87,8 @@ interface ErrorBoundaryProps {
   onReset?: () => void;
 }
 
-export const ErrorBoundary = React.memo<ErrorBoundaryProps>(({ 
-  children, 
+export const ErrorBoundary = React.memo<ErrorBoundaryProps>(({
+  children,
   fallback = ErrorFallback,
   onError,
   onReset
@@ -101,10 +101,10 @@ export const ErrorBoundary = React.memo<ErrorBoundaryProps>(({
         if (import.meta.env.DEV) {
           console.error('Error caught by boundary:', error, errorInfo);
         }
-        
+
         // Call custom error handler if provided
         onError?.(error, errorInfo);
-        
+
         // Send to monitoring service in production
         if (!import.meta.env.DEV && import.meta.env.VITE_ERROR_REPORTING_ENDPOINT) {
           fetch(import.meta.env.VITE_ERROR_REPORTING_ENDPOINT, {

@@ -37,9 +37,9 @@ interface BlogListContent {
   cta_link?: string;
 }
 
-const BlogListBlock: React.FC<BlockComponentProps<BlogListContent>> = ({ 
+const BlogListBlock: React.FC<BlockComponentProps<BlogListContent>> = ({
   content = {},
-  isEditing = false 
+  isEditing = false
 }) => {
   const {
     title = 'Latest Blog Posts',
@@ -144,8 +144,8 @@ const BlogListBlock: React.FC<BlockComponentProps<BlogListContent>> = ({
           <Card key={post.id} className="overflow-hidden hover:shadow-lg transition-shadow">
             {post.featured_image && (
               <div className="aspect-video overflow-hidden bg-gray-100">
-                <img 
-                  src={post.featured_image} 
+                <img
+                  src={post.featured_image}
                   alt={post.title}
                   className="w-full h-full object-cover"
                 />
@@ -161,15 +161,15 @@ const BlogListBlock: React.FC<BlockComponentProps<BlogListContent>> = ({
                   ))}
                 </div>
               )}
-              
+
               <h3 className="text-xl font-semibold text-gray-900 mb-2">
                 {post.title}
               </h3>
-              
+
               {show_excerpt && post.excerpt && (
                 <p className="text-gray-600 mb-4 line-clamp-3">{post.excerpt}</p>
               )}
-              
+
               <div className="flex items-center gap-4 text-sm text-gray-500">
                 {show_author && post.author && (
                   <div className="flex items-center gap-1">
@@ -184,7 +184,7 @@ const BlogListBlock: React.FC<BlockComponentProps<BlogListContent>> = ({
                   </div>
                 )}
               </div>
-              
+
               {show_tags && post.tags && post.tags.length > 0 && (
                 <div className="flex gap-2 mt-3">
                   {post.tags.map((tag) => (
@@ -195,9 +195,9 @@ const BlogListBlock: React.FC<BlockComponentProps<BlogListContent>> = ({
                   ))}
                 </div>
               )}
-              
+
               {cta_text && (
-                <a 
+                <a
                   href={`/blog/${post.slug}`}
                   className="inline-flex items-center gap-1 mt-4 text-primary hover:text-primary/80 font-medium"
                 >

@@ -81,7 +81,7 @@ const convertFileToMediaAsset = (file: any): MediaAsset => {
   if (import.meta.env.DEV) {
     console.log('Converting file:', file);
   }
-  
+
   const converted = {
     id: file.id,
     name: file.original_filename || file.filename,
@@ -101,7 +101,7 @@ const convertFileToMediaAsset = (file: any): MediaAsset => {
     isUsed: false, // Backend doesn't track usage yet
     hasMissingAlt: !file.description
   };
-  
+
   if (import.meta.env.DEV) {
     console.log('Converted to:', converted);
   }
@@ -114,7 +114,7 @@ const Media = memo(() => {
   const { t } = useTranslation();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const dropZoneRef = useRef<HTMLDivElement>(null);
-  
+
   // Component-level memory management
   const abortControllerRef = useRef<AbortController>(new AbortController());
   const isMountedRef = useRef(true);
@@ -142,11 +142,11 @@ const Media = memo(() => {
     return () => {
       isMountedRef.current = false;
       abortControllerRef.current.abort();
-      
+
       // Clear any pending timers
       timersRef.current.forEach(timer => clearTimeout(timer));
       timersRef.current.clear();
-      
+
       // Revoke all object URLs to prevent memory leaks
       objectUrlsRef.current.forEach(url => URL.revokeObjectURL(url));
       objectUrlsRef.current.clear();
@@ -189,11 +189,11 @@ const Media = memo(() => {
   // Load files from API
   const loadFiles = useCallback(async () => {
     if (!isMountedRef.current) return;
-    
+
     try {
       safeSetState(setLoading)(true);
       safeSetState(setError)(null);
-      
+
       // Check authentication first
       try {
         const user = await api.request({
@@ -201,7 +201,7 @@ const Media = memo(() => {
           url: '/auth/users/me/',
           signal: abortControllerRef.current.signal
         });
-        
+
         if (!user || !isMountedRef.current) {
           safeSetState(setError)('Please log in to view files.');
           return;
@@ -211,30 +211,30 @@ const Media = memo(() => {
         safeSetState(setError)('Please log in to view files.');
         return;
       }
-      
+
       const response = await api.request({
         method: 'GET',
         url: '/api/v1/files/',
         signal: abortControllerRef.current.signal
       });
-      
+
       if (!isMountedRef.current || abortControllerRef.current.signal.aborted) return;
-      
+
       if (import.meta.env.DEV) {
         console.log('API Response:', response);
       }
-      
+
       // Convert backend files to MediaAsset format
       const convertedAssets = response.results.map(convertFileToMediaAsset);
-      
+
       if (import.meta.env.DEV) {
         console.log('Converted assets:', convertedAssets);
       }
-      
+
       safeSetState(setAssets)(convertedAssets);
     } catch (err: any) {
       if (err.name === 'AbortError' || !isMountedRef.current) return;
-      
+
       console.error('Failed to load files:', err);
       if (err.message.includes('Authentication')) {
         safeSetState(setError)('Please log in to view files.');
@@ -278,7 +278,7 @@ const Media = memo(() => {
   // Memoized helper function to check if a file is an image based on filename or mime type
   const isImageFile = useCallback((asset: MediaAsset) => {
     if (asset.type === 'image') return true;
-    
+
     // Check file extension for common image formats (including WebP)
     const imageExtensions = ['.jpg', '.jpeg', '.png', '.gif', '.bmp', '.svg', '.webp', '.avif', '.tiff', '.ico'];
     const fileName = asset.name.toLowerCase();
@@ -292,7 +292,7 @@ const Media = memo(() => {
     onDelete: (id: string) => void;
   }>(({ asset, onEdit, onDelete }) => {
     const Icon = getFileIcon(asset.type);
-    
+
     const handleCardClick = useCallback((e: React.MouseEvent) => {
       console.log('Card clicked for asset:', asset.id);
       onEdit(asset);
@@ -314,7 +314,7 @@ const Media = memo(() => {
     }, [asset.id, onDelete]);
 
     return (
-      <Card 
+      <Card
         className="group relative cursor-pointer transition-all hover:ring-2 hover:ring-primary/20"
         onClick={handleCardClick}
       >
@@ -325,8 +325,8 @@ const Media = memo(() => {
             <Button size="sm" variant="secondary" onClick={handleEditClick}>
               <Edit3 className="w-3 h-3" />
             </Button>
-            <Button 
-              size="sm" 
+            <Button
+              size="sm"
               variant="destructive"
               onClick={handleDeleteClick}
               disabled={asset.isUsed}
@@ -338,8 +338,8 @@ const Media = memo(() => {
           {/* Thumbnail */}
           <div className="aspect-square bg-muted rounded-lg mb-3 flex items-center justify-center overflow-hidden">
             {isImageFile(asset) ? (
-              <MediaImage 
-                src={asset.thumbnail} 
+              <MediaImage
+                src={asset.thumbnail}
                 alt={asset.altTexts.en || asset.name}
                 className="w-full h-full object-cover"
               />
@@ -356,11 +356,11 @@ const Media = memo(() => {
             <p className="text-xs text-muted-foreground">
               {formatFileSize(asset.size)}
             </p>
-            
+
             {/* Alt text locales */}
             <div className="flex gap-1">
               {Object.entries(asset.altTexts).map(([locale, alt]) => (
-                <Badge 
+                <Badge
                   key={locale}
                   variant={alt ? "secondary" : "destructive"}
                   className="text-xs px-1.5 py-0.5"
@@ -389,7 +389,7 @@ const Media = memo(() => {
     // Only re-render if essential props change
     const prevAsset = prevProps.asset;
     const nextAsset = nextProps.asset;
-    
+
     // Shallow comparison for performance
     if (
       prevAsset.id !== nextAsset.id ||
@@ -401,24 +401,24 @@ const Media = memo(() => {
     ) {
       return false;
     }
-    
+
     // Compare altTexts efficiently without JSON.stringify
     const prevAltTexts = prevAsset.altTexts || {};
     const nextAltTexts = nextAsset.altTexts || {};
     const prevKeys = Object.keys(prevAltTexts);
     const nextKeys = Object.keys(nextAltTexts);
-    
+
     if (prevKeys.length !== nextKeys.length) return false;
-    
+
     for (const key of prevKeys) {
       if (prevAltTexts[key] !== nextAltTexts[key]) return false;
     }
-    
+
     return true;
   });
 
   // Separate preview component that's completely isolated from form state
-  const MediaPreview: React.FC<{ 
+  const MediaPreview: React.FC<{
     asset: MediaAsset;
   }> = React.memo(({ asset }) => {
     return (
@@ -426,16 +426,16 @@ const Media = memo(() => {
         <h3 className="font-medium">Preview</h3>
         <div className="aspect-video bg-muted rounded-lg flex items-center justify-center overflow-hidden">
           {isImageFile(asset) ? (
-            <MediaImage 
+            <MediaImage
               key={asset.id}
-              src={asset.url} 
+              src={asset.url}
               alt={asset.name}
               className="max-w-full max-h-full object-contain"
             />
           ) : (
             <div className="text-center">
-              {React.createElement(getFileIcon(asset.type), { 
-                className: "w-16 h-16 text-muted-foreground mx-auto mb-2" 
+              {React.createElement(getFileIcon(asset.type), {
+                className: "w-16 h-16 text-muted-foreground mx-auto mb-2"
               })}
               <p className="text-sm text-muted-foreground">{asset.type.toUpperCase()} file</p>
             </div>
@@ -454,10 +454,10 @@ const Media = memo(() => {
   });
 
   // Component for handling image loading with fallbacks
-  const MediaImage: React.FC<{ 
-    src: string; 
-    alt: string; 
-    className?: string; 
+  const MediaImage: React.FC<{
+    src: string;
+    alt: string;
+    className?: string;
     onError?: () => void;
   }> = React.memo(({ src, alt, className = "", onError }) => {
     const [imageError, setImageError] = useState(false);
@@ -490,8 +490,8 @@ const Media = memo(() => {
             <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary"></div>
           </div>
         )}
-        <img 
-          src={src} 
+        <img
+          src={src}
           alt={alt}
           className={`w-full h-full object-cover ${isLoading ? 'opacity-0' : 'opacity-100'} transition-opacity`}
           onError={handleImageError}
@@ -507,7 +507,7 @@ const Media = memo(() => {
   // Memoized filter and sort assets
   const filteredAssets = useMemo(() => {
     return assets.filter(asset => {
-      if (searchQuery && !asset.name.toLowerCase().includes(searchQuery.toLowerCase()) && 
+      if (searchQuery && !asset.name.toLowerCase().includes(searchQuery.toLowerCase()) &&
           !asset.title.toLowerCase().includes(searchQuery.toLowerCase())) return false;
       return true;
     });
@@ -549,7 +549,7 @@ const Media = memo(() => {
 
   const handleFileUpload = useCallback(async (files: File[]) => {
     if (!isMountedRef.current) return;
-    
+
     // Limit upload queue size to prevent memory issues
     const MAX_QUEUE_SIZE = 50;
     if (files.length + uploadQueue.length > MAX_QUEUE_SIZE) {
@@ -560,7 +560,7 @@ const Media = memo(() => {
       });
       return;
     }
-    
+
     const newUploadItems: UploadItem[] = files.map(file => ({
       id: Math.random().toString(36).substr(2, 9),
       file,
@@ -588,10 +588,10 @@ const Media = memo(() => {
 
   const uploadFile = async (uploadItem: UploadItem) => {
     if (!isMountedRef.current) return;
-    
+
     try {
       // Update status to uploading
-      safeSetState(setUploadQueue)(prev => prev.map(item => 
+      safeSetState(setUploadQueue)(prev => prev.map(item =>
         item.id === uploadItem.id ? { ...item, status: 'uploading', progress: 0 } : item
       ));
 
@@ -602,7 +602,7 @@ const Media = memo(() => {
           url: '/auth/users/me/',
           signal: abortControllerRef.current.signal
         });
-        
+
         if (!user || !isMountedRef.current) {
           throw new Error('Authentication required');
         }
@@ -626,7 +626,7 @@ const Media = memo(() => {
       if (!isMountedRef.current) return;
 
       // Update progress to complete
-      safeSetState(setUploadQueue)(prev => prev.map(item => 
+      safeSetState(setUploadQueue)(prev => prev.map(item =>
         item.id === uploadItem.id ? { ...item, status: 'complete', progress: 100 } : item
       ));
 
@@ -640,14 +640,14 @@ const Media = memo(() => {
 
     } catch (err: any) {
       if (err.name === 'AbortError' || !isMountedRef.current) return;
-      
+
       console.error('Upload failed:', err);
-      
-      safeSetState(setUploadQueue)(prev => prev.map(item => 
-        item.id === uploadItem.id ? { 
-          ...item, 
-          status: 'error', 
-          error: 'Upload failed' 
+
+      safeSetState(setUploadQueue)(prev => prev.map(item =>
+        item.id === uploadItem.id ? {
+          ...item,
+          status: 'error',
+          error: 'Upload failed'
         } : item
       ));
 
@@ -674,7 +674,7 @@ const Media = memo(() => {
       });
       return;
     }
-    
+
     setDeleteAssetId(assetId);
     setShowDeleteConfirm(true);
   };
@@ -684,7 +684,7 @@ const Media = memo(() => {
       try {
         const asset = assets.find(a => a.id === deleteAssetId);
         await api.files.delete(deleteAssetId);
-        
+
         toast({
           title: "Asset deleted",
           description: `${asset?.name} has been deleted successfully.`,
@@ -692,7 +692,7 @@ const Media = memo(() => {
 
         // Remove from local state
         setAssets(prev => prev.filter(a => a.id !== deleteAssetId));
-        
+
         // Close asset detail if this asset was being viewed
         if (selectedAsset?.id === deleteAssetId) {
           setShowAssetDetail(false);
@@ -723,7 +723,7 @@ const Media = memo(() => {
 
   const handleSaveAsset = async () => {
     if (!selectedAsset) return;
-    
+
     setIsSaving(true);
     try {
       // Convert tags string back to array
@@ -731,14 +731,14 @@ const Media = memo(() => {
         .split(',')
         .map(tag => tag.trim())
         .filter(tag => tag.length > 0);
-      
+
       // Update via API
       await api.files.update(selectedAsset.id, {
         description: editFormData.title,
         tags: tagsArray.join(', '),
         is_public: true // You might want to make this configurable
       });
-      
+
       // Update local state
       const updatedAsset = {
         ...selectedAsset,
@@ -748,17 +748,17 @@ const Media = memo(() => {
         sourceUrl: editFormData.sourceUrl,
         altTexts: editFormData.altTexts
       };
-      
-      setAssets(prev => prev.map(asset => 
+
+      setAssets(prev => prev.map(asset =>
         asset.id === selectedAsset.id ? updatedAsset : asset
       ));
       setSelectedAsset(updatedAsset);
-      
+
       toast({
         title: "Asset updated",
         description: "Your changes have been saved successfully.",
       });
-      
+
     } catch (err) {
       console.error('Save failed:', err);
       toast({
@@ -780,7 +780,7 @@ const Media = memo(() => {
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
-    
+
     toast({
       title: "Download started",
       description: `Downloading ${asset.name}`,
@@ -802,18 +802,18 @@ const Media = memo(() => {
     <div className="min-h-screen">
       <div className="flex">
         <Sidebar />
-        
+
         <div className="flex-1 flex flex-col ml-72">
           <TopNavbar />
-          
-          <main 
+
+          <main
             className="flex-1 p-8"
             onDragOver={handleDragOver}
             onDragLeave={handleDragLeave}
             onDrop={handleDrop}
           >
             <div className="max-w-7xl mx-auto space-y-6" ref={dropZoneRef}>
-              
+
               {/* Drag overlay */}
               {isDragOver && (
                 <div className="fixed inset-0 bg-primary/10 backdrop-blur-sm z-50 flex items-center justify-center">
@@ -866,7 +866,7 @@ const Media = memo(() => {
                           className="pl-10"
                         />
                       </div>
-                      
+
                       <div className="flex items-center gap-2">
                         <Select value={sortBy} onValueChange={(value: any) => setSortBy(value)}>
                           <SelectTrigger className="w-32">
@@ -1002,18 +1002,18 @@ const Media = memo(() => {
                   <CardContent className="p-0">
                     {sortedAssets.map((asset) => {
                       const Icon = getFileIcon(asset.type);
-                      
+
                       return (
-                        <div 
+                        <div
                           key={asset.id}
                           className="flex items-center gap-4 p-4 border-b last:border-b-0 hover:bg-muted/50 transition-colors"
                         >
-                          
+
                           <div className="flex-1 flex items-center gap-3">
                             <div className="w-10 h-10 bg-muted rounded flex items-center justify-center overflow-hidden">
                               {isImageFile(asset) ? (
-                                <MediaImage 
-                                  src={asset.thumbnail} 
+                                <MediaImage
+                                  src={asset.thumbnail}
                                   alt={asset.altTexts.en || asset.name}
                                   className="w-full h-full object-cover rounded"
                                 />
@@ -1026,21 +1026,21 @@ const Media = memo(() => {
                               <p className="text-sm text-muted-foreground">{asset.title}</p>
                             </div>
                           </div>
-                          
+
                           <div className="w-20 text-sm text-muted-foreground">
                             {formatFileSize(asset.size)}
                           </div>
-                          
+
                           <div className="w-24">
                             <Badge variant="outline" className="capitalize">
                               {asset.type}
                             </Badge>
                           </div>
-                          
+
                           <div className="w-32 text-sm text-muted-foreground">
                             {asset.uploadedAt.toLocaleDateString()}
                           </div>
-                          
+
                           <div className="w-24">
                             <div className="flex items-center gap-1">
                               {asset.hasMissingAlt && (
@@ -1053,7 +1053,7 @@ const Media = memo(() => {
                               )}
                             </div>
                           </div>
-                          
+
                           <div className="w-20 flex gap-1">
                             <Button
                               size="sm"
@@ -1133,7 +1133,7 @@ const Media = memo(() => {
 
               {/* Empty state */}
               {!loading && !error && sortedAssets.length === 0 && (
-                <MediaEmptyState 
+                <MediaEmptyState
                   onUpload={() => fileInputRef.current?.click()}
                   isDragActive={isDragOver}
                 />
@@ -1152,11 +1152,11 @@ const Media = memo(() => {
               <SheetHeader>
                 <SheetTitle>{selectedAsset.name}</SheetTitle>
               </SheetHeader>
-              
+
               <div className="space-y-6 py-6">
                 {/* Preview - Isolated from form state */}
                 <MediaPreview asset={selectedAsset} />
-                  
+
                   {/* Renditions */}
                   {selectedAsset.renditions.length > 0 && (
                     <div className="space-y-2">
@@ -1179,13 +1179,13 @@ const Media = memo(() => {
                   <div className="space-y-3">
                     <div>
                       <Label htmlFor="title">Title</Label>
-                      <Input 
-                        id="title" 
+                      <Input
+                        id="title"
                         value={editFormData.title}
                         onChange={(e) => setEditFormData(prev => ({ ...prev, title: e.target.value }))}
                       />
                     </div>
-                    
+
                     <div>
                       <Label>Alt Text</Label>
                       <div className="space-y-2">
@@ -1197,7 +1197,7 @@ const Media = memo(() => {
                                 <Badge variant="destructive" className="ml-1 text-xs">Required</Badge>
                               )}
                             </Label>
-                            <Textarea 
+                            <Textarea
                               id={`alt-${locale}`}
                               value={alt}
                               onChange={(e) => setEditFormData(prev => ({
@@ -1211,30 +1211,30 @@ const Media = memo(() => {
                         ))}
                       </div>
                     </div>
-                    
+
                     <div>
                       <Label htmlFor="tags">Tags</Label>
-                      <Input 
-                        id="tags" 
+                      <Input
+                        id="tags"
                         value={editFormData.tags}
                         onChange={(e) => setEditFormData(prev => ({ ...prev, tags: e.target.value }))}
                         placeholder="Enter tags separated by commas"
                       />
                     </div>
-                    
+
                     <div>
                       <Label htmlFor="license">License</Label>
-                      <Input 
-                        id="license" 
+                      <Input
+                        id="license"
                         value={editFormData.license}
                         onChange={(e) => setEditFormData(prev => ({ ...prev, license: e.target.value }))}
                       />
                     </div>
-                    
+
                     <div>
                       <Label htmlFor="source">Source URL</Label>
-                      <Input 
-                        id="source" 
+                      <Input
+                        id="source"
                         value={editFormData.sourceUrl}
                         onChange={(e) => setEditFormData(prev => ({ ...prev, sourceUrl: e.target.value }))}
                       />
@@ -1243,8 +1243,8 @@ const Media = memo(() => {
                 </div>
 
                 <div className="flex gap-2 pt-4">
-                  <Button 
-                    className="flex-1" 
+                  <Button
+                    className="flex-1"
                     onClick={handleSaveAsset}
                     disabled={isSaving}
                   >

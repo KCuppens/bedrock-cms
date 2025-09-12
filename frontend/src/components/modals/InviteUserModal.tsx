@@ -24,10 +24,10 @@ interface InviteUserModalProps {
   onSuccess?: () => void;
 }
 
-const InviteUserModal: React.FC<InviteUserModalProps> = ({ 
-  open, 
+const InviteUserModal: React.FC<InviteUserModalProps> = ({
+  open,
   onOpenChange,
-  onSuccess 
+  onSuccess
 }) => {
   const { toast } = useToast();
   const [email, setEmail] = useState('');
@@ -51,7 +51,7 @@ const InviteUserModal: React.FC<InviteUserModalProps> = ({
     try {
       setLoading(true);
       const response = await api.userManagement.roles.list();
-      
+
       // Handle paginated response
       const roleList = response.results || [];
       setRoles(roleList);
@@ -76,20 +76,20 @@ const InviteUserModal: React.FC<InviteUserModalProps> = ({
 
   const validateForm = (): boolean => {
     const newErrors: { email?: string } = {};
-    
+
     if (!email.trim()) {
       newErrors.email = 'Email is required';
     } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
       newErrors.email = 'Please enter a valid email address';
     }
-    
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
   const handleRoleToggle = (roleId: number) => {
-    setSelectedRoles(prev => 
-      prev.includes(roleId) 
+    setSelectedRoles(prev =>
+      prev.includes(roleId)
         ? prev.filter(id => id !== roleId)
         : [...prev, roleId]
     );
@@ -102,7 +102,7 @@ const InviteUserModal: React.FC<InviteUserModalProps> = ({
 
     try {
       setSending(true);
-      
+
       // Send invitation with multiple roles support
       const response = await api.userManagement.users.invite({
         email: email.trim(),
@@ -122,7 +122,7 @@ const InviteUserModal: React.FC<InviteUserModalProps> = ({
       }
     } catch (error: any) {
       console.error('Failed to invite user:', error);
-      
+
       // Handle specific error cases
       if (error.message?.includes('already exists')) {
         setErrors({ email: 'A user with this email already exists' });

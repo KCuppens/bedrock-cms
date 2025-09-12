@@ -12,12 +12,12 @@ import { MediaPicker } from "@/components/ui/media-picker";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/components/ui/use-toast";
 import { api } from "@/lib/api.ts";
-import { 
-  Settings, 
-  Globe, 
-  Twitter, 
-  Facebook, 
-  Code, 
+import {
+  Settings,
+  Globe,
+  Twitter,
+  Facebook,
+  Code,
   Shield,
   Eye,
   Image,
@@ -32,9 +32,9 @@ interface SEOSettingsFormProps {
   onSave?: () => void;
 }
 
-export const SEOSettingsForm: React.FC<SEOSettingsFormProps> = ({ 
+export const SEOSettingsForm: React.FC<SEOSettingsFormProps> = ({
   localeCode = 'en',
-  onSave 
+  onSave
 }) => {
   const { toast } = useToast();
   const [loading, setLoading] = useState(true);
@@ -99,10 +99,10 @@ export const SEOSettingsForm: React.FC<SEOSettingsFormProps> = ({
       try {
         setLoading(true);
         const response = await api.seoSettings.getByLocale(selectedLocale);
-        
+
         if (response?.data || response) {
           const data: SEOSettingsResponse = response.data || response;
-          
+
           setSettings({
             ...data,
             // Ensure nulls are handled
@@ -117,7 +117,7 @@ export const SEOSettingsForm: React.FC<SEOSettingsFormProps> = ({
         }
       } catch (error) {
         console.log('No existing settings, using defaults');
-        
+
         // Initialize with defaults
         setSettings({
           id: 0,
@@ -158,7 +158,7 @@ export const SEOSettingsForm: React.FC<SEOSettingsFormProps> = ({
         setLoading(false);
       }
     };
-    
+
     if (selectedLocale) {
       loadSettings();
     }
@@ -167,7 +167,7 @@ export const SEOSettingsForm: React.FC<SEOSettingsFormProps> = ({
   const handleSave = async () => {
     try {
       setSaving(true);
-      
+
       // Find locale ID
       const locale = locales.find(l => l.code === selectedLocale);
       if (!locale) {
@@ -182,41 +182,41 @@ export const SEOSettingsForm: React.FC<SEOSettingsFormProps> = ({
       // Prepare payload with exact field mapping
       const payload: SEOSettingsPayload = {
         locale_id: locale.id,
-        
+
         // Basic SEO
         title_suffix: settings.title_suffix || '',
         default_title: settings.default_title || '',
         default_description: settings.default_description || '',
         default_keywords: settings.default_keywords || '',
-        
+
         // Open Graph - use _id suffix for write
         default_og_asset_id: settings.default_og_asset || null,
         default_og_title: settings.default_og_title || '',
         default_og_description: settings.default_og_description || '',
         default_og_type: settings.default_og_type || 'website',
         default_og_site_name: settings.default_og_site_name || '',
-        
+
         // Twitter Card - use _id suffix for write
         default_twitter_asset_id: settings.default_twitter_asset || null,
         default_twitter_card: settings.default_twitter_card || 'summary_large_image',
         default_twitter_site: settings.default_twitter_site || '',
         default_twitter_creator: settings.default_twitter_creator || '',
-        
+
         // Technical SEO
         robots_default: settings.robots_default || 'index,follow',
         canonical_domain: settings.canonical_domain || '',
         google_site_verification: settings.google_site_verification || '',
         bing_site_verification: settings.bing_site_verification || '',
-        
+
         // JSON-LD
         jsonld_default: settings.jsonld_default || [],
         organization_jsonld: settings.organization_jsonld || {},
-        
+
         // Meta tags
         meta_author: settings.meta_author || '',
         meta_generator: settings.meta_generator || 'Bedrock CMS',
         meta_viewport: settings.meta_viewport || 'width=device-width, initial-scale=1.0',
-        
+
         // Social
         facebook_app_id: settings.facebook_app_id || ''
       };
@@ -229,7 +229,7 @@ export const SEOSettingsForm: React.FC<SEOSettingsFormProps> = ({
         // Create new settings
         response = await api.seoSettings.create(payload);
       }
-      
+
       // Update local state with response
       if (response?.data) {
         setSettings({
@@ -238,28 +238,28 @@ export const SEOSettingsForm: React.FC<SEOSettingsFormProps> = ({
           _validationErrors: {}
         });
       }
-      
+
       toast({
         title: "Success",
         description: "SEO settings saved successfully"
       });
-      
+
       if (onSave) {
         onSave();
       }
     } catch (error: any) {
       console.error('Failed to save SEO settings:', error);
-      
+
       // Handle specific validation errors
       if (error.response?.data) {
         const errors = error.response.data;
-        
+
         // Check for specific field errors
         if (errors.default_og_asset_id) {
           toast({
             title: "Invalid OG Image",
-            description: Array.isArray(errors.default_og_asset_id) 
-              ? errors.default_og_asset_id[0] 
+            description: Array.isArray(errors.default_og_asset_id)
+              ? errors.default_og_asset_id[0]
               : errors.default_og_asset_id,
             variant: "destructive"
           });
@@ -278,7 +278,7 @@ export const SEOSettingsForm: React.FC<SEOSettingsFormProps> = ({
             variant: "destructive"
           });
         }
-        
+
         // Store validation errors in state
         setSettings(prev => ({
           ...prev,
@@ -377,7 +377,7 @@ export const SEOSettingsForm: React.FC<SEOSettingsFormProps> = ({
                   />
                 </div>
               </div>
-              
+
               <div>
                 <Label htmlFor="default_description">Default Meta Description</Label>
                 <Textarea
@@ -391,7 +391,7 @@ export const SEOSettingsForm: React.FC<SEOSettingsFormProps> = ({
                   {settings.default_description?.length || 0}/160 characters
                 </p>
               </div>
-              
+
               <div>
                 <Label htmlFor="default_keywords">Default Keywords</Label>
                 <Input
@@ -401,7 +401,7 @@ export const SEOSettingsForm: React.FC<SEOSettingsFormProps> = ({
                   placeholder="keyword1, keyword2, keyword3"
                 />
               </div>
-              
+
               <div>
                 <Label htmlFor="meta_author">Default Author</Label>
                 <Input
@@ -434,7 +434,7 @@ export const SEOSettingsForm: React.FC<SEOSettingsFormProps> = ({
                   placeholder="Open Graph title"
                 />
               </div>
-              
+
               <div>
                 <Label htmlFor="default_og_description">Default OG Description</Label>
                 <Textarea
@@ -445,11 +445,11 @@ export const SEOSettingsForm: React.FC<SEOSettingsFormProps> = ({
                   rows={3}
                 />
               </div>
-              
+
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <Label htmlFor="default_og_type">OG Type</Label>
-                  <Select 
+                  <Select
                     value={settings.default_og_type || 'website'}
                     onValueChange={(value) => setSettings({...settings, default_og_type: value})}
                   >
@@ -464,7 +464,7 @@ export const SEOSettingsForm: React.FC<SEOSettingsFormProps> = ({
                     </SelectContent>
                   </Select>
                 </div>
-                
+
                 <div>
                   <Label htmlFor="default_og_site_name">Site Name</Label>
                   <Input
@@ -475,7 +475,7 @@ export const SEOSettingsForm: React.FC<SEOSettingsFormProps> = ({
                   />
                 </div>
               </div>
-              
+
               <div>
                 <Label>Default OG Image</Label>
                 <div className="flex gap-2 items-center">
@@ -533,7 +533,7 @@ export const SEOSettingsForm: React.FC<SEOSettingsFormProps> = ({
                   </SelectContent>
                 </Select>
               </div>
-              
+
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <Label htmlFor="default_twitter_site">Site @username</Label>
@@ -544,7 +544,7 @@ export const SEOSettingsForm: React.FC<SEOSettingsFormProps> = ({
                     placeholder="@yoursite"
                   />
                 </div>
-                
+
                 <div>
                   <Label htmlFor="default_twitter_creator">Creator @username</Label>
                   <Input
@@ -555,7 +555,7 @@ export const SEOSettingsForm: React.FC<SEOSettingsFormProps> = ({
                   />
                 </div>
               </div>
-              
+
               <div>
                 <Label>Default Twitter Image</Label>
                 <div className="flex gap-2 items-center">
@@ -582,7 +582,7 @@ export const SEOSettingsForm: React.FC<SEOSettingsFormProps> = ({
                   )}
                 </div>
               </div>
-              
+
               <div>
                 <Label htmlFor="facebook_app_id">Facebook App ID</Label>
                 <Input
@@ -624,7 +624,7 @@ export const SEOSettingsForm: React.FC<SEOSettingsFormProps> = ({
                   </SelectContent>
                 </Select>
               </div>
-              
+
               <div>
                 <Label htmlFor="canonical_domain">Canonical Domain</Label>
                 <Input
@@ -637,7 +637,7 @@ export const SEOSettingsForm: React.FC<SEOSettingsFormProps> = ({
                   Used for generating canonical URLs
                 </p>
               </div>
-              
+
               <div>
                 <Label htmlFor="google_site_verification">Google Site Verification</Label>
                 <Input
@@ -647,7 +647,7 @@ export const SEOSettingsForm: React.FC<SEOSettingsFormProps> = ({
                   placeholder="Google verification code"
                 />
               </div>
-              
+
               <div>
                 <Label htmlFor="bing_site_verification">Bing Site Verification</Label>
                 <Input
@@ -657,7 +657,7 @@ export const SEOSettingsForm: React.FC<SEOSettingsFormProps> = ({
                   placeholder="Bing verification code"
                 />
               </div>
-              
+
               <div>
                 <Label htmlFor="meta_viewport">Viewport Meta Tag</Label>
                 <Input
@@ -666,7 +666,7 @@ export const SEOSettingsForm: React.FC<SEOSettingsFormProps> = ({
                   onChange={(e) => setSettings({...settings, meta_viewport: e.target.value})}
                 />
               </div>
-              
+
               <div>
                 <Label htmlFor="meta_generator">Generator Meta Tag</Label>
                 <Input
@@ -707,7 +707,7 @@ export const SEOSettingsForm: React.FC<SEOSettingsFormProps> = ({
                   className="font-mono text-sm"
                 />
               </div>
-              
+
               <div>
                 <Label htmlFor="jsonld_default">Default JSON-LD Blocks</Label>
                 <Textarea
@@ -748,7 +748,7 @@ export const SEOSettingsForm: React.FC<SEOSettingsFormProps> = ({
         title="Select Open Graph Image"
         description="Choose an image for Open Graph sharing (Recommended: 1200x630px)"
       />
-      
+
       <MediaPicker
         open={twitterImagePickerOpen}
         onOpenChange={setTwitterImagePickerOpen}

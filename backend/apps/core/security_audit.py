@@ -7,7 +7,6 @@ from typing import Any
 
 from django.conf import settings
 from django.urls import get_resolver
-
 from rest_framework.viewsets import ModelViewSet, ViewSet
 
 logger = logging.getLogger(__name__)
@@ -242,7 +241,7 @@ class SecurityAuditReport:
     def _is_write_endpoint(self, view_class, path):
         """Check if this is a write endpoint."""
         # Check if it's a ViewSet with write methods
-        if issubclass(view_class, ModelViewSet | ViewSet):
+        if issubclass(view_class, (ModelViewSet, ViewSet)):
             return True
 
         # Check path patterns that suggest write operations

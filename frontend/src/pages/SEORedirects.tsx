@@ -17,11 +17,11 @@ import { SimpleDialog, SimpleDialogHeader, SimpleDialogTitle } from "@/component
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import DeleteConfirmModal from "@/components/modals/DeleteConfirmModal";
 import SEOSettingsForm from "@/components/SEOSettingsForm";
-import { 
-  Search, 
-  MoreHorizontal, 
-  Plus, 
-  Link2, 
+import {
+  Search,
+  MoreHorizontal,
+  Plus,
+  Link2,
   FileText,
   Settings,
   ExternalLink,
@@ -88,11 +88,11 @@ const SEORedirects = () => {
 
   // Handle update redirect
   const handleUpdateRedirect = (formData: FormData) => {
-    console.log('🔥 handleUpdateRedirect called', { 
+    console.log('🔥 handleUpdateRedirect called', {
       editingRedirect: !!editingRedirect,
-      isPending: updateRedirect.isPending 
+      isPending: updateRedirect.isPending
     });
-    
+
     if (!editingRedirect) return;
 
     const redirectData = {
@@ -137,7 +137,7 @@ const SEORedirects = () => {
   // Handle delete redirect
   const handleDeleteRedirect = () => {
     if (!redirectToDelete) return;
-    
+
     deleteRedirect.mutate(redirectToDelete.id, {
       onSuccess: () => {
         setDeleteRedirectDialogOpen(false);
@@ -151,7 +151,7 @@ const SEORedirects = () => {
     const baseUrl = window.location.origin;
     const testUrl = `${baseUrl}${redirect.from_path}`;
     window.open(testUrl, '_blank');
-    
+
     toast({
       title: "Testing Redirect",
       description: `Opening ${redirect.from_path} in a new tab. It should redirect to ${redirect.to_path}`,
@@ -163,13 +163,13 @@ const SEORedirects = () => {
     const file = event.target.files?.[0];
     if (file && file.type === "text/csv") {
       setCsvFile(file);
-      
+
       const reader = new FileReader();
       reader.onload = (e) => {
         const text = e.target?.result as string;
         const lines = text.split('\n');
         const headers = lines[0].split(',').map(h => h.trim());
-        
+
         const data = lines.slice(1, 6).map(line => {
           const values = line.split(',').map(v => v.trim());
           const row: any = {};
@@ -178,7 +178,7 @@ const SEORedirects = () => {
           });
           return row;
         }).filter(row => Object.values(row).some(v => v !== ''));
-        
+
         setCsvPreview(data);
       };
       reader.readAsText(file);
@@ -188,7 +188,7 @@ const SEORedirects = () => {
   // Handle CSV import
   const handleCSVImport = () => {
     if (!csvFile) return;
-    
+
     importCSV.mutate(csvFile, {
       onSuccess: () => {
         setCsvImportDialogOpen(false);
@@ -208,10 +208,10 @@ const SEORedirects = () => {
     <div className="min-h-screen">
       <div className="flex">
         <Sidebar />
-        
+
         <div className="flex-1 flex flex-col ml-72">
           <TopNavbar />
-          
+
           <main className="flex-1 p-8">
             <div className="max-w-7xl mx-auto">
               <div className="mb-8">
@@ -227,7 +227,7 @@ const SEORedirects = () => {
                 </TabsList>
 
                 <TabsContent value="settings" className="space-y-6">
-                  <SEOSettingsForm 
+                  <SEOSettingsForm
                     onSave={() => {
                       toast({
                         title: "Settings Saved",
@@ -245,7 +245,7 @@ const SEORedirects = () => {
                         URL Redirects
                       </CardTitle>
                       <div className="flex gap-2">
-                        <Button 
+                        <Button
                           variant="outline"
                           onClick={() => exportCSV.mutate()}
                           disabled={exportCSV.isPending}
@@ -281,7 +281,7 @@ const SEORedirects = () => {
                                   Expected format: from_path, to_path, status_code, locale
                                 </p>
                               </div>
-                              
+
                               {csvPreview.length > 0 && (
                                 <div>
                                   <Label>Preview (first 5 rows)</Label>
@@ -309,10 +309,10 @@ const SEORedirects = () => {
                                   </div>
                                 </div>
                               )}
-                              
+
                               <div className="flex gap-2">
-                                <Button 
-                                  className="flex-1" 
+                                <Button
+                                  className="flex-1"
                                   onClick={handleCSVImport}
                                   disabled={!csvFile || importCSV.isPending}
                                 >
@@ -337,8 +337,8 @@ const SEORedirects = () => {
                         </SimpleDialog>
 
                         {/* Edit Redirect Dialog */}
-                        <SimpleDialog 
-                          open={editRedirectDialogOpen} 
+                        <SimpleDialog
+                          open={editRedirectDialogOpen}
                           onOpenChange={(open) => {
                             if (!updateRedirect.isPending) {
                               setEditRedirectDialogOpen(open);
@@ -361,21 +361,21 @@ const SEORedirects = () => {
                                 <div className="space-y-4">
                                   <div>
                                     <Label htmlFor="editFromPath">From Path</Label>
-                                    <Input 
-                                      id="editFromPath" 
+                                    <Input
+                                      id="editFromPath"
                                       name="fromPath"
                                       defaultValue={editingRedirect.from_path}
-                                      placeholder="/old-path or /old-path/*" 
+                                      placeholder="/old-path or /old-path/*"
                                       required
                                     />
                                   </div>
                                   <div>
                                     <Label htmlFor="editToPath">To Path</Label>
-                                    <Input 
-                                      id="editToPath" 
+                                    <Input
+                                      id="editToPath"
                                       name="toPath"
                                       defaultValue={editingRedirect.to_path}
-                                      placeholder="/new-path or /new-path/*" 
+                                      placeholder="/new-path or /new-path/*"
                                       required
                                     />
                                   </div>
@@ -396,7 +396,7 @@ const SEORedirects = () => {
                                     </div>
                                     <div>
                                       <Label>Notes (Optional)</Label>
-                                      <Textarea 
+                                      <Textarea
                                         name="notes"
                                         defaultValue={editingRedirect.notes || ''}
                                         placeholder="Add notes about this redirect..."
@@ -405,9 +405,9 @@ const SEORedirects = () => {
                                     </div>
                                   </div>
                                   <div className="flex gap-2">
-                                    <Button 
+                                    <Button
                                       type="submit"
-                                      className="flex-1" 
+                                      className="flex-1"
                                       disabled={updateRedirect.isPending}
                                     >
                                       {updateRedirect.isPending ? (
@@ -419,9 +419,9 @@ const SEORedirects = () => {
                                         'Update Redirect'
                                       )}
                                     </Button>
-                                    <Button 
+                                    <Button
                                       type="button"
-                                      variant="outline" 
+                                      variant="outline"
                                       onClick={() => {
                                         setEditRedirectDialogOpen(false);
                                         setEditingRedirect(null);
@@ -453,8 +453,8 @@ const SEORedirects = () => {
                             className="pl-10"
                           />
                         </div>
-                        <Button 
-                          variant="outline" 
+                        <Button
+                          variant="outline"
                           onClick={() => refetch()}
                           disabled={isLoading}
                         >
@@ -521,14 +521,14 @@ const SEORedirects = () => {
                                         <TestTube className="h-4 w-4 mr-2" />
                                         Test Locally
                                       </DropdownMenuItem>
-                                      <DropdownMenuItem 
+                                      <DropdownMenuItem
                                         onClick={() => testRedirect.mutate(redirect.id)}
                                         disabled={testRedirect.isPending}
                                       >
                                         Verify Redirect
                                       </DropdownMenuItem>
-                                      <DropdownMenuItem 
-                                        className="text-destructive" 
+                                      <DropdownMenuItem
+                                        className="text-destructive"
                                         onClick={() => {
                                           setRedirectToDelete(redirect);
                                           setDeleteRedirectDialogOpen(true);
@@ -568,8 +568,8 @@ const SEORedirects = () => {
       </div>
 
       {/* Create Redirect Dialog */}
-      <SimpleDialog 
-        open={redirectDialogOpen} 
+      <SimpleDialog
+        open={redirectDialogOpen}
         onOpenChange={(open) => {
           if (!createRedirect.isPending) {
             setRedirectDialogOpen(open);
@@ -587,19 +587,19 @@ const SEORedirects = () => {
           <div className="space-y-4">
             <div>
               <Label htmlFor="fromPath">From Path</Label>
-              <Input 
+              <Input
                 id="fromPath"
                 name="fromPath"
-                placeholder="/old-path or /old-path/*" 
+                placeholder="/old-path or /old-path/*"
                 required
               />
             </div>
             <div>
               <Label htmlFor="toPath">To Path</Label>
-              <Input 
+              <Input
                 id="toPath"
                 name="toPath"
-                placeholder="/new-path or /new-path/*" 
+                placeholder="/new-path or /new-path/*"
                 required
               />
             </div>
@@ -619,7 +619,7 @@ const SEORedirects = () => {
             </div>
             <div>
               <Label htmlFor="notes">Notes (Optional)</Label>
-              <Textarea 
+              <Textarea
                 id="notes"
                 name="notes"
                 placeholder="Add notes about this redirect..."
@@ -627,8 +627,8 @@ const SEORedirects = () => {
               />
             </div>
             <div className="flex gap-2">
-              <Button 
-                type="submit" 
+              <Button
+                type="submit"
                 className="flex-1"
                 disabled={createRedirect.isPending}
               >
@@ -641,9 +641,9 @@ const SEORedirects = () => {
                   'Create Redirect'
                 )}
               </Button>
-              <Button 
-                type="button" 
-                variant="outline" 
+              <Button
+                type="button"
+                variant="outline"
                 onClick={() => setRedirectDialogOpen(false)}
                 disabled={createRedirect.isPending}
               >
@@ -653,7 +653,7 @@ const SEORedirects = () => {
           </div>
         </form>
       </SimpleDialog>
-      
+
       {/* Delete Redirect Confirmation Modal */}
       <DeleteConfirmModal
         open={deleteRedirectDialogOpen}

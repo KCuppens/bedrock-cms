@@ -26,12 +26,12 @@ const TagCard = memo<{
       <CardHeader>
         <div className="flex items-start justify-between">
           <div className="flex items-center gap-3">
-            <div 
+            <div
               className="w-10 h-10 rounded-lg flex items-center justify-center"
               style={{ backgroundColor: tag.color ? `${tag.color}20` : '#f3f4f6' }}
             >
-              <Tag 
-                className="w-5 h-5" 
+              <Tag
+                className="w-5 h-5"
                 style={{ color: tag.color || '#6b7280' }}
               />
             </div>
@@ -89,21 +89,21 @@ interface Tag {
 
 const Tags = memo(() => {
   const { toast } = useToast();
-  
+
   // Modal states
   const [tagModalOpen, setTagModalOpen] = useState(false);
   const [tagModalMode, setTagModalMode] = useState<'add' | 'edit'>('add');
   const [editingTag, setEditingTag] = useState<Tag | null>(null);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [tagToDelete, setTagToDelete] = useState<Tag | null>(null);
-  
+
   // Data states
   const [tags, setTags] = useState<Tag[]>([]);
   const [trendingTags, setTrendingTags] = useState<Tag[]>([]);
   const [unusedTags, setUnusedTags] = useState<Tag[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  
+
   // Filter states
   const [searchTerm, setSearchTerm] = useState("");
   const [activeTab, setActiveTab] = useState("all");
@@ -113,17 +113,17 @@ const Tags = memo(() => {
     try {
       setLoading(true);
       setError(null);
-      
+
       // Fetch all tags
       const allTagsResponse = await api.cms.tags.list({ search: searchTerm || undefined });
       const allTags = allTagsResponse.results || [];
-      
+
       setTags(allTags);
       // Filter trending tags based on the trending field
       setTrendingTags(allTags.filter(tag => tag.trending === true));
       // Filter unused tags (tags with 0 posts)
       setUnusedTags(allTags.filter(tag => tag.post_count === 0));
-      
+
     } catch (error: any) {
       console.error('Failed to fetch tags:', error);
       setError(error.message || 'Failed to load tags');
@@ -170,16 +170,16 @@ const Tags = memo(() => {
       } else if (editingTag) {
         await api.cms.tags.update(editingTag.slug, tagData);
         toast({
-          title: "Success", 
+          title: "Success",
           description: "Tag updated successfully.",
         });
       }
-      
+
       // Refresh tags list
       await fetchTags();
       setTagModalOpen(false);
       setEditingTag(null);
-      
+
     } catch (error: any) {
       console.error('Failed to save tag:', error);
       toast({
@@ -198,12 +198,12 @@ const Tags = memo(() => {
           title: "Success",
           description: "Tag deleted successfully.",
         });
-        
+
         // Refresh tags list
         await fetchTags();
         setDeleteModalOpen(false);
         setTagToDelete(null);
-        
+
       } catch (error: any) {
         console.error('Failed to delete tag:', error);
         toast({
@@ -259,12 +259,12 @@ const Tags = memo(() => {
                 <TabsTrigger value="popular">Popular</TabsTrigger>
                 <TabsTrigger value="unused">Unused</TabsTrigger>
               </TabsList>
-              
+
               <div className="flex items-center gap-2">
                 <div className="relative">
                   <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                  <Input 
-                    placeholder="Search tags..." 
+                  <Input
+                    placeholder="Search tags..."
                     className="pl-10 w-64"
                     value={searchTerm}
                     onChange={useCallback((e: React.ChangeEvent<HTMLInputElement>) => setSearchTerm(e.target.value), [])}

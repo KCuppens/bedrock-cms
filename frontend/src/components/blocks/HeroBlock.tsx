@@ -69,7 +69,7 @@ const HeroBlock: React.FC<HeroBlockProps> = React.memo(({ props, isEditable }) =
   }
 
   return (
-    <section 
+    <section
       className={`hero-block relative py-20 px-6 ${backgroundColor} ${textColor} ${alignmentClasses[alignment]} ${className}`.trim()}
       style={containerStyle}
       aria-label="Hero section"
@@ -77,31 +77,31 @@ const HeroBlock: React.FC<HeroBlockProps> = React.memo(({ props, isEditable }) =
       {backgroundImage && (
         <div className="absolute inset-0 bg-black/50" aria-hidden="true" />
       )}
-      
+
       <div className="relative max-w-4xl mx-auto">
         {(title || isEditable) && (
           <h1 className="text-4xl md:text-6xl font-bold mb-6">
             {title || (isEditable ? t('defaultTitle') : null)}
           </h1>
         )}
-        
+
         {(subtitle || isEditable) && (
           <h2 className="text-xl md:text-2xl font-medium mb-6 opacity-90">
             {subtitle || (isEditable ? t('defaultSubtitle') : null)}
           </h2>
         )}
-        
+
         {content && (
-          <div 
+          <div
             className="text-lg mb-8 opacity-80 prose prose-invert max-w-none"
             dangerouslySetInnerHTML={{ __html: content }}
           />
         )}
-        
+
         {(buttonText || isEditable) && buttonUrl && (
-          <Button 
+          <Button
             asChild
-            size="lg" 
+            size="lg"
             className="bg-white text-gray-900 hover:bg-gray-100"
           >
             <a href={buttonUrl}>

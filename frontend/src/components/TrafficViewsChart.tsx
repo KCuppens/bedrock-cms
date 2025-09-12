@@ -65,7 +65,7 @@ const TrafficViewsChart = memo(() => {
     const totalUsers = trafficData.reduce((sum, day) => sum + day.users, 0);
     const avgViews = Math.round(totalViews / trafficData.length);
     const avgUsers = Math.round(totalUsers / trafficData.length);
-    
+
     return {
       totalViews,
       totalUsers,
@@ -112,13 +112,13 @@ const TrafficViewsChart = memo(() => {
                   <stop offset="95%" stopColor="hsl(var(--secondary))" stopOpacity={0.05}/>
                 </linearGradient>
               </defs>
-              <XAxis 
-                dataKey="date" 
+              <XAxis
+                dataKey="date"
                 axisLine={false}
                 tickLine={false}
                 tick={{ fontSize: 11, fill: 'hsl(var(--muted-foreground))' }}
               />
-              <YAxis 
+              <YAxis
                 axisLine={false}
                 tickLine={false}
                 tick={{ fontSize: 12, fill: 'hsl(var(--muted-foreground))' }}
@@ -142,7 +142,7 @@ const TrafficViewsChart = memo(() => {
             </AreaChart>
           </ResponsiveContainer>
         </div>
-        
+
         {/* Stats Summary */}
         <div className="space-y-3">
           <h4 className="font-medium text-foreground mb-3">Summary Statistics</h4>

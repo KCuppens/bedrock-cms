@@ -114,20 +114,20 @@ export default function Blocks() {
 
     try {
       setLoading(true);
-      
+
       // Use the API with abort signal
       const response = await api.blockTypes.dashboardData(abortController.signal);
-      
+
       // Check if request was aborted
       if (abortController.signal.aborted) return;
-      
+
       setBlockTypes(response.block_types || []);
       setCategories(response.categories || []);
       setStats(response.stats || null);
     } catch (error: any) {
       // Don't show error if request was aborted
       if (error.name === 'AbortError') return;
-      
+
       console.error('Failed to fetch data:', error);
       toast.error('Failed to load blocks data');
     } finally {
@@ -141,7 +141,7 @@ export default function Blocks() {
   // Initial data fetch with cleanup - run only once on mount
   useEffect(() => {
     fetchData();
-    
+
     // Cleanup function
     return () => {
       if (abortControllerRef.current) {
@@ -159,18 +159,18 @@ export default function Blocks() {
         if (activeFilter === "active" && !block.is_active) return false;
         if (activeFilter === "inactive" && block.is_active) return false;
       }
-      
+
       if (debouncedSearchTerm) {
         const searchLower = debouncedSearchTerm.toLowerCase();
-        const matchesSearch = 
+        const matchesSearch =
           block.label.toLowerCase().includes(searchLower) ||
           block.type.toLowerCase().includes(searchLower) ||
           block.component.toLowerCase().includes(searchLower) ||
           (block.description && block.description.toLowerCase().includes(searchLower));
-        
+
         if (!matchesSearch) return false;
       }
-      
+
       return true;
     });
   }, [blockTypes, debouncedSearchTerm, categoryFilter, activeFilter]);
@@ -192,7 +192,7 @@ export default function Blocks() {
   // Handlers
   const handleCreate = async (formData: any) => {
     const abortController = new AbortController();
-    
+
     try {
       await api.blockTypes.create(formData, abortController.signal);
       toast.success('Block type created successfully');
@@ -208,9 +208,9 @@ export default function Blocks() {
 
   const handleEdit = async (formData: any) => {
     if (!selectedBlockType) return;
-    
+
     const abortController = new AbortController();
-    
+
     try {
       await api.blockTypes.update(selectedBlockType.id, formData, abortController.signal);
       toast.success('Block type updated successfully');
@@ -227,9 +227,9 @@ export default function Blocks() {
 
   const handleDelete = async () => {
     if (!selectedBlockType) return;
-    
+
     const abortController = new AbortController();
-    
+
     try {
       await api.blockTypes.delete(selectedBlockType.id, abortController.signal);
       toast.success('Block type deleted successfully');
@@ -246,7 +246,7 @@ export default function Blocks() {
 
   const handleToggleActive = async (blockType: BlockType) => {
     const abortController = new AbortController();
-    
+
     try {
       await api.blockTypes.toggleActive(blockType.id, abortController.signal);
       toast.success(`Block type ${blockType.is_active ? 'deactivated' : 'activated'} successfully`);
@@ -261,7 +261,7 @@ export default function Blocks() {
 
   const handleDuplicate = async (blockType: BlockType) => {
     const abortController = new AbortController();
-    
+
     try {
       await api.blockTypes.duplicate(blockType.id, abortController.signal);
       toast.success('Block type duplicated successfully');
@@ -321,8 +321,8 @@ export default function Blocks() {
                   <h1 className="text-3xl font-bold text-foreground">Block Types</h1>
                   <p className="text-muted-foreground">Manage your content blocks and components</p>
                 </div>
-                <Button 
-                  onClick={() => setShowCreateModal(true)} 
+                <Button
+                  onClick={() => setShowCreateModal(true)}
                   className="flex items-center gap-2"
                 >
                   <Plus className="h-4 w-4" />
@@ -515,7 +515,7 @@ export default function Blocks() {
                                   <><Eye className="h-4 w-4 mr-2" /> Activate</>
                                 )}
                               </DropdownMenuItem>
-                              <DropdownMenuItem 
+                              <DropdownMenuItem
                                 onClick={() => {
                                   setSelectedBlockType(blockType);
                                   setShowDeleteModal(true);

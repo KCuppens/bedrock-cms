@@ -21,10 +21,10 @@ export const useLocaleScopedData = <T extends LocaleAware>(
   } = {}
 ): T[] => {
   const permissions = usePermissions();
-  const { 
-    enforceScope = true, 
+  const {
+    enforceScope = true,
     defaultLocale = 'en',
-    includeNoLocale = true 
+    includeNoLocale = true
   } = options;
 
   return useMemo(() => {
@@ -107,11 +107,11 @@ export const useScopedData = <T extends LocaleAware & SectionAware>(
   } = {}
 ): T[] => {
   const permissions = usePermissions();
-  const { 
-    enforceLocaleScope = true, 
+  const {
+    enforceLocaleScope = true,
     enforceSectionScope = true,
     includeNoLocale = true,
-    includeNoSection = true 
+    includeNoSection = true
   } = options;
 
   return useMemo(() => {
@@ -185,7 +185,7 @@ export const useAvailableLocales = (): string[] => {
       // Superuser can access all locales - would need to fetch from API
       return permissions.scopes.locales || [];
     }
-    
+
     return permissions.scopes.locales || [];
   }, [permissions]);
 };
@@ -201,7 +201,7 @@ export const useAvailableSections = (): string[] => {
       // Superuser can access all sections
       return ['/'];
     }
-    
+
     return permissions.scopes.sections || [];
   }, [permissions]);
 };

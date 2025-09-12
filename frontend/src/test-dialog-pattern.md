@@ -54,13 +54,13 @@ const handleUpdate = async () => {
   try {
     setIsUpdating(true);
     await api.update();
-    
+
     // Use setTimeout to defer close
     setTimeout(() => {
       setDialogOpen(false);
       setEditingItem(null);
     }, 0);
-    
+
     loadItems();
   } finally {
     setIsUpdating(false);

@@ -89,7 +89,7 @@ sequenceDiagram
     participant ContentDetailPage
     participant API
     participant Database
-    
+
     User->>Router: Visit /blog/my-post
     Router->>ContentDetailPage: Route to component
     ContentDetailPage->>API: GET /resolve_content?path=/blog/my-post
@@ -150,11 +150,11 @@ interface BlogDetailProps {
   show_author?: boolean;
   show_date?: boolean;
   layout?: 'article' | 'minimal' | 'magazine';
-  
+
   // System props
   isEditing?: boolean;
   onChange?: (props: any) => void;
-  
+
   // Injected content (runtime only)
   __injectedContent?: BlogPost;
 }
@@ -177,12 +177,12 @@ const BlogDetail: React.FC<BlogDetailProps> = ({
       </div>
     );
   }
-  
+
   // No content - show skeleton
   if (!__injectedContent) {
     return <BlogDetailSkeleton />;
   }
-  
+
   // Render actual content
   const post = __injectedContent;
   return (
@@ -227,15 +227,15 @@ def resolve_content(self, request):
     """Resolve content with presentation page."""
     path = request.query_params.get('path')
     locale_code = request.query_params.get('locale', 'en')
-    
+
     # Parse path
     path_parts = path.strip('/').split('/')
     content_type = path_parts[0]
     slug = path_parts[1]
-    
+
     if content_type == 'blog':
         return self._resolve_blog_post(slug, locale_code, request)
-    
+
     return Response({'error': 'Content type not supported'}, status=404)
 
 def _resolve_blog_post(self, slug, locale_code, request):
@@ -244,7 +244,7 @@ def _resolve_blog_post(self, slug, locale_code, request):
         'presentation_page',
         'category__presentation_page'
     ).get(slug=slug, locale__code=locale_code)
-    
+
     # Determine presentation page
     presentation_page = None
     if post.presentation_page:
@@ -255,7 +255,7 @@ def _resolve_blog_post(self, slug, locale_code, request):
         # Get global default
         settings = BlogSettings.objects.get(locale__code=locale_code)
         presentation_page = settings.default_presentation_page
-    
+
     return Response({
         'content': BlogPostSerializer(post).data,
         'presentation_page': PageSerializer(presentation_page).data,
@@ -275,7 +275,7 @@ import { DynamicBlocksRenderer } from '@/components/blocks/DynamicBlocksRenderer
 
 const ContentDetailPage: React.FC = () => {
   const location = useLocation();
-  
+
   // Fetch resolved content
   const { data, isLoading, error } = useQuery({
     queryKey: ['content-resolve', location.pathname],
@@ -284,11 +284,11 @@ const ContentDetailPage: React.FC = () => {
       locale: currentLocale
     })
   });
-  
+
   // Inject content into blocks
   const enrichedBlocks = useMemo(() => {
     if (!data?.presentation_page?.blocks) return [];
-    
+
     return data.presentation_page.blocks.map(block => {
       if (block.type.endsWith('_detail')) {
         return {
@@ -302,10 +302,10 @@ const ContentDetailPage: React.FC = () => {
       return block;
     });
   }, [data]);
-  
+
   if (isLoading) return <LoadingSpinner />;
   if (error) return <NotFound />;
-  
+
   return <DynamicBlocksRenderer blocks={enrichedBlocks} />;
 };
 ```
@@ -324,7 +324,7 @@ const EventDetail: React.FC<EventDetailProps> = ({
   __injectedContent
 }) => {
   if (!__injectedContent) return <EventDetailPlaceholder />;
-  
+
   const event = __injectedContent;
   return (
     <div className="event-detail">
@@ -345,15 +345,15 @@ const EventDetail: React.FC<EventDetailProps> = ({
 def _resolve_event(self, slug, locale_code, request):
     """Resolve event with presentation."""
     from apps.events.models import Event, EventSettings
-    
+
     event = Event.objects.select_related(
         'presentation_page',
         'category__presentation_page'
     ).get(slug=slug, locale__code=locale_code)
-    
+
     # Same hierarchy logic as blog posts
     presentation_page = self._get_presentation_page(event)
-    
+
     return Response({
         'content': EventSerializer(event).data,
         'presentation_page': PageSerializer(presentation_page).data,
@@ -505,7 +505,7 @@ class BlogPost(models.Model):
     title = models.CharField(max_length=200)
     slug = models.SlugField(unique=True)
     content = models.TextField()
-    
+
     # Presentation override
     presentation_page = models.ForeignKey(
         'cms.Page',
@@ -517,7 +517,7 @@ class BlogPost(models.Model):
 # Category models need:
 class Category(models.Model):
     name = models.CharField(max_length=100)
-    
+
     # Category-level template
     presentation_page = models.ForeignKey(
         'cms.Page',
@@ -529,7 +529,7 @@ class Category(models.Model):
 # Settings models need:
 class BlogSettings(models.Model):
     locale = models.OneToOneField('i18n.Locale')
-    
+
     # Global default template
     default_presentation_page = models.ForeignKey(
         'cms.Page',
@@ -544,18 +544,18 @@ class BlogSettings(models.Model):
 ```python
 # backend/apps/cms/views.py
 class PagesViewSet(viewsets.ModelViewSet):
-    
+
     @action(detail=False, methods=['get'])
     def presentation_templates(self, request):
         """List templates for a content type."""
         content_type = request.query_params.get('content_type')
         block_type = f"{content_type}_detail"
-        
+
         # Find pages with the detail block
         pages = Page.objects.filter(
             status='published'
         ).select_related('locale')
-        
+
         templates = [
             page for page in pages
             if any(
@@ -563,7 +563,7 @@ class PagesViewSet(viewsets.ModelViewSet):
                 for block in page.blocks or []
             )
         ]
-        
+
         return Response({
             'templates': PageSerializer(templates, many=True).data,
             'content_type': content_type,
@@ -603,7 +603,7 @@ interface Props {
 Use consistent logic to detect presentation templates:
 ```typescript
 const isPresentationTemplate = (page: Page) => {
-  return page.blocks?.some(block => 
+  return page.blocks?.some(block =>
     block.type?.endsWith('_detail')
   );
 };
@@ -743,7 +743,7 @@ BlogPost.objects.select_related(
 
 ```typescript
 // Lazy load detail block components
-const BlogDetail = lazy(() => 
+const BlogDetail = lazy(() =>
   import('./blocks/blog_detail')
 );
 
@@ -876,14 +876,14 @@ blocks.map(block => {
 def get_presentation_page(self, content):
     """Get template with A/B testing."""
     import random
-    
+
     if settings.AB_TESTING_ENABLED:
         templates = [
             content.presentation_page_a,
             content.presentation_page_b
         ]
         return random.choice(templates)
-    
+
     return content.presentation_page
 ```
 
@@ -895,10 +895,10 @@ Always sanitize HTML content:
 ```typescript
 import DOMPurify from 'dompurify';
 
-<div 
-  dangerouslySetInnerHTML={{ 
-    __html: DOMPurify.sanitize(content.html) 
-  }} 
+<div
+  dangerouslySetInnerHTML={{
+    __html: DOMPurify.sanitize(content.html)
+  }}
 />
 ```
 
@@ -908,12 +908,12 @@ Check permissions in resolver:
 ```python
 def resolve_content(self, request):
     content = self._get_content(path)
-    
+
     # Check if user can view
     if content.status == 'draft':
         if not request.user.has_perm('view_draft'):
             raise PermissionDenied
-    
+
     return content
 ```
 
@@ -924,10 +924,10 @@ Validate template structure:
 def validate_presentation_page(page):
     """Ensure page has exactly one detail block."""
     detail_blocks = [
-        b for b in page.blocks 
+        b for b in page.blocks
         if b['type'].endswith('_detail')
     ]
-    
+
     if len(detail_blocks) != 1:
         raise ValidationError(
             "Presentation pages must have exactly one detail block"
@@ -945,7 +945,7 @@ describe('BlogDetail', () => {
     render(<BlogDetail isEditing={true} />);
     expect(screen.getByText('Blog Post Detail')).toBeInTheDocument();
   });
-  
+
   it('renders content when injected', () => {
     const content = { title: 'Test Post', content: 'Content' };
     render(<BlogDetail __injectedContent={content} />);
@@ -963,11 +963,11 @@ def test_resolve_blog_post():
         slug='test',
         presentation_page=template
     )
-    
+
     response = client.get('/api/v1/cms/pages/resolve_content/', {
         'path': '/blog/test'
     })
-    
+
     assert response.data['content']['slug'] == 'test'
     assert response.data['presentation_page']['id'] == template.id
     assert response.data['resolution_source'] == 'individual'
@@ -987,13 +987,13 @@ describe('Presentation Pages', () => {
         { type: 'blog_detail', props: {} }
       ]
     });
-    
+
     // Create post
     cy.createBlogPost({
       title: 'Test Post',
       slug: 'test-post'
     });
-    
+
     // Visit and verify
     cy.visit('/blog/test-post');
     cy.contains('Test Post');

@@ -28,14 +28,14 @@ class PerformanceMonitor {
   private sessionId: string;
   private observer: PerformanceObserver | null = null;
 
-  constructor(config?: { 
-    reportEndpoint?: string; 
+  constructor(config?: {
+    reportEndpoint?: string;
     debug?: boolean;
   }) {
     this.reportEndpoint = config?.reportEndpoint || null;
     this.debug = config?.debug || false;
     this.sessionId = this.generateSessionId();
-    
+
     // Initialize monitoring
     this.initWebVitals();
     this.initResourceTiming();
@@ -52,16 +52,16 @@ class PerformanceMonitor {
   private initWebVitals(): void {
     // First Contentful Paint
     onFCP(this.handleMetric.bind(this));
-    
+
     // Largest Contentful Paint
     onLCP(this.handleMetric.bind(this));
-    
+
     // Interaction to Next Paint (replaced FID)
     onINP(this.handleMetric.bind(this));
-    
+
     // Cumulative Layout Shift
     onCLS(this.handleMetric.bind(this));
-    
+
     // Time to First Byte
     onTTFB(this.handleMetric.bind(this));
   }
@@ -69,7 +69,7 @@ class PerformanceMonitor {
   // Handle Web Vitals metrics
   private handleMetric(metric: Metric): void {
     const rating = this.getRating(metric.name, metric.value);
-    
+
     const data: PerformanceData = {
       metric: metric.name,
       value: Math.round(metric.value),
@@ -82,7 +82,7 @@ class PerformanceMonitor {
     };
 
     this.data.push(data);
-    
+
     if (this.debug) {
       console.log(`[Performance] ${metric.name}: ${Math.round(metric.value)}ms (${rating})`);
     }
@@ -117,13 +117,13 @@ class PerformanceMonitor {
         for (const entry of list.getEntries()) {
           if (entry.entryType === 'resource') {
             const resource = entry as PerformanceResourceTiming;
-            
+
             // Track slow resources
             if (resource.duration > 1000) {
               if (this.debug) {
                 console.warn(`[Performance] Slow resource: ${resource.name} (${Math.round(resource.duration)}ms)`);
               }
-              
+
               this.trackSlowResource(resource);
             }
           }
@@ -162,7 +162,7 @@ class PerformanceMonitor {
           if (this.debug) {
             console.warn(`[Performance] Long task detected: ${Math.round(entry.duration)}ms`);
           }
-          
+
           this.trackLongTask(entry);
         }
       });
@@ -189,7 +189,7 @@ class PerformanceMonitor {
 
   // Monitor memory usage
   private memoryInterval: NodeJS.Timeout | null = null;
-  
+
   private initMemoryMonitoring(): void {
     if (!(performance as any).memory) return;
 
@@ -203,7 +203,7 @@ class PerformanceMonitor {
         if (this.debug) {
           console.warn(`[Performance] High memory usage: ${usedMemory.toFixed(2)}MB (${usage.toFixed(1)}%)`);
         }
-        
+
         this.trackHighMemory(usedMemory, usage);
       }
     }, 60000); // Check every 60 seconds instead of 30
@@ -351,12 +351,12 @@ class PerformanceMonitor {
           value: item.value,
           rating: item.rating,
         };
-        
+
         // Calculate score
         if (item.rating === 'good') totalScore += 100;
         else if (item.rating === 'needs-improvement') totalScore += 50;
         else totalScore += 0;
-        
+
         metricCount++;
       }
     }
@@ -380,10 +380,10 @@ class PerformanceMonitor {
       } else {
         performance.measure(name, startMark);
       }
-      
+
       const measures = performance.getEntriesByName(name, 'measure');
       const lastMeasure = measures[measures.length - 1];
-      
+
       if (lastMeasure && this.debug) {
         console.log(`[Performance] ${name}: ${Math.round(lastMeasure.duration)}ms`);
       }

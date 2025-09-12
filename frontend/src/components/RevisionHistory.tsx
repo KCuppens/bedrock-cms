@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { format } from 'date-fns';
-import { 
-  Clock, 
-  User, 
-  RotateCcw, 
-  Eye, 
-  GitBranch, 
+import {
+  Clock,
+  User,
+  RotateCcw,
+  Eye,
+  GitBranch,
   Save,
   ChevronRight,
   AlertCircle,
@@ -84,15 +84,15 @@ const RevisionHistory: React.FC<RevisionHistoryProps> = ({
   const loadRevisions = async () => {
     try {
       setLoading(true);
-      const endpoint = contentType === 'page' 
+      const endpoint = contentType === 'page'
         ? `/api/v1/cms/pages/${contentId}/revisions/`
         : `/api/v1/blog/posts/${contentId}/revisions/`;
-      
+
       const response = await api.request<{ results: Revision[] }>({
         method: 'GET',
         url: endpoint
       });
-      
+
       setRevisions(response.results || []);
     } catch (error) {
       console.error('Failed to load revisions:', error);
@@ -108,27 +108,27 @@ const RevisionHistory: React.FC<RevisionHistoryProps> = ({
 
   const handleRevert = async (revision: Revision) => {
     if (!onRevert) return;
-    
+
     try {
       setReverting(true);
-      
+
       // Call the API to revert
       const response = await api.request({
         method: 'POST',
         url: `/api/v1/cms/revisions/${revision.id}/revert/`
       });
-      
+
       toast({
         title: "Content Reverted",
         description: `Successfully reverted to version ${revision.version} from ${format(new Date(revision.created_at), 'MMM d, yyyy h:mm a')}`,
       });
-      
+
       // Notify parent component
       onRevert(revision.id);
-      
+
       // Reload revisions to show the new revert revision
       await loadRevisions();
-      
+
     } catch (error: any) {
       console.error('Failed to revert:', error);
       toast({
@@ -160,13 +160,13 @@ const RevisionHistory: React.FC<RevisionHistoryProps> = ({
       autosave: 'secondary',
       manual: 'outline'
     };
-    
+
     const labels = {
       published: 'Published',
       autosave: 'Auto-save',
       manual: 'Manual'
     };
-    
+
     return (
       <Badge variant={variants[type as keyof typeof variants] || 'outline'} className="text-xs">
         {labels[type as keyof typeof labels] || type}
@@ -187,17 +187,17 @@ const RevisionHistory: React.FC<RevisionHistoryProps> = ({
         .filter(block => block.type === 'richtext' || block.type === 'text')
         .map(block => block.content?.text || block.content?.value || '')
         .join(' ');
-      
+
       return textBlocks.slice(0, 150) + (textBlocks.length > 150 ? '...' : '');
     }
-    
+
     if (content.content) {
-      const text = typeof content.content === 'string' 
-        ? content.content 
+      const text = typeof content.content === 'string'
+        ? content.content
         : JSON.stringify(content.content);
       return text.slice(0, 150) + (text.length > 150 ? '...' : '');
     }
-    
+
     return 'No content preview available';
   };
 
@@ -256,7 +256,7 @@ const RevisionHistory: React.FC<RevisionHistoryProps> = ({
                           <div className="w-px h-6 bg-border mt-2"></div>
                         )}
                       </div>
-                      
+
                       {/* Content */}
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 mb-2">
@@ -271,31 +271,31 @@ const RevisionHistory: React.FC<RevisionHistoryProps> = ({
                             </Badge>
                           )}
                         </div>
-                        
+
                         <div className="flex items-center gap-2 text-sm text-muted-foreground mb-2">
                           <User className="w-3 h-3" />
                           <span>{formatUserName(revision.created_by)}</span>
                           <span>•</span>
                           <span>{format(new Date(revision.created_at), 'MMM d, yyyy h:mm a')}</span>
                         </div>
-                        
+
                         {revision.comment && (
                           <div className="text-sm text-muted-foreground mb-2 italic">
                             "{revision.comment}"
                           </div>
                         )}
-                        
+
                         {revision.title !== currentTitle && (
                           <div className="text-sm text-muted-foreground mb-2">
                             <span className="font-medium">Title:</span> {revision.title}
                           </div>
                         )}
-                        
+
                         <div className="text-xs text-muted-foreground">
                           {getContentPreview(revision.content)}
                         </div>
                       </div>
-                      
+
                       {/* Actions */}
                       <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                         <Button
@@ -327,11 +327,11 @@ const RevisionHistory: React.FC<RevisionHistoryProps> = ({
           <DialogHeader>
             <DialogTitle>Confirm Revert</DialogTitle>
             <DialogDescription>
-              Are you sure you want to revert to this version? This will create a new revision 
+              Are you sure you want to revert to this version? This will create a new revision
               with the content from version {selectedRevision?.version}.
             </DialogDescription>
           </DialogHeader>
-          
+
           {selectedRevision && (
             <div className="space-y-4">
               <div className="border rounded-lg p-4">
@@ -339,29 +339,29 @@ const RevisionHistory: React.FC<RevisionHistoryProps> = ({
                   <span className="font-medium">Version {selectedRevision.version}</span>
                   {getRevisionTypeBadge(selectedRevision.revision_type)}
                 </div>
-                
+
                 <div className="text-sm text-muted-foreground mb-2">
                   Created by {formatUserName(selectedRevision.created_by)} on{' '}
                   {format(new Date(selectedRevision.created_at), 'MMMM d, yyyy h:mm a')}
                 </div>
-                
+
                 {selectedRevision.title !== currentTitle && (
                   <div className="text-sm">
                     <span className="font-medium">Title:</span> {selectedRevision.title}
                   </div>
                 )}
               </div>
-              
+
               <Alert>
                 <AlertCircle className="h-4 w-4" />
                 <AlertDescription>
-                  This action will create a new revision and update the current content. 
+                  This action will create a new revision and update the current content.
                   Your current unsaved changes will be lost.
                 </AlertDescription>
               </Alert>
             </div>
           )}
-          
+
           <DialogFooter>
             <Button
               variant="outline"

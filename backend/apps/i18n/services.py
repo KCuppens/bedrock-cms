@@ -4,9 +4,8 @@ Translation services for auto-suggestions and machine translation.
 
 import logging
 
-from django.conf import settings
-
 import requests
+from django.conf import settings
 
 logger = logging.getLogger(__name__)
 

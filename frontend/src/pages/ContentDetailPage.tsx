@@ -43,7 +43,7 @@ interface ResolvedContent {
 const ContentDetailPage: React.FC = () => {
   const location = useLocation();
   const { currentLocale } = useLocale();
-  
+
   // Fetch resolved content and presentation
   const { data, isLoading, error } = useQuery<ResolvedContent>({
     queryKey: ['content-resolve', location.pathname, currentLocale],
@@ -59,13 +59,13 @@ const ContentDetailPage: React.FC = () => {
     retry: false,
     staleTime: 5 * 60 * 1000, // Cache for 5 minutes
   });
-  
+
   // Inject content into presentation page blocks
   const enrichedBlocks = useMemo(() => {
     if (!data?.presentation_page?.blocks || !data?.content) {
       return [];
     }
-    
+
     return data.presentation_page.blocks.map(block => {
       // Find detail blocks and inject content
       if (block.type.endsWith('_detail')) {
@@ -80,7 +80,7 @@ const ContentDetailPage: React.FC = () => {
       return block;
     });
   }, [data]);
-  
+
   // Loading state
   if (isLoading) {
     return (
@@ -89,12 +89,12 @@ const ContentDetailPage: React.FC = () => {
       </div>
     );
   }
-  
+
   // Error or not found
   if (error || !data?.content) {
     return <NotFound />;
   }
-  
+
   // If no presentation page, use fallback layout
   if (!data.presentation_page) {
     return (
@@ -105,7 +105,7 @@ const ContentDetailPage: React.FC = () => {
           {data.seo.og_image && <meta property="og:image" content={data.seo.og_image} />}
           <link rel="canonical" href={data.seo.canonical_url} />
         </Helmet>
-        
+
         <div className="container mx-auto px-4 py-8">
           <article className="prose prose-lg max-w-4xl mx-auto">
             <h1>{data.content.title}</h1>
@@ -118,7 +118,7 @@ const ContentDetailPage: React.FC = () => {
       </PublicLayout>
     );
   }
-  
+
   // Render with presentation page
   return (
     <PublicLayout>
@@ -128,7 +128,7 @@ const ContentDetailPage: React.FC = () => {
         {data.seo.og_image && <meta property="og:image" content={data.seo.og_image} />}
         <link rel="canonical" href={data.seo.canonical_url} />
       </Helmet>
-      
+
       {/* Debug info in development */}
       {import.meta.env.DEV && (
         <div className="fixed bottom-4 right-4 z-50 bg-black/80 text-white text-xs p-2 rounded">
@@ -136,7 +136,7 @@ const ContentDetailPage: React.FC = () => {
           <div>Source: {data.resolution_source}</div>
         </div>
       )}
-      
+
       <DynamicBlocksRenderer blocks={enrichedBlocks} />
     </PublicLayout>
   );

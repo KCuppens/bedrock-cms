@@ -48,18 +48,18 @@ const PostRow = memo<{
   getStatusColor: (status: string) => string;
   formatDate: (dateString: string) => string;
   renderTags: (tags: string[] | undefined) => React.ReactNode;
-}>(({ 
-  post, 
-  selectedPosts, 
-  toggleSelectPost, 
-  openDrawer, 
-  handleEditPost, 
-  handlePublishToggle, 
-  handleDuplicatePost, 
+}>(({
+  post,
+  selectedPosts,
+  toggleSelectPost,
+  openDrawer,
+  handleEditPost,
+  handlePublishToggle,
+  handleDuplicatePost,
   handleDeletePost,
   getStatusColor,
   formatDate,
-  renderTags 
+  renderTags
 }) => {
   const handleRowClick = useCallback(() => openDrawer(post), [post, openDrawer]);
   const handleStopPropagation = useCallback((e: React.MouseEvent) => e.stopPropagation(), []);
@@ -73,8 +73,8 @@ const PostRow = memo<{
   }, [post.slug]);
 
   return (
-    <TableRow 
-      key={post.id} 
+    <TableRow
+      key={post.id}
       className="cursor-pointer hover:bg-muted/30"
       onClick={handleRowClick}
     >
@@ -165,7 +165,7 @@ PostRow.displayName = 'PostRow';
 const BlogPosts = memo(() => {
   // Initialize hooks first
   const { toast } = useToast();
-  
+
   // State declarations
   const [selectedPosts, setSelectedPosts] = useState<string[]>([]);
   const [drawerOpen, setDrawerOpen] = useState(false);
@@ -178,7 +178,7 @@ const BlogPosts = memo(() => {
   const [loading, setLoading] = useState(true);
   const [categories, setCategories] = useState<Array<{id: number; name: string}>>([]);
   const [locales, setLocales] = useState<Array<{code: string; name: string}>>([]);
-  
+
   // Modal states
   const [blogPostModalOpen, setBlogPostModalOpen] = useState(false);
   const [blogPostModalMode, setBlogPostModalMode] = useState<'add' | 'edit'>('add');
@@ -191,12 +191,12 @@ const BlogPosts = memo(() => {
     try {
       setLoading(true);
       const params: any = {};
-      
+
       if (searchQuery) params.search = searchQuery;
       if (statusFilter !== 'all') params.status = statusFilter;
       if (localeFilter !== 'all') params.locale = localeFilter;
       if (categoryFilter !== 'all') params.category = categoryFilter;
-      
+
       const response = await api.blog.posts.list(params);
       setPosts(response.results || response.data || []);
     } catch (error: any) {
@@ -218,7 +218,7 @@ const BlogPosts = memo(() => {
         api.blog.categories.list(),
         api.i18n.locales.list()
       ]);
-      
+
       setCategories(categoriesResponse.results || categoriesResponse.data || []);
       setLocales(localesResponse.results || localesResponse.data || []);
     } catch (error: any) {
@@ -264,7 +264,7 @@ const BlogPosts = memo(() => {
         });
       } else if (editingPost) {
         const response = await api.blog.posts.update(Number(editingPost.id), postData);
-        setPosts(prev => prev.map(post => 
+        setPosts(prev => prev.map(post =>
           post.id === editingPost.id ? response.data : post
         ));
         toast({
@@ -317,21 +317,21 @@ const BlogPosts = memo(() => {
 
   const formatDate = useCallback((dateString: string) => {
     if (!dateString) return '-';
-    
+
     const date = new Date(dateString);
     if (isNaN(date.getTime())) return 'Invalid date';
-    
-    return date.toLocaleDateString('en-US', { 
-      month: 'short', 
-      day: 'numeric', 
-      hour: '2-digit', 
-      minute: '2-digit' 
+
+    return date.toLocaleDateString('en-US', {
+      month: 'short',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
     });
   }, []);
 
   const toggleSelectPost = useCallback((postId: string) => {
-    setSelectedPosts(prev => 
-      prev.includes(postId) 
+    setSelectedPosts(prev =>
+      prev.includes(postId)
         ? prev.filter(id => id !== postId)
         : [...prev, postId]
     );
@@ -359,7 +359,7 @@ const BlogPosts = memo(() => {
         const response = await api.blog.posts.publish(Number(post.id));
         setPosts(prev => prev.map(p => p.id === post.id ? response.data : p));
         toast({
-          title: "Success", 
+          title: "Success",
           description: "Blog post published successfully.",
         });
       }
@@ -381,7 +381,7 @@ const BlogPosts = memo(() => {
         copy_tags: true,
         copy_category: true
       });
-      
+
       // Add the duplicated post to the list
       if (response.data) {
         setPosts(prev => [response.data, ...prev]);
@@ -404,10 +404,10 @@ const BlogPosts = memo(() => {
     if (!tags || tags.length === 0) {
       return <span className="text-muted-foreground text-xs">No tags</span>;
     }
-    
+
     const visibleTags = tags.slice(0, 3);
     const remainingCount = tags.length - 3;
-    
+
     return (
       <div className="flex items-center gap-1 flex-wrap">
         {visibleTags.map(tag => (
@@ -425,7 +425,7 @@ const BlogPosts = memo(() => {
   }, []);
 
   // Memoized values - must be called unconditionally
-  const localeOptions = useMemo(() => 
+  const localeOptions = useMemo(() =>
     locales.map(locale => (
       <SelectItem key={locale.code} value={locale.code}>
         {locale.code.toUpperCase()}
@@ -433,7 +433,7 @@ const BlogPosts = memo(() => {
     )), [locales]
   );
 
-  const categoryOptions = useMemo(() => 
+  const categoryOptions = useMemo(() =>
     categories.map(category => (
       <SelectItem key={category.id} value={category.name}>
         {category.name}
@@ -441,7 +441,7 @@ const BlogPosts = memo(() => {
     )), [categories]
   );
 
-  const postRows = useMemo(() => 
+  const postRows = useMemo(() =>
     posts.map((post) => (
       <PostRow
         key={post.id}
@@ -457,8 +457,8 @@ const BlogPosts = memo(() => {
         formatDate={formatDate}
         renderTags={renderTags}
       />
-    )), [posts, selectedPosts, toggleSelectPost, openDrawer, handleEditPost, 
-        handlePublishToggle, handleDuplicatePost, handleDeletePost, 
+    )), [posts, selectedPosts, toggleSelectPost, openDrawer, handleEditPost,
+        handlePublishToggle, handleDuplicatePost, handleDeletePost,
         getStatusColor, formatDate, renderTags]
   );
 
@@ -527,14 +527,14 @@ const BlogPosts = memo(() => {
               <div className="flex items-center gap-4 p-4 bg-muted/20 rounded-lg mb-6">
             <div className="relative flex-1 max-w-sm">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-              <Input 
-                placeholder="Search title, slug..." 
+              <Input
+                placeholder="Search title, slug..."
                 className="pl-10"
                 value={searchQuery}
                 onChange={useCallback((e: React.ChangeEvent<HTMLInputElement>) => setSearchQuery(e.target.value), [])}
               />
             </div>
-            
+
             <Select value={statusFilter} onValueChange={setStatusFilter}>
               <SelectTrigger className="w-32">
                 <SelectValue placeholder="Status" />
@@ -579,7 +579,7 @@ const BlogPosts = memo(() => {
               <TableHeader>
                 <TableRow>
                   <TableHead className="w-12">
-                    <Checkbox 
+                    <Checkbox
                       checked={selectedPosts.length === posts.length && posts.length > 0}
                       onCheckedChange={selectAllPosts}
                     />
@@ -629,7 +629,7 @@ const BlogPosts = memo(() => {
                 <SheetTitle>{selectedPost?.title}</SheetTitle>
                 <SheetDescription>Post details and analytics</SheetDescription>
               </SheetHeader>
-              
+
               {selectedPost && (
                 <div className="mt-6 space-y-6">
                   {/* SEO Snippet */}

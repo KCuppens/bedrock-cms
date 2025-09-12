@@ -103,7 +103,7 @@ const TranslatorWorkspace = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const unitId = searchParams.get('unit');
-  
+
   const [unit, setUnit] = useState<TranslationUnit>(mockUnit);
   const [targetText, setTargetText] = useState(unit.targetText);
   const [status, setStatus] = useState(unit.status);
@@ -200,10 +200,10 @@ const TranslatorWorkspace = () => {
     <div className="min-h-screen">
       <div className="flex">
         <Sidebar />
-        
+
         <div className="flex-1 flex flex-col ml-72">
           <TopNavbar />
-          
+
           {/* Workspace Header */}
           <div className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
             <div className="p-4">
@@ -213,9 +213,9 @@ const TranslatorWorkspace = () => {
                     <ArrowLeft className="w-4 h-4 mr-2" />
                     Back to Queue
                   </Button>
-                  
+
                   <Separator orientation="vertical" className="h-6" />
-                  
+
                   <div className="flex items-center gap-2">
                     <Button variant="outline" size="sm" asChild>
                       <a href={unit.objectUrl} target="_blank" rel="noopener noreferrer">
@@ -239,9 +239,9 @@ const TranslatorWorkspace = () => {
                         <SelectItem value="DE">DE</SelectItem>
                       </SelectContent>
                     </Select>
-                    
+
                     <Languages className="w-4 h-4 text-muted-foreground" />
-                    
+
                     <Select value={targetLocale} onValueChange={setTargetLocale}>
                       <SelectTrigger className="w-20">
                         <SelectValue />
@@ -270,7 +270,7 @@ const TranslatorWorkspace = () => {
               </div>
             </div>
           </div>
-          
+
           <div className="flex-1 flex">
             {/* Left Panel - Source */}
             <div className="w-1/2 border-r bg-background">
@@ -283,7 +283,7 @@ const TranslatorWorkspace = () => {
                   </div>
                 </div>
               </div>
-              
+
               <div className="p-4 h-full flex flex-col">
                 {/* Search within source */}
                 <div className="relative mb-4">
@@ -295,7 +295,7 @@ const TranslatorWorkspace = () => {
                     onChange={(e) => setSearchTerm(e.target.value)}
                   />
                 </div>
-                
+
                 {/* Source text - read only */}
                 <div className="flex-1 bg-muted/30 p-4 rounded-lg overflow-y-auto">
                   <p className="text-foreground leading-relaxed whitespace-pre-wrap">
@@ -349,7 +349,7 @@ const TranslatorWorkspace = () => {
                   </div>
                 </div>
               </div>
-              
+
               <div className="p-4 h-full flex flex-col">
                 {/* MT Suggestion */}
                 {showMtSuggestion && mtSuggestion && (
@@ -392,7 +392,7 @@ const TranslatorWorkspace = () => {
                       Translation is significantly longer than source
                     </div>
                   )}
-                  
+
                   {targetWordCount < sourceWordCount * 0.5 && targetText.length > 0 && (
                     <div className="flex items-center gap-2 text-yellow-600 text-sm">
                       <AlertCircle className="w-4 h-4" />
@@ -409,8 +409,8 @@ const TranslatorWorkspace = () => {
                       {Math.min(Math.round((targetCharCount / sourceCharCount) * 100), 100)}%
                     </span>
                   </div>
-                  <Progress 
-                    value={Math.min((targetCharCount / sourceCharCount) * 100, 100)} 
+                  <Progress
+                    value={Math.min((targetCharCount / sourceCharCount) * 100, 100)}
                     className="h-2"
                   />
                 </div>
@@ -423,8 +423,8 @@ const TranslatorWorkspace = () => {
             <div className="p-4">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-4">
-                  <Button 
-                    variant="outline" 
+                  <Button
+                    variant="outline"
                     size="sm"
                     onClick={handleMtSuggest}
                     disabled={showMtSuggestion}
@@ -432,12 +432,12 @@ const TranslatorWorkspace = () => {
                     <Sparkles className="w-4 h-4 mr-2" />
                     MT Suggest
                   </Button>
-                  
+
                   <Button variant="outline" size="sm">
                     <Lightbulb className="w-4 h-4 mr-2" />
                     Glossary Hints
                   </Button>
-                  
+
                   <Button variant="outline" size="sm">
                     <BarChart3 className="w-4 h-4 mr-2" />
                     Quality Check
@@ -455,7 +455,7 @@ const TranslatorWorkspace = () => {
                   </div>
 
                   <div className="flex gap-2">
-                    <Button 
+                    <Button
                       variant="outline"
                       onClick={handleSave}
                       disabled={isSaving || !hasUnsavedChanges}
@@ -463,8 +463,8 @@ const TranslatorWorkspace = () => {
                       <Save className="w-4 h-4 mr-2" />
                       {isSaving ? 'Saving...' : 'Save'}
                     </Button>
-                    
-                    <Button 
+
+                    <Button
                       onClick={() => {
                         handleStatusChange('approved');
                         handleSave();

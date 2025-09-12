@@ -5,7 +5,7 @@ Global content registry for CMS content types.
 # mypy: ignore-errors
 
 import json
-from typing import Dict, List, Optional, Type, Any
+from typing import Any, Dict, List, Optional, Type, Union
 
 from django.core.exceptions import ValidationError
 from django.db import models
@@ -202,7 +202,7 @@ def register(config: ContentConfig):
 
 
 def register_model(
-    model: type[models.Model], kind: str, name: str = None, **kwargs
+    model: Type[models.Model], kind: str, name: str = None, **kwargs
 ) -> ContentConfig:
     """
     Convenience function to register a model with the content registry.

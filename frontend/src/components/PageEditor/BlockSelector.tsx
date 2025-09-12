@@ -48,7 +48,7 @@ export const BlockSelector = memo(({ onAddBlock }: BlockSelectorProps) => {
     const loadBlockTypes = async () => {
       try {
         setLoading(true);
-        
+
         // Try to load from API first
         const response = await api.blocks.list();
         if (response && response.block_types) {
@@ -60,7 +60,7 @@ export const BlockSelector = memo(({ onAddBlock }: BlockSelectorProps) => {
       } catch (err) {
         console.error('Failed to load block types:', err);
         setError('Failed to load block types');
-        
+
         // Fallback to hardcoded blocks if API fails
         setBlockTypes([
           { type: "hero", label: "Hero Section", icon: "layout", description: "Large header with title and CTA", category: "Layout" },
@@ -127,7 +127,7 @@ export const BlockSelector = memo(({ onAddBlock }: BlockSelectorProps) => {
     <div className="grid grid-cols-2 gap-2">
       {blockTypes.map(({ type, label, icon, description }) => {
         const Icon = iconMap[icon] || Layout; // Fallback to Layout icon
-        
+
         return (
           <Card
             key={type}

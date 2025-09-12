@@ -20,11 +20,11 @@ interface DeleteBlockModalProps {
   blockType: BlockType | null;
 }
 
-export default function DeleteBlockModal({ 
-  open, 
-  onOpenChange, 
+export default function DeleteBlockModal({
+  open,
+  onOpenChange,
   onConfirm,
-  blockType 
+  blockType
 }: DeleteBlockModalProps) {
   if (!blockType) return null;
 

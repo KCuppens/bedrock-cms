@@ -57,7 +57,7 @@ export function usePages(filters?: { locale?: string; status?: string; search?: 
       if (filters?.locale) params.locale = filters.locale;
       if (filters?.status) params.status = filters.status;
       if (filters?.search) params.search = filters.search;
-      
+
       const response = await api.cms.pages.list(params);
       return response.results || response.data || [];
     },
@@ -92,7 +92,7 @@ export function useUpdatePage() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ id, ...data }: UpdatePageDto) => 
+    mutationFn: ({ id, ...data }: UpdatePageDto) =>
       api.cms.pages.update(id, data),
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: pageKeys.lists() });
@@ -178,7 +178,7 @@ export function useReorderPages() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (data: { pageId: string; newParentId?: string; newPosition: number }) => 
+    mutationFn: (data: { pageId: string; newParentId?: string; newPosition: number }) =>
       api.cms.pages.reorder(data.pageId, data.newParentId, data.newPosition),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: pageKeys.lists() });

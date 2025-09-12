@@ -1,7 +1,6 @@
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Group, Permission
 from django.db.models import Count, Q
-
 from drf_spectacular.utils import extend_schema, extend_schema_view
 from rest_framework import serializers, status, viewsets
 from rest_framework.decorators import action, api_view, permission_classes

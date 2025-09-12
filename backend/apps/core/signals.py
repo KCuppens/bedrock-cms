@@ -262,9 +262,8 @@ def send_cdn_purge_webhook(keys: list, tags: list = None):
         tags: List of cache tags to purge (if CDN supports tag-based purging)
     """
     try:
-        from django.conf import settings
-
         import requests
+        from django.conf import settings
 
         # Check if CDN webhook is configured
         webhook_url = getattr(settings, "CDN_PURGE_WEBHOOK_URL", None)

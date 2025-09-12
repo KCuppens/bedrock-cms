@@ -65,7 +65,7 @@ export const useSEOSettings = (localeCode: string = 'en') => {
       try {
         setLoading(true);
         setError(null);
-        
+
         // Try to get SEO settings for the locale
         const response = await api.seoSettings.getByLocale(localeCode);
         setSettings(response.data || response);
@@ -125,8 +125,8 @@ export const useSEOMetaTags = (
   }
 
   // Build final meta title
-  const finalTitle = pageTitle 
-    ? `${pageTitle}${settings.title_suffix}` 
+  const finalTitle = pageTitle
+    ? `${pageTitle}${settings.title_suffix}`
     : settings.default_title || 'Bedrock CMS';
 
   // Build final description

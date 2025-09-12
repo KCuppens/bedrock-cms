@@ -55,9 +55,9 @@ const KeyboardShortcutsHelp = () => {
   ];
 
   const renderShortcutKey = (key: string) => (
-    <Badge 
-      key={key} 
-      variant="outline" 
+    <Badge
+      key={key}
+      variant="outline"
       className="px-2 py-1 text-xs font-mono bg-muted"
     >
       {key}
@@ -79,7 +79,7 @@ const KeyboardShortcutsHelp = () => {
             Keyboard Shortcuts
           </DialogTitle>
         </DialogHeader>
-        
+
         <div className="space-y-6">
           {shortcutGroups.map((group) => (
             <div key={group.title}>
@@ -88,8 +88,8 @@ const KeyboardShortcutsHelp = () => {
               </h3>
               <div className="space-y-2">
                 {group.shortcuts.map((shortcut, index) => (
-                  <div 
-                    key={index} 
+                  <div
+                    key={index}
                     className="flex items-center justify-between py-2 px-3 rounded-lg bg-muted/30 hover:bg-muted/50 transition-colors"
                   >
                     <div className="flex-1">
@@ -117,7 +117,7 @@ const KeyboardShortcutsHelp = () => {
               </div>
             </div>
           ))}
-          
+
           <div className="pt-4 border-t border-border">
             <p className="text-sm text-muted-foreground">
               <strong>Tip:</strong> Most shortcuts work globally, but some are specific to certain pages or contexts.

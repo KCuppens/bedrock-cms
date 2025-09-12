@@ -5,30 +5,30 @@ import re
 
 def fix_blog_files():
     """Fix Django model field type annotations in blog app"""
-    
+
     files = [
         "backend/apps/blog/models.py",
         "backend/apps/blog/versioning.py"
     ]
-    
+
     for file_path in files:
         with open(file_path, 'r', encoding='utf-8') as f:
             content = f.read()
-        
+
         # Add necessary imports if not present
         if 'from django.db.models import' not in content and 'models.py' in file_path:
             # Find the import section and add our imports
             import_pattern = r'(from django\.db import models.*\n)'
             replacement = r'\1from django.db.models import (\n    CharField, TextField, BooleanField, DateTimeField, ForeignKey, \n    ManyToManyField, ImageField, PositiveIntegerField, UUIDField\n)\n'
             content = re.sub(import_pattern, replacement, content)
-        
+
         if 'versioning.py' in file_path:
             # Add imports for versioning.py
             if 'from django.db.models import' not in content:
                 import_pattern = r'(from django\.db import models.*\n)'
                 replacement = r'\1from django.db.models import CharField, TextField, BooleanField, DateTimeField, ForeignKey, PositiveIntegerField, UUIDField\n'
                 content = re.sub(import_pattern, replacement, content)
-            
+
             # Fix User type alias issue in versioning.py
             if 'User = get_user_model()' in content:
                 content = re.sub(
@@ -43,7 +43,7 @@ def fix_blog_files():
                         r'\1, TYPE_CHECKING',
                         content
                     )
-            
+
             # Fix timezone.datetime imports
             content = re.sub(
                 r'timezone\.datetime',
@@ -57,7 +57,7 @@ def fix_blog_files():
                     r'\1\nimport datetime',
                     content
                 )
-        
+
         # Define field patterns and their type annotations
         field_patterns = [
             (r'(\s+)(\w+)\s*=\s*models\.CharField\(', r'\1\2: CharField = models.CharField('),
@@ -70,15 +70,15 @@ def fix_blog_files():
             (r'(\s+)(\w+)\s*=\s*models\.PositiveIntegerField\(', r'\1\2: PositiveIntegerField = models.PositiveIntegerField('),
             (r'(\s+)(\w+)\s*=\s*models\.UUIDField\(', r'\1\2: UUIDField = models.UUIDField('),
         ]
-        
+
         # Apply all patterns
         for pattern, replacement in field_patterns:
             content = re.sub(pattern, replacement, content, flags=re.MULTILINE)
-        
+
         # Write back the fixed content
         with open(file_path, 'w', encoding='utf-8') as f:
             f.write(content)
-        
+
         print(f"Fixed Django model field type annotations in {file_path}")
 
 if __name__ == "__main__":

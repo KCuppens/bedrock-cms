@@ -56,13 +56,13 @@ const BlogPost: React.FC = () => {
     // Update document title and meta description
     if (post) {
       document.title = post.seo?.title || `${post.title} | Blog`;
-      
+
       // Update meta description
       const metaDescription = document.querySelector('meta[name="description"]');
       if (metaDescription) {
         metaDescription.setAttribute('content', post.seo?.description || post.excerpt);
       }
-      
+
       // Update og:image
       const ogImage = document.querySelector('meta[property="og:image"]');
       if (ogImage && (post.seo?.og_image || post.featured_image)) {
@@ -80,17 +80,17 @@ const BlogPost: React.FC = () => {
     try {
       setLoading(true);
       setNotFound(false);
-      
+
       const response = await api.blog.posts.getBySlug(postSlug);
       const postData = response.data;
-      
+
       if (!postData) {
         setNotFound(true);
         return;
       }
-      
+
       setPost(postData);
-      
+
       // Load related posts (same category, excluding current post)
       if (postData.categories.length > 0) {
         try {
@@ -104,7 +104,7 @@ const BlogPost: React.FC = () => {
           console.error('Failed to load related posts:', error);
         }
       }
-      
+
     } catch (error) {
       console.error('Failed to load blog post:', error);
       setNotFound(true);
@@ -230,8 +230,8 @@ const BlogPost: React.FC = () => {
             <div className="flex flex-wrap items-center gap-6 text-muted-foreground mb-6">
               <div className="flex items-center gap-2">
                 {post.author.avatar && (
-                  <img 
-                    src={post.author.avatar} 
+                  <img
+                    src={post.author.avatar}
                     alt={post.author.name}
                     className="w-8 h-8 rounded-full"
                   />
@@ -272,8 +272,8 @@ const BlogPost: React.FC = () => {
           {/* Featured image */}
           {post.featured_image && (
             <div className="mb-8">
-              <img 
-                src={post.featured_image} 
+              <img
+                src={post.featured_image}
                 alt={post.title}
                 className="w-full rounded-lg shadow-lg"
               />
@@ -313,8 +313,8 @@ const BlogPost: React.FC = () => {
                 <Card key={relatedPost.id} className="hover:shadow-lg transition-shadow">
                   {relatedPost.featured_image && (
                     <div className="aspect-video bg-muted overflow-hidden rounded-t-lg">
-                      <img 
-                        src={relatedPost.featured_image} 
+                      <img
+                        src={relatedPost.featured_image}
                         alt={relatedPost.title}
                         className="w-full h-full object-cover"
                       />
@@ -322,7 +322,7 @@ const BlogPost: React.FC = () => {
                   )}
                   <CardContent className="p-4">
                     <h3 className="font-semibold mb-2 line-clamp-2">
-                      <Link 
+                      <Link
                         to={`/blog/${relatedPost.slug}`}
                         className="hover:text-primary transition-colors"
                       >

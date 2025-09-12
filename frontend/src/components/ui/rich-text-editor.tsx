@@ -1,16 +1,16 @@
 import { useState, useRef, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
-import { 
-  Bold, 
-  Italic, 
-  Underline, 
+import {
+  Bold,
+  Italic,
+  Underline,
   Strikethrough,
-  AlignLeft, 
-  AlignCenter, 
-  AlignRight, 
+  AlignLeft,
+  AlignCenter,
+  AlignRight,
   AlignJustify,
-  List, 
+  List,
   ListOrdered,
   Quote,
   Link,
@@ -29,9 +29,9 @@ interface RichTextEditorProps {
   minHeight?: number;
 }
 
-export const RichTextEditor = ({ 
-  value, 
-  onChange, 
+export const RichTextEditor = ({
+  value,
+  onChange,
   placeholder = "Start writing...",
   className,
   minHeight = 200

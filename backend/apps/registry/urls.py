@@ -3,7 +3,6 @@ Dynamic URL routing for registered content models.
 """
 
 from django.urls import include, path
-
 from rest_framework.routers import DefaultRouter
 
 from .registry import content_registry

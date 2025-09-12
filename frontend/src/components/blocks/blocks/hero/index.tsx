@@ -21,7 +21,7 @@ export const HeroBlock: React.FC<BlockComponentProps> = ({
   };
 
   return (
-    <div 
+    <div
       className={`relative overflow-hidden bg-gray-900 ${className}`}
       onClick={onSelect}
       style={{
@@ -34,7 +34,7 @@ export const HeroBlock: React.FC<BlockComponentProps> = ({
       {backgroundImage && (
         <div className="absolute inset-0 bg-black bg-opacity-40" />
       )}
-      
+
       <div className="relative px-6 py-24 sm:px-12 sm:py-32 lg:px-16">
         <div className="mx-auto max-w-2xl text-center">
           {isEditing ? (
@@ -50,7 +50,7 @@ export const HeroBlock: React.FC<BlockComponentProps> = ({
               {title || 'Your Hero Title'}
             </h1>
           )}
-          
+
           {isEditing ? (
             <textarea
               value={subtitle}
@@ -64,7 +64,7 @@ export const HeroBlock: React.FC<BlockComponentProps> = ({
               {subtitle || 'Your compelling subtitle goes here'}
             </p>
           )}
-          
+
           <div className="mt-10 flex items-center justify-center gap-x-6">
             {(buttonText || isEditing) && (
               isEditing ? (

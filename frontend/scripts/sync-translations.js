@@ -29,18 +29,18 @@ async function syncTranslations() {
     const headers = {
       'Content-Type': 'application/json'
     };
-    
+
     if (API_TOKEN) {
       headers['Authorization'] = `Token ${API_TOKEN}`;
     }
 
     // Use fetch (Node 18+) or node-fetch
     const fetch = globalThis.fetch || require('node-fetch');
-    
+
     const response = await fetch(`${API_URL}/i18n/ui-messages/sync-keys/`, {
       method: 'POST',
       headers,
-      body: JSON.stringify({ 
+      body: JSON.stringify({
         keys: manifest.keys,
         source: 'build'
       })
@@ -52,17 +52,17 @@ async function syncTranslations() {
     }
 
     const result = await response.json();
-    
+
     console.log('✅ Sync complete:');
     console.log(`   - Created: ${result.created.length} new keys`);
     console.log(`   - Updated: ${result.updated.length} existing keys`);
     console.log(`   - Total processed: ${result.total_processed}`);
-    
+
     if (result.created.length > 0) {
       console.log('\n📝 New keys created:');
       result.created.forEach(key => console.log(`   - ${key}`));
     }
-    
+
     if (result.errors && result.errors.length > 0) {
       console.log('\n⚠️ Errors:');
       result.errors.forEach(err => console.log(`   - ${err.key}: ${err.error}`));

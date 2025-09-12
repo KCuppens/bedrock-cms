@@ -4,15 +4,12 @@ Simple CMS Views tests to start building coverage.
 Basic tests for CMS views without complex factory dependencies.
 """
 
-import json
-from datetime import datetime, timedelta
+from datetime import timedelta
 
-from django.test import TestCase
 from django.contrib.auth import get_user_model
-from django.urls import reverse
 from django.utils import timezone
 from rest_framework import status
-from rest_framework.test import APITestCase, APIClient
+from rest_framework.test import APIClient, APITestCase
 
 from apps.cms.models import Page
 from apps.cms.views import PagesViewSet

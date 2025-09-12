@@ -24,7 +24,7 @@ const UserManagementExample: React.FC = () => {
     try {
       setLoading(true);
       const response = await api.userManagement.roles.list();
-      
+
       // Handle paginated response
       if (response.results) {
         setRoles(response.results);
@@ -32,7 +32,7 @@ const UserManagementExample: React.FC = () => {
         // In case the response is not paginated
         setRoles(response as any);
       }
-      
+
       toast({
         title: "Roles loaded",
         description: `Loaded ${response.results?.length || 0} roles`,
@@ -61,7 +61,7 @@ const UserManagementExample: React.FC = () => {
 
     try {
       setLoading(true);
-      
+
       const inviteData: UserInviteRequest = {
         email: inviteEmail,
         role: selectedRole || undefined,
@@ -69,7 +69,7 @@ const UserManagementExample: React.FC = () => {
       };
 
       const response = await api.userManagement.users.invite(inviteData);
-      
+
       toast({
         title: "User invited",
         description: response.data?.message || `Invitation sent to ${inviteEmail}`,
@@ -94,7 +94,7 @@ const UserManagementExample: React.FC = () => {
   return (
     <div className="p-6 max-w-2xl mx-auto">
       <h1 className="text-2xl font-bold mb-6">User Management Example</h1>
-      
+
       {/* Roles Section */}
       <div className="mb-8">
         <h2 className="text-xl font-semibold mb-4">Available Roles</h2>
@@ -128,7 +128,7 @@ const UserManagementExample: React.FC = () => {
       {/* Invite User Section */}
       <div>
         <h2 className="text-xl font-semibold mb-4">Invite New User</h2>
-        
+
         <div className="space-y-4">
           <div>
             <label className="block text-sm font-medium mb-1">

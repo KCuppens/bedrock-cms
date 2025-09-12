@@ -10,9 +10,9 @@ interface ImageContent {
   alignment?: 'left' | 'center' | 'right';
 }
 
-const ImageBlock: React.FC<BlockComponentProps<ImageContent>> = ({ 
+const ImageBlock: React.FC<BlockComponentProps<ImageContent>> = ({
   content = {},
-  isEditing = false 
+  isEditing = false
 }) => {
   const {
     src,
@@ -43,8 +43,8 @@ const ImageBlock: React.FC<BlockComponentProps<ImageContent>> = ({
   return (
     <div className={`my-8 ${alignmentClass}`}>
       {src && (
-        <img 
-          src={src} 
+        <img
+          src={src}
           alt={alt}
           className="max-w-full h-auto rounded-lg shadow-lg"
         />

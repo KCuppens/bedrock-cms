@@ -43,7 +43,7 @@ export function useRedirects(filters?: { search?: string }) {
     queryFn: async () => {
       const params: any = {};
       if (filters?.search) params.search = filters.search;
-      
+
       const response = await api.redirects.list(params);
       return response.results || response.data || [];
     },
@@ -84,9 +84,9 @@ export function useCreateRedirect() {
 
 export function useUpdateRedirect() {
   const queryClient = useQueryClient();
-  
+
   return useMutation({
-    mutationFn: ({ id, ...data }: UpdateRedirectDto) => 
+    mutationFn: ({ id, ...data }: UpdateRedirectDto) =>
       api.redirects.update(id, data),
     onSuccess: (_, variables) => {
       // Defer query invalidation to avoid race conditions
@@ -132,8 +132,8 @@ export function useTestRedirect() {
     onSuccess: (result) => {
       toast({
         title: result.success ? "Success" : "Test Failed",
-        description: result.success 
-          ? `Redirect working correctly (${result.status})` 
+        description: result.success
+          ? `Redirect working correctly (${result.status})`
           : `Test failed: ${result.error || 'Unknown error'}`,
         variant: result.success ? "default" : "destructive",
       });

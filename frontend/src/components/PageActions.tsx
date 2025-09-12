@@ -9,13 +9,13 @@ import {
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
-import { 
-  MoreHorizontal, 
-  Edit, 
-  Eye, 
-  Copy, 
-  Trash2, 
-  Send, 
+import {
+  MoreHorizontal,
+  Edit,
+  Eye,
+  Copy,
+  Trash2,
+  Send,
   Archive,
   ExternalLink,
   Calendar,
@@ -63,31 +63,31 @@ export const PageActions: React.FC<PageActionsProps> = ({
   }, [page.locale?.code, canAccessLocale]);
 
   // Permission checks with locale scope
-  const canView = useMemo(() => 
+  const canView = useMemo(() =>
     permissions.hasPermission('cms.view_page') && hasLocaleAccess
   , [permissions, hasLocaleAccess]);
 
-  const canEdit = useMemo(() => 
+  const canEdit = useMemo(() =>
     permissions.hasPermission('cms.change_page') && hasLocaleAccess
   , [permissions, hasLocaleAccess]);
 
-  const canDelete = useMemo(() => 
+  const canDelete = useMemo(() =>
     permissions.hasPermission('cms.delete_page') && hasLocaleAccess
   , [permissions, hasLocaleAccess]);
 
-  const canPublish = useMemo(() => 
+  const canPublish = useMemo(() =>
     permissions.hasPermission('cms.publish_page') && hasLocaleAccess
   , [permissions, hasLocaleAccess]);
 
-  const canDuplicate = useMemo(() => 
+  const canDuplicate = useMemo(() =>
     permissions.hasPermission('cms.add_page') && hasLocaleAccess
   , [permissions, hasLocaleAccess]);
 
-  const canViewRevisions = useMemo(() => 
+  const canViewRevisions = useMemo(() =>
     permissions.hasPermission('cms.view_pagerevision') && hasLocaleAccess
   , [permissions, hasLocaleAccess]);
 
-  const canSchedule = useMemo(() => 
+  const canSchedule = useMemo(() =>
     permissions.hasPermission('cms.schedule_page') && hasLocaleAccess
   , [permissions, hasLocaleAccess]);
 
@@ -137,8 +137,8 @@ export const PageActions: React.FC<PageActionsProps> = ({
     return (
       <div className="flex items-center gap-2">
         <PermissionGuard permissions={['cms.view_page']} locales={page.locale?.code ? [page.locale.code] : undefined}>
-          <Button 
-            variant="ghost" 
+          <Button
+            variant="ghost"
             size={size}
             onClick={handleNavigate}
             disabled={isLoading === 'navigate'}
@@ -148,8 +148,8 @@ export const PageActions: React.FC<PageActionsProps> = ({
         </PermissionGuard>
 
         <PermissionGuard permissions={['cms.change_page']} locales={page.locale?.code ? [page.locale.code] : undefined}>
-          <Button 
-            variant="ghost" 
+          <Button
+            variant="ghost"
             size={size}
             onClick={handleEdit}
             disabled={!onEdit || isLoading === 'edit'}
@@ -160,8 +160,8 @@ export const PageActions: React.FC<PageActionsProps> = ({
 
         {page.status === 'draft' && (
           <PermissionGuard permissions={['cms.publish_page']} locales={page.locale?.code ? [page.locale.code] : undefined}>
-            <Button 
-              variant="default" 
+            <Button
+              variant="default"
               size={size}
               onClick={handlePublish}
               disabled={!onPublish || isLoading === 'publish'}
@@ -173,8 +173,8 @@ export const PageActions: React.FC<PageActionsProps> = ({
 
         {page.status === 'published' && (
           <PermissionGuard permissions={['cms.publish_page']} locales={page.locale?.code ? [page.locale.code] : undefined}>
-            <Button 
-              variant="outline" 
+            <Button
+              variant="outline"
               size={size}
               onClick={handleUnpublish}
               disabled={!onUnpublish || isLoading === 'unpublish'}
@@ -185,8 +185,8 @@ export const PageActions: React.FC<PageActionsProps> = ({
         )}
 
         <PermissionGuard permissions={['cms.delete_page']} locales={page.locale?.code ? [page.locale.code] : undefined}>
-          <Button 
-            variant="ghost" 
+          <Button
+            variant="ghost"
             size={size}
             onClick={handleDelete}
             disabled={!onDelete || isLoading === 'delete'}
@@ -275,8 +275,8 @@ export const PageActions: React.FC<PageActionsProps> = ({
         {/* Delete Actions */}
         <PermissionGuard permissions={['cms.delete_page']} locales={page.locale?.code ? [page.locale.code] : undefined} showFallback={false}>
           <DropdownMenuSeparator />
-          <DropdownMenuItem 
-            onClick={handleDelete} 
+          <DropdownMenuItem
+            onClick={handleDelete}
             disabled={!onDelete || isLoading === 'delete'}
             className="text-destructive focus:text-destructive"
           >

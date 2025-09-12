@@ -92,7 +92,7 @@ def get_breadcrumbs(page):
 # Build navigation tree
 def build_nav_tree():
     return Page.objects.filter(
-        parent=None, 
+        parent=None,
         status="published"
     ).prefetch_related('children')
 ```
@@ -115,9 +115,9 @@ class Page(models.Model):
             self.path = f"{self.parent.path.rstrip('/')}/{self.slug}/"
         else:
             self.path = f"/{self.slug}/" if self.slug else "/"
-        
+
         super().save(*args, **kwargs)
-        
+
         # Update children paths if this page's path changed
         self._update_children_paths()
 ```
@@ -204,7 +204,7 @@ class Page(models.Model):
         ('article', 'Article'),
         ('gallery', 'Gallery'),
     ]
-    
+
     template = models.CharField(
         max_length=50,
         choices=TEMPLATE_CHOICES,
@@ -218,7 +218,7 @@ class Page(models.Model):
 # views.py
 class PageDetailView(DetailView):
     model = Page
-    
+
     def get_template_names(self):
         page = self.get_object()
         return [
@@ -309,23 +309,23 @@ def build_navigation():
         parent=None,
         status="published"
     ).order_by('order', 'title')
-    
+
     for page in root_pages:
         nav_item = {
             'title': page.title,
             'path': page.path,
             'children': []
         }
-        
+
         # Add children (limit depth as needed)
         for child in page.children.filter(status="published"):
             nav_item['children'].append({
                 'title': child.title,
                 'path': child.path,
             })
-        
+
         nav_items.append(nav_item)
-    
+
     return nav_items
 ```
 
@@ -336,7 +336,7 @@ def get_page_breadcrumbs(page):
     """Get breadcrumb navigation for a page."""
     breadcrumbs = []
     current = page
-    
+
     while current:
         breadcrumbs.insert(0, {
             'title': current.title,
@@ -344,7 +344,7 @@ def get_page_breadcrumbs(page):
             'is_current': current == page
         })
         current = current.parent
-    
+
     return breadcrumbs
 ```
 
@@ -374,11 +374,11 @@ def get_navigation_cached():
     """Get navigation with caching."""
     cache_key = 'site_navigation'
     nav = cache.get(cache_key)
-    
+
     if nav is None:
         nav = build_navigation()
         cache.set(cache_key, nav, 300)  # 5 minutes
-    
+
     return nav
 
 # Invalidate cache when pages change
@@ -463,7 +463,7 @@ def clean_path(self):
 def clean_parent(self):
     if self.parent == self:
         raise ValidationError("A page cannot be its own parent")
-    
+
     # Check for circular references
     current = self.parent
     while current:

@@ -92,7 +92,7 @@ const BlogListBlock: React.FC<BlogListBlockProps> = ({
         page: currentPage,
         limit,
         status: 'published',
-        ordering: order_by === 'published_at' ? '-published_at' : 
+        ordering: order_by === 'published_at' ? '-published_at' :
                   order_by === 'created_at' ? '-created_at' :
                   order_by === 'title' ? 'title' : undefined
       };
@@ -134,8 +134,8 @@ const BlogListBlock: React.FC<BlogListBlockProps> = ({
           <Card key={post.id} className="h-full hover:shadow-lg transition-shadow">
             {post.featured_image && (
               <div className="aspect-video bg-muted">
-                <img 
-                  src={post.featured_image} 
+                <img
+                  src={post.featured_image}
                   alt={post.title}
                   className="w-full h-full object-cover rounded-t-lg"
                 />
@@ -144,7 +144,7 @@ const BlogListBlock: React.FC<BlogListBlockProps> = ({
             <CardHeader>
               <div className="flex items-center gap-2 mb-2">
                 {show_category && post.category && (
-                  <Badge 
+                  <Badge
                     variant="secondary"
                     style={{ backgroundColor: post.category.color + '20', color: post.category.color }}
                   >
@@ -230,8 +230,8 @@ const BlogListBlock: React.FC<BlogListBlockProps> = ({
           <div key={post.id} className="flex gap-4 pb-6 border-b last:border-0">
             {post.featured_image && (
               <div className="w-48 h-32 bg-muted rounded-lg flex-shrink-0">
-                <img 
-                  src={post.featured_image} 
+                <img
+                  src={post.featured_image}
                   alt={post.title}
                   className="w-full h-full object-cover rounded-lg"
                 />

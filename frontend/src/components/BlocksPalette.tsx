@@ -75,10 +75,10 @@ export const BlocksPalette = ({ onAddBlock, editMode }: BlocksPaletteProps) => {
         setLoading(false);
         return;
       }
-      
+
       try {
         setLoading(true);
-        
+
         // Try to load from API first
         const response = await api.blocks.list();
         if (response && response.block_types) {
@@ -88,7 +88,7 @@ export const BlocksPalette = ({ onAddBlock, editMode }: BlocksPaletteProps) => {
         }
       } catch (err) {
         console.error('Failed to load block types:', err);
-        
+
         // Fallback to hardcoded blocks if API fails
         setBlockTypes([
           { type: "hero", label: "Hero", icon: "layout", description: "Large banner with title and subtitle", category: "Layout" },
@@ -143,7 +143,7 @@ export const BlocksPalette = ({ onAddBlock, editMode }: BlocksPaletteProps) => {
   return (
     <div className="w-64 bg-card border-r border-border overflow-y-auto">
       <div className="p-4 space-y-6">
-        
+
         {/* Block Types */}
         <div>
           <h3 className="font-semibold mb-3 flex items-center gap-2">
@@ -169,9 +169,9 @@ export const BlocksPalette = ({ onAddBlock, editMode }: BlocksPaletteProps) => {
             ) : (
               blockTypes.map((block) => {
                 const Icon = iconMap[block.icon] || Layout; // Fallback to Layout icon
-                
+
                 return (
-                  <Card 
+                  <Card
                     key={block.type}
                     className="cursor-pointer hover:bg-muted/50 transition-colors"
                     onClick={() => onAddBlock(block.type as Block['type'], 999)}
@@ -206,7 +206,7 @@ export const BlocksPalette = ({ onAddBlock, editMode }: BlocksPaletteProps) => {
           </h3>
           <div className="space-y-3">
             {templates.map((template, idx) => (
-              <Card 
+              <Card
                 key={idx}
                 className="cursor-pointer hover:bg-muted/50 transition-colors"
               >
@@ -217,7 +217,7 @@ export const BlocksPalette = ({ onAddBlock, editMode }: BlocksPaletteProps) => {
                   </p>
                   <div className="flex flex-wrap gap-1">
                     {template.blocks.map((blockType, blockIdx) => (
-                      <span 
+                      <span
                         key={blockIdx}
                         className="px-2 py-1 bg-muted text-xs rounded"
                       >

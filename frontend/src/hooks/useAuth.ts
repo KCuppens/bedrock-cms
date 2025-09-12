@@ -48,29 +48,29 @@ export const useAuthState = () => {
         setIsLoading(false);
       }
     };
-    
+
     checkSession();
   }, []);
 
   const signIn = async (email: string, password: string): Promise<{ success: boolean; error?: string }> => {
     setIsLoading(true);
-    
+
     try {
       const response = await api.auth.login(email, password);
-      
+
       if (response.user) {
         setUser(response.user);
         setIsLoading(false);
         return { success: true };
       }
-      
+
       setIsLoading(false);
       return { success: false, error: response.message || 'Login failed' };
     } catch (error: any) {
       setIsLoading(false);
-      return { 
-        success: false, 
-        error: error.message || 'An error occurred during login' 
+      return {
+        success: false,
+        error: error.message || 'An error occurred during login'
       };
     }
   };
@@ -88,29 +88,29 @@ export const useAuthState = () => {
 
   const resetPassword = async (email: string): Promise<{ success: boolean; error?: string }> => {
     setIsLoading(true);
-    
+
     try {
       const response = await api.auth.resetPassword(email);
       setIsLoading(false);
       return { success: true };
     } catch (error: any) {
       setIsLoading(false);
-      return { 
-        success: false, 
-        error: error.message || 'Failed to send password reset email' 
+      return {
+        success: false,
+        error: error.message || 'Failed to send password reset email'
       };
     }
   };
 
   const signUp = async (email: string, password: string, name: string): Promise<{ success: boolean; error?: string }> => {
     setIsLoading(true);
-    
+
     try {
       // Split name into first and last name
       const nameParts = name.trim().split(' ');
       const first_name = nameParts[0] || '';
       const last_name = nameParts.slice(1).join(' ') || '';
-      
+
       const response = await api.auth.register({
         email,
         password1: password,
@@ -118,7 +118,7 @@ export const useAuthState = () => {
         first_name,
         last_name,
       });
-      
+
       if (response.user) {
         // After successful registration, automatically sign in
         const loginResult = await signIn(email, password);
@@ -126,14 +126,14 @@ export const useAuthState = () => {
           return { success: true };
         }
       }
-      
+
       setIsLoading(false);
       return { success: true }; // Registration successful even if auto-login fails
     } catch (error: any) {
       setIsLoading(false);
-      return { 
-        success: false, 
-        error: error.message || 'Registration failed' 
+      return {
+        success: false,
+        error: error.message || 'Registration failed'
       };
     }
   };

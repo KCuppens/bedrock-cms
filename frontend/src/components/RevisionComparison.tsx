@@ -41,10 +41,10 @@ const generateDiff = (oldText: string, newText: string): DiffLine[] => {
   const oldLines = oldText.split('\n');
   const newLines = newText.split('\n');
   const diff: DiffLine[] = [];
-  
+
   let oldIndex = 0;
   let newIndex = 0;
-  
+
   while (oldIndex < oldLines.length || newIndex < newLines.length) {
     if (oldIndex >= oldLines.length) {
       // Only new lines remain
@@ -87,13 +87,13 @@ const generateDiff = (oldText: string, newText: string): DiffLine[] => {
       newIndex++;
     }
   }
-  
+
   return diff;
 };
 
 const DiffView = ({ oldText, newText }: { oldText: string; newText: string }) => {
   const diff = generateDiff(oldText, newText);
-  
+
   return (
     <div className="font-mono text-sm border rounded-lg overflow-hidden">
       <ScrollArea className="h-96">

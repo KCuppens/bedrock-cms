@@ -8,13 +8,13 @@ interface DynamicBlockRendererProps extends Omit<BlockComponentProps, 'content'>
   block: BlockData;
 }
 
-const DynamicComponent: React.FC<{ componentName: string; props: BlockComponentProps }> = ({ 
-  componentName, 
-  props 
+const DynamicComponent: React.FC<{ componentName: string; props: BlockComponentProps }> = ({
+  componentName,
+  props
 }) => {
   const Component = useMemo(() => {
     const registry = BlockRegistry.getInstance();
-    return React.lazy(() => 
+    return React.lazy(() =>
       registry.getComponent(componentName).then(comp => {
         if (!comp) {
           throw new Error(`Block component ${componentName} not found`);
@@ -34,7 +34,7 @@ const DynamicComponent: React.FC<{ componentName: string; props: BlockComponentP
 const ErrorFallback: React.FC<{ blockType: string; componentName?: string }> = ({ blockType, componentName }) => {
   const registry = BlockRegistry.getInstance();
   const availableComponents = registry.getAllComponentNames();
-  
+
   return (
     <div className="p-4 border border-red-200 rounded-lg bg-red-50">
       <div className="text-red-700 font-medium">Block Component Not Found</div>
@@ -67,14 +67,14 @@ export const DynamicBlockRenderer: React.FC<DynamicBlockRendererProps> = ({
     if (block.component) {
       return block.component;
     }
-    
+
     // Fall back to using the type field as component name
     // This is common when blocks use type to identify the component
     if (block.type) {
       console.log(`[DynamicBlockRenderer] Using type '${block.type}' as component name`);
       return block.type;
     }
-    
+
     console.warn(`Block missing both 'component' and 'type' fields`);
     return null;
   }, [block.type, block.component]);
@@ -100,7 +100,7 @@ export const DynamicBlockRenderer: React.FC<DynamicBlockRendererProps> = ({
 
   return (
     <ErrorBoundary fallback={<ErrorFallback blockType={block.type} componentName={componentName} />}>
-      <DynamicComponent 
+      <DynamicComponent
         componentName={componentName}
         props={blockProps}
       />

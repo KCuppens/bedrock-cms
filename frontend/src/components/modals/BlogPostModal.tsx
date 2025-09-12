@@ -94,14 +94,14 @@ const BlogPostModal = ({ open, onOpenChange, mode, post, onSave }: BlogPostModal
         api.i18n.locales.list(),
         api.blog.tags.list()
       ]);
-      
+
       setCategories(categoriesResponse.results || categoriesResponse.data || []);
-      
+
       // Filter for only active locales
       const allLocales = localesResponse.results || localesResponse.data || [];
       const activeLocales = allLocales.filter((locale: any) => locale.is_active);
       setLocales(activeLocales);
-      
+
       setAvailableTags(tagsResponse.results || tagsResponse.data || []);
     } catch (error: any) {
       console.error('Failed to load options:', error);
@@ -129,15 +129,15 @@ const BlogPostModal = ({ open, onOpenChange, mode, post, onSave }: BlogPostModal
           }
         }
       }
-      
+
       const { author, ...postWithoutAuthor } = post;
-      
+
       // Convert ISO dates to datetime-local format for input fields
       const formatDateTimeForInput = (isoString: string | undefined) => {
         if (!isoString) return '';
         return new Date(isoString).toISOString().slice(0, 16);
       };
-      
+
       setFormData({
         ...postWithoutAuthor,
         content: post.content || '', // Ensure content is always a string
@@ -145,7 +145,7 @@ const BlogPostModal = ({ open, onOpenChange, mode, post, onSave }: BlogPostModal
         scheduledPublishAt: formatDateTimeForInput(post.scheduledPublishAt),
         scheduledUnpublishAt: formatDateTimeForInput(post.scheduledUnpublishAt)
       });
-      
+
       // Load selected image if social_image exists
       if (post.social_image) {
         loadSelectedImage(post.social_image);
@@ -212,7 +212,7 @@ const BlogPostModal = ({ open, onOpenChange, mode, post, onSave }: BlogPostModal
 
   const handleInputChange = (field: keyof BlogPost, value: any) => {
     setFormData(prev => ({ ...prev, [field]: value }));
-    
+
     // Auto-generate slug from title
     if (field === 'title' && value) {
       const slug = value.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
@@ -239,13 +239,13 @@ const BlogPostModal = ({ open, onOpenChange, mode, post, onSave }: BlogPostModal
 
   const handleSave = () => {
     const postData = { ...formData };
-    
+
     // Convert datetime-local to ISO string for API
     const formatDateTimeForAPI = (dateTimeLocal: string | undefined) => {
       if (!dateTimeLocal) return undefined;
       return new Date(dateTimeLocal).toISOString();
     };
-    
+
     // Handle scheduling fields
     if (formData.scheduledPublishAt) {
       postData.scheduledPublishAt = formatDateTimeForAPI(formData.scheduledPublishAt);
@@ -253,20 +253,20 @@ const BlogPostModal = ({ open, onOpenChange, mode, post, onSave }: BlogPostModal
     if (formData.scheduledUnpublishAt) {
       postData.scheduledUnpublishAt = formatDateTimeForAPI(formData.scheduledUnpublishAt);
     }
-    
+
     // Ensure content is included in the save data
     if (formData.content) {
       postData.content = formData.content;
     }
-    
+
     // Remove author field - backend sets it automatically
     delete postData.author;
-    
+
     // Include social_image if selected
     if (selectedImage) {
       postData.social_image = selectedImage.id;
     }
-    
+
     // Convert locale code to locale ID for the API
     if (formData.locale) {
       const selectedLocale = locales.find(locale => locale.code.toLowerCase() === formData.locale);
@@ -274,7 +274,7 @@ const BlogPostModal = ({ open, onOpenChange, mode, post, onSave }: BlogPostModal
         postData.locale = selectedLocale.id;
       }
     }
-    
+
     // Convert category name to category ID for the API
     if (formData.category) {
       const selectedCategory = categories.find(category => category.name === formData.category);
@@ -287,7 +287,7 @@ const BlogPostModal = ({ open, onOpenChange, mode, post, onSave }: BlogPostModal
     } else {
       postData.category = null;
     }
-    
+
     // Convert tag names to tag IDs for the API
     if (formData.tags && formData.tags.length > 0) {
       const tagIds = formData.tags.map(tagName => {
@@ -298,13 +298,13 @@ const BlogPostModal = ({ open, onOpenChange, mode, post, onSave }: BlogPostModal
     } else {
       postData.tags = [];
     }
-    
+
     onSave(postData);
     onOpenChange(false);
   };
 
-  const isValid = formData.title?.trim() && 
-    formData.slug?.trim() && 
+  const isValid = formData.title?.trim() &&
+    formData.slug?.trim() &&
     (formData.status !== 'scheduled' || formData.scheduledPublishAt);
 
   return (
@@ -315,8 +315,8 @@ const BlogPostModal = ({ open, onOpenChange, mode, post, onSave }: BlogPostModal
             {mode === 'add' ? 'Create New Blog Post' : 'Edit Blog Post'}
           </DialogTitle>
           <DialogDescription>
-            {mode === 'add' 
-              ? 'Add a new blog post to your collection.' 
+            {mode === 'add'
+              ? 'Add a new blog post to your collection.'
               : 'Make changes to your blog post here.'
             }
           </DialogDescription>
@@ -491,8 +491,8 @@ const BlogPostModal = ({ open, onOpenChange, mode, post, onSave }: BlogPostModal
               {formData.tags?.map(tag => (
                 <Badge key={tag} variant="secondary" className="flex items-center gap-1">
                   {tag}
-                  <X 
-                    className="w-3 h-3 cursor-pointer" 
+                  <X
+                    className="w-3 h-3 cursor-pointer"
                     onClick={() => removeTag(tag)}
                   />
                 </Badge>
@@ -531,7 +531,7 @@ const BlogPostModal = ({ open, onOpenChange, mode, post, onSave }: BlogPostModal
                 <CalendarIcon className="w-4 h-4" />
                 Scheduling Options
               </Label>
-              
+
               <div className="space-y-2">
                 <Label htmlFor="scheduledPublishAt">Publish Date & Time *</Label>
                 <Input
@@ -569,7 +569,7 @@ const BlogPostModal = ({ open, onOpenChange, mode, post, onSave }: BlogPostModal
                 <CalendarIcon className="w-4 h-4" />
                 Auto-Unpublish (Optional)
               </Label>
-              
+
               <div className="space-y-2">
                 <Label htmlFor="scheduledUnpublishAt">Unpublish Date & Time</Label>
                 <Input
@@ -597,7 +597,7 @@ const BlogPostModal = ({ open, onOpenChange, mode, post, onSave }: BlogPostModal
           </Button>
         </DialogFooter>
       </DialogContent>
-      
+
       {/* Media Picker Modal */}
       <MediaPicker
         open={showMediaPicker}

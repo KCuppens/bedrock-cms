@@ -8,9 +8,9 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Separator } from "@/components/ui/separator";
-import { 
-  Shield, 
-  Loader2, 
+import {
+  Shield,
+  Loader2,
   Save,
   AlertCircle,
   CheckCircle
@@ -26,7 +26,7 @@ const Profile = () => {
   const navigate = useNavigate();
   const { user, isLoading: authLoading } = useAuth();
   const { toast } = useToast();
-  
+
   // Profile form state
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
@@ -34,7 +34,7 @@ const Profile = () => {
   const [profileLoading, setProfileLoading] = useState(false);
   const [profileError, setProfileError] = useState("");
   const [profileSuccess, setProfileSuccess] = useState(false);
-  
+
   // Password form state
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
@@ -72,16 +72,16 @@ const Profile = () => {
           title: "Profile Updated",
           description: "Your profile has been updated successfully.",
         });
-        
+
         // Refresh user data after successful update
         setTimeout(() => {
           window.location.reload();
         }, 1500);
       }
     } catch (error: any) {
-      const errorMessage = error.response?.data?.email?.[0] || 
-                          error.response?.data?.detail || 
-                          error.message || 
+      const errorMessage = error.response?.data?.email?.[0] ||
+                          error.response?.data?.detail ||
+                          error.message ||
                           "Failed to update profile";
       setProfileError(errorMessage);
       toast({
@@ -141,21 +141,21 @@ const Profile = () => {
         setCurrentPassword("");
         setNewPassword("");
         setConfirmPassword("");
-        
+
         // Redirect to sign in after password change
         setTimeout(() => {
           navigate("/sign-in");
         }, 2000);
       }
     } catch (error: any) {
-      const errorMessage = 
+      const errorMessage =
         error.response?.data?.old_password?.[0] ||
         error.response?.data?.new_password2?.[0] ||
         error.response?.data?.non_field_errors?.[0] ||
         error.response?.data?.detail ||
         error.message ||
         "Failed to change password";
-      
+
       setPasswordError(errorMessage);
       toast({
         title: "Password Change Failed",
@@ -193,10 +193,10 @@ const Profile = () => {
     <div className="min-h-screen">
       <div className="flex">
         <Sidebar />
-        
+
         <div className="flex-1 flex flex-col ml-72">
           <TopNavbar />
-          
+
           <main className="flex-1 p-8">
             <div className="max-w-5xl mx-auto">
               {/* Header */}

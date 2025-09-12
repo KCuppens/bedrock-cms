@@ -10,7 +10,7 @@ This guide provides actionable steps to optimize Bedrock CMS performance for pro
   ```bash
   # Install Redis
   docker run -d -p 6379:6379 --name redis redis:alpine
-  
+
   # Verify connection
   redis-cli ping  # Should return PONG
   ```
@@ -19,10 +19,10 @@ This guide provides actionable steps to optimize Bedrock CMS performance for pro
   ```python
   # Create migration
   python manage.py makemigrations --empty your_app_name
-  
+
   # Add to migration file:
   from django.db import migrations
-  
+
   class Migration(migrations.Migration):
       operations = [
           migrations.RunSQL("CREATE INDEX idx_page_path ON cms_page(path);"),
@@ -50,7 +50,7 @@ This guide provides actionable steps to optimize Bedrock CMS performance for pro
 ### 🔧 Performance Optimizations (Should Do)
 
 - [ ] **Implement Query Optimization**
-- [ ] **Add API Pagination** 
+- [ ] **Add API Pagination**
 - [ ] **Setup CDN for Static Files**
 - [ ] **Configure Database Connection Pooling**
 - [ ] **Implement Application-Level Caching**
@@ -121,7 +121,7 @@ SESSION_CACHE_ALIAS = 'default'
 from django.db import migrations
 
 class Migration(migrations.Migration):
-    
+
     dependencies = [
         ('cms', '0001_initial'),
         ('blog', '0001_initial'),
@@ -142,8 +142,8 @@ class Migration(migrations.Migration):
             "CREATE INDEX CONCURRENTLY idx_page_status_locale ON cms_page(status, locale_id) WHERE status = 'published';",
             reverse_sql="DROP INDEX IF EXISTS idx_page_status_locale;"
         ),
-        
-        # Blog performance indexes  
+
+        # Blog performance indexes
         migrations.RunSQL(
             "CREATE UNIQUE INDEX CONCURRENTLY idx_blogpost_slug_locale ON blog_blogpost(slug, locale_id);",
             reverse_sql="DROP INDEX IF EXISTS idx_blogpost_slug_locale;"
@@ -152,13 +152,13 @@ class Migration(migrations.Migration):
             "CREATE INDEX CONCURRENTLY idx_blogpost_published ON blog_blogpost(published_at) WHERE status = 'published';",
             reverse_sql="DROP INDEX IF EXISTS idx_blogpost_published;"
         ),
-        
+
         # Media performance indexes
         migrations.RunSQL(
             "CREATE UNIQUE INDEX CONCURRENTLY idx_asset_checksum ON media_asset(checksum);",
             reverse_sql="DROP INDEX IF EXISTS idx_asset_checksum;"
         ),
-        
+
         # Translation performance indexes
         migrations.RunSQL(
             "CREATE INDEX CONCURRENTLY idx_translation_key_locale ON i18n_translationunit(key, target_locale, status);",
@@ -181,7 +181,7 @@ def get_published_pages_optimized():
         'id', 'title', 'slug', 'path', 'parent_id', 'locale_id'
     )
 
-# Optimized Blog queries  
+# Optimized Blog queries
 def get_blog_posts_optimized():
     return BlogPost.objects.select_related(
         'category', 'locale', 'hero_asset'
@@ -204,11 +204,11 @@ def get_navigation_tree_cached(locale_code):
     """Get navigation tree with caching."""
     cache_key = f'nav_tree_{locale_code}'
     tree = cache.get(cache_key)
-    
+
     if tree is None:
         tree = build_navigation_tree(locale_code)
         cache.set(cache_key, tree, 300)  # 5 minutes
-    
+
     return tree
 
 def invalidate_navigation_cache():
@@ -266,19 +266,19 @@ class LargePagination(PageNumberPagination):
 # apps/cms/serializers.py
 class PageListSerializer(serializers.ModelSerializer):
     """Optimized serializer for page lists."""
-    
+
     class Meta:
         model = Page
         fields = ['id', 'title', 'slug', 'path', 'status', 'updated_at']
-        
+
 class PageDetailSerializer(serializers.ModelSerializer):
     """Full serializer for page details."""
-    
+
     class Meta:
         model = Page
         fields = '__all__'
 
-# apps/cms/views.py  
+# apps/cms/views.py
 class PageViewSet(viewsets.ModelViewSet):
     def get_serializer_class(self):
         if self.action == 'list':
@@ -311,19 +311,19 @@ MEDIA_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/media/'
 server {
     listen 80;
     server_name example.com;
-    
+
     location /static/ {
         alias /path/to/static/files/;
         expires 1y;
         add_header Cache-Control "public, immutable";
     }
-    
+
     location /media/ {
         alias /path/to/media/files/;
         expires 1y;
         add_header Cache-Control "public";
     }
-    
+
     location / {
         proxy_pass http://127.0.0.1:8000;
         proxy_set_header Host $host;
@@ -397,12 +397,12 @@ class PerformanceMiddleware:
         start_time = time.time()
         response = self.get_response(request)
         duration = time.time() - start_time
-        
+
         if duration > 1.0:  # Log slow requests
             logger.warning(
                 f'Slow request: {request.path} took {duration:.2f}s'
             )
-        
+
         response['X-Response-Time'] = f'{duration:.3f}s'
         return response
 ```
@@ -430,15 +430,15 @@ from locust import HttpUser, task, between
 
 class CmsUser(HttpUser):
     wait_time = between(1, 3)
-    
+
     @task(3)
     def view_pages(self):
         self.client.get("/api/pages/")
-    
+
     @task(2)
     def view_blog(self):
         self.client.get("/api/content/blog.blogpost/")
-    
+
     @task(1)
     def search(self):
         self.client.get("/api/search/?q=test")
@@ -455,7 +455,7 @@ locust -f performance_test.py --host=http://localhost:8000 -u 10 -r 2
 
 **API Performance:**
 - [ ] Average response time < 100ms
-- [ ] 95th percentile response time < 500ms  
+- [ ] 95th percentile response time < 500ms
 - [ ] Error rate < 0.1%
 
 **Database Performance:**
@@ -503,15 +503,15 @@ locust -f performance_test.py --host=http://localhost:8000 -u 10 -r 2
 **2. High Database Load**
 ```sql
 -- Check slow queries
-SELECT query, mean_time, calls 
-FROM pg_stat_statements 
-WHERE mean_time > 100 
+SELECT query, mean_time, calls
+FROM pg_stat_statements
+WHERE mean_time > 100
 ORDER BY mean_time DESC;
 
 -- Check missing indexes
-SELECT schemaname, tablename, attname, n_distinct, correlation 
-FROM pg_stats 
-WHERE schemaname = 'public' 
+SELECT schemaname, tablename, attname, n_distinct, correlation
+FROM pg_stats
+WHERE schemaname = 'public'
 AND n_distinct > 100;
 ```
 

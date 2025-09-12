@@ -11,11 +11,11 @@ interface BlogDetailProps {
   show_reading_time?: boolean;
   show_category?: boolean;
   layout?: 'article' | 'minimal' | 'magazine';
-  
+
   // System props
   isEditing?: boolean;
   onChange?: (props: any) => void;
-  
+
   // Injected content (runtime only)
   __injectedContent?: BlogPost;
 }
@@ -62,11 +62,11 @@ const BlogDetail: React.FC<BlogDetailProps> = ({
               <p>Current Layout: {layout}</p>
             </div>
           </div>
-          
+
           {/* Settings panel */}
           <div className="p-4 bg-white rounded border border-purple-200">
             <h4 className="font-medium mb-3 text-gray-900">Display Settings</h4>
-            
+
             {/* Layout selector */}
             <div className="mb-4">
               <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -82,7 +82,7 @@ const BlogDetail: React.FC<BlogDetailProps> = ({
                 <option value="magazine">Magazine</option>
               </select>
             </div>
-            
+
             {/* Display options */}
             <div className="space-y-2">
               <label className="flex items-center gap-2 text-sm">
@@ -136,7 +136,7 @@ const BlogDetail: React.FC<BlogDetailProps> = ({
       </div>
     );
   }
-  
+
   // No content injected (loading or error state)
   if (!__injectedContent) {
     return (
@@ -151,12 +151,12 @@ const BlogDetail: React.FC<BlogDetailProps> = ({
       </div>
     );
   }
-  
+
   // Render actual blog post
   const post = __injectedContent;
   const tags = post.tag_data || post.tags || [];
   const category = post.category_data || post.category;
-  
+
   // Minimal layout
   if (layout === 'minimal') {
     return (
@@ -166,7 +166,7 @@ const BlogDetail: React.FC<BlogDetailProps> = ({
       </article>
     );
   }
-  
+
   // Magazine layout
   if (layout === 'magazine') {
     return (
@@ -195,11 +195,11 @@ const BlogDetail: React.FC<BlogDetailProps> = ({
               )}
             </div>
           </div>
-          
+
           <div className="lg:col-span-10">
             <header className="mb-8">
               {show_category && category && (
-                <Badge 
+                <Badge
                   className="mb-4"
                   style={{ backgroundColor: category.color || '#6366f1' }}
                 >
@@ -211,12 +211,12 @@ const BlogDetail: React.FC<BlogDetailProps> = ({
                 <p className="text-xl text-gray-600">{post.excerpt}</p>
               )}
             </header>
-            
-            <div 
+
+            <div
               className="prose prose-lg max-w-none mb-8"
               dangerouslySetInnerHTML={{ __html: post.content }}
             />
-            
+
             {show_tags && tags.length > 0 && (
               <footer className="border-t pt-6">
                 <div className="flex flex-wrap gap-2">
@@ -233,15 +233,15 @@ const BlogDetail: React.FC<BlogDetailProps> = ({
       </article>
     );
   }
-  
+
   // Default article layout
   return (
     <article className="blog-detail blog-detail--article">
       <header className="mb-8">
         {show_category && category && (
-          <Badge 
+          <Badge
             className="mb-4"
-            style={{ 
+            style={{
               backgroundColor: category.color ? `${category.color}20` : '#6366f120',
               color: category.color || '#6366f1',
               borderColor: category.color || '#6366f1'
@@ -250,13 +250,13 @@ const BlogDetail: React.FC<BlogDetailProps> = ({
             {category.name}
           </Badge>
         )}
-        
+
         <h1 className="text-4xl font-bold mb-4">{post.title}</h1>
-        
+
         {post.excerpt && (
           <p className="text-xl text-gray-600 mb-4">{post.excerpt}</p>
         )}
-        
+
         <div className="flex flex-wrap items-center gap-4 text-gray-600">
           {show_author && post.author_name && (
             <div className="flex items-center gap-2">
@@ -264,7 +264,7 @@ const BlogDetail: React.FC<BlogDetailProps> = ({
               <span>{post.author_name}</span>
             </div>
           )}
-          
+
           {show_date && post.published_at && (
             <div className="flex items-center gap-2">
               <Calendar className="w-4 h-4" />
@@ -277,7 +277,7 @@ const BlogDetail: React.FC<BlogDetailProps> = ({
               </time>
             </div>
           )}
-          
+
           {show_reading_time && post.reading_time && (
             <div className="flex items-center gap-2">
               <Clock className="w-4 h-4" />
@@ -286,12 +286,12 @@ const BlogDetail: React.FC<BlogDetailProps> = ({
           )}
         </div>
       </header>
-      
-      <div 
+
+      <div
         className="prose prose-lg max-w-none mb-8"
         dangerouslySetInnerHTML={{ __html: post.content }}
       />
-      
+
       {show_tags && tags.length > 0 && (
         <footer className="border-t pt-6">
           <div className="flex flex-wrap gap-2">

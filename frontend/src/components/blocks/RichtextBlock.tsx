@@ -16,7 +16,7 @@ const RichtextBlock: React.FC<RichtextBlockProps> = ({ props }) => {
   }
 
   return (
-    <div 
+    <div
       className={`richtext-block prose prose-lg max-w-none ${className}`.trim()}
       dangerouslySetInnerHTML={{ __html: content }}
     />

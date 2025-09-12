@@ -18,54 +18,54 @@ const Index = memo(() => {
   const { data: queueSummary, isLoading: queueLoading } = useTranslationQueueSummary();
   const navigate = useNavigate();
   const { t } = useTranslation();
-  
+
   // Delay loading translation data to reduce initial memory usage
   useEffect(() => {
     const timer = setTimeout(() => setShowTranslations(true), 1000);
     return () => clearTimeout(timer);
   }, []);
-  
+
   return (
     <div className="min-h-screen">
       <div className="flex">
         <Sidebar />
-        
+
         <div className="flex-1 flex flex-col ml-72">
           <TopNavbar />
-          
+
           <main className="flex-1 p-8">
             <div className="max-w-7xl mx-auto">
             {/* Header with Welcome and Quick Actions */}
             <div className="mb-8">
               <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-6">
                 <h1 className="text-3xl font-bold text-foreground">{t('dashboard.index.welcome', 'Welcome back')}, {userName}</h1>
-                
+
                 <div className="grid grid-cols-2 gap-3">
-                  <Button 
+                  <Button
                     size="sm"
                     onClick={() => navigate('/dashboard/pages?action=new')}
                   >
                     <Plus className="w-4 h-4 mr-2" />
                     {t('dashboard.index.new_page', 'New Page')}
                   </Button>
-                  <Button 
-                    variant="outline" 
+                  <Button
+                    variant="outline"
                     size="sm"
                     onClick={() => navigate('/dashboard/media')}
                   >
                     <Upload className="w-4 h-4 mr-2" />
                     {t('dashboard.index.upload_media', 'Upload Media')}
                   </Button>
-                  <Button 
-                    variant="outline" 
+                  <Button
+                    variant="outline"
                     size="sm"
                     onClick={() => navigate('/dashboard/translations/locales?action=add')}
                   >
                     <Globe className="w-4 h-4 mr-2" />
                     {t('dashboard.index.add_locale', 'Add Locale')}
                   </Button>
-                  <Button 
-                    variant="outline" 
+                  <Button
+                    variant="outline"
                     size="sm"
                     onClick={() => navigate('/dashboard/users-roles?action=invite')}
                   >
@@ -85,7 +85,7 @@ const Index = memo(() => {
 
             {/* Dashboard Cards */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              
+
               {/* My Work */}
               <Card>
                 <CardHeader>
@@ -175,8 +175,8 @@ const Index = memo(() => {
                             </span>
                           </div>
                           <div className="w-full bg-muted rounded-full h-2">
-                            <div 
-                              className="bg-primary h-2 rounded-full transition-all duration-300" 
+                            <div
+                              className="bg-primary h-2 rounded-full transition-all duration-300"
                               style={{ width: `${queueSummary.overall.completion_percentage}%` }}
                             ></div>
                           </div>
@@ -188,7 +188,7 @@ const Index = memo(() => {
                           )}
                         </div>
                       )}
-                      
+
                       {/* Per-locale breakdown */}
                       <div className="space-y-3">
                         {queueSummary.locales.slice(0, 3).map((locale) => (
@@ -210,7 +210,7 @@ const Index = memo(() => {
                               </div>
                             </div>
                             <div className="w-full bg-muted rounded-full h-2">
-                              <div 
+                              <div
                                 className={`h-2 rounded-full transition-all duration-300 ${
                                   locale.completion_percentage >= 90 ? 'bg-green-500' :
                                   locale.completion_percentage >= 70 ? 'bg-yellow-500' :
@@ -231,7 +231,7 @@ const Index = memo(() => {
                           </div>
                         ))}
                       </div>
-                      
+
                       {/* Show message if no data */}
                       {queueSummary.locales.length === 0 && (
                         <div className="text-center py-4">
@@ -239,12 +239,12 @@ const Index = memo(() => {
                           <p className="text-sm text-muted-foreground">{t('dashboard.index.no_translations', 'No translations in queue')}</p>
                         </div>
                       )}
-                      
+
                       {/* View Queue button */}
                       {queueSummary.overall.total > 0 && (
-                        <Button 
-                          variant="outline" 
-                          size="sm" 
+                        <Button
+                          variant="outline"
+                          size="sm"
                           className="w-full"
                           onClick={() => navigate('/dashboard/translations/queue')}
                         >

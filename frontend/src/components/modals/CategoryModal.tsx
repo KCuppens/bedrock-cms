@@ -45,7 +45,7 @@ const CategoryModal = ({ open, onOpenChange, mode, category, onSave }: CategoryM
 
   const handleInputChange = (field: keyof CategoryCreateRequest, value: any) => {
     setFormData(prev => ({ ...prev, [field]: value }));
-    
+
     // Auto-generate slug from name
     if (field === 'name' && value) {
       const slug = value.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
@@ -68,8 +68,8 @@ const CategoryModal = ({ open, onOpenChange, mode, category, onSave }: CategoryM
             {mode === 'add' ? 'Create New Category' : 'Edit Category'}
           </DialogTitle>
           <DialogDescription>
-            {mode === 'add' 
-              ? 'Add a new category to organize your content.' 
+            {mode === 'add'
+              ? 'Add a new category to organize your content.'
               : 'Make changes to your category here.'
             }
           </DialogDescription>

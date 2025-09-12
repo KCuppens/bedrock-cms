@@ -7,7 +7,6 @@ from django.contrib.auth.models import Group, Permission
 from django.core.exceptions import ValidationError
 from django.test import TestCase, TransactionTestCase
 from django.urls import reverse
-
 from rest_framework import status
 from rest_framework.test import APIClient, APITestCase
 

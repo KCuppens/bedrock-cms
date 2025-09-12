@@ -8,8 +8,8 @@ interface FooterProps {
   homeUrl?: string;
 }
 
-const Footer: React.FC<FooterProps> = ({ 
-  footerItems, 
+const Footer: React.FC<FooterProps> = ({
+  footerItems,
   siteName = 'Your Site',
   homeUrl = '/'
 }) => {
@@ -21,8 +21,8 @@ const Footer: React.FC<FooterProps> = ({
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           {/* Site Info */}
           <div className="col-span-1 md:col-span-2">
-            <Link 
-              to={homeUrl} 
+            <Link
+              to={homeUrl}
               className="text-xl font-bold text-white hover:text-gray-300"
             >
               {siteName}
@@ -41,7 +41,7 @@ const Footer: React.FC<FooterProps> = ({
               <ul className="mt-4 space-y-2">
                 {footerItems.map((item) => (
                   <li key={item.id}>
-                    <Link 
+                    <Link
                       to={item.path}
                       className="text-sm text-gray-400 hover:text-white transition-colors"
                     >
@@ -72,18 +72,18 @@ const Footer: React.FC<FooterProps> = ({
             <p className="text-sm text-gray-400">
               © {currentYear} {siteName}. All rights reserved.
             </p>
-            
+
             {/* Additional Footer Links */}
             <div className="mt-4 md:mt-0">
               <div className="flex space-x-6">
-                <Link 
-                  to="/privacy" 
+                <Link
+                  to="/privacy"
                   className="text-sm text-gray-400 hover:text-white transition-colors"
                 >
                   Privacy Policy
                 </Link>
-                <Link 
-                  to="/terms" 
+                <Link
+                  to="/terms"
                   className="text-sm text-gray-400 hover:text-white transition-colors"
                 >
                   Terms of Service

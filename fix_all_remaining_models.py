@@ -3,33 +3,32 @@
 
 import re
 import os
-from pathlib import Path
 
 def fix_model_files():
     """Fix Django model field type annotations in all remaining app model files"""
-    
+
     # Files to process
     files = [
         "backend/apps/cms/models.py",
-        "backend/apps/files/models.py", 
+        "backend/apps/files/models.py",
         "backend/apps/search/models.py",
         "backend/apps/core/models.py",
     ]
-    
+
     # Files to add ignore-errors comment to (complex files with forward reference issues)
     ignore_files = [
         "backend/apps/cms/versioning.py",
-        "backend/apps/cms/presentation.py", 
+        "backend/apps/cms/presentation.py",
         "backend/apps/core/cache.py",
         "backend/apps/registry/registry.py",
     ]
-    
+
     # Add ignore-errors to complex files
     for file_path in ignore_files:
         if os.path.exists(file_path):
             with open(file_path, 'r', encoding='utf-8') as f:
                 content = f.read()
-            
+
             if '# mypy: ignore-errors' not in content:
                 # Find first docstring or comment and add ignore after it
                 lines = content.split('\n')
@@ -50,31 +49,31 @@ def fix_model_files():
                         # First non-comment line
                         insert_pos = i
                         break
-                
+
                 lines.insert(insert_pos, '# mypy: ignore-errors')
                 content = '\n'.join(lines)
-                
+
                 with open(file_path, 'w', encoding='utf-8') as f:
                     f.write(content)
-                
+
                 print(f"Added mypy ignore to {file_path}")
-    
+
     # Fix model files
     for file_path in files:
         if not os.path.exists(file_path):
             print(f"File not found: {file_path}")
             continue
-            
+
         with open(file_path, 'r', encoding='utf-8') as f:
             content = f.read()
-        
+
         # Add necessary imports if not present
         if 'from django.db.models import' not in content:
             # Find the import section and add our imports
             import_pattern = r'(from django\.db import models.*\n)'
             replacement = r'\1from django.db.models import (\n    CharField, TextField, BooleanField, DateTimeField, ForeignKey, \n    ManyToManyField, ImageField, PositiveIntegerField, UUIDField, SlugField, \n    AutoField, OneToOneField, URLField, GenericIPAddressField, IntegerField\n)\n'
             content = re.sub(import_pattern, replacement, content)
-        
+
         # Define field patterns and their type annotations
         field_patterns = [
             (r'(\s+)(\w+)\s*=\s*models\.CharField\(', r'\1\2: CharField = models.CharField('),
@@ -93,22 +92,22 @@ def fix_model_files():
             (r'(\s+)(\w+)\s*=\s*models\.GenericIPAddressField\(', r'\1\2: GenericIPAddressField = models.GenericIPAddressField('),
             (r'(\s+)(\w+)\s*=\s*models\.IntegerField\(', r'\1\2: IntegerField = models.IntegerField('),
         ]
-        
+
         # Apply all patterns
         for pattern, replacement in field_patterns:
             content = re.sub(pattern, replacement, content, flags=re.MULTILINE)
-        
+
         # Fix duplicate annotations if any exist
         content = re.sub(
             r'(\w+):\s*(\w+):\s*(\w+)\s*=',
             r'\1: \2 =',
             content
         )
-        
+
         # Write back the fixed content
         with open(file_path, 'w', encoding='utf-8') as f:
             f.write(content)
-        
+
         print(f"Fixed Django model field type annotations in {file_path}")
 
 if __name__ == "__main__":

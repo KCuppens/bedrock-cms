@@ -1,6 +1,7 @@
 """Global pytest configuration and fixtures"""
 
 import os
+
 import django
 from django.conf import settings
 

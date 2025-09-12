@@ -5,10 +5,10 @@ interface PlaceholderContent {
   [key: string]: any;
 }
 
-const PlaceholderBlock: React.FC<BlockComponentProps<PlaceholderContent>> = ({ 
+const PlaceholderBlock: React.FC<BlockComponentProps<PlaceholderContent>> = ({
   content = {},
   isEditing = false,
-  blockType = 'placeholder' 
+  blockType = 'placeholder'
 }) => {
   return (
     <div className="p-8 border-2 border-dashed border-gray-300 rounded-lg bg-gray-50">

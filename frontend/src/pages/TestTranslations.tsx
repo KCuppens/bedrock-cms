@@ -135,7 +135,7 @@ export default function TestTranslations() {
                       {testCases.map(({ key, expected }) => {
                         const actual = t(key);
                         const isCorrect = actual === expected || (!expected && actual === key);
-                        
+
                         return (
                           <div key={key} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
                             <div className="flex-1">
@@ -174,7 +174,7 @@ export default function TestTranslations() {
                         Test Key
                       </Button>
                     </div>
-                    
+
                     <div className="flex gap-2">
                       <Button onClick={handleRegisterKey} variant="outline">
                         <Code className="h-4 w-4 mr-2" />
@@ -253,7 +253,7 @@ export default function TestTranslations() {
                     <RefreshCw className="h-4 w-4 mr-2" />
                     Reload Page
                   </Button>
-                  <Button 
+                  <Button
                     onClick={() => {
                       console.log('Translation Registry:', (window as any).TRANSLATION_REGISTRY);
                       alert('Check console for translation registry');

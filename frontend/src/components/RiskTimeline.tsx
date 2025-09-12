@@ -29,17 +29,17 @@ const RiskTimeline = () => {
         <div className="h-64 w-full">
           <ResponsiveContainer width="100%" height="100%">
             <LineChart data={data}>
-              <XAxis 
-                dataKey="name" 
+              <XAxis
+                dataKey="name"
                 axisLine={false}
                 tickLine={false}
                 tick={{ fontSize: 12, fill: 'hsl(var(--muted-foreground))' }}
               />
               <YAxis hide />
-              <Line 
-                type="monotone" 
-                dataKey="value" 
-                stroke="hsl(var(--primary))" 
+              <Line
+                type="monotone"
+                dataKey="value"
+                stroke="hsl(var(--primary))"
                 strokeWidth={3}
                 dot={false}
                 activeDot={{ r: 4, fill: "hsl(var(--primary))" }}

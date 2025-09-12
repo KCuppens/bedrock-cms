@@ -1,7 +1,6 @@
 import logging
 
 from django.core.files.storage import default_storage
-
 from drf_spectacular.utils import extend_schema, extend_schema_view
 from rest_framework import permissions, status, viewsets
 from rest_framework.parsers import FormParser, MultiPartParser

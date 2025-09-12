@@ -9,7 +9,7 @@ import logging
 import time
 from collections.abc import Callable
 from enum import Enum
-from typing import Any
+from typing import Any, Dict, Optional, Tuple, Type, Union
 
 from django.core.cache import cache
 
@@ -39,7 +39,7 @@ class CircuitBreaker:
         name: str,
         failure_threshold: int = 5,
         recovery_timeout: int = 60,
-        expected_exception: type[Exception] | tuple[type[Exception], ...] = Exception,
+        expected_exception: Union[Type[Exception], Tuple[Type[Exception], ...]] = Exception,
         success_threshold: int = 2,
     ):
         """
@@ -126,7 +126,7 @@ class CircuitBreaker:
             self._on_success()
             return result
 
-        except self.expected_exception as e:  # type: ignore[misc]
+        except self.expected_exception as e:
             self._on_failure()
             raise e
 
@@ -202,12 +202,12 @@ class CircuitOpenException(Exception):
 
 
 def circuit_breaker(
-    name: str | None = None,
+    name: Optional[str] = None,
     failure_threshold: int = 5,
     recovery_timeout: int = 60,
-    expected_exception: type[Exception] | tuple[type[Exception], ...] = Exception,
+    expected_exception: Union[Type[Exception], Tuple[Type[Exception], ...]] = Exception,
     success_threshold: int = 2,
-    fallback: Callable | None = None,
+    fallback: Optional[Callable] = None,
 ):
     """
     Decorator to add circuit breaker to functions.
@@ -294,7 +294,7 @@ external_api_circuit_breaker = functools.partial(
 class CircuitBreakerManager:
     """Manager for all circuit breakers in the system"""
 
-    _breakers: dict[str, CircuitBreaker] = {}
+    _breakers: Dict[str, CircuitBreaker] = {}
 
     @classmethod
     def register(cls, breaker: CircuitBreaker):
@@ -302,12 +302,12 @@ class CircuitBreakerManager:
         cls._breakers[breaker.name] = breaker
 
     @classmethod
-    def get(cls, name: str) -> CircuitBreaker | None:
+    def get(cls, name: str) -> Optional[CircuitBreaker]:
         """Get a circuit breaker by name"""
         return cls._breakers.get(name)
 
     @classmethod
-    def get_all_status(cls) -> dict:
+    def get_all_status(cls) -> Dict[str, Dict]:
         """Get status of all circuit breakers"""
         return {name: breaker.get_status() for name, breaker in cls._breakers.items()}
 

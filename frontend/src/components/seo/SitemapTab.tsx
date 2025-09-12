@@ -6,10 +6,10 @@ import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Skeleton } from '@/components/ui/skeleton';
-import { 
-  Globe, 
-  RefreshCw, 
-  Download, 
+import {
+  Globe,
+  RefreshCw,
+  Download,
   ExternalLink,
   Settings,
   FileText,
@@ -49,7 +49,7 @@ const SitemapTab = () => {
 
   // Filter only active locales
   const activeLocales = locales?.filter(locale => locale.is_active) || [];
-  
+
   // Debug logging
   console.log('🔍 SitemapTab Debug:', {
     locales,
@@ -74,7 +74,7 @@ const SitemapTab = () => {
 
   const handleRegenerate = async (localeCode: string) => {
     setRegenerating(prev => [...prev, localeCode]);
-    
+
     // Simulate API call
     setTimeout(() => {
       setRegenerating(prev => prev.filter(code => code !== localeCode));
@@ -88,7 +88,7 @@ const SitemapTab = () => {
   const handleRegenerateAll = async () => {
     const codes = activeLocales.map(l => l.code);
     setRegenerating(codes);
-    
+
     setTimeout(() => {
       setRegenerating([]);
       toast({
@@ -157,8 +157,8 @@ const SitemapTab = () => {
           <p className="text-muted-foreground text-center max-w-md">
             No active locales found. Please activate at least one locale to generate sitemaps.
           </p>
-          <Button 
-            variant="outline" 
+          <Button
+            variant="outline"
             className="mt-4"
             onClick={() => window.location.href = '/dashboard/translations/locales'}
           >
@@ -195,7 +195,7 @@ const SitemapTab = () => {
             </div>
             <div className="space-y-1">
               <div className="text-sm font-medium">
-                {sitemapData[0]?.lastModified 
+                {sitemapData[0]?.lastModified
                   ? new Date(sitemapData[0].lastModified).toLocaleDateString()
                   : 'Never'}
               </div>
@@ -203,14 +203,14 @@ const SitemapTab = () => {
             </div>
           </div>
           <div className="flex gap-2">
-            <Button 
+            <Button
               onClick={handleRegenerateAll}
               disabled={regenerating.length > 0}
             >
               <RefreshCw className={`w-4 h-4 mr-2 ${regenerating.length > 0 ? 'animate-spin' : ''}`} />
               Regenerate All
             </Button>
-            <Button 
+            <Button
               variant="outline"
               onClick={() => window.open('/robots.txt', '_blank')}
             >
@@ -220,12 +220,12 @@ const SitemapTab = () => {
           </div>
         </CardContent>
       </Card>
-      
+
       {/* Locale Sitemaps Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
         {sitemapData.map((sitemap) => {
           const isRegenerating = regenerating.includes(sitemap.locale.code);
-          
+
           return (
             <Card key={sitemap.locale.code} className="relative">
               <CardHeader>
@@ -235,7 +235,7 @@ const SitemapTab = () => {
                     <span className="truncate">{sitemap.locale.native_name}</span>
                     <span className="text-xs text-muted-foreground">({sitemap.locale.code})</span>
                   </span>
-                  <Badge 
+                  <Badge
                     variant={getStatusVariant(isRegenerating ? 'generating' : sitemap.status)}
                     className="flex items-center gap-1"
                   >
@@ -264,16 +264,16 @@ const SitemapTab = () => {
                       </div>
                     </div>
                     <div className="flex gap-2">
-                      <Button 
-                        size="sm" 
+                      <Button
+                        size="sm"
                         variant="outline"
                         onClick={() => handleViewSitemap(sitemap.url)}
                         title="View sitemap"
                       >
                         <ExternalLink className="w-4 h-4" />
                       </Button>
-                      <Button 
-                        size="sm" 
+                      <Button
+                        size="sm"
                         variant="outline"
                         onClick={() => handleRegenerate(sitemap.locale.code)}
                         disabled={isRegenerating}
@@ -281,8 +281,8 @@ const SitemapTab = () => {
                       >
                         <RefreshCw className={`w-4 h-4 ${isRegenerating ? 'animate-spin' : ''}`} />
                       </Button>
-                      <Button 
-                        size="sm" 
+                      <Button
+                        size="sm"
                         variant="outline"
                         onClick={() => handleDownloadSitemap(sitemap.url, sitemap.locale.code)}
                         title="Download sitemap"
@@ -296,7 +296,7 @@ const SitemapTab = () => {
                     <p className="text-sm text-muted-foreground mb-3">
                       Sitemap not generated yet
                     </p>
-                    <Button 
+                    <Button
                       size="sm"
                       onClick={() => handleRegenerate(sitemap.locale.code)}
                       disabled={isRegenerating}
@@ -328,10 +328,10 @@ const SitemapTab = () => {
                 Automatically regenerate sitemaps on schedule
               </span>
             </Label>
-            <Switch 
+            <Switch
               id="auto-generate"
               checked={sitemapSettings.autoGenerate}
-              onCheckedChange={(checked) => 
+              onCheckedChange={(checked) =>
                 setSitemapSettings(prev => ({ ...prev, autoGenerate: checked }))
               }
             />
@@ -340,9 +340,9 @@ const SitemapTab = () => {
           {sitemapSettings.autoGenerate && (
             <div className="space-y-2 pl-6 border-l-2 border-muted">
               <Label htmlFor="frequency">Generation Frequency</Label>
-              <Select 
+              <Select
                 value={sitemapSettings.generateFrequency}
-                onValueChange={(value) => 
+                onValueChange={(value) =>
                   setSitemapSettings(prev => ({ ...prev, generateFrequency: value }))
                 }
               >
@@ -366,10 +366,10 @@ const SitemapTab = () => {
                 Add alternate language links for multi-locale pages
               </span>
             </Label>
-            <Switch 
+            <Switch
               id="alternates"
               checked={sitemapSettings.includeAlternates}
-              onCheckedChange={(checked) => 
+              onCheckedChange={(checked) =>
                 setSitemapSettings(prev => ({ ...prev, includeAlternates: checked }))
               }
             />
@@ -378,9 +378,9 @@ const SitemapTab = () => {
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label htmlFor="priority">Default Priority</Label>
-              <Select 
+              <Select
                 value={sitemapSettings.defaultPriority}
-                onValueChange={(value) => 
+                onValueChange={(value) =>
                   setSitemapSettings(prev => ({ ...prev, defaultPriority: value }))
                 }
               >
@@ -405,9 +405,9 @@ const SitemapTab = () => {
 
             <div className="space-y-2">
               <Label htmlFor="changefreq">Default Change Frequency</Label>
-              <Select 
+              <Select
                 value={sitemapSettings.defaultChangefreq}
-                onValueChange={(value) => 
+                onValueChange={(value) =>
                   setSitemapSettings(prev => ({ ...prev, defaultChangefreq: value }))
                 }
               >

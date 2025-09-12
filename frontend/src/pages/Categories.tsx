@@ -66,7 +66,7 @@ const Categories = memo(() => {
   const [editingCategory, setEditingCategory] = useState<Category | null>(null);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [categoryToDelete, setCategoryToDelete] = useState<Category | null>(null);
-  
+
   // Data states
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
@@ -139,7 +139,7 @@ const Categories = memo(() => {
   }, [categoryToDelete, loadCategories]);
 
   // Memoize category cards to avoid re-renders
-  const categoryCards = useMemo(() => 
+  const categoryCards = useMemo(() =>
     categories.map((category) => (
       <CategoryCard
         key={category.id}

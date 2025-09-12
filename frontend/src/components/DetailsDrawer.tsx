@@ -49,14 +49,14 @@ interface DetailsDrawerProps {
 
 export const DetailsDrawer = ({ page, isOpen, onClose, onPageUpdate }: DetailsDrawerProps) => {
   const [activeTab, setActiveTab] = useState("page");
-  
+
   // Local state for form fields
   const [localPageData, setLocalPageData] = useState<PageData>(page);
   const [isSaving, setIsSaving] = useState(false);
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
-  
+
   const { toast } = useToast();
-  
+
   // Update local state when page prop changes
   useEffect(() => {
     setLocalPageData(page);
@@ -80,7 +80,7 @@ export const DetailsDrawer = ({ page, isOpen, onClose, onPageUpdate }: DetailsDr
   // Manual save
   const saveNow = async () => {
     if (!localPageData.id) return;
-    
+
     setIsSaving(true);
     try {
       await api.cms.pages.update(parseInt(localPageData.id), {
@@ -88,10 +88,10 @@ export const DetailsDrawer = ({ page, isOpen, onClose, onPageUpdate }: DetailsDr
         slug: localPageData.slug,
         seo: localPageData.seo,
       });
-      
+
       setHasUnsavedChanges(false);
       onPageUpdate(localPageData);
-      
+
       toast({
         title: "Saved",
         description: "Page details saved successfully",
@@ -139,9 +139,9 @@ export const DetailsDrawer = ({ page, isOpen, onClose, onPageUpdate }: DetailsDr
                     Saving...
                   </Badge>
                 )}
-                <Button 
-                  size="sm" 
-                  onClick={saveChanges} 
+                <Button
+                  size="sm"
+                  onClick={saveChanges}
                   disabled={isSaving || !hasUnsavedChanges}
                   variant={hasUnsavedChanges ? "default" : "outline"}
                 >
@@ -280,7 +280,7 @@ export const DetailsDrawer = ({ page, isOpen, onClose, onPageUpdate }: DetailsDr
                   <Label htmlFor="robots" className="flex items-center gap-2">
                     Robots Meta
                   </Label>
-                  <Select 
+                  <Select
                     value={localPageData.seo.robots || "index,follow"}
                     onValueChange={(value) => updateSeo({ robots: value })}
                   >
@@ -336,14 +336,14 @@ export const DetailsDrawer = ({ page, isOpen, onClose, onPageUpdate }: DetailsDr
                     <Calendar className="h-4 w-4" />
                     Publishing Schedule
                   </Label>
-                  
+
                   <div className="space-y-2">
                     <Label htmlFor="publish-at" className="text-sm">Publish At</Label>
                     <Input
                       id="publish-at"
                       type="datetime-local"
                       value={localPageData.schedule?.publishAt || ""}
-                      onChange={(e) => updatePage({ 
+                      onChange={(e) => updatePage({
                         schedule: { ...localPageData.schedule, publishAt: e.target.value }
                       })}
                     />
@@ -355,7 +355,7 @@ export const DetailsDrawer = ({ page, isOpen, onClose, onPageUpdate }: DetailsDr
                       id="unpublish-at"
                       type="datetime-local"
                       value={localPageData.schedule?.unpublishAt || ""}
-                      onChange={(e) => updatePage({ 
+                      onChange={(e) => updatePage({
                         schedule: { ...localPageData.schedule, unpublishAt: e.target.value }
                       })}
                     />
@@ -404,8 +404,8 @@ export const DetailsDrawer = ({ page, isOpen, onClose, onPageUpdate }: DetailsDr
               <Button variant="outline" onClick={onClose}>
                 Cancel
               </Button>
-              <Button 
-                onClick={saveChanges} 
+              <Button
+                onClick={saveChanges}
                 disabled={isSaving || !hasUnsavedChanges}
                 variant={hasUnsavedChanges ? "default" : "outline"}
               >

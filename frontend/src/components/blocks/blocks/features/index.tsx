@@ -14,8 +14,8 @@ export const FeaturesBlock: React.FC<BlockComponentProps> = ({
   onChange,
   className = ''
 }) => {
-  const { 
-    title = 'Features', 
+  const {
+    title = 'Features',
     subtitle = '',
     features = [] as Feature[],
     columns = 3
@@ -75,7 +75,7 @@ export const FeaturesBlock: React.FC<BlockComponentProps> = ({
               {title}
             </h2>
           )}
-          
+
           {isEditing ? (
             <input
               type="text"
@@ -90,7 +90,7 @@ export const FeaturesBlock: React.FC<BlockComponentProps> = ({
             </p>
           ) : null}
         </div>
-        
+
         <div className={`mx-auto mt-10 max-w-2xl sm:mt-16 lg:mt-20 lg:max-w-none`}>
           <dl className={`grid max-w-xl gap-x-8 gap-y-10 lg:max-w-none lg:grid-cols-${columns} lg:gap-y-16`}>
             {features && features.map((feature: Feature, index: number) => (
@@ -138,7 +138,7 @@ export const FeaturesBlock: React.FC<BlockComponentProps> = ({
               </div>
             ))}
           </dl>
-          
+
           {isEditing && (
             <button
               onClick={addFeature}

@@ -8,9 +8,9 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
-import { 
-  Eye, 
-  Globe, 
+import {
+  Eye,
+  Globe,
   Download,
   Settings
 } from "lucide-react";
@@ -22,10 +22,10 @@ interface PageEditorTopBarProps {
   onDrawerToggle: () => void;
 }
 
-export const PageEditorTopBar = ({ 
-  page, 
-  onPageUpdate, 
-  onDrawerToggle 
+export const PageEditorTopBar = ({
+  page,
+  onPageUpdate,
+  onDrawerToggle
 }: PageEditorTopBarProps) => {
   const formatLastSaved = (date: Date) => {
     return date.toLocaleTimeString('en-US', {
@@ -60,11 +60,11 @@ export const PageEditorTopBar = ({
               </BreadcrumbItem>
             </BreadcrumbList>
           </Breadcrumb>
-          
+
           <Badge className={statusColors[page.status]}>
             {page.status.charAt(0).toUpperCase() + page.status.slice(1)}
           </Badge>
-          
+
           <span className="text-sm text-muted-foreground">
             Last saved: {formatLastSaved(new Date())}
           </span>
@@ -76,19 +76,19 @@ export const PageEditorTopBar = ({
             <Eye className="w-4 h-4 mr-2" />
             Preview
           </Button>
-          
+
           <Button size="sm">
             <Globe className="w-4 h-4 mr-2" />
             Publish
           </Button>
-          
+
           <Button variant="outline" size="sm">
             <Download className="w-4 h-4 mr-2" />
             Export JSON
           </Button>
-          
-          <Button 
-            variant="outline" 
+
+          <Button
+            variant="outline"
             size="sm"
             onClick={onDrawerToggle}
           >

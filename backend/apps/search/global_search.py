@@ -6,7 +6,6 @@ from typing import Any
 
 from django.contrib.auth import get_user_model
 from django.db.models import Count, Q
-
 from drf_spectacular.utils import OpenApiParameter, extend_schema
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated

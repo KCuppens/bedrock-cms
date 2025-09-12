@@ -7,7 +7,7 @@ settings in sync with the database Locale model.
 
 import logging
 from pathlib import Path
-from typing import Any
+from typing import Any, Optional
 
 from django.conf import settings
 from django.core.cache import cache
@@ -173,7 +173,7 @@ class DjangoSettingsSync:
             # This is not a critical failure - the system will work without cache
 
     @classmethod
-    def update_settings_file(cls, settings_path: str | None = None) -> bool:
+    def update_settings_file(cls, settings_path: Optional[str] = None) -> bool:
         """
         Update the Django settings file with current database locale settings.
 

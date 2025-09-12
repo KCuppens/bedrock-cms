@@ -4,10 +4,11 @@ Media and file factories for testing uploads and media management.
 
 import factory
 import factory.django
-from faker import Faker
 from django.core.files.base import ContentFile
+from faker import Faker
 
 from apps.media.models import MediaItem
+
 from .base import BaseFactory, UserFactory
 
 fake = Faker()

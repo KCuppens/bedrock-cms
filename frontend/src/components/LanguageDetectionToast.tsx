@@ -11,30 +11,30 @@ import { getBrowserLanguages, matchBrowserToLocale } from "@/utils/browserLangua
 export const LanguageDetectionToast = () => {
   const { activeLocales, currentLocale, setCurrentLocale, defaultLocale } = useLocale();
   const [hasShownSuggestion, setHasShownSuggestion] = useState(false);
-  
+
   useEffect(() => {
     // Only run once and if we have multiple locales
     if (hasShownSuggestion || activeLocales.length <= 1 || !currentLocale) {
       return;
     }
-    
+
     // Check if we've already shown the suggestion this session
     const sessionShown = sessionStorage.getItem('language_suggestion_shown');
     if (sessionShown) {
       return;
     }
-    
+
     // Get browser languages
     const browserLanguages = getBrowserLanguages();
     const suggestedLocaleCode = matchBrowserToLocale(browserLanguages, activeLocales);
-    
+
     // If browser language is different from current and not the default
-    if (suggestedLocaleCode && 
+    if (suggestedLocaleCode &&
         suggestedLocaleCode !== currentLocale.code &&
         suggestedLocaleCode !== defaultLocale?.code) {
-      
+
       const suggestedLocale = activeLocales.find(l => l.code === suggestedLocaleCode);
-      
+
       if (suggestedLocale) {
         // Show toast with suggestion
         toast(
@@ -73,13 +73,13 @@ export const LanguageDetectionToast = () => {
             position: "bottom-right",
           }
         );
-        
+
         setHasShownSuggestion(true);
         sessionStorage.setItem('language_suggestion_shown', 'true');
       }
     }
   }, [activeLocales, currentLocale, defaultLocale, setCurrentLocale, hasShownSuggestion]);
-  
+
   return null;
 };
 

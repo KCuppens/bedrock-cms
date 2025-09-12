@@ -4,13 +4,14 @@ CMS-specific factories for pages, categories, and content.
 
 import factory
 import factory.django
-from faker import Faker
 from django.utils.text import slugify
+from faker import Faker
 
+from apps.cms.model_parts.category import Category, Tag
 from apps.cms.models import Page
-from apps.cms.model_parts.category import Category, Tag, Collection
 from apps.i18n.models import Locale
-from .base import BaseFactory, UserFactory
+
+from .base import BaseFactory
 
 fake = Faker()
 

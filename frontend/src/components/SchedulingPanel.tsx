@@ -46,7 +46,7 @@ const SchedulingPanel: React.FC<SchedulingPanelProps> = ({
   const [scheduledDateTime, setScheduledDateTime] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [conflicts, setConflicts] = useState<any[]>([]);
-  
+
   useEffect(() => {
     if (currentPublishedAt && currentStatus === 'scheduled') {
       // Format the existing scheduled time for the input
@@ -78,14 +78,14 @@ const SchedulingPanel: React.FC<SchedulingPanelProps> = ({
     }
 
     setIsLoading(true);
-    
+
     try {
       const publishAt = new Date(scheduledDateTime).toISOString();
-      
-      const endpoint = contentType === 'page' 
+
+      const endpoint = contentType === 'page'
         ? `/api/v1/cms/pages/${contentId}/schedule/`
         : `/api/v1/blog/posts/${contentId}/schedule/`;
-      
+
       const response = await api.request({
         method: 'POST',
         url: endpoint,
@@ -93,14 +93,14 @@ const SchedulingPanel: React.FC<SchedulingPanelProps> = ({
           publish_at: publishAt
         }
       });
-      
+
       toast({
         title: "Content Scheduled",
         description: `Content will be published on ${format(new Date(publishAt), 'MMM d, yyyy h:mm a')}`,
       });
-      
+
       onStatusChange?.('scheduled', publishAt);
-      
+
     } catch (error: any) {
       console.error('Failed to schedule content:', error);
       toast({
@@ -115,24 +115,24 @@ const SchedulingPanel: React.FC<SchedulingPanelProps> = ({
 
   const handleUnschedule = async () => {
     setIsLoading(true);
-    
+
     try {
-      const endpoint = contentType === 'page' 
+      const endpoint = contentType === 'page'
         ? `/api/v1/cms/pages/${contentId}/unschedule/`
         : `/api/v1/blog/posts/${contentId}/unschedule/`;
-      
+
       await api.request({
         method: 'POST',
         url: endpoint
       });
-      
+
       toast({
         title: "Scheduling Removed",
         description: "Content is no longer scheduled for publishing",
       });
-      
+
       onStatusChange?.('draft', null);
-      
+
     } catch (error: any) {
       console.error('Failed to unschedule content:', error);
       toast({
@@ -147,24 +147,24 @@ const SchedulingPanel: React.FC<SchedulingPanelProps> = ({
 
   const handlePublishNow = async () => {
     setIsLoading(true);
-    
+
     try {
-      const endpoint = contentType === 'page' 
+      const endpoint = contentType === 'page'
         ? `/api/v1/cms/pages/${contentId}/publish/`
         : `/api/v1/blog/posts/${contentId}/publish/`;
-      
+
       const response = await api.request({
         method: 'POST',
         url: endpoint
       });
-      
+
       toast({
         title: "Content Published",
         description: "Content is now live",
       });
-      
+
       onStatusChange?.('published', response.published_at);
-      
+
     } catch (error: any) {
       console.error('Failed to publish content:', error);
       toast({
@@ -231,7 +231,7 @@ const SchedulingPanel: React.FC<SchedulingPanelProps> = ({
             </AlertDescription>
           </Alert>
         )}
-        
+
         {currentStatus === 'published' && currentPublishedAt && (
           <Alert>
             <CheckCircle className="h-4 w-4" />
@@ -271,7 +271,7 @@ const SchedulingPanel: React.FC<SchedulingPanelProps> = ({
               {currentStatus === 'scheduled' ? 'Reschedule' : 'Schedule'}
             </Button>
           )}
-          
+
           {currentStatus === 'scheduled' && (
             <Button
               variant="outline"
@@ -284,7 +284,7 @@ const SchedulingPanel: React.FC<SchedulingPanelProps> = ({
               Unschedule
             </Button>
           )}
-          
+
           {currentStatus !== 'published' && (
             <Button
               variant="default"

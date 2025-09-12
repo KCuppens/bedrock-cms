@@ -4,11 +4,10 @@ Management command to scaffold CRUD API endpoints for registered models.
 
 from pathlib import Path
 
+import inflection
 from django.apps import apps
 from django.core.management.base import BaseCommand, CommandError
 from django.template import Context, Template
-
-import inflection
 
 from apps.registry.registry import content_registry
 

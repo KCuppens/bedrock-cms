@@ -64,7 +64,7 @@ A successful CORS response should include:
 ### 1. CORS Error in Browser Console
 **Symptom:** "Access to fetch at 'http://localhost:8000/api/...' from origin 'http://localhost:5173' has been blocked by CORS policy"
 
-**Solution:** 
+**Solution:**
 - Ensure the frontend URL is in `CORS_ALLOWED_ORIGINS`
 - Check that the backend server is running
 - Verify the request URL is correct

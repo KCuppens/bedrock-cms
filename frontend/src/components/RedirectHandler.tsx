@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useLocation, Navigate } from 'react-router-dom';
-import { api } from '@/lib/api';
+import { api } from '@/lib/api.ts';
 
 interface RedirectHandlerProps {
   children: React.ReactNode;
@@ -15,7 +15,7 @@ const RedirectHandler: React.FC<RedirectHandlerProps> = ({ children }) => {
     const checkForRedirect = async () => {
       try {
         setLoading(true);
-        
+
         // Check if there's a redirect for the current path
         const response = await api.redirects.list({
           search: location.pathname
@@ -23,18 +23,18 @@ const RedirectHandler: React.FC<RedirectHandlerProps> = ({ children }) => {
 
         if (response.results?.length > 0) {
           const redirectRule = response.results[0];
-          
+
           // Find exact match for source path
-          const exactMatch = response.results.find((rule: any) => 
+          const exactMatch = response.results.find((rule: any) =>
             rule.from_path === location.pathname && rule.is_active
           );
-          
+
           if (exactMatch && exactMatch.to_path) {
             setRedirect(exactMatch.to_path);
             return;
           }
         }
-        
+
         setRedirect(null);
       } catch (error) {
         console.error('Failed to check for redirects:', error);
@@ -66,7 +66,7 @@ const RedirectHandler: React.FC<RedirectHandlerProps> = ({ children }) => {
       window.location.href = redirect;
       return null;
     }
-    
+
     // Internal redirect
     return <Navigate to={redirect} replace />;
   }

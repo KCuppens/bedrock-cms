@@ -4,9 +4,8 @@ Security utilities for CMS content.
 
 from typing import Any, Dict, List, Optional
 
+import bleach  # type: ignore
 from django.conf import settings
-
-import bleach  # type: ignore[import-untyped]
 
 # Default allowed tags for rich text content
 DEFAULT_ALLOWED_TAGS = [
@@ -115,7 +114,7 @@ def sanitize_html(
     )
 
 
-def sanitize_rich_text_block(block_data: dict[str, Any]) -> dict[str, Any]:
+def sanitize_rich_text_block(block_data: Dict[str, Any]) -> Dict[str, Any]:
     """
     Sanitize HTML content in a rich_text block.
 
@@ -144,7 +143,7 @@ def sanitize_rich_text_block(block_data: dict[str, Any]) -> dict[str, Any]:
     return sanitized_block
 
 
-def sanitize_block_content(block_data: dict[str, Any]) -> dict[str, Any]:
+def sanitize_block_content(block_data: Dict[str, Any]) -> Dict[str, Any]:
     """
     Recursively sanitize HTML content in block data.
 
@@ -247,7 +246,7 @@ def sanitize_block_content(block_data: dict[str, Any]) -> dict[str, Any]:
     return block_data
 
 
-def sanitize_blocks(blocks: list[dict[str, Any]]) -> list[dict[str, Any]]:
+def sanitize_blocks(blocks: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
     """
     Sanitize HTML content in a list of blocks.
 

@@ -2,11 +2,10 @@
 Reports API views for CMS background jobs and analytics.
 """
 
-from django.db.models import Count, Q
-from django.utils import timezone
-
 from celery import current_app
 from celery.result import AsyncResult
+from django.db.models import Count, Q
+from django.utils import timezone
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAdminUser, IsAuthenticated

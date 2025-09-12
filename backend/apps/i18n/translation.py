@@ -282,8 +282,8 @@ class TranslationManager:
     def update_translation(
         self,
         unit: TranslationUnit,
-        target_text: str | None = None,
-        status: str | None = None,
+        target_text: Optional[str] = None,
+        status: Optional[str] = None,
         user=None,
     ) -> TranslationUnit:
         """
@@ -482,8 +482,8 @@ class UiMessageResolver:
     def resolve(
         self,
         key: str,
-        default: str | None = None,
-        parameters: dict[str, Any] | None = None,
+        default: Optional[str] = None,
+        parameters: Dict[str, Any] | None = None,
     ) -> str:
         """
         Resolve a UI message with fallback and parameter substitution.
@@ -513,7 +513,7 @@ class UiMessageResolver:
 
         return message
 
-    def get_message_bundle(self, namespace: str | None = None) -> dict[str, str]:
+    def get_message_bundle(self, namespace: Optional[str] = None) -> dict[str, str]:
         """
         Get all messages for a namespace as a dict.
 

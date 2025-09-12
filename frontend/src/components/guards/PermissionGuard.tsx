@@ -28,8 +28,8 @@ interface PermissionGuardProps {
   customCheck?: (permissions: ReturnType<typeof usePermissions>) => boolean;
 }
 
-const PermissionDenied: React.FC<{ message?: string }> = ({ 
-  message = "You don't have permission to access this feature" 
+const PermissionDenied: React.FC<{ message?: string }> = ({
+  message = "You don't have permission to access this feature"
 }) => (
   <Alert variant="destructive" className="max-w-md">
     <ShieldX className="h-4 w-4" />
@@ -65,7 +65,7 @@ export const PermissionGuard: React.FC<PermissionGuardProps> = ({
 
     // Check permissions
     if (permissions.length > 0) {
-      const hasPerms = requireAll 
+      const hasPerms = requireAll
         ? perms.hasAllPermissions(permissions)
         : perms.hasAnyPermission(permissions);
       if (!hasPerms) return false;
@@ -96,13 +96,13 @@ export const PermissionGuard: React.FC<PermissionGuardProps> = ({
 
     return true;
   }, [
-    permissions, 
+    permissions,
     requireAllPermissions,
-    roles, 
-    locales, 
-    sections, 
-    requireAll, 
-    perms, 
+    roles,
+    locales,
+    sections,
+    requireAll,
+    perms,
     customCheck
   ]);
 
@@ -134,10 +134,10 @@ export const RequirePermission: React.FC<{
   fallback?: ReactNode;
   children: ReactNode;
 }> = ({ permission, fallback, children }) => (
-  <PermissionGuard 
-    permissions={[permission]} 
+  <PermissionGuard
+    permissions={[permission]}
     fallback={fallback}
-    children={children} 
+    children={children}
   />
 );
 
@@ -146,10 +146,10 @@ export const RequireRole: React.FC<{
   fallback?: ReactNode;
   children: ReactNode;
 }> = ({ role, fallback, children }) => (
-  <PermissionGuard 
-    roles={[role]} 
+  <PermissionGuard
+    roles={[role]}
     fallback={fallback}
-    children={children} 
+    children={children}
   />
 );
 
@@ -157,10 +157,10 @@ export const RequireAdmin: React.FC<{
   fallback?: ReactNode;
   children: ReactNode;
 }> = ({ fallback, children }) => (
-  <PermissionGuard 
+  <PermissionGuard
     customCheck={(perms) => perms.isAdmin()}
     fallback={fallback}
-    children={children} 
+    children={children}
   />
 );
 
@@ -169,9 +169,9 @@ export const RequireLocaleAccess: React.FC<{
   fallback?: ReactNode;
   children: ReactNode;
 }> = ({ locale, fallback, children }) => (
-  <PermissionGuard 
-    locales={[locale]} 
+  <PermissionGuard
+    locales={[locale]}
     fallback={fallback}
-    children={children} 
+    children={children}
   />
 );

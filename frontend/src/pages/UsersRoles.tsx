@@ -37,12 +37,12 @@ const UsersRoles = memo(() => {
   const [isDeletingRole, setIsDeletingRole] = useState(false);
   const [openDropdownId, setOpenDropdownId] = useState<number | null>(null);
   const [isSavingRole, setIsSavingRole] = useState(false);
-  
+
   // Resend invite states
   const [resendInviteDialogOpen, setResendInviteDialogOpen] = useState(false);
   const [selectedUserForInvite, setSelectedUserForInvite] = useState<any>(null);
   const [isResendingInvite, setIsResendingInvite] = useState(false);
-  
+
   // API data states
   const [users, setUsers] = useState<any[]>([]);
   const [roles, setRoles] = useState<any[]>([]);
@@ -55,7 +55,7 @@ const UsersRoles = memo(() => {
   // Memoized function to extract user role IDs
   const extractUserRoleIds = useCallback((user: any, roles: any[]) => {
     const userRoles = user.roles || user.groups || user.user_permissions || [];
-    
+
     const currentRoleIds = userRoles.map((r: any) => {
       // Handle different API response formats
       if (typeof r === 'object') {
@@ -68,14 +68,14 @@ const UsersRoles = memo(() => {
       }
       // If it's a string (role name), find the corresponding role ID
       if (typeof r === 'string') {
-        const role = roles.find((role: any) => 
+        const role = roles.find((role: any) =>
           role.name === r || role.name.toLowerCase() === r.toLowerCase()
         );
         return role ? role.id : null;
       }
       return null;
     }).filter((id: any) => id !== null && id !== undefined);
-    
+
     return currentRoleIds;
   }, []);
 
@@ -118,7 +118,7 @@ const UsersRoles = memo(() => {
 
     fetchData();
   }, [toast]);
-  
+
   // Dynamically build permission categories and actions from fetched permissions
   const getPermissionMatrix = () => {
     const matrix: Record<string, Set<string>> = {};
@@ -129,23 +129,23 @@ const UsersRoles = memo(() => {
       'delete': 'delete',
       'publish': 'publish'
     };
-    
+
     permissions.forEach((perm: any) => {
       const contentType = perm.content_type_display || perm.content_type;
       if (!matrix[contentType]) {
         matrix[contentType] = new Set();
       }
-      
+
       // Extract action from codename (e.g., 'add_page' -> 'add')
       const parts = perm.codename.split('_');
       const action = parts[0];
       const mappedAction = actionMap[action] || action;
       matrix[contentType].add(mappedAction);
     });
-    
+
     return matrix;
   };
-  
+
   const permissionMatrix = getPermissionMatrix();
   const permissionCategories = Object.keys(permissionMatrix).sort();
   const permissionActions = ['create', 'read', 'update', 'delete', 'publish']; // Keep standard order
@@ -171,16 +171,16 @@ const UsersRoles = memo(() => {
         email: inviteEmail,
         roles: [parseInt(inviteRole)]  // Use 'roles' field for multiple role IDs
       });
-      
+
       toast({
         title: "Success",
         description: `Invitation sent to ${inviteEmail}`,
       });
-      
+
       // Refresh users list
       const usersResponse = await api.userManagement.users.list();
       setUsers(usersResponse.results || []);
-      
+
       setInviteDialogOpen(false);
       setInviteEmail("");
       setInviteRole("");
@@ -201,16 +201,16 @@ const UsersRoles = memo(() => {
     setIsDeletingUser(true);
     try {
       await api.userManagement.users.delete(userToDelete.id);
-      
+
       toast({
         title: "Success",
         description: `User ${userToDelete.email} has been deleted.`,
       });
-      
+
       // Refresh users list
       const usersResponse = await api.userManagement.users.list();
       setUsers(usersResponse.results || []);
-      
+
       // Close dialog
       setDeleteUserDialogOpen(false);
       setUserToDelete(null);
@@ -232,16 +232,16 @@ const UsersRoles = memo(() => {
     setIsDeletingRole(true);
     try {
       await api.userManagement.roles.delete(roleToDelete.id);
-      
+
       toast({
         title: "Success",
         description: `Role "${roleToDelete.name}" has been deleted.`,
       });
-      
+
       // Refresh roles list
       const rolesResponse = await api.userManagement.roles.list();
       setRoles(rolesResponse.results || []);
-      
+
       // Close dialog
       setDeleteRoleDialogOpen(false);
       setRoleToDelete(null);
@@ -266,12 +266,12 @@ const UsersRoles = memo(() => {
         email: selectedUserForInvite.email,
         resend: true  // Flag to indicate this is a resend
       });
-      
+
       toast({
         title: "Success",
         description: `Invite has been resent to ${selectedUserForInvite.email}`,
       });
-      
+
       // Close dialog and reset state
       setResendInviteDialogOpen(false);
       setSelectedUserForInvite(null);
@@ -290,17 +290,17 @@ const UsersRoles = memo(() => {
 
   const generateRolePreview = (role: any) => {
     const actions = [];
-    
+
     // If permissions is an array (backend format)
     if (Array.isArray(role.permissions)) {
       const grouped: Record<string, string[]> = {};
-      
+
       role.permissions.forEach((perm: any) => {
         const contentType = perm.content_type || 'unknown';
         if (!grouped[contentType]) {
           grouped[contentType] = [];
         }
-        
+
         // Extract and format the action
         const parts = perm.codename.split('_');
         const action = parts[0];
@@ -314,7 +314,7 @@ const UsersRoles = memo(() => {
         const mappedAction = actionMap[action] || action;
         grouped[contentType].push(mappedAction);
       });
-      
+
       // Format grouped permissions
       Object.entries(grouped).forEach(([contentType, perms]) => {
         if (perms.length > 0) {
@@ -336,11 +336,11 @@ const UsersRoles = memo(() => {
       });
     }
 
-    const locales = role.locale_scopes?.length 
-      ? `[${role.locale_scopes.map((ls: any) => ls.code || ls).join(", ")}]` 
+    const locales = role.locale_scopes?.length
+      ? `[${role.locale_scopes.map((ls: any) => ls.code || ls).join(", ")}]`
       : "[all locales]";
 
-    return actions.length > 0 
+    return actions.length > 0
       ? `This role can: ${actions.join(", ")} in ${locales}`
       : `This role has no specific permissions configured`;
   };
@@ -350,10 +350,10 @@ const UsersRoles = memo(() => {
       <div className="min-h-screen">
         <div className="flex">
           <Sidebar />
-          
+
           <div className="flex-1 flex flex-col ml-72">
             <TopNavbar />
-          
+
           <main className="flex-1 p-8">
             <div className="max-w-7xl mx-auto">
               <div className="mb-8">
@@ -388,9 +388,9 @@ const UsersRoles = memo(() => {
                     <div className="space-y-4">
                       <div>
                         <Label htmlFor="email">Email Address</Label>
-                        <Input 
-                          id="email" 
-                          type="email" 
+                        <Input
+                          id="email"
+                          type="email"
                           placeholder="user@example.com"
                           value={inviteEmail}
                           onChange={(e) => setInviteEmail(e.target.value)}
@@ -413,18 +413,18 @@ const UsersRoles = memo(() => {
                         </Select>
                       </div>
                       <div className="flex gap-2">
-                        <Button 
+                        <Button
                           type="button"
-                          className="flex-1" 
+                          className="flex-1"
                           onClick={handleInviteUser}
                           disabled={isInviting}
                         >
                           <Mail className="h-4 w-4 mr-2" />
                           {isInviting ? "Sending..." : "Send Invite"}
                         </Button>
-                        <Button 
+                        <Button
                           type="button"
-                          variant="outline" 
+                          variant="outline"
                           onClick={() => {
                             setInviteDialogOpen(false);
                             setInviteEmail("");
@@ -471,7 +471,7 @@ const UsersRoles = memo(() => {
                       users.map(user => (
                         <TableRow key={user.id}>
                           <TableCell className="font-medium">
-                            {user.first_name && user.last_name 
+                            {user.first_name && user.last_name
                               ? `${user.first_name} ${user.last_name}`
                               : user.username || user.email}
                           </TableCell>
@@ -487,7 +487,7 @@ const UsersRoles = memo(() => {
                           </TableCell>
                           <TableCell>
                             <div className="flex items-center gap-2">
-                              <Badge 
+                              <Badge
                                 variant={user.is_active ? "default" : "secondary"}
                                 className={user.is_active ? "bg-green-100 text-green-800" : ""}
                               >
@@ -514,19 +514,19 @@ const UsersRoles = memo(() => {
                           <TableCell className="text-muted-foreground">
                             <div className="flex items-center gap-1">
                               <Clock className="h-3 w-3" />
-                              {user.last_seen 
+                              {user.last_seen
                                 ? new Date(user.last_seen).toLocaleString()
                                 : "Never"}
                             </div>
                           </TableCell>
                         <TableCell>
-                          <DropdownMenu 
-                            open={openDropdownId === user.id} 
+                          <DropdownMenu
+                            open={openDropdownId === user.id}
                             onOpenChange={(open) => setOpenDropdownId(open ? user.id : null)}
                           >
                             <DropdownMenuTrigger asChild>
-                              <Button 
-                                variant="ghost" 
+                              <Button
+                                variant="ghost"
                                 size="sm"
                                 onClick={() => console.log('Dropdown clicked for user:', user.id)}
                               >
@@ -536,10 +536,10 @@ const UsersRoles = memo(() => {
                             <DropdownMenuContent align="end" className="bg-background border shadow-md z-50">
                               <DropdownMenuItem onClick={() => {
                                 setSelectedUser(user);
-                                
+
                                 // Use memoized function to extract role IDs
                                 const currentRoleIds = extractUserRoleIds(user, roles);
-                                
+
                                 setEditUserForm({
                                   first_name: user.first_name || '',
                                   last_name: user.last_name || '',
@@ -556,7 +556,7 @@ const UsersRoles = memo(() => {
                                 <Tooltip>
                                   <TooltipTrigger asChild>
                                     <div>
-                                      <DropdownMenuItem 
+                                      <DropdownMenuItem
                                         disabled
                                         className="text-muted-foreground cursor-not-allowed"
                                       >
@@ -570,8 +570,8 @@ const UsersRoles = memo(() => {
                                   </TooltipContent>
                                 </Tooltip>
                               ) : (
-                                <DropdownMenuItem 
-                                  className="text-destructive" 
+                                <DropdownMenuItem
+                                  className="text-destructive"
                                   onClick={() => {
                                     console.log('Delete clicked for user:', user);
                                     setUserToDelete(user);
@@ -610,8 +610,8 @@ const UsersRoles = memo(() => {
                           <div className="grid grid-cols-2 gap-4">
                             <div>
                               <Label htmlFor="userFirstName">First Name</Label>
-                              <Input 
-                                id="userFirstName" 
+                              <Input
+                                id="userFirstName"
                                 value={editUserForm.first_name || ''}
                                 onChange={(e) => setEditUserForm({...editUserForm, first_name: e.target.value})}
                                 className="mt-1"
@@ -620,8 +620,8 @@ const UsersRoles = memo(() => {
                             </div>
                             <div>
                               <Label htmlFor="userLastName">Last Name</Label>
-                              <Input 
-                                id="userLastName" 
+                              <Input
+                                id="userLastName"
                                 value={editUserForm.last_name || ''}
                                 onChange={(e) => setEditUserForm({...editUserForm, last_name: e.target.value})}
                                 className="mt-1"
@@ -631,8 +631,8 @@ const UsersRoles = memo(() => {
                           </div>
                           <div>
                             <Label htmlFor="userEmail">Email Address</Label>
-                            <Input 
-                              id="userEmail" 
+                            <Input
+                              id="userEmail"
                               type="email"
                               value={editUserForm.email || ''}
                               onChange={(e) => setEditUserForm({...editUserForm, email: e.target.value})}
@@ -642,7 +642,7 @@ const UsersRoles = memo(() => {
                           </div>
                           <div>
                             <Label htmlFor="userStatus">Status</Label>
-                            <Select 
+                            <Select
                               value={editUserForm.is_active !== undefined ? (editUserForm.is_active ? 'active' : 'inactive') : 'active'}
                               onValueChange={(value) => setEditUserForm({...editUserForm, is_active: value === 'active'})}
                               disabled={isUpdatingUser}
@@ -665,23 +665,23 @@ const UsersRoles = memo(() => {
                                 roles.map(role => {
                                   const isChecked = (editUserForm.role_ids || []).includes(role.id);
                                   console.log(`Role ${role.name} (ID: ${role.id}) - isChecked: ${isChecked}, current role_ids:`, editUserForm.role_ids);
-                                  
+
                                   return (
                                     <div key={role.id} className="flex items-start space-x-2">
-                                      <Checkbox 
+                                      <Checkbox
                                         id={`role-${role.id}`}
                                         checked={isChecked}
                                         onCheckedChange={(checked) => {
                                           console.log(`Toggling role ${role.name} (ID: ${role.id}) to ${checked}`);
                                           const currentRoles = editUserForm.role_ids || [];
                                           let newRoleIds;
-                                          
+
                                           if (checked) {
                                             newRoleIds = [...currentRoles, role.id];
                                           } else {
                                             newRoleIds = currentRoles.filter((id: number) => id !== role.id);
                                           }
-                                          
+
                                           console.log('Setting new role IDs:', newRoleIds);
                                           setEditUserForm({...editUserForm, role_ids: newRoleIds});
                                         }}
@@ -706,18 +706,18 @@ const UsersRoles = memo(() => {
                             </div>
                           </div>
                           <div className="flex gap-2 pt-4">
-                            <Button 
+                            <Button
                               onClick={async () => {
                                 setIsUpdatingUser(true);
                                 try {
                                   const updatePromises = [];
-                                  
+
                                   // Update basic user information if any field has changed
-                                  const hasProfileChanges = 
+                                  const hasProfileChanges =
                                     editUserForm.first_name !== selectedUser.first_name ||
                                     editUserForm.last_name !== selectedUser.last_name ||
                                     editUserForm.email !== selectedUser.email;
-                                  
+
                                   if (hasProfileChanges) {
                                     const updateData = {
                                       first_name: editUserForm.first_name,
@@ -734,7 +734,7 @@ const UsersRoles = memo(() => {
                                         })
                                     );
                                   }
-                                  
+
                                   // Update user status if changed
                                   if (editUserForm.is_active !== selectedUser.is_active) {
                                     if (editUserForm.is_active) {
@@ -743,7 +743,7 @@ const UsersRoles = memo(() => {
                                       updatePromises.push(api.userManagement.users.deactivate(selectedUser.id));
                                     }
                                   }
-                                  
+
                                   // Update user roles if they have been modified
                                   const userRoles = selectedUser.roles || selectedUser.groups || selectedUser.user_permissions || [];
                                   const currentRoleIds = userRoles.map((r: any) => {
@@ -758,16 +758,16 @@ const UsersRoles = memo(() => {
                                     }
                                     return null;
                                   }).filter((id: any) => id !== null && id !== undefined);
-                                  
+
                                   const newRoleIds = editUserForm.role_ids || [];
                                   const rolesChanged = JSON.stringify(currentRoleIds.sort()) !== JSON.stringify(newRoleIds.sort());
-                                  
+
                                   console.log('Role update check:', {
                                     currentRoleIds,
                                     newRoleIds,
                                     rolesChanged
                                   });
-                                  
+
                                   if (rolesChanged) {
                                     console.log('Updating roles for user:', selectedUser.id, 'with roles:', newRoleIds);
                                     updatePromises.push(
@@ -779,20 +779,20 @@ const UsersRoles = memo(() => {
                                         })
                                     );
                                   }
-                                  
+
                                   // Execute all updates
                                   if (updatePromises.length > 0) {
                                     await Promise.all(updatePromises);
-                                    
+
                                     toast({
                                       title: "Success",
                                       description: "User updated successfully",
                                     });
-                                    
+
                                     // Refresh users list
                                     const usersResponse = await api.userManagement.users.list();
                                     setUsers(usersResponse.results || []);
-                                    
+
                                     setEditUserDialogOpen(false);
                                     setEditUserForm({});
                                     setSelectedUser(null);
@@ -804,7 +804,7 @@ const UsersRoles = memo(() => {
                                   }
                                 } catch (error: any) {
                                   console.error('Failed to update user:', error);
-                                  
+
                                   // Check if it's a throttling error
                                   if (error?.message?.includes('throttle') || error?.message?.includes('No default throttle rate')) {
                                     toast({
@@ -827,8 +827,8 @@ const UsersRoles = memo(() => {
                             >
                               {isUpdatingUser ? "Saving..." : "Save Changes"}
                             </Button>
-                            <Button 
-                              variant="outline" 
+                            <Button
+                              variant="outline"
                               onClick={() => {
                                 setEditUserDialogOpen(false);
                                 setEditUserForm({});
@@ -894,7 +894,7 @@ const UsersRoles = memo(() => {
                             Resending invite to <strong>{selectedUserForInvite.email}</strong>
                           </div>
                           <div className="flex gap-2">
-                            <Button 
+                            <Button
                               onClick={handleResendInvite}
                               disabled={isResendingInvite}
                               className="flex-1"
@@ -902,7 +902,7 @@ const UsersRoles = memo(() => {
                               <Mail className="h-4 w-4 mr-2" />
                               {isResendingInvite ? "Sending..." : "Resend Invite"}
                             </Button>
-                            <Button 
+                            <Button
                               variant="outline"
                               onClick={() => {
                                 setResendInviteDialogOpen(false);
@@ -969,19 +969,19 @@ const UsersRoles = memo(() => {
                               <p className="text-sm text-muted-foreground mt-1">{role.description || "No description"}</p>
                             </div>
                             <div className="flex gap-2">
-                              <Button 
-                                variant="outline" 
+                              <Button
+                                variant="outline"
                                 onClick={() => {
                                   // Convert role permissions from backend format to UI format
                                   const uiPermissions: Record<string, Record<string, boolean>> = {};
-                                  
+
                                   if (Array.isArray(role.permissions)) {
                                     role.permissions.forEach((perm: any) => {
                                       const contentType = perm.content_type || 'unknown';
                                       if (!uiPermissions[contentType]) {
                                         uiPermissions[contentType] = {};
                                       }
-                                      
+
                                       // Map backend action to UI action
                                       const actionMap: Record<string, string> = {
                                         'add': 'create',
@@ -990,15 +990,15 @@ const UsersRoles = memo(() => {
                                         'delete': 'delete',
                                         'publish': 'publish'
                                       };
-                                      
+
                                       const parts = perm.codename.split('_');
                                       const action = parts[0];
                                       const mappedAction = actionMap[action] || action;
-                                      
+
                                       uiPermissions[contentType][mappedAction] = true;
                                     });
                                   }
-                                  
+
                                   setSelectedRole({
                                     ...role,
                                     permissions: uiPermissions,
@@ -1011,8 +1011,8 @@ const UsersRoles = memo(() => {
                               </Button>
                               {/* Only show delete button if role has no users assigned */}
                               {(role.user_count === 0 || role.user_count === undefined) ? (
-                                <Button 
-                                  variant="outline" 
+                                <Button
+                                  variant="outline"
                                   size="sm"
                                   className="text-destructive hover:bg-destructive hover:text-destructive-foreground"
                                   onClick={() => {
@@ -1028,8 +1028,8 @@ const UsersRoles = memo(() => {
                                   <Tooltip>
                                     <TooltipTrigger asChild>
                                       <div>
-                                        <Button 
-                                          variant="outline" 
+                                        <Button
+                                          variant="outline"
                                           size="sm"
                                           disabled
                                           className="text-muted-foreground cursor-not-allowed"
@@ -1053,7 +1053,7 @@ const UsersRoles = memo(() => {
                         {generateRolePreview(role)}
                       </p>
                     </div>
-                    
+
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div>
                         <h4 className="font-medium mb-2">Permissions</h4>
@@ -1062,9 +1062,9 @@ const UsersRoles = memo(() => {
                             // New API structure - permissions as array
                             <div className="flex flex-wrap gap-1">
                               {role.permissions.map((perm: any) => (
-                                <Badge 
+                                <Badge
                                   key={perm.id || perm.codename}
-                                  variant="default" 
+                                  variant="default"
                                   className="text-xs bg-green-100 text-green-800"
                                 >
                                   {perm.name || perm.codename}
@@ -1081,9 +1081,9 @@ const UsersRoles = memo(() => {
                                 <span className="text-sm capitalize min-w-20">{category}:</span>
                                 <div className="flex gap-1">
                                   {Object.entries(perms).map(([action, allowed]: [string, any]) => (
-                                    <Badge 
+                                    <Badge
                                       key={action}
-                                      variant={allowed ? "default" : "secondary"} 
+                                      variant={allowed ? "default" : "secondary"}
                                       className={`text-xs ${allowed ? "bg-green-100 text-green-800" : ""}`}
                                     >
                                       {action}
@@ -1097,7 +1097,7 @@ const UsersRoles = memo(() => {
                           )}
                         </div>
                       </div>
-                      
+
                       <div>
                         <h4 className="font-medium mb-2">Scopes</h4>
                         <div className="space-y-2">
@@ -1138,8 +1138,8 @@ const UsersRoles = memo(() => {
                     {!selectedRole.id && (
                       <div>
                         <Label htmlFor="roleName">Role Name</Label>
-                        <Input 
-                          id="roleName" 
+                        <Input
+                          id="roleName"
                           value={selectedRole.name || ''}
                           onChange={(e) => setSelectedRole({...selectedRole, name: e.target.value})}
                           placeholder="e.g., Content Editor"
@@ -1150,8 +1150,8 @@ const UsersRoles = memo(() => {
                     )}
                     <div>
                       <Label htmlFor="description">Description</Label>
-                      <Textarea 
-                        id="description" 
+                      <Textarea
+                        id="description"
                         value={selectedRole.description || ''}
                         onChange={(e) => setSelectedRole({...selectedRole, description: e.target.value})}
                         placeholder="Describe the purpose and responsibilities of this role"
@@ -1178,7 +1178,7 @@ const UsersRoles = memo(() => {
                                       <Checkbox
                                         checked={
                                           permissionCategories.length > 0 &&
-                                          permissionCategories.every(category => 
+                                          permissionCategories.every(category =>
                                             selectedRole.permissions?.[category]?.[action] === true
                                           )
                                         }
@@ -1242,7 +1242,7 @@ const UsersRoles = memo(() => {
                                         return (
                                           <TableCell key={action} className="text-center">
                                             {isAvailable ? (
-                                              <Checkbox 
+                                              <Checkbox
                                                 checked={selectedRole.permissions?.[category]?.[action] || false}
                                                 onCheckedChange={(checked) => {
                                                   const updatedPerms = {...(selectedRole.permissions || {})};
@@ -1284,12 +1284,12 @@ const UsersRoles = memo(() => {
                           })
                           .map(locale => (
                           <div key={locale.id} className="flex items-center space-x-2">
-                            <Checkbox 
+                            <Checkbox
                               id={`locale-${locale.id}`}
                               checked={selectedRole.locale_scope_ids?.includes(locale.id) || false}
                               onCheckedChange={(checked) => {
                                 const currentScopes = selectedRole.locale_scope_ids || [];
-                                const updatedScopes = checked 
+                                const updatedScopes = checked
                                   ? [...currentScopes, locale.id]
                                   : currentScopes.filter((id: number) => id !== locale.id);
                                 setSelectedRole({...selectedRole, locale_scope_ids: updatedScopes});
@@ -1312,7 +1312,7 @@ const UsersRoles = memo(() => {
                     </div>
 
                     <div className="flex gap-2">
-                      <Button 
+                      <Button
                         type="button"
                         onClick={async () => {
                         setIsSavingRole(true);
@@ -1326,14 +1326,14 @@ const UsersRoles = memo(() => {
                             });
                             return;
                           }
-                          
+
                           // Convert permissions format for API
                           // Map permission structure to permission IDs based on available permissions
                           const permissionIds: number[] = [];
-                          
+
                           console.log('Converting permissions for role save:', selectedRole.permissions);
                           console.log('Available permissions:', permissions);
-                          
+
                           // Get permission IDs from the permissions state
                           // This maps our UI permission structure to actual permission IDs
                           if (selectedRole.permissions && typeof selectedRole.permissions === 'object') {
@@ -1343,7 +1343,7 @@ const UsersRoles = memo(() => {
                                 Object.entries(actions).forEach(([action, enabled]) => {
                                   if (enabled) {
                                     console.log(`Looking for permission: ${category}.${action}`);
-                                    
+
                                     // Find the permission that matches this category and action
                                     const permission = permissions.find((p: any) => {
                                       // Match based on codename pattern (e.g., 'add_page', 'change_page', etc.)
@@ -1355,26 +1355,26 @@ const UsersRoles = memo(() => {
                                         'publish': 'publish'
                                       };
                                       const mappedAction = actionMap[action] || action;
-                                      
+
                                       // Get the content type from the permission
                                       const contentType = p.content_type_display || p.content_type;
                                       const codename = p.codename;
-                                      
+
                                       // The key insight: the category from UI should match the contentType from the permission
                                       // Since getPermissionMatrix() creates categories from p.content_type_display
                                       const isMatchingContentType = contentType === category;
                                       const expectedCodename = `${mappedAction}_${contentType}`;
                                       const isMatchingAction = codename === expectedCodename;
-                                      
+
                                       console.log(`  Checking permission ${codename} (content_type: ${contentType})`);
                                       console.log(`    Category match (${category} === ${contentType}): ${isMatchingContentType}`);
                                       console.log(`    Expected codename: ${expectedCodename}`);
                                       console.log(`    Action match: ${isMatchingAction}`);
                                       console.log(`    Both match: ${isMatchingContentType && isMatchingAction}`);
-                                      
+
                                       return isMatchingContentType && isMatchingAction;
                                     });
-                                    
+
                                     if (permission) {
                                       console.log(`  Found matching permission: ${permission.codename} (ID: ${permission.id})`);
                                       permissionIds.push(permission.id);
@@ -1386,23 +1386,23 @@ const UsersRoles = memo(() => {
                               }
                             });
                           }
-                          
+
                           console.log('Final permission IDs to send:', permissionIds);
-                          
+
                           if (selectedRole.id) {
                             // Update existing role
                             const updateData: any = {
                               name: selectedRole.name,
                               locale_scope_ids: selectedRole.locale_scope_ids || []
                             };
-                            
+
                             await api.userManagement.roles.update(selectedRole.id, updateData);
-                            
+
                             // Update permissions separately if we have permission IDs
                             if (permissionIds.length > 0 || selectedRole.permissions) {
                               await api.userManagement.roles.updatePermissions(selectedRole.id, permissionIds);
                             }
-                            
+
                             toast({
                               title: "Success",
                               description: "Role updated successfully",
@@ -1413,17 +1413,17 @@ const UsersRoles = memo(() => {
                               name: selectedRole.name,
                               locale_scope_ids: selectedRole.locale_scope_ids || []
                             };
-                            
+
                             const response = await api.userManagement.roles.create(createData);
                             console.log('Role create response:', response);
-                            
+
                             // Set permissions for the newly created role if we have any
                             if (permissionIds.length > 0) {
                               // The RoleSerializer returns the ID directly, not nested in data
                               const roleId = response.id;
                               console.log('Attempting to update permissions for role ID:', roleId);
                               console.log('Permission IDs to apply:', permissionIds);
-                              
+
                               if (roleId) {
                                 try {
                                   console.log('Making updatePermissions API call...');
@@ -1445,17 +1445,17 @@ const UsersRoles = memo(() => {
                             } else {
                               console.log('No permissions to apply');
                             }
-                            
+
                             toast({
                               title: "Success",
                               description: "Role created successfully",
                             });
                           }
-                          
+
                           // Refresh roles list
                           const rolesResponse = await api.userManagement.roles.list();
                           setRoles(rolesResponse.results || []);
-                          
+
                           setRoleDialogOpen(false);
                           setSelectedRole(null);
                         } catch (error: any) {
@@ -1473,9 +1473,9 @@ const UsersRoles = memo(() => {
                       >
                         {isSavingRole ? 'Saving...' : (selectedRole.id ? 'Save Changes' : 'Create Role')}
                       </Button>
-                      <Button 
+                      <Button
                         type="button"
-                        variant="outline" 
+                        variant="outline"
                         onClick={() => {
                           setRoleDialogOpen(false);
                           setSelectedRole(null);
@@ -1508,7 +1508,7 @@ const UsersRoles = memo(() => {
                               <br />
                               <br />
                               <span className="text-destructive font-medium">
-                                Warning: This role is currently assigned to {roleToDelete.user_count} user(s). 
+                                Warning: This role is currently assigned to {roleToDelete.user_count} user(s).
                                 Please reassign these users to other roles before deleting this role.
                               </span>
                             </>

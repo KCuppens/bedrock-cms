@@ -16,7 +16,7 @@ const NotFound = () => {
 
   return (
     <div className="min-h-screen bg-background flex items-center justify-center p-4">
-      <NotFoundState 
+      <NotFoundState
         title="Page not found"
         description="The page you're looking for doesn't exist or has been moved."
         onGoBack={() => navigate(-1)}

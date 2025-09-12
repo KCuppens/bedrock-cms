@@ -13,7 +13,7 @@ import { RefreshCw, Eye } from 'lucide-react';
 
 /**
  * Performance-optimized dynamic page component that renders CMS pages.
- * 
+ *
  * Features:
  * - SEO-optimized with resolved meta data
  * - Block-based content rendering
@@ -76,7 +76,7 @@ const DynamicPage: React.FC = () => {
 
     // Add hover listeners to prefetch linked pages
     document.addEventListener('mouseenter', handleMouseEnter, { capture: true, passive: true });
-    
+
     return () => {
       document.removeEventListener('mouseenter', handleMouseEnter, { capture: true });
     };
@@ -156,20 +156,20 @@ const DynamicPage: React.FC = () => {
           <title>{seoData.title}</title>
           {seoData.description && <meta name="description" content={seoData.description} />}
           {seoData.keywords && <meta name="keywords" content={seoData.keywords} />}
-          
+
           {/* Canonical URL */}
           {seoData.canonicalUrl && <link rel="canonical" href={seoData.canonicalUrl} />}
-          
+
           {/* Open Graph */}
           <meta property="og:title" content={seoData.title} />
           {seoData.description && <meta property="og:description" content={seoData.description} />}
           <meta property="og:type" content={seoData.ogType} />
           <meta property="og:url" content={window.location.href} />
           {seoData.ogImage && <meta property="og:image" content={seoData.ogImage} />}
-          
+
           {/* Language */}
           <html lang={seoData.localeCode} />
-          
+
           {/* Hreflang alternates */}
           {page.seo_links?.alternates?.map((alternate, index) => (
             <link
@@ -179,14 +179,14 @@ const DynamicPage: React.FC = () => {
               href={alternate.href}
             />
           ))}
-          
+
           {/* JSON-LD structured data */}
           {seoData.jsonLd.map((jsonLdItem, index) => (
             <script key={index} type="application/ld+json">
               {JSON.stringify(jsonLdItem)}
             </script>
           ))}
-          
+
           {/* Cache headers for performance */}
           {page.status === 'published' && !isPreviewMode && (
             <meta httpEquiv="Cache-Control" content="public, max-age=300" />
@@ -204,9 +204,9 @@ const DynamicPage: React.FC = () => {
               Viewing {page.status} content
             </span>
             {isStale && (
-              <Button 
-                size="sm" 
-                variant="outline" 
+              <Button
+                size="sm"
+                variant="outline"
                 onClick={() => refetch()}
                 className="ml-4"
               >
@@ -228,18 +228,18 @@ const DynamicPage: React.FC = () => {
         localeCode={seoData?.localeCode}
         jsonLd={seoData?.jsonLd}
       >
-        <main 
+        <main
           className="dynamic-page"
           data-page-id={page.id}
           data-page-status={page.status}
           data-locale={page.locale_code}
         >
           {/* Render blocks */}
-          <DynamicBlocksRenderer 
-            blocks={page.blocks || []} 
+          <DynamicBlocksRenderer
+            blocks={page.blocks || []}
             className="page-blocks"
           />
-          
+
           {/* Fallback content if no blocks */}
           {(!page.blocks || page.blocks.length === 0) && (
             <div className="container mx-auto px-4 py-12">

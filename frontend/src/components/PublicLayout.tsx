@@ -19,7 +19,7 @@ interface PublicLayoutProps {
   jsonLd?: any[];
 }
 
-const PublicLayout: React.FC<PublicLayoutProps> = ({ 
+const PublicLayout: React.FC<PublicLayoutProps> = ({
   children,
   title,
   description,
@@ -54,15 +54,15 @@ const PublicLayout: React.FC<PublicLayoutProps> = ({
           localeCode={localeCode}
           jsonLd={jsonLd}
         />
-        
+
         {/* Simple header while loading */}
         <header className="sticky top-0 z-50 w-full border-b bg-background/95">
           <div className="container mx-auto px-4">
             <div className="flex h-16 items-center justify-between">
               <Link to="/" className="flex items-center gap-2">
-                <img 
-                  src="/bedrock-logo.png" 
-                  alt="Bedrock" 
+                <img
+                  src="/bedrock-logo.png"
+                  alt="Bedrock"
                   className="h-8 w-auto"
                 />
               </Link>
@@ -70,9 +70,9 @@ const PublicLayout: React.FC<PublicLayoutProps> = ({
             </div>
           </div>
         </header>
-        
+
         <main>{children}</main>
-        
+
         {/* Simple footer while loading */}
         <footer className="border-t bg-muted/50">
           <div className="container mx-auto px-4 py-12">
@@ -122,10 +122,10 @@ const PublicLayout: React.FC<PublicLayoutProps> = ({
         localeCode={localeCode}
         jsonLd={jsonLd}
       />
-      
+
       {/* Dynamic Navigation */}
-      <Navigation 
-        menuItems={navigation} 
+      <Navigation
+        menuItems={navigation}
         siteName={siteName}
         homeUrl={homeUrl}
       />
@@ -134,7 +134,7 @@ const PublicLayout: React.FC<PublicLayoutProps> = ({
       <main className="flex-1">{children}</main>
 
       {/* Dynamic Footer */}
-      <Footer 
+      <Footer
         footerItems={footerItems}
         siteName={siteName}
         homeUrl={homeUrl}

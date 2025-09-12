@@ -23,9 +23,9 @@ services:
     volumes:
       - redis_data:/data
     command: >
-      redis-server 
-      --appendonly yes 
-      --maxmemory 512mb 
+      redis-server
+      --appendonly yes
+      --maxmemory 512mb
       --maxmemory-policy allkeys-lru
       --requirepass ${REDIS_PASSWORD}
     restart: unless-stopped

@@ -112,7 +112,7 @@ export const PageHeader = memo((props: PageHeaderProps) => {
           >
             <Redo className="h-4 w-4" />
           </Button>
-          
+
           <Button variant="ghost" size="sm" onClick={onVersionHistory}>
             <History className="h-4 w-4 mr-2" />
             Version History

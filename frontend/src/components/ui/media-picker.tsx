@@ -5,12 +5,12 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { 
-  Search, 
-  Upload, 
-  Image as ImageIcon, 
-  FileImage, 
-  X, 
+import {
+  Search,
+  Upload,
+  Image as ImageIcon,
+  FileImage,
+  X,
   Check,
   Loader2,
   AlertCircle
@@ -68,11 +68,11 @@ export const MediaPicker: React.FC<MediaPickerProps> = ({
         page: 1,
         limit: 50
       };
-      
+
       if (searchQuery) {
         filters.search = searchQuery;
       }
-      
+
       if (allowedTypes.length === 1) {
         filters.file_type = allowedTypes[0];
       }
@@ -84,21 +84,21 @@ export const MediaPicker: React.FC<MediaPickerProps> = ({
         page: 1,
         limit: 50
       });
-      
+
       console.log('API Response:', response); // Debug log
-      
+
       if (response?.results || response?.data) {
         const rawAssets = response.results || response.data || [];
         console.log('Raw assets:', rawAssets); // Debug log
-        
+
         // Convert API response to our MediaAsset interface
         const convertedAssets = rawAssets.map((asset: any) => {
           console.log('Raw asset from API:', asset);
           console.log('Asset ID type:', typeof asset.id, 'Value:', asset.id);
-          
+
           // The backend returns UUID strings for file IDs
           const assetId = String(asset.id); // Keep as UUID string
-          
+
           return {
           id: assetId, // UUID string from backend
           filename: asset.filename || asset.original_filename || asset.name || 'Unknown',
@@ -112,10 +112,10 @@ export const MediaPicker: React.FC<MediaPickerProps> = ({
           tags: Array.isArray(asset.tags) ? asset.tags.join(', ') : asset.tags || ''
         };
         });
-        
+
         console.log('Converted assets:', convertedAssets); // Debug log
         setAssets(convertedAssets);
-        
+
         // Pre-select current asset if provided
         if (selectedAssetId) {
           const currentAsset = convertedAssets.find((asset: MediaAsset) => asset.id === selectedAssetId);
@@ -144,7 +144,7 @@ export const MediaPicker: React.FC<MediaPickerProps> = ({
   // Handle search with debounce
   useEffect(() => {
     if (!open || !searchQuery) return; // Only run if modal is open and there's a search query
-    
+
     const timeoutId = setTimeout(() => {
       loadAssets();
     }, 300);
@@ -175,10 +175,10 @@ export const MediaPicker: React.FC<MediaPickerProps> = ({
       console.log('Uploading file:', uploadFile.name);
       const response = await api.files.upload(uploadData);
       console.log('Upload response:', response);
-      
+
       if (response?.data || response) {
         const rawAsset = response?.data || response;
-        
+
         // Convert uploaded asset to MediaAsset format
         const assetId = String(rawAsset.id); // Keep UUID as string
         const newAsset: MediaAsset = {
@@ -193,17 +193,17 @@ export const MediaPicker: React.FC<MediaPickerProps> = ({
           description: rawAsset.description || 'SEO Image',
           tags: rawAsset.tags || 'seo,media'
         };
-        
+
         console.log('Converted new asset:', newAsset);
-        
+
         // Add to assets list immediately for instant feedback
         setAssets(prev => [newAsset, ...prev]);
-        
+
         // Auto-select uploaded asset
         setSelectedAsset(newAsset);
         setActiveTab('browse');
         setUploadFile(null);
-        
+
         // Refresh the assets list in the background to sync with server
         setTimeout(() => {
           // Store the selected asset ID before refresh
@@ -216,7 +216,7 @@ export const MediaPicker: React.FC<MediaPickerProps> = ({
             }
           });
         }, 500);
-        
+
         console.log('Upload completed successfully');
       } else {
         console.error('No data in upload response:', response);
@@ -270,7 +270,7 @@ export const MediaPicker: React.FC<MediaPickerProps> = ({
             <TabsTrigger value="browse">Browse Media</TabsTrigger>
             <TabsTrigger value="upload">Upload New</TabsTrigger>
           </TabsList>
-          
+
           <TabsContent value="browse" className="space-y-4">
             <div className="flex items-center space-x-2">
               <div className="relative flex-1">
@@ -344,13 +344,13 @@ export const MediaPicker: React.FC<MediaPickerProps> = ({
                           <ImageIcon className="h-8 w-8 text-muted-foreground" />
                         </div>
                       </div>
-                      
+
                       {selectedAsset?.id === asset.id && (
                         <div className="absolute top-2 right-2 bg-primary text-primary-foreground rounded-full p-1">
                           <Check className="h-3 w-3" />
                         </div>
                       )}
-                      
+
                       <div className="mt-2">
                         <p className="text-xs truncate" title={asset.filename}>
                           {asset.filename}
@@ -372,7 +372,7 @@ export const MediaPicker: React.FC<MediaPickerProps> = ({
               )}
             </ScrollArea>
           </TabsContent>
-          
+
           <TabsContent value="upload" className="space-y-4">
             <div className="border-2 border-dashed border-muted-foreground/25 rounded-lg p-8 text-center">
               {uploadFile ? (

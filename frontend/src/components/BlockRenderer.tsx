@@ -27,7 +27,7 @@ const UnknownBlock: React.FC<BlockProps> = ({ type, props }) => {
       </div>
     );
   }
-  
+
   // In production, render nothing for unknown blocks
   return null;
 };
@@ -40,17 +40,17 @@ const BlockLoadingFallback: React.FC<{ type: string }> = ({ type }) => (
 );
 
 // Error fallback for block components
-const BlockErrorFallback: React.FC<{ error: Error; type: string; resetError: () => void }> = ({ 
-  error, 
-  type, 
-  resetError 
+const BlockErrorFallback: React.FC<{ error: Error; type: string; resetError: () => void }> = ({
+  error,
+  type,
+  resetError
 }) => {
   if (process.env.NODE_ENV === 'development') {
     return (
       <div className="border-2 border-red-300 bg-red-50 p-4 rounded-lg">
         <p className="text-red-800 font-medium">Error in {type} block:</p>
         <p className="text-red-600 text-sm mt-1">{error.message}</p>
-        <button 
+        <button
           onClick={resetError}
           className="mt-2 px-3 py-1 bg-red-600 text-white rounded text-xs hover:bg-red-700"
         >
@@ -59,7 +59,7 @@ const BlockErrorFallback: React.FC<{ error: Error; type: string; resetError: () 
       </div>
     );
   }
-  
+
   // In production, render nothing for errored blocks
   return null;
 };
@@ -91,22 +91,22 @@ const getBlockComponent = (blockType: string) => {
 };
 
 // Individual block wrapper with error boundary
-const BlockWrapper: React.FC<BlockProps & { className?: string }> = ({ 
-  type, 
-  props, 
-  index, 
+const BlockWrapper: React.FC<BlockProps & { className?: string }> = ({
+  type,
+  props,
+  index,
   isEditable = false,
   className = ''
 }) => {
   const BlockComponent = useMemo(() => getBlockComponent(type), [type]);
-  
+
   return (
     <ErrorBoundary
       fallbackRender={({ error, resetErrorBoundary }) => (
-        <BlockErrorFallback 
-          error={error} 
-          type={type} 
-          resetError={resetErrorBoundary} 
+        <BlockErrorFallback
+          error={error}
+          type={type}
+          resetError={resetErrorBoundary}
         />
       )}
       resetKeys={[type, props]} // Reset error boundary when props change
@@ -136,7 +136,7 @@ interface BlockRendererProps {
 
 /**
  * High-performance block renderer component.
- * 
+ *
  * Features:
  * - Lazy loading of block components
  * - Error boundaries for individual blocks
@@ -168,7 +168,7 @@ export const BlockRenderer: React.FC<BlockRendererProps> = ({
   }
 
   return (
-    <div 
+    <div
       className={`block-renderer ${className}`.trim()}
       role="main"
       aria-label="Page content"

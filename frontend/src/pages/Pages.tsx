@@ -198,10 +198,10 @@ const SortableRow = memo<SortableRowProps>(({ page, isSelected, onSelect, onOpen
                 )}
               </Button>
             )}
-            
+
             {/* If no children, add spacing */}
             {!hasChildren && <div className="w-6" />}
-            
+
             <span className="font-medium">{page.title}</span>
             {/* Memoized template badge computation */}
             <TemplateBadge blocks={page.blocks} />
@@ -282,7 +282,7 @@ const SortableRow = memo<SortableRowProps>(({ page, isSelected, onSelect, onOpen
               Duplicate
             </DropdownMenuItem>
             {page.status === 'draft' ? (
-              <DropdownMenuItem 
+              <DropdownMenuItem
                 className="text-green-600"
                 onClick={(e) => {
                   e.stopPropagation();
@@ -293,7 +293,7 @@ const SortableRow = memo<SortableRowProps>(({ page, isSelected, onSelect, onOpen
                 Publish
               </DropdownMenuItem>
             ) : (
-              <DropdownMenuItem 
+              <DropdownMenuItem
                 className="text-orange-600"
                 onClick={(e) => {
                   e.stopPropagation();
@@ -304,7 +304,7 @@ const SortableRow = memo<SortableRowProps>(({ page, isSelected, onSelect, onOpen
                 Unpublish
               </DropdownMenuItem>
             )}
-            <DropdownMenuItem 
+            <DropdownMenuItem
               className="text-destructive"
               onClick={(e) => {
                 e.stopPropagation();
@@ -377,7 +377,7 @@ const mockPages: Page[] = [
     status: "draft",
     locale: "EN",
     updatedAt: "2024-01-13T16:30:00Z",
-    updatedBy: "Sarah Johnson", 
+    updatedBy: "Sarah Johnson",
     internalLinks: 2,
     incomingLinks: 1,
     parentId: "2",
@@ -491,11 +491,11 @@ const STATUS_COLORS = {
 // Memoized component for template badge to optimize expensive computation
 const TemplateBadge = memo<{ blocks?: any[] }>(({ blocks }) => {
   const templateInfo = useMemo(() => {
-    const detailBlock = blocks?.find((block: any) => 
+    const detailBlock = blocks?.find((block: any) =>
       typeof block === 'object' && block?.type?.endsWith('_detail')
     );
     if (!detailBlock) return null;
-    
+
     const contentType = detailBlock.type.replace('_detail', '');
     return { contentType };
   }, [blocks]);
@@ -517,12 +517,12 @@ const Pages = memo(() => {
   const [pages, setPages] = useState<Page[]>([]);
   const [locales, setLocales] = useState<Locale[]>([]);
   const [loading, setLoading] = useState(true);
-  
+
   // Component-level memory management
   const abortControllerRef = useRef<AbortController>(new AbortController());
   const isMountedRef = useRef(true);
   const timersRef = useRef<Set<NodeJS.Timeout>>(new Set());
-  
+
   // Safe state setter to prevent updates on unmounted components
   const safeSetState = useCallback((setState: Function) => {
     return (...args: any[]) => {
@@ -531,7 +531,7 @@ const Pages = memo(() => {
       }
     };
   }, []);
-  
+
   const [selectedPages, setSelectedPages] = useState<string[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
@@ -576,10 +576,10 @@ const Pages = memo(() => {
     const date = new Date(dateString);
     const now = new Date();
     const diffInHours = (now.getTime() - date.getTime()) / (1000 * 60 * 60);
-    
+
     if (diffInHours < 1) {
       const diffInMinutes = Math.floor(diffInHours * 60);
-      return diffInMinutes === 1 
+      return diffInMinutes === 1
         ? t('pages.time.minute_ago', '1 minute ago')
         : t('pages.time.minutes_ago', `${diffInMinutes} minutes ago`);
     } else if (diffInHours < 24) {
@@ -615,14 +615,14 @@ const Pages = memo(() => {
   // Define loadLocales function before using it
   const loadLocales = useCallback(async () => {
     if (!isMountedRef.current) return;
-    
+
     try {
       const response = await api.request({
         method: 'GET',
         url: '/api/v1/i18n/locales/',
         signal: abortControllerRef.current.signal
       });
-      
+
       if (!isMountedRef.current) return;
       safeSetState(setLocales)(response.results || response || []);
     } catch (error: any) {
@@ -639,14 +639,14 @@ const Pages = memo(() => {
   // Load pages when filters change or on mount
   useEffect(() => {
     const abortController = new AbortController();
-    
+
     const fetchPages = async () => {
       if (!isMountedRef.current) return;
-      
+
       try {
         safeSetState(setLoading)(true);
         const filters: any = {};
-        
+
         if (searchQuery) {
           filters.q = searchQuery;
         }
@@ -656,18 +656,18 @@ const Pages = memo(() => {
         if (localeFilter !== 'all') {
           filters.locale = localeFilter;
         }
-        
+
         const response = await api.request({
           method: 'GET',
           url: '/api/v1/cms/pages/',
           params: filters,
           signal: abortController.signal
         });
-        
+
         if (!isMountedRef.current || abortController.signal.aborted) return;
-        
+
         const pagesData = response.results || [];
-        
+
         // Transform API pages to include display fields
         const transformedPages: Page[] = pagesData.map((page: ApiPage) => ({
           ...page,
@@ -682,7 +682,7 @@ const Pages = memo(() => {
           inFooter: (page as any).in_footer || (page as any).inFooter || false,
           isHomepage: (page as any).is_homepage || page.path === '/' || page.slug === ''
         }));
-        
+
         safeSetState(setPages)(transformedPages);
       } catch (error: any) {
         if (error.name === 'AbortError' || !isMountedRef.current) return;
@@ -696,7 +696,7 @@ const Pages = memo(() => {
     };
 
     fetchPages();
-    
+
     return () => {
       abortController.abort();
     };
@@ -722,7 +722,7 @@ const Pages = memo(() => {
     try {
       setLoading(true);
       const filters: any = {};
-      
+
       if (searchQuery) {
         filters.q = searchQuery;
       }
@@ -732,10 +732,10 @@ const Pages = memo(() => {
       if (localeFilter !== 'all') {
         filters.locale = localeFilter;
       }
-      
+
       const response = await api.cms.pages.list(filters);
       const pagesData = response.results || [];
-      
+
       // Transform API pages to include display fields
       const transformedPages: Page[] = pagesData.map((page: ApiPage) => ({
         ...page,
@@ -750,10 +750,10 @@ const Pages = memo(() => {
         inFooter: (page as any).in_footer || (page as any).inFooter || false,
         isHomepage: (page as any).is_homepage || page.path === '/' || page.slug === ''
       }));
-      
+
       // Group pages by parent and sort each group by position
       const pagesByParent = new Map<string | undefined, Page[]>();
-      
+
       // Group pages by parent
       transformedPages.forEach(page => {
         const parentKey = page.parentId || 'ROOT';
@@ -762,26 +762,26 @@ const Pages = memo(() => {
         }
         pagesByParent.get(parentKey)!.push(page);
       });
-      
+
       // Sort each group by position
       pagesByParent.forEach((pages, parentKey) => {
         pages.sort((a, b) => (a.position || 0) - (b.position || 0));
       });
-      
+
       // Build final sorted array: ROOT pages first, then child pages
       const sortedPages: Page[] = [];
-      
+
       // Add root pages first (sorted by position)
       const rootPages = pagesByParent.get('ROOT') || [];
       sortedPages.push(...rootPages);
-      
+
       // Add child pages (sorted by position within each parent)
       pagesByParent.forEach((pages, parentKey) => {
         if (parentKey !== 'ROOT') {
           sortedPages.push(...pages);
         }
       });
-      
+
       setPages(sortedPages);
     } catch (error) {
       toast.error('Failed to load pages');
@@ -810,8 +810,8 @@ const Pages = memo(() => {
 
   // Toggle expand/collapse for a page
   const toggleExpandPage = useCallback((pageId: string) => {
-    setExpandedPages(prev => 
-      prev.includes(pageId) 
+    setExpandedPages(prev =>
+      prev.includes(pageId)
         ? prev.filter(id => id !== pageId)
         : [...prev, pageId]
     );
@@ -824,7 +824,7 @@ const Pages = memo(() => {
                            page.path.toLowerCase().includes(searchQuery.toLowerCase());
       const matchesStatus = statusFilter === "all" || page.status === statusFilter;
       const matchesLocale = localeFilter === "all" || page.locale === localeFilter;
-      
+
       return matchesSearch && matchesStatus && matchesLocale;
     });
   }, [pages, searchQuery, statusFilter, localeFilter]);
@@ -832,18 +832,18 @@ const Pages = memo(() => {
   // Memoize hierarchical pages computation for performance
   const hierarchicalPages = useMemo(() => {
     const hierarchicalPages: Page[] = [];
-    
+
     // First add all root pages (no parent)
     const rootPages = filteredPages.filter(page => !page.parentId);
-    
+
     const addPagesRecursively = (parentPages: Page[], level = 0) => {
       parentPages.forEach(page => {
         const pageWithLevel = { ...page, level };
         hierarchicalPages.push(pageWithLevel);
-        
+
         // If page is expanded, add children
         if (expandedPages.includes(page.id)) {
-          const children = getChildPages(page.id).filter(child => 
+          const children = getChildPages(page.id).filter(child =>
             filteredPages.some(p => p.id === child.id)
           );
           if (children.length > 0) {
@@ -852,11 +852,11 @@ const Pages = memo(() => {
         }
       });
     };
-    
+
     addPagesRecursively(rootPages);
     return hierarchicalPages;
   }, [filteredPages, expandedPages, getChildPages]);
-  
+
   // Legacy function for backward compatibility
   const getHierarchicalPages = useCallback((filterSearch = true) => {
     return filterSearch ? hierarchicalPages : pages;
@@ -866,7 +866,7 @@ const Pages = memo(() => {
   const handleCreatePage = useCallback(async () => {
     try {
       setIsCreatingPage(true);
-      
+
       // Validate scheduling fields
       if (newPageForm.status === 'scheduled' && !newPageForm.scheduledPublishAt) {
         toast({
@@ -877,13 +877,13 @@ const Pages = memo(() => {
         setIsCreatingPage(false);
         return;
       }
-      
+
       // Convert datetime-local to ISO string for API
       const formatDateTimeForAPI = (dateTimeLocal: string) => {
         if (!dateTimeLocal) return undefined;
         return new Date(dateTimeLocal).toISOString();
       };
-      
+
       const createRequest: PageCreateRequest = {
         title: newPageForm.title,
         slug: newPageForm.isHomepage ? "" : newPageForm.slug,
@@ -899,7 +899,7 @@ const Pages = memo(() => {
 
       await api.cms.pages.create(createRequest);
       toast.success(t('pages.success.created', 'Page created successfully'));
-      
+
       // Defer state updates to next tick to avoid React batching issues
       setTimeout(() => {
         setNewPageModalOpen(false);
@@ -915,7 +915,7 @@ const Pages = memo(() => {
         });
         setIsCreatingPage(false);
       }, 0);
-      
+
       // Load pages after a slight delay to ensure dialog closes smoothly
       setTimeout(() => {
         loadPages();
@@ -930,14 +930,14 @@ const Pages = memo(() => {
   const handleDuplicatePage = useCallback(async (page: Page) => {
     try {
       const duplicatedPage = await api.cms.pages.duplicate(page.id);
-      
+
       // The API returns the page object directly
       if (duplicatedPage && duplicatedPage.title) {
         toast.success(t('pages.success.duplicated_as', `Page duplicated as "${duplicatedPage.title}"`));
       } else {
         toast.success(t('pages.success.duplicated', 'Page duplicated successfully'));
       }
-      
+
       // Reload pages to show the new duplicate
       loadPages();
     } catch (error) {
@@ -981,10 +981,10 @@ const Pages = memo(() => {
   // Handle deleting a page
   const handleDeletePage = useCallback(async () => {
     if (!pageToDelete) return;
-    
+
     try {
       setIsDeletingPage(true);
-      
+
       // Check if page has children and pass cascade parameter
       const hasChildPages = hasChildren(pageToDelete.id);
       if (hasChildPages) {
@@ -1002,13 +1002,13 @@ const Pages = memo(() => {
       } else {
         await api.cms.pages.delete(parseInt(pageToDelete.id));
       }
-      
+
       toast.success(t('pages.success.deleted', `Page "${pageToDelete.title}" has been deleted`));
-      
+
       // Close modal and reset state
       setDeleteModalOpen(false);
       setPageToDelete(null);
-      
+
       // Reload pages
       loadPages();
     } catch (error) {
@@ -1031,10 +1031,10 @@ const Pages = memo(() => {
       const deletePromises = selectedPages.map(pageId =>
         api.cms.pages.delete(parseInt(pageId))
       );
-      
+
       await Promise.all(deletePromises);
       toast.success(t('pages.success.bulk_deleted', `Successfully deleted ${selectedPages.length} page(s)`));
-      
+
       // Clear selection and reload
       setSelectedPages([]);
       loadPages();
@@ -1047,10 +1047,10 @@ const Pages = memo(() => {
   // Handle editing an existing page
   const handleEditPage = useCallback(async () => {
     if (!editingPage) return;
-    
+
     try {
       setIsUpdatingPage(true);
-      
+
       // Validate scheduling fields
       if (newPageForm.status === 'scheduled' && !newPageForm.scheduledPublishAt) {
         toast({
@@ -1061,16 +1061,16 @@ const Pages = memo(() => {
         setIsUpdatingPage(false);
         return;
       }
-      
+
       // Handle slug for homepage - convert '/' to empty string for backend
       const apiSlug = newPageForm.isHomepage ? '' : newPageForm.slug.replace(/^\/+/, '');
-      
+
       // Convert datetime-local to ISO string for API
       const formatDateTimeForAPI = (dateTimeLocal: string) => {
         if (!dateTimeLocal) return undefined;
         return new Date(dateTimeLocal).toISOString();
       };
-      
+
       const updateRequest = {
         title: newPageForm.title,
         slug: apiSlug,
@@ -1086,7 +1086,7 @@ const Pages = memo(() => {
 
       await api.cms.pages.update(parseInt(editingPage.id), updateRequest);
       toast.success(t('pages.success.updated', 'Page updated successfully'));
-      
+
       // Defer state updates to next tick to avoid React batching issues
       setTimeout(() => {
         setEditPageModalOpen(false);
@@ -1105,7 +1105,7 @@ const Pages = memo(() => {
         });
         setIsUpdatingPage(false);
       }, 0);
-      
+
       // Load pages after a slight delay to ensure dialog closes smoothly
       setTimeout(() => {
         loadPages();
@@ -1120,19 +1120,19 @@ const Pages = memo(() => {
   // Open edit modal with pre-filled data
   const openEditModal = useCallback((page: Page) => {
     setEditingPage(page);
-    
+
     // Handle slug for homepage vs regular pages
     let displaySlug = page.slug || '';
     if (page.isHomepage || page.path === '/' || page.slug === '') {
       displaySlug = '/';
     }
-    
+
     // Convert ISO dates to datetime-local format for input fields
     const formatDateTimeForInput = (isoString: string | undefined) => {
       if (!isoString) return '';
       return new Date(isoString).toISOString().slice(0, 16);
     };
-    
+
     setNewPageForm({
       title: page.title,
       slug: displaySlug,
@@ -1164,10 +1164,10 @@ const Pages = memo(() => {
       if (prev.isHomepage) {
         return { ...prev, title };
       }
-      
+
       // For new pages (empty slug) or if slug matches generated version of old title
       const shouldAutoGenerate = prev.slug === '' || prev.slug === generateSlug(prev.title);
-      
+
       return {
         ...prev,
         title,
@@ -1186,8 +1186,8 @@ const Pages = memo(() => {
   }, [generateSlug]);
 
   const handlePageSelect = useCallback((pageId: string) => {
-    setSelectedPages(prev => 
-      prev.includes(pageId) 
+    setSelectedPages(prev =>
+      prev.includes(pageId)
         ? prev.filter(id => id !== pageId)
         : [...prev, pageId]
     );
@@ -1219,7 +1219,7 @@ const Pages = memo(() => {
       try {
         // Get the parent group for the dragged page
         const parentId = draggedPage.parentId || null;
-        
+
         // Get the ordered list of page IDs for this parent group
         const pageIds = newPages
           .filter(p => {
@@ -1230,13 +1230,13 @@ const Pages = memo(() => {
             return p.parentId === parentId;
           })
           .map(p => parseInt(p.id));
-        
+
         // Use the unified reorder endpoint
         await api.pages.reorder(
           parentId ? parseInt(parentId) : null,
           pageIds
         );
-        
+
         // Refresh data to ensure consistency
         await loadPages();
       } catch (error) {
@@ -1262,17 +1262,17 @@ const Pages = memo(() => {
     if (!dateString) {
       return '';
     }
-    
+
     const date = new Date(dateString);
-    
+
     // Check if date is invalid
     if (isNaN(date.getTime())) {
       return '';
     }
-    
+
     const now = new Date();
     const diffInHours = (now.getTime() - date.getTime()) / (1000 * 60 * 60);
-    
+
     // If less than 24 hours ago, show relative time
     if (diffInHours < 24 && diffInHours >= 0) {
       if (diffInHours < 1) {
@@ -1281,7 +1281,7 @@ const Pages = memo(() => {
       }
       return `${Math.floor(diffInHours)}h ago`;
     }
-    
+
     // If within the current year, don't show year
     if (date.getFullYear() === now.getFullYear()) {
       return date.toLocaleDateString('en-US', {
@@ -1292,7 +1292,7 @@ const Pages = memo(() => {
         hour12: false
       });
     }
-    
+
     // For older dates, include year
     return date.toLocaleDateString('en-US', {
       month: 'short',
@@ -1345,7 +1345,7 @@ const Pages = memo(() => {
                     <h1 className="text-3xl font-bold text-foreground mb-2">{t('pages.title', 'Pages')}</h1>
                     <p className="text-muted-foreground">Manage your website content and structure</p>
                   </div>
-                  
+
                   <PagesEmptyState onCreatePage={() => setNewPageModalOpen(true)} />
                 </div>
               </main>
@@ -1365,7 +1365,7 @@ const Pages = memo(() => {
                 Create a new page with customizable properties and hierarchy settings.
               </DialogDescription>
             </DialogHeader>
-            
+
             <div className="space-y-6 py-4">
               {/* Title */}
               <div className="space-y-2">
@@ -1459,13 +1459,13 @@ const Pages = memo(() => {
               {/* Page Options */}
               <div className="space-y-4">
                 <Label className="text-base font-medium">Page Options</Label>
-                
+
                 <div className="space-y-3">
                   <div className="flex items-center space-x-2">
-                    <Checkbox 
+                    <Checkbox
                       id="inMainMenu"
                       checked={newPageForm.inMainMenu}
-                      onCheckedChange={(checked) => 
+                      onCheckedChange={(checked) =>
                         setNewPageForm(prev => ({ ...prev, inMainMenu: checked as boolean }))
                       }
                     />
@@ -1473,12 +1473,12 @@ const Pages = memo(() => {
                       Include in main navigation menu
                     </Label>
                   </div>
-                  
+
                   <div className="flex items-center space-x-2">
-                    <Checkbox 
+                    <Checkbox
                       id="inFooter"
                       checked={newPageForm.inFooter}
-                      onCheckedChange={(checked) => 
+                      onCheckedChange={(checked) =>
                         setNewPageForm(prev => ({ ...prev, inFooter: checked as boolean }))
                       }
                     />
@@ -1486,12 +1486,12 @@ const Pages = memo(() => {
                       Include in footer
                     </Label>
                   </div>
-                  
+
                   <div className="flex items-center space-x-2">
-                    <Checkbox 
+                    <Checkbox
                       id="isHomepage"
                       checked={newPageForm.isHomepage}
-                      onCheckedChange={(checked) => 
+                      onCheckedChange={(checked) =>
                         setNewPageForm(prev => ({ ...prev, isHomepage: checked as boolean }))
                       }
                     />
@@ -1507,8 +1507,8 @@ const Pages = memo(() => {
                 <div className="p-3 bg-muted rounded-lg">
                   <Label className="text-sm font-medium">Page URL Preview:</Label>
                   <code className="block text-sm text-primary mt-1">
-                    {newPageForm.isHomepage 
-                      ? "/" 
+                    {newPageForm.isHomepage
+                      ? "/"
                       : newPageForm.parentId !== "none"
                         ? `${pages.find(p => p.id === newPageForm.parentId)?.path}/${newPageForm.slug}`.replace(/\/+/g, '/')
                         : `/${newPageForm.slug}`
@@ -1519,14 +1519,14 @@ const Pages = memo(() => {
             </div>
 
             <DialogFooter>
-              <Button 
-                variant="outline" 
+              <Button
+                variant="outline"
                 onClick={handleCloseNewPageModal}
                 disabled={isCreatingPage}
               >
                 Cancel
               </Button>
-              <Button 
+              <Button
                 onClick={handleCreatePage}
                 disabled={isCreatingPage || !newPageForm.title || (!newPageForm.slug && !newPageForm.isHomepage)}
               >
@@ -1543,13 +1543,13 @@ const Pages = memo(() => {
     <div className="min-h-screen">
       <div className="flex">
         <Sidebar />
-        
+
         <div className="flex-1 flex flex-col ml-72">
           <TopNavbar />
-          
+
           <main className="flex-1 p-8">
             <div className="max-w-7xl mx-auto space-y-6">
-              
+
               {/* Header */}
               <div className="flex items-center justify-between">
                 <h1 className="text-3xl font-bold text-foreground">{t('pages.title', 'Pages')}</h1>
@@ -1575,7 +1575,7 @@ const Pages = memo(() => {
                           <Download className="w-4 h-4 mr-2" />
                           Export Selected
                         </DropdownMenuItem>
-                        <DropdownMenuItem 
+                        <DropdownMenuItem
                           className="text-destructive"
                           onClick={() => {
                             if (selectedPages.length > 0) {
@@ -1614,7 +1614,7 @@ const Pages = memo(() => {
                         className="pl-10"
                       />
                     </div>
-                    
+
                     <Select value={statusFilter} onValueChange={setStatusFilter}>
                       <SelectTrigger>
                         <SelectValue placeholder="All Statuses" />
@@ -1738,7 +1738,7 @@ const Pages = memo(() => {
               </SheetHeader>
 
               <div className="mt-6 space-y-6">
-                
+
                 {/* SEO Snippet */}
                 <div>
                   <h3 className="font-medium mb-3 flex items-center gap-2">
@@ -1787,35 +1787,35 @@ const Pages = memo(() => {
                     {(() => {
                       // Generate mock revision data based on the selected page
                       const mockRevisions = [
-                        { 
-                          id: `rev-${selectedPage.id}-1`, 
-                          revision_type: 'published', 
-                          created_at: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(), 
-                          created_by_name: 'John Doe', 
-                          comment: 'Published latest changes', 
-                          is_published_snapshot: true, 
-                          is_autosave: false, 
-                          block_count: 5 
+                        {
+                          id: `rev-${selectedPage.id}-1`,
+                          revision_type: 'published',
+                          created_at: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
+                          created_by_name: 'John Doe',
+                          comment: 'Published latest changes',
+                          is_published_snapshot: true,
+                          is_autosave: false,
+                          block_count: 5
                         },
-                        { 
-                          id: `rev-${selectedPage.id}-2`, 
-                          revision_type: 'autosave', 
-                          created_at: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(), 
-                          created_by_name: 'Jane Smith', 
-                          comment: '', 
-                          is_published_snapshot: false, 
-                          is_autosave: true, 
-                          block_count: 5 
+                        {
+                          id: `rev-${selectedPage.id}-2`,
+                          revision_type: 'autosave',
+                          created_at: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(),
+                          created_by_name: 'Jane Smith',
+                          comment: '',
+                          is_published_snapshot: false,
+                          is_autosave: true,
+                          block_count: 5
                         },
-                        { 
-                          id: `rev-${selectedPage.id}-3`, 
-                          revision_type: 'manual', 
-                          created_at: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(), 
-                          created_by_name: 'Admin', 
-                          comment: 'Initial version', 
-                          is_published_snapshot: false, 
-                          is_autosave: false, 
-                          block_count: 3 
+                        {
+                          id: `rev-${selectedPage.id}-3`,
+                          revision_type: 'manual',
+                          created_at: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(),
+                          created_by_name: 'Admin',
+                          comment: 'Initial version',
+                          is_published_snapshot: false,
+                          is_autosave: false,
+                          block_count: 3
                         }
                       ];
                       return mockRevisions;
@@ -1823,8 +1823,8 @@ const Pages = memo(() => {
                         <div key={revision.id} className="flex items-center justify-between p-2 bg-muted/20 rounded">
                           <div>
                             <div className="text-sm font-medium">
-                              {revision.revision_type === 'published' ? 'Published Version' : 
-                               revision.revision_type === 'autosave' ? 'Auto-saved Draft' : 
+                              {revision.revision_type === 'published' ? 'Published Version' :
+                               revision.revision_type === 'autosave' ? 'Auto-saved Draft' :
                                'Manual Revision'}
                               {index === 0 && ' (Current)'}
                             </div>
@@ -1874,7 +1874,7 @@ const Pages = memo(() => {
               Create a new page with customizable properties and hierarchy settings.
             </DialogDescription>
           </DialogHeader>
-          
+
           <div className="flex-1 overflow-y-auto px-1">
             <div className="space-y-6 py-4 pr-2">
             {/* Title */}
@@ -1973,7 +1973,7 @@ const Pages = memo(() => {
                   <Calendar className="w-4 h-4" />
                   Scheduling Options
                 </Label>
-                
+
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                   <div className="space-y-1">
                     <Label htmlFor="scheduledPublishAt" className="text-xs">Publish Date & Time *</Label>
@@ -2029,13 +2029,13 @@ const Pages = memo(() => {
             {/* Page Options */}
             <div className="space-y-4">
               <Label className="text-base font-medium">Page Options</Label>
-              
+
               <div className="space-y-3">
                 <div className="flex items-center space-x-2">
-                  <Checkbox 
+                  <Checkbox
                     id="inMainMenu"
                     checked={newPageForm.inMainMenu}
-                    onCheckedChange={(checked) => 
+                    onCheckedChange={(checked) =>
                       setNewPageForm(prev => ({ ...prev, inMainMenu: checked as boolean }))
                     }
                   />
@@ -2043,12 +2043,12 @@ const Pages = memo(() => {
                     Include in main navigation menu
                   </Label>
                 </div>
-                
+
                 <div className="flex items-center space-x-2">
-                  <Checkbox 
+                  <Checkbox
                     id="inFooter"
                     checked={newPageForm.inFooter}
-                    onCheckedChange={(checked) => 
+                    onCheckedChange={(checked) =>
                       setNewPageForm(prev => ({ ...prev, inFooter: checked as boolean }))
                     }
                   />
@@ -2056,12 +2056,12 @@ const Pages = memo(() => {
                     Include in footer
                   </Label>
                 </div>
-                
+
                 <div className="flex items-center space-x-2">
-                  <Checkbox 
+                  <Checkbox
                     id="isHomepage"
                     checked={newPageForm.isHomepage}
-                    onCheckedChange={(checked) => 
+                    onCheckedChange={(checked) =>
                       setNewPageForm(prev => ({ ...prev, isHomepage: checked as boolean }))
                     }
                   />
@@ -2077,8 +2077,8 @@ const Pages = memo(() => {
               <div className="p-3 bg-muted rounded-lg">
                 <Label className="text-sm font-medium">Page URL Preview:</Label>
                 <code className="block text-sm text-primary mt-1">
-                  {newPageForm.isHomepage 
-                    ? "/" 
+                  {newPageForm.isHomepage
+                    ? "/"
                     : newPageForm.parentId !== "none"
                       ? `${pages.find(p => p.id === newPageForm.parentId)?.path}/${newPageForm.slug}`.replace(/\/+/g, '/')
                       : `/${newPageForm.slug}`
@@ -2090,16 +2090,16 @@ const Pages = memo(() => {
           </div>
 
           <DialogFooter className="flex-shrink-0">
-            <Button 
-              variant="outline" 
+            <Button
+              variant="outline"
               onClick={handleCloseNewPageModal}
             >
               Cancel
             </Button>
-            <Button 
+            <Button
               onClick={handleCreatePage}
               disabled={
-                !newPageForm.title || 
+                !newPageForm.title ||
                 (!newPageForm.slug && !newPageForm.isHomepage) ||
                 (newPageForm.status === 'scheduled' && !newPageForm.scheduledPublishAt)
               }
@@ -2122,7 +2122,7 @@ const Pages = memo(() => {
               Edit page properties and settings.
             </p>
           </SimpleDialogHeader>
-          
+
           <div className="flex-1 overflow-y-auto px-1">
             <div className="space-y-4 py-4 pr-2">
             <div className="space-y-2">
@@ -2208,7 +2208,7 @@ const Pages = memo(() => {
                   <Calendar className="w-4 h-4" />
                   Scheduling Options
                 </Label>
-                
+
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                   <div className="space-y-1">
                     <Label htmlFor="edit-scheduledPublishAt" className="text-xs">Publish Date & Time *</Label>
@@ -2263,29 +2263,29 @@ const Pages = memo(() => {
 
             <div className="space-y-3">
               <div className="flex items-center space-x-2">
-                <Checkbox 
+                <Checkbox
                   id="edit-mainmenu"
                   checked={newPageForm.inMainMenu}
-                  onCheckedChange={(checked) => 
+                  onCheckedChange={(checked) =>
                     setNewPageForm(prev => ({ ...prev, inMainMenu: checked as boolean }))
                   }
                 />
                 <Label htmlFor="edit-mainmenu">Include in main menu</Label>
               </div>
-              
+
               <div className="flex items-center space-x-2">
-                <Checkbox 
+                <Checkbox
                   id="edit-footer"
                   checked={newPageForm.inFooter}
-                  onCheckedChange={(checked) => 
+                  onCheckedChange={(checked) =>
                     setNewPageForm(prev => ({ ...prev, inFooter: checked as boolean }))
                   }
                 />
                 <Label htmlFor="edit-footer">Include in footer</Label>
               </div>
-              
+
               <div className="flex items-center space-x-2">
-                <Checkbox 
+                <Checkbox
                   id="edit-homepage"
                   checked={newPageForm.isHomepage}
                   onCheckedChange={(checked) => handleHomepageChange(checked as boolean)}
@@ -2302,18 +2302,18 @@ const Pages = memo(() => {
           </div>
 
           <div className="flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2 pt-4 flex-shrink-0">
-            <Button 
-              variant="outline" 
+            <Button
+              variant="outline"
               onClick={handleCloseEditPageModal}
               disabled={isUpdatingPage}
             >
               Cancel
             </Button>
-            <Button 
+            <Button
               onClick={handleEditPage}
               disabled={
-                isUpdatingPage || 
-                !newPageForm.title || 
+                isUpdatingPage ||
+                !newPageForm.title ||
                 (!newPageForm.slug && !newPageForm.isHomepage) ||
                 (newPageForm.status === 'scheduled' && !newPageForm.scheduledPublishAt)
               }
@@ -2338,7 +2338,7 @@ const Pages = memo(() => {
             Are you sure you want to delete this page? This action cannot be undone.
           </p>
         </SimpleDialogHeader>
-          
+
           {pageToDelete && (
             <div className="space-y-4 py-4">
               <div className="p-4 bg-destructive/10 rounded-lg border border-destructive/20">
@@ -2359,7 +2359,7 @@ const Pages = memo(() => {
                   )}
                 </div>
               </div>
-              
+
               <div className="text-sm text-muted-foreground">
                 <p>This will permanently delete:</p>
                 <ul className="list-disc list-inside mt-2 space-y-1">
@@ -2375,14 +2375,14 @@ const Pages = memo(() => {
           )}
 
           <div className="flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2 pt-4">
-            <Button 
-              variant="outline" 
+            <Button
+              variant="outline"
               onClick={() => setDeleteModalOpen(false)}
               disabled={isDeletingPage}
             >
               Cancel
             </Button>
-            <Button 
+            <Button
               variant="destructive"
               onClick={handleDeletePage}
               disabled={isDeletingPage}

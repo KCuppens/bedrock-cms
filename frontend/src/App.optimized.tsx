@@ -55,16 +55,16 @@ const App = () => {
   useEffect(() => {
     // Preload core components after initial render
     preloadOnIdle(coreComponents, 2000);
-    
+
     // Preload admin components on fast connections
     preloadOnFastConnection(adminComponents);
   }, []);
 
   return (
     <QueryClientProvider client={queryClient}>
-      <ThemeProvider 
-        attribute="class" 
-        defaultTheme="light" 
+      <ThemeProvider
+        attribute="class"
+        defaultTheme="light"
         enableSystem={false}
         disableTransitionOnChange
       >
@@ -77,11 +77,11 @@ const App = () => {
                   <Routes>
                     {/* Public routes */}
                     <Route path="/login" element={<Login />} />
-                    
+
                     {/* Main app routes */}
                     <Route path="/" element={<Navigate to="/dashboard" replace />} />
                     <Route path="/dashboard" element={<Dashboard />} />
-                    
+
                     {/* Content management */}
                     <Route path="/pages" element={<Pages />} />
                     <Route path="/pages/new" element={<PageEditor />} />
@@ -90,26 +90,26 @@ const App = () => {
                     <Route path="/blog/new" element={<BlogPostEditor />} />
                     <Route path="/blog/:id/edit" element={<BlogPostEditor />} />
                     <Route path="/media" element={<Media />} />
-                    
+
                     {/* SEO & Settings */}
                     <Route path="/seo/redirects" element={<SEORedirects />} />
                     <Route path="/settings" element={<CMSSettings />} />
                     <Route path="/settings/blocks" element={<BlockTypeManager />} />
                     <Route path="/settings/registry" element={<RegistryManager />} />
-                    
+
                     {/* Users & Permissions */}
                     <Route path="/users" element={<UsersRoles />} />
                     <Route path="/profile" element={<Profile />} />
-                    
+
                     {/* Localization */}
                     <Route path="/locales" element={<Locales />} />
                     <Route path="/translations" element={<TranslationsQueue />} />
                     <Route path="/translations/workspace" element={<TranslatorWorkspace />} />
                     <Route path="/translations/ui-messages" element={<UIMessages />} />
-                    
+
                     {/* Documentation */}
                     <Route path="/api-docs" element={<APIDocs />} />
-                    
+
                     {/* Live preview routes */}
                     <Route path="/live/*" element={<LiveContent />} />
                     <Route path="/blog-preview" element={<BlogPage />} />

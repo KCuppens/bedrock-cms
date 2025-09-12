@@ -4,11 +4,10 @@ Celery tasks for accounts app.
 
 import logging
 
+from celery import shared_task
 from django.contrib.auth import get_user_model
 from django.core.cache import cache
 from django.utils import timezone
-
-from celery import shared_task
 
 logger = logging.getLogger(__name__)
 User = get_user_model()

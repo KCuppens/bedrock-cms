@@ -45,7 +45,7 @@ from .admin import BlogPostAdmin
 content_registry.register('blog.blogpost', BlogPost, {
     'label': 'Blog Post',
     'description': 'Blog posts with rich content',
-    
+
     # Admin configuration
     'admin_config': {
         'admin_class': BlogPostAdmin,  # Custom admin class
@@ -55,7 +55,7 @@ content_registry.register('blog.blogpost', BlogPost, {
         'readonly_fields': ['created_at', 'updated_at'],
         'ordering': ['-created_at'],
     },
-    
+
     # API configuration
     'api_config': {
         'serializer_class': BlogPostSerializer,  # Custom serializer
@@ -67,7 +67,7 @@ content_registry.register('blog.blogpost', BlogPost, {
         'ordering': ['-created_at'],
         'pagination_class': 'rest_framework.pagination.PageNumberPagination',
     },
-    
+
     # CMS integration
     'cms_config': {
         'list_template': 'blog/post_list.html',
@@ -75,7 +75,7 @@ content_registry.register('blog.blogpost', BlogPost, {
         'supports_blocks': True,
         'supports_seo': True,
     },
-    
+
     # Features
     'features': {
         'versioning': True,
@@ -274,7 +274,7 @@ from apps.core.models import TimestampedModel, SluggedModel
 
 class BlogPost(TimestampedModel, SluggedModel):
     """Blog post model."""
-    
+
     title = models.CharField(max_length=200)
     content = models.TextField()
     author = models.ForeignKey('auth.User', on_delete=models.CASCADE)
@@ -287,14 +287,14 @@ class BlogPost(TimestampedModel, SluggedModel):
         ],
         default='draft'
     )
-    
+
     class Meta:
         db_table = 'blog_post'
         ordering = ['-created_at']
-        
+
     def __str__(self):
         return self.title
-    
+
     def get_absolute_url(self):
         return f'/blog/{self.slug}/'
 ```
@@ -308,7 +308,7 @@ from django.apps import AppConfig
 class BlogConfig(AppConfig):
     default_auto_field = 'django.db.models.BigAutoField'
     name = 'apps.blog'
-    
+
     def ready(self):
         from . import registry  # Import registry configuration
 ```
@@ -344,11 +344,11 @@ from .models import BlogPost
 class BlogPostSerializer(serializers.ModelSerializer):
     author_name = serializers.CharField(source='author.get_full_name', read_only=True)
     read_time = serializers.SerializerMethodField()
-    
+
     class Meta:
         model = BlogPost
         fields = '__all__'
-        
+
     def get_read_time(self, obj):
         words = len(obj.content.split())
         return max(1, words // 200)  # Assume 200 words per minute
@@ -368,7 +368,7 @@ class BlogPostViewSet(viewsets.ModelViewSet):
     filter_backends = [DjangoFilterBackend, filters.SearchFilter]
     filterset_fields = ['status', 'author']
     search_fields = ['title', 'content']
-    
+
     def get_queryset(self):
         queryset = super().get_queryset()
         if self.action == 'list':
@@ -388,7 +388,7 @@ class BlogPostAdmin(admin.ModelAdmin):
     list_filter = ['status', 'author', 'created_at']
     search_fields = ['title', 'content']
     readonly_fields = ['created_at', 'updated_at']
-    
+
     fieldsets = [
         (None, {
             'fields': ['title', 'slug', 'content']
@@ -429,7 +429,7 @@ from apps.registry.registry import content_registry
 def check_registry_health():
     """Check registry for common issues."""
     issues = []
-    
+
     for label, config in content_registry._registry.items():
         # Check model exists
         try:
@@ -437,13 +437,13 @@ def check_registry_health():
         except ImportError:
             issues.append(f"Model {label} cannot be imported")
             continue
-            
+
         # Check serializer
         if 'api_config' in config:
             serializer_class = config['api_config'].get('serializer_class')
             if serializer_class and not hasattr(serializer_class, 'Meta'):
                 issues.append(f"Serializer for {label} missing Meta class")
-    
+
     return issues
 ```
 

@@ -22,11 +22,11 @@ export function useFormAutoSave<T>(
   options: UseFormAutoSaveOptions = {}
 ): UseFormAutoSaveReturn {
   const { delay = 1000, enabled = true } = options;
-  
+
   const [isSaving, setIsSaving] = useState(false);
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
   const [lastSavedData, setLastSavedData] = useState<string>('');
-  
+
   const timeoutRef = useRef<NodeJS.Timeout>();
   const saveFunctionRef = useRef(saveFunction);
   const isInitializedRef = useRef(false);
@@ -62,7 +62,7 @@ export function useFormAutoSave<T>(
     if (isSaving) return;
 
     const serializedData = JSON.stringify(dataToSave);
-    
+
     // Don't save if data hasn't actually changed
     if (serializedData === lastSavedData) {
       setHasUnsavedChanges(false);
@@ -74,11 +74,11 @@ export function useFormAutoSave<T>(
 
     // Create new abort controller for this request
     abortControllerRef.current = new AbortController();
-    
+
     setIsSaving(true);
     try {
       await saveFunctionRef.current(dataToSave);
-      
+
       // Only update if this request wasn't aborted
       if (!abortControllerRef.current.signal.aborted) {
         setLastSavedData(serializedData);
@@ -115,12 +115,12 @@ export function useFormAutoSave<T>(
   // Manual save function
   const saveNow = useCallback(async () => {
     if (!enabled) return;
-    
+
     // Cancel debounced save
     if (timeoutRef.current) {
       clearTimeout(timeoutRef.current);
     }
-    
+
     await performSave(data);
   }, [enabled, data, performSave]);
 
@@ -130,9 +130,9 @@ export function useFormAutoSave<T>(
 
     const serializedData = JSON.stringify(data);
     const hasChanges = serializedData !== lastSavedData;
-    
+
     setHasUnsavedChanges(hasChanges);
-    
+
     if (hasChanges) {
       debouncedSave(data);
     }

@@ -50,7 +50,7 @@ if [ "$CELERY_ENABLED" = "true" ]; then
         --concurrency=2 \
         --queues=default,publishing,translations,maintenance \
         --detach
-    
+
     # Start Celery beat scheduler
     celery -A apps.config beat \
         --loglevel=info \

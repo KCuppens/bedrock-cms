@@ -43,7 +43,7 @@ const ContainerBlock: React.FC<ContainerBlockProps> = ({ props }) => {
   };
 
   return (
-    <div 
+    <div
       className={`container-block mx-auto ${maxWidthClasses[maxWidth]} ${paddingClasses[padding]} ${className}`.trim()}
       style={containerStyles}
     >

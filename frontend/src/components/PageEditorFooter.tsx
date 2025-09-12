@@ -1,9 +1,9 @@
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { 
-  Undo, 
-  Redo, 
-  Save, 
+import {
+  Undo,
+  Redo,
+  Save,
   Loader2,
   Edit,
   Eye,
@@ -17,11 +17,11 @@ interface PageEditorFooterProps {
   onToggleEditMode: () => void;
 }
 
-export const PageEditorFooter = ({ 
-  saving, 
-  lastSaved, 
+export const PageEditorFooter = ({
+  saving,
+  lastSaved,
   editMode,
-  onToggleEditMode 
+  onToggleEditMode
 }: PageEditorFooterProps) => {
   const formatTime = (date: Date) => {
     return date.toLocaleTimeString('en-US', {
@@ -39,7 +39,7 @@ export const PageEditorFooter = ({
             <Undo className="w-4 h-4 mr-2" />
             Undo
           </Button>
-          
+
           <Button variant="ghost" size="sm" disabled>
             <Redo className="w-4 h-4 mr-2" />
             Redo
@@ -47,8 +47,8 @@ export const PageEditorFooter = ({
 
           <div className="h-6 w-px bg-border" />
 
-          <Button 
-            variant={editMode ? "default" : "ghost"} 
+          <Button
+            variant={editMode ? "default" : "ghost"}
             size="sm"
             onClick={onToggleEditMode}
           >
@@ -78,7 +78,7 @@ export const PageEditorFooter = ({
             <Keyboard className="w-3 h-3 mr-1" />
             Ctrl+S to save
           </Badge>
-          
+
           <Badge variant="outline" className="text-xs">
             Ctrl+Z to undo
           </Badge>

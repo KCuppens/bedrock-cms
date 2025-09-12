@@ -74,9 +74,9 @@ export const usePermissions = (): PermissionContext => {
       if (!user) return false;
       if ((user as any)?.is_superuser) return true;
       if (!scopes.sections || scopes.sections.length === 0) return true; // No section restrictions
-      
+
       // Check if any allowed section is a prefix of the requested section
-      return scopes.sections.some(allowedSection => 
+      return scopes.sections.some(allowedSection =>
         section.startsWith(allowedSection) || allowedSection === '/'
       );
     };

@@ -11,7 +11,7 @@ const ThreatCards = () => {
     },
     {
       type: "Vulnerability",
-      title: "Vendors Data Encryption Attack", 
+      title: "Vendors Data Encryption Attack",
       priority: "5",
       priorityColor: "bg-foreground text-white"
     },

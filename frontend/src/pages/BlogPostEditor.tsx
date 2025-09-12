@@ -10,13 +10,13 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Switch } from "@/components/ui/switch";
 import { Separator } from "@/components/ui/separator";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { 
-  ArrowLeft, 
-  Eye, 
-  Save, 
-  MoreHorizontal, 
-  Globe, 
-  Image, 
+import {
+  ArrowLeft,
+  Eye,
+  Save,
+  MoreHorizontal,
+  Globe,
+  Image,
   Calendar,
   User,
   Tag as TagIcon,
@@ -346,7 +346,7 @@ const BlogPostEditor = () => {
                     <div className="space-y-4">
                       <div>
                         <Label htmlFor="title">Title</Label>
-                        <Input 
+                        <Input
                           id="title"
                           value={post.title}
                           onChange={(e) => setPost(prev => ({ ...prev, title: e.target.value }))}
@@ -355,7 +355,7 @@ const BlogPostEditor = () => {
                       </div>
                       <div>
                         <Label htmlFor="slug">Slug</Label>
-                        <Input 
+                        <Input
                           id="slug"
                           value={post.slug}
                           onChange={(e) => setPost(prev => ({ ...prev, slug: e.target.value }))}
@@ -363,11 +363,11 @@ const BlogPostEditor = () => {
                         />
                       </div>
                     </div>
-                    
+
                     <div className="space-y-4">
                       <div>
                         <Label htmlFor="excerpt">Excerpt</Label>
-                        <Textarea 
+                        <Textarea
                           id="excerpt"
                           value={post.excerpt}
                           onChange={(e) => setPost(prev => ({ ...prev, excerpt: e.target.value }))}
@@ -410,7 +410,7 @@ const BlogPostEditor = () => {
                         <Button variant="ghost" size="sm">Code</Button>
                         <Button variant="ghost" size="sm">Image</Button>
                       </div>
-                      <Textarea 
+                      <Textarea
                         id="content"
                         value={post.content}
                         onChange={(e) => setPost(prev => ({ ...prev, content: e.target.value }))}
@@ -440,7 +440,7 @@ const BlogPostEditor = () => {
                       <div className="grid grid-cols-2 gap-4">
                         <div className="flex items-center justify-between">
                           <Label htmlFor="show-toc">Show Table of Contents</Label>
-                          <Switch 
+                          <Switch
                             id="show-toc"
                             checked={post.showToc}
                             onCheckedChange={(checked) => setPost(prev => ({ ...prev, showToc: checked }))}
@@ -448,7 +448,7 @@ const BlogPostEditor = () => {
                         </div>
                         <div className="flex items-center justify-between">
                           <Label htmlFor="show-author">Show Author</Label>
-                          <Switch 
+                          <Switch
                             id="show-author"
                             checked={post.showAuthor}
                             onCheckedChange={(checked) => setPost(prev => ({ ...prev, showAuthor: checked }))}
@@ -456,7 +456,7 @@ const BlogPostEditor = () => {
                         </div>
                         <div className="flex items-center justify-between">
                           <Label htmlFor="show-dates">Show Dates</Label>
-                          <Switch 
+                          <Switch
                             id="show-dates"
                             checked={post.showDates}
                             onCheckedChange={(checked) => setPost(prev => ({ ...prev, showDates: checked }))}
@@ -464,7 +464,7 @@ const BlogPostEditor = () => {
                         </div>
                         <div className="flex items-center justify-between">
                           <Label htmlFor="show-share">Show Share Buttons</Label>
-                          <Switch 
+                          <Switch
                             id="show-share"
                             checked={post.showShare}
                             onCheckedChange={(checked) => setPost(prev => ({ ...prev, showShare: checked }))}
@@ -480,7 +480,7 @@ const BlogPostEditor = () => {
                     <div className="space-y-4">
                       <div>
                         <Label htmlFor="seo-title">SEO Title</Label>
-                        <Input 
+                        <Input
                           id="seo-title"
                           value={post.seoTitle}
                           onChange={(e) => setPost(prev => ({ ...prev, seoTitle: e.target.value }))}
@@ -492,7 +492,7 @@ const BlogPostEditor = () => {
                       </div>
                       <div>
                         <Label htmlFor="seo-description">Meta Description</Label>
-                        <Textarea 
+                        <Textarea
                           id="seo-description"
                           value={post.seoDescription}
                           onChange={(e) => setPost(prev => ({ ...prev, seoDescription: e.target.value }))}
@@ -504,7 +504,7 @@ const BlogPostEditor = () => {
                         </div>
                       </div>
                     </div>
-                    
+
                     <div>
                       <Label>Search Preview</Label>
                       <div className="mt-2 p-4 border rounded-lg bg-muted/20">
@@ -539,7 +539,7 @@ const BlogPostEditor = () => {
                           </SelectContent>
                         </Select>
                       </div>
-                      
+
                       <div>
                         <Label>Tags</Label>
                         <div className="flex flex-wrap gap-2 mt-2">
@@ -596,14 +596,14 @@ const BlogPostEditor = () => {
                     <CardContent className="space-y-4">
                       <div>
                         <Label>Publish Date & Time</Label>
-                        <Input 
+                        <Input
                           type="datetime-local"
                           className="mt-2"
                         />
                       </div>
                       <div>
                         <Label>Unpublish Date (Optional)</Label>
-                        <Input 
+                        <Input
                           type="datetime-local"
                           className="mt-2"
                         />
@@ -624,7 +624,7 @@ const BlogPostEditor = () => {
                       </div>
                       <Badge variant="outline">Current</Badge>
                     </div>
-                    
+
                     <div className="flex items-center gap-2 p-4 border rounded-lg">
                       <History className="w-5 h-5 text-muted-foreground" />
                       <div className="flex-1">

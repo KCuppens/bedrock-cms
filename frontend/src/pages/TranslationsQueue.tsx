@@ -59,7 +59,7 @@ import {
 
 interface TranslationUnit {
   id: string;
-  key: string; // e.g., "page#1.title" 
+  key: string; // e.g., "page#1.title"
   model: string; // e.g., "page", "block", "asset"
   objectId: string;
   field: string;
@@ -227,15 +227,15 @@ const TranslationsQueue = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [locales, setLocales] = useState<any[]>([]);
   const [pagination, setPagination] = useState({ page: 1, limit: 50, total: 0 });
-  
+
   // Load more functionality
   const [hasMore, setHasMore] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
-  
+
   const [selectedUnit, setSelectedUnit] = useState<TranslationUnit | null>(null);
   const [detailsPanelOpen, setDetailsPanelOpen] = useState(false);
   const [bulkActionsOpen, setBulkActionsOpen] = useState(false);
-  
+
   // Assignment state
   const [users, setUsers] = useState<any[]>([]);
   const [assignmentOpen, setAssignmentOpen] = useState(false);
@@ -254,7 +254,7 @@ const TranslationsQueue = () => {
     } else {
       setLoadingMore(true);
     }
-    
+
     try {
       // Use the translations.list endpoint which maps to translation-units
       const response = await api.translations.list({
@@ -262,11 +262,11 @@ const TranslationsQueue = () => {
         page: page,
         limit: pagination.limit
       });
-      
+
       // Handle both paginated and non-paginated responses
       const items = response.results || response.data || response;
       const totalItems = response.count || response.total || items?.length || 0;
-      
+
       // Map API response to our TranslationUnit format
       const mappedUnits: TranslationUnit[] = (Array.isArray(items) ? items : []).map((item: any) => ({
         id: item.id?.toString() || '',
@@ -287,18 +287,18 @@ const TranslationsQueue = () => {
         comments: item.comments || [],
         history: item.history || item.revisions || []
       }));
-      
+
       // Either append or replace units
       if (append) {
         setUnits(prev => [...prev, ...mappedUnits]);
       } else {
         setUnits(mappedUnits);
       }
-      
+
       // Update pagination and hasMore state
       setPagination(prev => ({ ...prev, page, total: totalItems }));
       setHasMore(page * pagination.limit < totalItems);
-      
+
     } catch (error) {
       console.error('Failed to fetch translations:', error);
       // Use mock data as fallback only on initial load
@@ -337,7 +337,7 @@ const TranslationsQueue = () => {
       try {
         // Fetch users first
         await fetchUsers();
-        
+
         // Fetch locales first
         let localesResponse;
         try {
@@ -360,10 +360,10 @@ const TranslationsQueue = () => {
             console.error('Failed to fetch locales directly:', fetchError);
           }
         }
-        
+
         // Log the locales response to debug
         console.log('Locales response:', localesResponse);
-        
+
         // Handle various response formats
         let localesList = [];
         if (localesResponse) {
@@ -375,7 +375,7 @@ const TranslationsQueue = () => {
             localesList = localesResponse.data;
           }
         }
-        
+
         // If still no locales, use defaults
         if (localesList.length === 0) {
           localesList = [
@@ -385,15 +385,15 @@ const TranslationsQueue = () => {
             { code: 'de', name: 'German', id: 4 },
           ];
         }
-        
+
         setLocales(localesList);
         console.log('Locales set to:', localesList);
-        
+
         // Fetch translations
         await fetchTranslations();
       } catch (error: any) {
         console.error('Failed to fetch data:', error);
-        
+
         // Show appropriate error message based on the error type
         if (error?.response?.status === 401) {
           toast({
@@ -414,7 +414,7 @@ const TranslationsQueue = () => {
             variant: "destructive",
           });
         }
-        
+
         // Fallback to mock data if API fails
         setUnits(mockTranslationUnits);
         // Also set some default locales as fallback
@@ -455,14 +455,14 @@ const TranslationsQueue = () => {
     // Compare locale codes case-insensitively - ensure we're comparing strings
     const unitTargetLocale = typeof unit.targetLocale === 'string' ? unit.targetLocale : String(unit.targetLocale || '');
     const unitSourceLocale = typeof unit.sourceLocale === 'string' ? unit.sourceLocale : String(unit.sourceLocale || '');
-    const matchesTargetLocale = targetLocaleFilter === "all" || 
+    const matchesTargetLocale = targetLocaleFilter === "all" ||
                                 unitTargetLocale.toUpperCase() === targetLocaleFilter?.toUpperCase();
-    const matchesSourceLocale = sourceLocaleFilter === "all" || 
+    const matchesSourceLocale = sourceLocaleFilter === "all" ||
                                 unitSourceLocale.toUpperCase() === sourceLocaleFilter?.toUpperCase();
     const matchesModel = modelFilter === "all" || unit.model === modelFilter;
     const matchesStatus = statusFilter === "all" || unit.status === statusFilter;
     const matchesAssignee = assigneeFilter === "all" || unit.assignee === assigneeFilter;
-    
+
     return matchesSearch && matchesTargetLocale && matchesSourceLocale && matchesModel && matchesStatus && matchesAssignee;
   });
 
@@ -476,8 +476,8 @@ const TranslationsQueue = () => {
   };
 
   const handleUnitSelect = (unitId: string) => {
-    setSelectedUnits(prev => 
-      prev.includes(unitId) 
+    setSelectedUnits(prev =>
+      prev.includes(unitId)
         ? prev.filter(id => id !== unitId)
         : [...prev, unitId]
     );
@@ -532,12 +532,12 @@ const TranslationsQueue = () => {
           target_text: textToSend,
           status: textToSend.trim() ? 'draft' : 'missing'
         });
-        
+
         // Update local state
-        setUnits(prev => prev.map(unit => 
-          unit.id === unitId 
-            ? { 
-                ...unit, 
+        setUnits(prev => prev.map(unit =>
+          unit.id === unitId
+            ? {
+                ...unit,
                 targetText: newText,
                 status: newText.trim() ? (unit.status === 'missing' ? 'draft' : unit.status) : 'missing',
                 lastModified: new Date().toISOString(),
@@ -545,15 +545,15 @@ const TranslationsQueue = () => {
               }
             : unit
         ));
-        
+
         toast({
           title: "Translation updated",
           description: "The translation has been saved successfully.",
         });
       } catch (error: any) {
         console.error('Failed to save translation:', error);
-        const errorMessage = error?.response?.data?.detail || 
-                           error?.response?.data?.message || 
+        const errorMessage = error?.response?.data?.detail ||
+                           error?.response?.data?.message ||
                            "Failed to save translation. Please try again.";
         toast({
           title: "Error",
@@ -562,7 +562,7 @@ const TranslationsQueue = () => {
         });
       }
     }
-    
+
     cancelInlineEdit(unitId);
   };
 
@@ -572,7 +572,7 @@ const TranslationsQueue = () => {
 
   const quickStatusChange = async (unitId: string, newStatus: TranslationUnit['status']) => {
     const unit = units.find(u => u.id === unitId);
-    
+
     try {
       // Validate status change requirements
       if (newStatus === 'needs_review' && !unit?.targetText?.trim()) {
@@ -583,7 +583,7 @@ const TranslationsQueue = () => {
         });
         return;
       }
-      
+
       if (newStatus === 'approved' && !unit?.targetText?.trim()) {
         toast({
           title: "Cannot approve",
@@ -592,7 +592,7 @@ const TranslationsQueue = () => {
         });
         return;
       }
-      
+
       // Handle different status changes with appropriate API calls
       if (newStatus === 'approved') {
         await api.i18n.translations.approve(unitId);
@@ -603,27 +603,27 @@ const TranslationsQueue = () => {
       } else {
         await api.translations.update(unitId, { status: newStatus });
       }
-      
+
       // Update local state
-      setUnits(prev => prev.map(unit => 
-        unit.id === unitId 
-          ? { 
-              ...unit, 
+      setUnits(prev => prev.map(unit =>
+        unit.id === unitId
+          ? {
+              ...unit,
               status: newStatus,
               lastModified: new Date().toISOString(),
               modifiedBy: 'Current User'
             }
           : unit
       ));
-      
+
       toast({
         title: "Status updated",
         description: `Translation status changed to ${statusConfig[newStatus].label}.`,
       });
     } catch (error: any) {
       console.error('Failed to update status:', error);
-      const errorMessage = error?.response?.data?.detail || 
-                         error?.response?.data?.message || 
+      const errorMessage = error?.response?.data?.detail ||
+                         error?.response?.data?.message ||
                          "Failed to update status. Please try again.";
       toast({
         title: "Error",
@@ -636,7 +636,7 @@ const TranslationsQueue = () => {
   const suggestTranslation = async (unitId: string) => {
     const unit = units.find(u => u.id === unitId);
     if (!unit) return;
-    
+
     try {
       // Get MT suggestion from API
       const response = await api.i18n.translations.mtSuggest(
@@ -647,7 +647,7 @@ const TranslationsQueue = () => {
         'deepl'
       );
       const suggestion = response.data?.suggestion || response.suggestion;
-      
+
       if (suggestion) {
         startInlineEdit(unitId, suggestion);
         toast({
@@ -676,9 +676,9 @@ const TranslationsQueue = () => {
           'Team photo showing our diverse group of developers collaborating': 'Teamfoto zeigt unsere vielfältige Gruppe von Entwicklern bei der Zusammenarbeit',
         }
       };
-      
+
       const fallbackSuggestion = mockSuggestions[unit.targetLocale as keyof typeof mockSuggestions]?.[unit.sourceText as keyof typeof mockSuggestions[keyof typeof mockSuggestions]];
-      
+
       if (fallbackSuggestion) {
         startInlineEdit(unitId, fallbackSuggestion);
         toast({
@@ -699,7 +699,7 @@ const TranslationsQueue = () => {
   const assignTranslation = async (unitId: string, assignedToId?: number, comment?: string) => {
     try {
       await api.i18n.translations.assign(unitId, assignedToId, comment);
-      
+
       // Update local state
       setUnits(prev => prev.map(unit => {
         if (unit.id === unitId) {
@@ -713,18 +713,18 @@ const TranslationsQueue = () => {
         }
         return unit;
       }));
-      
+
       const assignedUser = assignedToId ? users.find(u => u.id === assignedToId) : null;
       toast({
         title: "Assignment updated",
-        description: assignedUser 
+        description: assignedUser
           ? `Translation assigned to ${assignedUser.first_name} ${assignedUser.last_name}`
           : "Translation unassigned",
       });
     } catch (error: any) {
       console.error('Failed to assign translation:', error);
-      const errorMessage = error?.response?.data?.detail || 
-                         error?.response?.data?.message || 
+      const errorMessage = error?.response?.data?.detail ||
+                         error?.response?.data?.message ||
                          "Failed to assign translation. Please try again.";
       toast({
         title: "Error",
@@ -738,7 +738,7 @@ const TranslationsQueue = () => {
     try {
       const numericIds = unitIds.map(id => parseInt(id)).filter(id => !isNaN(id));
       await api.i18n.translations.bulkAssign(numericIds, assignedToId, comment);
-      
+
       // Update local state
       setUnits(prev => prev.map(unit => {
         if (unitIds.includes(unit.id)) {
@@ -752,20 +752,20 @@ const TranslationsQueue = () => {
         }
         return unit;
       }));
-      
+
       const assignedUser = assignedToId ? users.find(u => u.id === assignedToId) : null;
       toast({
         title: "Bulk assignment complete",
-        description: assignedUser 
+        description: assignedUser
           ? `${unitIds.length} translations assigned to ${assignedUser.first_name} ${assignedUser.last_name}`
           : `${unitIds.length} translations unassigned`,
       });
-      
+
       setSelectedUnits([]);
     } catch (error: any) {
       console.error('Failed to bulk assign translations:', error);
-      const errorMessage = error?.response?.data?.detail || 
-                         error?.response?.data?.message || 
+      const errorMessage = error?.response?.data?.detail ||
+                         error?.response?.data?.message ||
                          "Failed to assign translations. Please try again.";
       toast({
         title: "Error",
@@ -786,13 +786,13 @@ const TranslationsQueue = () => {
     <div className="min-h-screen">
       <div className="flex">
         <Sidebar />
-        
+
         <div className="flex-1 flex flex-col ml-72">
           <TopNavbar />
-          
+
           <main className="flex-1 p-8">
             <div className="max-w-7xl mx-auto space-y-6">
-              
+
               {/* Header */}
               <div className="flex items-center justify-between">
                 <div>
@@ -843,7 +843,7 @@ const TranslationsQueue = () => {
                               u.priority
                             ])
                           ].map(row => row.map(cell => `"${cell}"`).join(',')).join('\n');
-                          
+
                           const blob = new Blob([csv], { type: 'text/csv' });
                           const url = URL.createObjectURL(blob);
                           const a = document.createElement('a');
@@ -853,7 +853,7 @@ const TranslationsQueue = () => {
                           a.click();
                           document.body.removeChild(a);
                           URL.revokeObjectURL(url);
-                          
+
                           toast({
                             title: "Export complete",
                             description: `Exported ${selectedData.length} translations to CSV.`,
@@ -869,7 +869,7 @@ const TranslationsQueue = () => {
                             const unit = units.find(u => u.id === unitId);
                             return unit?.targetText?.trim();
                           });
-                          
+
                           if (unitsToApprove.length === 0) {
                             toast({
                               title: "No translations to approve",
@@ -879,7 +879,7 @@ const TranslationsQueue = () => {
                             setBulkActionsOpen(false);
                             return;
                           }
-                          
+
                           if (unitsToApprove.length < selectedUnits.length) {
                             const skipped = selectedUnits.length - unitsToApprove.length;
                             toast({
@@ -887,18 +887,18 @@ const TranslationsQueue = () => {
                               description: `${skipped} translations were skipped because they don't have target text.`,
                             });
                           }
-                          
+
                           try {
                             await Promise.all(
                               unitsToApprove.map(unitId => api.i18n.translations.approve(unitId))
                             );
-                            
-                            setUnits(prev => prev.map(unit => 
+
+                            setUnits(prev => prev.map(unit =>
                               unitsToApprove.includes(unit.id)
                                 ? { ...unit, status: 'approved' as TranslationUnit['status'] }
                                 : unit
                             ));
-                            
+
                             toast({
                               title: "Bulk approval complete",
                               description: `Approved ${unitsToApprove.length} translations.`,
@@ -906,7 +906,7 @@ const TranslationsQueue = () => {
                             setSelectedUnits([]);
                           } catch (error: any) {
                             console.error('Bulk approval failed:', error);
-                            const errorMessage = error?.response?.data?.detail || 
+                            const errorMessage = error?.response?.data?.detail ||
                                                "Failed to approve some translations.";
                             toast({
                               title: "Error",
@@ -949,7 +949,7 @@ const TranslationsQueue = () => {
                         <SelectContent>
                           <SelectItem value="all">All Target Locales</SelectItem>
                           {locales.length === 0 ? (
-                            <>                        
+                            <>
                               <SelectItem value="EN">English (EN)</SelectItem>
                               <SelectItem value="ES">Spanish (ES)</SelectItem>
                               <SelectItem value="FR">French (FR)</SelectItem>
@@ -1075,9 +1075,9 @@ const TranslationsQueue = () => {
                       const StatusIcon = statusInfo.icon;
                       const isEditing = editingUnits.has(unit.id);
                       const editValue = editingValues[unit.id] || unit.targetText;
-                      
+
                       return (
-                        <div 
+                        <div
                           key={unit.id}
                           className={`p-4 space-y-4 ${
                             isSelected ? 'bg-primary/5' : ''
@@ -1089,7 +1089,7 @@ const TranslationsQueue = () => {
                               checked={isSelected}
                               onCheckedChange={() => handleUnitSelect(unit.id)}
                             />
-                            
+
                             <div className="flex-1 flex items-center gap-2">
                               <code className="text-sm font-mono bg-muted px-2 py-1 rounded">
                                 {unit.key}
@@ -1103,14 +1103,14 @@ const TranslationsQueue = () => {
                                 </Badge>
                               )}
                             </div>
-                            
+
                             {/* Status and Actions */}
                             <div className="flex items-center gap-2">
                               <Badge className={statusInfo.color}>
                                 <StatusIcon className="w-3 h-3 mr-1" />
                                 {statusInfo.label}
                               </Badge>
-                              
+
                               {!isEditing && (
                                 <div className="flex gap-1">
                                   <Button
@@ -1121,7 +1121,7 @@ const TranslationsQueue = () => {
                                   >
                                     <Edit className="w-3 h-3" />
                                   </Button>
-                                  
+
                                   <Button
                                     variant="ghost"
                                     size="sm"
@@ -1130,7 +1130,7 @@ const TranslationsQueue = () => {
                                   >
                                     <Sparkles className="w-3 h-3" />
                                   </Button>
-                                  
+
                                   <DropdownMenu>
                                     <DropdownMenuTrigger asChild>
                                       <Button variant="ghost" size="sm">
@@ -1142,7 +1142,7 @@ const TranslationsQueue = () => {
                                         <Edit className="w-3 h-3 mr-2" />
                                         Mark as Draft
                                       </DropdownMenuItem>
-                                      <DropdownMenuItem 
+                                      <DropdownMenuItem
                                         onClick={() => quickStatusChange(unit.id, 'needs_review')}
                                         disabled={!unit.targetText?.trim()}
                                       >
@@ -1152,7 +1152,7 @@ const TranslationsQueue = () => {
                                           <span className="text-xs text-muted-foreground ml-1">(requires text)</span>
                                         )}
                                       </DropdownMenuItem>
-                                      <DropdownMenuItem 
+                                      <DropdownMenuItem
                                         onClick={() => quickStatusChange(unit.id, 'approved')}
                                         disabled={!unit.targetText?.trim()}
                                       >
@@ -1177,7 +1177,7 @@ const TranslationsQueue = () => {
                                   </DropdownMenu>
                                 </div>
                               )}
-                              
+
                               {isEditing && (
                                 <div className="flex gap-1">
                                   <Button
@@ -1188,7 +1188,7 @@ const TranslationsQueue = () => {
                                   >
                                     <Save className="w-3 h-3" />
                                   </Button>
-                                  
+
                                   <Button
                                     variant="ghost"
                                     size="sm"
@@ -1201,7 +1201,7 @@ const TranslationsQueue = () => {
                               )}
                             </div>
                           </div>
-                          
+
                           {/* Translation Content */}
                           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                             {/* Source */}
@@ -1218,7 +1218,7 @@ const TranslationsQueue = () => {
                                 </p>
                               </div>
                             </div>
-                            
+
                             {/* Target */}
                             <div className="space-y-2">
                               <div className="flex items-center gap-2">
@@ -1232,7 +1232,7 @@ const TranslationsQueue = () => {
                                   </Badge>
                                 )}
                               </div>
-                              
+
                               {isEditing ? (
                                 <div className="space-y-2">
                                   <Textarea
@@ -1267,7 +1267,7 @@ const TranslationsQueue = () => {
                                   </div>
                                 </div>
                               ) : (
-                                <div 
+                                <div
                                   className="p-3 bg-background border rounded-md cursor-text min-h-[60px] flex items-start hover:border-primary/50 transition-colors"
                                   onClick={() => startInlineEdit(unit.id, Array.isArray(unit.targetText) ? '' : unit.targetText)}
                                 >
@@ -1284,7 +1284,7 @@ const TranslationsQueue = () => {
                               )}
                             </div>
                           </div>
-                          
+
                           {/* Context and Metadata */}
                           <div className="flex items-center justify-between text-xs text-muted-foreground pt-2 border-t">
                             <div className="flex items-center gap-4">
@@ -1317,7 +1317,7 @@ const TranslationsQueue = () => {
                   <p className="text-sm text-muted-foreground">
                     Showing {units.length} of {pagination.total} translations
                   </p>
-                  <Button 
+                  <Button
                     onClick={handleLoadMore}
                     disabled={loadingMore}
                     variant="outline"
@@ -1354,7 +1354,7 @@ const TranslationsQueue = () => {
                   Translation details and history
                 </SheetDescription>
               </SheetHeader>
-              
+
               <div className="space-y-6 py-6">
                 {/* Unit Info */}
                 <div>
@@ -1405,7 +1405,7 @@ const TranslationsQueue = () => {
                         {selectedUnit.sourceText}
                       </div>
                     </div>
-                    
+
                     <div>
                       <Label className="text-xs text-muted-foreground">
                         Target ({selectedUnit.targetLocale})
@@ -1481,17 +1481,17 @@ const TranslationsQueue = () => {
 
                 {/* Actions */}
                 <div className="space-y-2">
-                  <Button 
-                    className="w-full" 
+                  <Button
+                    className="w-full"
                     onClick={() => openTranslator(selectedUnit)}
                   >
                     <Languages className="w-4 h-4 mr-2" />
                     Open in Translator
                   </Button>
-                  
+
                   <div className="grid grid-cols-2 gap-2">
-                    <Button 
-                      variant="outline" 
+                    <Button
+                      variant="outline"
                       size="sm"
                       onClick={() => setAssignmentOpen(true)}
                     >
@@ -1525,7 +1525,7 @@ const TranslationsQueue = () => {
               {selectedUnit ? `Assign ${selectedUnit.key}` : 'Assign translation to a user'}
             </SheetDescription>
           </SheetHeader>
-          
+
           <div className="space-y-4 py-6">
             <div>
               <Label htmlFor="assignee">Assignee</Label>
@@ -1543,7 +1543,7 @@ const TranslationsQueue = () => {
                 </SelectContent>
               </Select>
             </div>
-            
+
             <div>
               <Label htmlFor="comment">Comment (optional)</Label>
               <Textarea
@@ -1554,9 +1554,9 @@ const TranslationsQueue = () => {
                 className="mt-1"
               />
             </div>
-            
+
             <div className="flex gap-2 pt-4">
-              <Button 
+              <Button
                 onClick={async () => {
                   if (selectedUnit) {
                     await assignTranslation(selectedUnit.id, selectedAssignee || undefined, assignmentComment || undefined);
@@ -1569,8 +1569,8 @@ const TranslationsQueue = () => {
               >
                 Assign
               </Button>
-              <Button 
-                variant="outline" 
+              <Button
+                variant="outline"
                 onClick={() => {
                   setAssignmentOpen(false);
                   setSelectedAssignee(null);
@@ -1599,7 +1599,7 @@ const TranslationsQueue = () => {
               Assign {selectedUnits.length} selected translations
             </SheetDescription>
           </SheetHeader>
-          
+
           <div className="space-y-4 py-6">
             <div>
               <Label htmlFor="bulk-assignee">Assignee</Label>
@@ -1617,7 +1617,7 @@ const TranslationsQueue = () => {
                 </SelectContent>
               </Select>
             </div>
-            
+
             <div>
               <Label htmlFor="bulk-comment">Comment (optional)</Label>
               <Textarea
@@ -1628,15 +1628,15 @@ const TranslationsQueue = () => {
                 className="mt-1"
               />
             </div>
-            
+
             <div className="bg-muted/30 p-3 rounded-lg">
               <p className="text-sm text-muted-foreground">
                 {selectedUnits.length} translations will be assigned
               </p>
             </div>
-            
+
             <div className="flex gap-2 pt-4">
-              <Button 
+              <Button
                 onClick={async () => {
                   await bulkAssignTranslations(selectedUnits, selectedAssignee || undefined, assignmentComment || undefined);
                   setBulkAssignmentOpen(false);
@@ -1647,8 +1647,8 @@ const TranslationsQueue = () => {
               >
                 Assign All
               </Button>
-              <Button 
-                variant="outline" 
+              <Button
+                variant="outline"
                 onClick={() => {
                   setBulkAssignmentOpen(false);
                   setSelectedAssignee(null);

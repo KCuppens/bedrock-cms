@@ -23,14 +23,14 @@ export const TranslationProvider: React.FC<TranslationProviderProps> = ({
   reportMissing = true
 }) => {
   const { currentLocale } = useLocale();
-  
+
   const rawLocale = overrideLocale || currentLocale?.code || fallbackLocale;
   const activeLocale = normalizeLocale(rawLocale);
-  
+
   const [translations, setTranslations] = useState<TranslationBundle>({});
   const [isLoading, setIsLoading] = useState(false); // Start as false to allow non-blocking render
   const [missingKeys] = useState<Set<string>>(new Set());
-  
+
   const pendingKeys = useRef<Map<string, TranslationKey>>(new Map());
   const syncTimer = useRef<NodeJS.Timeout | null>(null);
   const lastSyncTime = useRef<number>(0);
@@ -39,15 +39,15 @@ export const TranslationProvider: React.FC<TranslationProviderProps> = ({
   const fetchTranslations = useCallback(async () => {
     const abortController = new AbortController();
     const timeoutId = setTimeout(() => abortController.abort(), 5000); // 5 second timeout
-    
+
     try {
       setIsLoading(true);
-      
+
       // Check localStorage cache first
       const cacheKey = `translations_${activeLocale}`;
       const cached = localStorage.getItem(cacheKey);
       const cacheTimestamp = localStorage.getItem(`${cacheKey}_timestamp`);
-      
+
       // Use cache if less than 1 hour old
       if (cached && cacheTimestamp && (Date.now() - parseInt(cacheTimestamp)) < 3600000) {
         const cachedTranslations = JSON.parse(cached);
@@ -56,7 +56,7 @@ export const TranslationProvider: React.FC<TranslationProviderProps> = ({
         clearTimeout(timeoutId);
         return;
       }
-      
+
       // Load basic fallback translations immediately to avoid blocking UI
       const basicTranslations = {
         'common.loading': 'Loading...',
@@ -71,24 +71,24 @@ export const TranslationProvider: React.FC<TranslationProviderProps> = ({
         'navigation.contact': 'Contact'
       };
       setTranslations(basicTranslations);
-      
+
       const response = await api.request<TranslationBundle>({
         method: 'GET',
         url: `/api/v1/i18n/ui-messages/bundle/${activeLocale}/`,
         signal: abortController.signal
       });
-      
+
       // Check if request was aborted
       if (abortController.signal.aborted) return;
-      
+
       // Cache the response with size management
       try {
         // Manage cache size - keep only last 5 locales to prevent unlimited growth
         const MAX_CACHED_LOCALES = 5;
-        const allCacheKeys = Object.keys(localStorage).filter(key => 
+        const allCacheKeys = Object.keys(localStorage).filter(key =>
           key.startsWith('translations_') && key.endsWith('_timestamp')
         );
-        
+
         if (allCacheKeys.length >= MAX_CACHED_LOCALES) {
           // Sort by timestamp and remove oldest entries
           const sortedKeys = allCacheKeys
@@ -97,7 +97,7 @@ export const TranslationProvider: React.FC<TranslationProviderProps> = ({
               timestamp: parseInt(localStorage.getItem(key) || '0')
             }))
             .sort((a, b) => a.timestamp - b.timestamp);
-          
+
           // Remove oldest cache entries
           const toRemove = sortedKeys.slice(0, sortedKeys.length - MAX_CACHED_LOCALES + 1);
           toRemove.forEach(({ key }) => {
@@ -105,13 +105,13 @@ export const TranslationProvider: React.FC<TranslationProviderProps> = ({
             localStorage.removeItem(`${key}_timestamp`);
           });
         }
-        
+
         localStorage.setItem(cacheKey, JSON.stringify(response));
         localStorage.setItem(`${cacheKey}_timestamp`, Date.now().toString());
       } catch (cacheError) {
         // Cache error - continue without caching
       }
-      
+
       // Merge fetched translations with basic ones
       setTranslations(prevTranslations => ({
         ...prevTranslations,
@@ -122,9 +122,9 @@ export const TranslationProvider: React.FC<TranslationProviderProps> = ({
       if (error.name === 'AbortError' || abortController.signal.aborted) {
         return;
       }
-      
+
       console.error('Failed to fetch translations:', error);
-      
+
       // Try fallback locale if current fails
       const normalizedFallback = normalizeLocale(fallbackLocale);
       if (activeLocale !== normalizedFallback) {
@@ -134,7 +134,7 @@ export const TranslationProvider: React.FC<TranslationProviderProps> = ({
             url: `/api/v1/i18n/ui-messages/bundle/${normalizedFallback}/`,
             signal: abortController.signal
           });
-          
+
           if (!abortController.signal.aborted) {
             setTranslations(fallbackResponse);
           }
@@ -150,7 +150,7 @@ export const TranslationProvider: React.FC<TranslationProviderProps> = ({
       }
       clearTimeout(timeoutId);
     }
-    
+
     return () => {
       abortController.abort();
       clearTimeout(timeoutId);
@@ -160,10 +160,10 @@ export const TranslationProvider: React.FC<TranslationProviderProps> = ({
   // Sync pending keys with backend
   const syncKeys = useCallback(async () => {
     if (pendingKeys.current.size === 0) return;
-    
+
     const now = Date.now();
     if (now - lastSyncTime.current < 5000) return; // Debounce 5 seconds
-    
+
     const keysToSync = Array.from(pendingKeys.current.values());
     pendingKeys.current.clear();
     lastSyncTime.current = now;
@@ -173,7 +173,7 @@ export const TranslationProvider: React.FC<TranslationProviderProps> = ({
       await api.request({
         method: 'POST',
         url: '/api/v1/i18n/ui-messages/sync-keys/',
-        data: { 
+        data: {
           keys: keysToSync,
           source: 'runtime-discovery'
         },
@@ -193,7 +193,7 @@ export const TranslationProvider: React.FC<TranslationProviderProps> = ({
   // Report missing keys (runtime detection)
   const reportMissingKeys = useCallback(async () => {
     if (missingKeys.size === 0 || !reportMissing) return;
-    
+
     const keys = Array.from(missingKeys);
     missingKeys.clear();
 
@@ -220,10 +220,10 @@ export const TranslationProvider: React.FC<TranslationProviderProps> = ({
   // Register a translation key
   const registerKey = useCallback((keyData: TranslationKey) => {
     TRANSLATION_REGISTRY.set(keyData.key, keyData);
-    
+
     if (enableAutoSync && !translations[keyData.key]) {
       pendingKeys.current.set(keyData.key, keyData);
-      
+
       // Schedule sync
       if (syncTimer.current) {
         clearTimeout(syncTimer.current);
@@ -235,10 +235,10 @@ export const TranslationProvider: React.FC<TranslationProviderProps> = ({
   // Translation function
   const t = useCallback((key: string, defaultValue?: string): string => {
     const translation = translations[key];
-    
+
     if (!translation) {
       const fallback = defaultValue || key;
-      
+
       // Track missing key with size limit to prevent memory leaks
       if (!missingKeys.has(key)) {
         // Limit missing keys set size to prevent memory issues
@@ -250,11 +250,11 @@ export const TranslationProvider: React.FC<TranslationProviderProps> = ({
           missingKeys.clear();
           toKeep.forEach(k => missingKeys.add(k));
         }
-        
+
         missingKeys.add(key);
-        
+
         // Missing translation detected in dev mode
-        
+
         // Auto-register if not already registered
         if (enableAutoSync && !TRANSLATION_REGISTRY.has(key)) {
           registerKey({
@@ -265,23 +265,23 @@ export const TranslationProvider: React.FC<TranslationProviderProps> = ({
           });
         }
       }
-      
+
       return fallback;
     }
-    
+
     return translation;
   }, [translations, missingKeys, enableAutoSync, registerKey]);
 
   // Load translations on mount and locale change
   useEffect(() => {
     let cleanup: (() => void) | undefined;
-    
+
     const loadTranslations = async () => {
       cleanup = await fetchTranslations();
     };
-    
+
     loadTranslations();
-    
+
     return () => {
       if (cleanup) cleanup();
     };
@@ -290,7 +290,7 @@ export const TranslationProvider: React.FC<TranslationProviderProps> = ({
   // Periodic sync of pending keys
   useEffect(() => {
     if (!enableAutoSync) return;
-    
+
     const interval = setInterval(syncKeys, syncInterval);
     return () => clearInterval(interval);
   }, [enableAutoSync, syncKeys, syncInterval]);
@@ -298,7 +298,7 @@ export const TranslationProvider: React.FC<TranslationProviderProps> = ({
   // Report missing keys periodically
   useEffect(() => {
     if (!reportMissing) return;
-    
+
     const interval = setInterval(reportMissingKeys, 60000); // Every minute
     return () => clearInterval(interval);
   }, [reportMissing, reportMissingKeys]);

@@ -17,7 +17,7 @@ interface KeyboardShortcutsOptions {
 export const useKeyboardShortcuts = (options: KeyboardShortcutsOptions = {}) => {
   const navigate = useNavigate();
   const location = useLocation();
-  
+
   const {
     onSave,
     onPublish,
@@ -59,10 +59,10 @@ export const useKeyboardShortcuts = (options: KeyboardShortcutsOptions = {}) => 
     const isInputElement = (target as HTMLElement)?.tagName?.toLowerCase() === 'input' ||
                           (target as HTMLElement)?.tagName?.toLowerCase() === 'textarea' ||
                           (target as HTMLElement)?.contentEditable === 'true';
-    
+
     // Don't trigger shortcuts when typing in input fields (except for save/publish)
     const isModifierKeyPressed = ctrlKey || metaKey;
-    
+
     // Cmd/Ctrl + S - Save
     if (isModifierKeyPressed && key === 's') {
       event.preventDefault();

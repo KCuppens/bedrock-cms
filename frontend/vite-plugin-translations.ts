@@ -16,13 +16,13 @@ interface ExtractedKey {
 
 export function translationExtractionPlugin(): Plugin {
   const extractedKeys = new Map<string, ExtractedKey>();
-  
+
   // Track which components use which keys
   const componentKeys = new Map<string, Set<string>>();
 
   return {
     name: 'vite-plugin-translation-extraction',
-    
+
     transform(code: string, id: string) {
       if (id.includes('node_modules') || !id.match(/\.(tsx?|jsx?)$/)) {
         return null;
@@ -39,27 +39,27 @@ export function translationExtractionPlugin(): Plugin {
 
         // Use traverse.default if it exists, otherwise use traverse directly
         const traverseFn = (traverse as any).default || traverse;
-        
+
         traverseFn(ast, {
           CallExpression(path: any) {
             const { node } = path;
-            
+
             // Detect useBlockTranslation calls
             if (node.callee.type === 'Identifier' && node.callee.name === 'useBlockTranslation') {
               const [optionsArg] = node.arguments;
-              
+
               if (optionsArg?.type === 'ObjectExpression') {
                 let blockType = '';
                 const keys: Record<string, string> = {};
-                
+
                 optionsArg.properties.forEach((prop: any) => {
                   if (prop.type === 'ObjectProperty') {
                     const propName = prop.key.name || prop.key.value;
-                    
+
                     if (propName === 'blockType' && prop.value.type === 'StringLiteral') {
                       blockType = prop.value.value;
                     }
-                    
+
                     if (propName === 'keys' && prop.value.type === 'ObjectExpression') {
                       prop.value.properties.forEach((keyProp: any) => {
                         if (keyProp.type === 'ObjectProperty' && keyProp.value.type === 'StringLiteral') {
@@ -70,7 +70,7 @@ export function translationExtractionPlugin(): Plugin {
                     }
                   }
                 });
-                
+
                 // Register block translation keys
                 if (blockType) {
                   Object.entries(keys).forEach(([shortKey, defaultValue]) => {
@@ -87,19 +87,19 @@ export function translationExtractionPlugin(): Plugin {
                 }
               }
             }
-            
+
             // Detect direct t() calls
             if (node.callee.type === 'Identifier' && node.callee.name === 't') {
               const [keyArg, defaultArg] = node.arguments;
-              
+
               if (keyArg?.type === 'StringLiteral') {
                 const key = keyArg.value;
-                const defaultValue = defaultArg?.type === 'StringLiteral' 
-                  ? defaultArg.value 
+                const defaultValue = defaultArg?.type === 'StringLiteral'
+                  ? defaultArg.value
                   : key;
-                
+
                 const namespace = key.split('.')[0] || 'general';
-                
+
                 extractedKeys.set(key, {
                   key,
                   defaultValue,

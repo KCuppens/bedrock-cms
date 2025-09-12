@@ -18,17 +18,17 @@ const SignIn = () => {
   const location = useLocation();
   const { user, signIn, isLoading } = useAuth();
   const { toast } = useToast();
-  
+
   // Get the redirect URL from query params, default to dashboard
   const from = location.state?.from?.pathname || "/dashboard";
-  
+
   // Redirect if already logged in
   useEffect(() => {
     if (user && !isLoading) {
       navigate(from, { replace: true });
     }
   }, [user, isLoading, navigate, from]);
-  
+
   // Show loading spinner while checking authentication
   if (isLoading) {
     return (
@@ -37,7 +37,7 @@ const SignIn = () => {
       </div>
     );
   }
-  
+
   // If user is logged in, don't show the form (will redirect via useEffect)
   if (user) {
     return null;
@@ -46,14 +46,14 @@ const SignIn = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
-    
+
     if (!email || !password) {
       setError("Please fill in all fields");
       return;
     }
 
     const result = await signIn(email, password);
-    
+
     if (result.success) {
       toast({
         title: "Welcome back!",

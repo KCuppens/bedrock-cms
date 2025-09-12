@@ -20,9 +20,9 @@ export const useLocales = () => {
     queryFn: async () => {
       try {
         // Use the API client's request method directly
-        const response = await (api as any).request({ 
-          method: 'GET', 
-          url: '/api/v1/i18n/locales/' 
+        const response = await (api as any).request({
+          method: 'GET',
+          url: '/api/v1/i18n/locales/'
         });
         // Handle paginated response - extract results array
         const result = response.results || response;

@@ -88,7 +88,7 @@ const AppContent = () => {
   useEffect(() => {
     // TEMPORARILY DISABLED: Memory guard might be causing issues
     // const memoryGuard = initMemoryGuard();
-    
+
     return () => {
       // memoryGuard.destroy();
     };
@@ -103,12 +103,12 @@ const AppContent = () => {
 
     // Listen for custom memory pressure events from memory guard
     window.addEventListener('memory-pressure', handleMemoryPressure);
-    
+
     return () => {
       window.removeEventListener('memory-pressure', handleMemoryPressure);
     };
   }, []);
-  
+
   // Initialize performance monitoring only in development
   useEffect(() => {
     if (import.meta.env.DEV) {
@@ -132,7 +132,7 @@ const AppContent = () => {
         <Routes>
           {/* Root redirect to default locale */}
           <Route path="/" element={<LocaleRedirect><HomePage /></LocaleRedirect>} />
-          
+
           {/* Language-prefixed public routes */}
           <Route path="/:locale" element={<HomePage />} />
           <Route path="/:locale/blog" element={<BlogIndex />} />
@@ -141,7 +141,7 @@ const AppContent = () => {
               <ContentDetailPage />
             </Suspense>
           } />
-          
+
           {/* Legacy routes without language prefix - auto-redirect to locale-prefixed version */}
           <Route path="/blog" element={<LocaleRedirect><BlogIndex /></LocaleRedirect>} />
           <Route path="/blog/:slug" element={
@@ -151,10 +151,10 @@ const AppContent = () => {
               </Suspense>
             </LocaleRedirect>
           } />
-          
+
           {/* Dashboard interface entry point */}
           <Route path="/dashboard" element={<Index />} />
-          
+
           {/* Protected dashboard routes */}
           <Route path="/dashboard/*" element={<ProtectedRoute />}>
             <Route path="" element={<Index />} />
@@ -185,10 +185,10 @@ const AppContent = () => {
           <Route path="/password-reset/:uid/:token" element={<Suspense fallback={<LoadingSpinner />}><PasswordResetConfirm /></Suspense>} />
           {/* Allauth-style password reset URL */}
           <Route path="/accounts/password/reset/key/:fulltoken" element={<Suspense fallback={<LoadingSpinner />}><PasswordResetConfirm /></Suspense>} />
-          
+
           {/* Language-prefixed dynamic CMS pages */}
           <Route path="/:locale/*" element={<Suspense fallback={<div className="flex h-screen w-full items-center justify-center"><div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" /></div>}><DynamicPage /></Suspense>} />
-          
+
           {/* Legacy dynamic CMS pages without language prefix for backward compatibility */}
           <Route path="*" element={<Suspense fallback={<div className="flex h-screen w-full items-center justify-center"><div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" /></div>}><DynamicPage /></Suspense>} />
         </Routes>
@@ -223,7 +223,7 @@ const App = () => (
             <BrowserRouter>
               <AuthProvider>
                 <LocaleProvider>
-                  <TranslationProvider 
+                  <TranslationProvider
                     enableAutoSync={import.meta.env.DEV}
                     reportMissing={true}
                     syncInterval={30000}

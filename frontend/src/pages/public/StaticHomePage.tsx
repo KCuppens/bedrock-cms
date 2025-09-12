@@ -102,14 +102,14 @@ const StaticHomePage: React.FC = () => {
               <h2 className="text-3xl font-bold mb-4">Latest Posts</h2>
               <p className="text-muted-foreground">Stay up to date with our latest thoughts and insights.</p>
             </div>
-            
+
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               {featuredPosts.map((post) => (
                 <Card key={post.id} className="hover:shadow-lg transition-shadow">
                   {post.featured_image && (
                     <div className="aspect-video bg-muted rounded-t-lg overflow-hidden">
-                      <img 
-                        src={post.featured_image} 
+                      <img
+                        src={post.featured_image}
                         alt={post.title}
                         className="w-full h-full object-cover"
                       />
@@ -117,7 +117,7 @@ const StaticHomePage: React.FC = () => {
                   )}
                   <CardHeader>
                     <CardTitle className="line-clamp-2">
-                      <Link 
+                      <Link
                         to={`/blog/${post.slug}`}
                         className="hover:text-primary transition-colors"
                       >
@@ -143,7 +143,7 @@ const StaticHomePage: React.FC = () => {
                 </Card>
               ))}
             </div>
-            
+
             <div className="text-center mt-12">
               <Button variant="outline" asChild>
                 <Link to="/blog">View All Posts</Link>
@@ -160,7 +160,7 @@ const StaticHomePage: React.FC = () => {
             <h2 className="text-3xl font-bold mb-4">Why Choose Us</h2>
             <p className="text-muted-foreground">Discover what makes us different.</p>
           </div>
-          
+
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <Card>
               <CardHeader className="text-center">
@@ -175,7 +175,7 @@ const StaticHomePage: React.FC = () => {
                 </p>
               </CardContent>
             </Card>
-            
+
             <Card>
               <CardHeader className="text-center">
                 <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mx-auto mb-4">
@@ -189,7 +189,7 @@ const StaticHomePage: React.FC = () => {
                 </p>
               </CardContent>
             </Card>
-            
+
             <Card>
               <CardHeader className="text-center">
                 <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mx-auto mb-4">

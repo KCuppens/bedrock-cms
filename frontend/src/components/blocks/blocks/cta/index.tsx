@@ -7,8 +7,8 @@ export const CTABlock: React.FC<BlockComponentProps> = ({
   onChange,
   className = ''
 }) => {
-  const { 
-    title = 'Ready to get started?', 
+  const {
+    title = 'Ready to get started?',
     description = '',
     primaryButtonText = '',
     primaryButtonUrl = '#',
@@ -42,7 +42,7 @@ export const CTABlock: React.FC<BlockComponentProps> = ({
               {title}
             </h2>
           )}
-          
+
           {isEditing ? (
             <textarea
               value={description}
@@ -56,7 +56,7 @@ export const CTABlock: React.FC<BlockComponentProps> = ({
               {description}
             </p>
           ) : null}
-          
+
           <div className="mt-10 flex items-center justify-center gap-x-6">
             {isEditing ? (
               <div className="flex flex-col gap-4 w-full max-w-2xl">

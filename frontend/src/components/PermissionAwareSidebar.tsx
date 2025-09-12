@@ -1,6 +1,6 @@
-import { 
-  Home, 
-  FileText, 
+import {
+  Home,
+  FileText,
   Users,
   FileCheck,
   ChevronDown,
@@ -59,16 +59,16 @@ const PermissionAwareSidebar = memo(() => {
 
   // Define all menu items with their permission requirements
   const allMenuItems: MenuItem[] = useMemo(() => [
-    { 
-      id: "home", 
-      icon: Home, 
-      label: "Dashboard", 
-      href: "/dashboard" 
+    {
+      id: "home",
+      icon: Home,
+      label: "Dashboard",
+      href: "/dashboard"
     },
-    { 
-      id: "pages", 
-      icon: FileText, 
-      label: "Pages", 
+    {
+      id: "pages",
+      icon: FileText,
+      label: "Pages",
       href: "/dashboard/pages",
       permissions: ['cms.view_page']
     },
@@ -79,20 +79,20 @@ const PermissionAwareSidebar = memo(() => {
       expandable: true,
       permissions: ['blog.view_blogpost'],
       children: [
-        { 
-          label: "Posts", 
-          href: "/dashboard/blog", 
-          permissions: ['blog.view_blogpost'] 
+        {
+          label: "Posts",
+          href: "/dashboard/blog",
+          permissions: ['blog.view_blogpost']
         },
-        { 
-          label: "Categories", 
-          href: "/dashboard/blog/categories", 
-          permissions: ['blog.view_category'] 
+        {
+          label: "Categories",
+          href: "/dashboard/blog/categories",
+          permissions: ['blog.view_category']
         },
-        { 
-          label: "Tags", 
-          href: "/dashboard/blog/tags", 
-          permissions: ['blog.view_tag'] 
+        {
+          label: "Tags",
+          href: "/dashboard/blog/tags",
+          permissions: ['blog.view_tag']
         }
       ]
     },
@@ -103,54 +103,54 @@ const PermissionAwareSidebar = memo(() => {
       expandable: true,
       permissions: ['cms.view_collection'],
       children: [
-        { 
-          label: "All Collections", 
+        {
+          label: "All Collections",
           href: "/dashboard/collections",
           permissions: ['cms.view_collection']
         },
-        { 
-          label: "Categories", 
-          href: "/dashboard/categories", 
+        {
+          label: "Categories",
+          href: "/dashboard/categories",
           permissions: ['cms.view_category']
         },
-        { 
-          label: "Tags", 
+        {
+          label: "Tags",
           href: "/dashboard/tags",
           permissions: ['cms.view_tag']
         }
       ]
     },
-    { 
-      id: "media", 
-      icon: Image, 
-      label: "Media", 
+    {
+      id: "media",
+      icon: Image,
+      label: "Media",
       href: "/dashboard/media",
       permissions: ['files.view_fileupload']
     },
     {
       id: "translations",
       icon: Globe,
-      label: "Translations", 
+      label: "Translations",
       expandable: true,
       permissions: ['i18n.view_translationunit'],
       children: [
-        { 
-          label: "Queue", 
+        {
+          label: "Queue",
           href: "/dashboard/translations/queue",
           permissions: ['i18n.view_translationqueue']
         },
-        { 
-          label: "UI Messages", 
+        {
+          label: "UI Messages",
           href: "/dashboard/translations/ui-messages",
           permissions: ['i18n.view_uimessage']
         },
-        { 
-          label: "Locales", 
+        {
+          label: "Locales",
           href: "/dashboard/translations/locales",
           permissions: ['i18n.view_locale']
         },
-        { 
-          label: "Glossary", 
+        {
+          label: "Glossary",
           href: "/dashboard/translations/glossary",
           permissions: ['i18n.view_glossary']
         }
@@ -163,36 +163,36 @@ const PermissionAwareSidebar = memo(() => {
       expandable: true,
       permissions: ['cms.view_redirect'],
       children: [
-        { 
-          label: "Redirects", 
+        {
+          label: "Redirects",
           href: "/dashboard/seo/redirects",
           permissions: ['cms.view_redirect']
         },
-        { 
-          label: "SEO Settings", 
+        {
+          label: "SEO Settings",
           href: "/dashboard/seo/settings",
           permissions: ['cms.view_seosettings']
         }
       ]
     },
-    { 
-      id: "analytics", 
-      icon: BarChart3, 
-      label: "Analytics", 
+    {
+      id: "analytics",
+      icon: BarChart3,
+      label: "Analytics",
       href: "/dashboard/analytics",
       permissions: ['analytics.view_analytics']
     },
-    { 
-      id: "users-roles", 
-      icon: Users, 
-      label: "Users & Roles", 
+    {
+      id: "users-roles",
+      icon: Users,
+      label: "Users & Roles",
       href: "/dashboard/users-roles",
       roles: ['admin', 'manager']
     },
-    { 
-      id: "settings", 
-      icon: Settings, 
-      label: "Settings", 
+    {
+      id: "settings",
+      icon: Settings,
+      label: "Settings",
       href: "/dashboard/settings",
       roles: ['admin']
     }
@@ -295,21 +295,21 @@ const PermissionAwareSidebar = memo(() => {
     setExpandedItems(prev => {
       const newExpanded = [...prev];
       let changed = false;
-      
+
       requiredExpansions.forEach(itemId => {
         if (!newExpanded.includes(itemId)) {
           newExpanded.push(itemId);
           changed = true;
         }
       });
-      
+
       return changed ? newExpanded : prev;
     });
   }, [getRequiredExpansions]);
 
   const toggleExpanded = useCallback((item: string) => {
-    setExpandedItems(prev => 
-      prev.includes(item) 
+    setExpandedItems(prev =>
+      prev.includes(item)
         ? prev.filter(i => i !== item)
         : [...prev, item]
     );
@@ -327,30 +327,30 @@ const PermissionAwareSidebar = memo(() => {
   // Get user display name with fallback to email
   const getUserDisplayName = useCallback(() => {
     if (!user) return "User";
-    
+
     if (user.first_name || user.last_name) {
       const firstName = user.first_name || "";
       const lastName = user.last_name || "";
       return `${firstName} ${lastName}`.trim();
     }
-    
+
     if (user.name) {
       return user.name;
     }
-    
+
     return user.email;
   }, [user]);
 
   // Get user initials for avatar
   const getUserInitials = useCallback(() => {
     if (!user) return "U";
-    
+
     if (user.first_name || user.last_name) {
       const firstInitial = user.first_name ? user.first_name[0].toUpperCase() : "";
       const lastInitial = user.last_name ? user.last_name[0].toUpperCase() : "";
       return `${firstInitial}${lastInitial}` || "U";
     }
-    
+
     if (user.name) {
       const nameParts = user.name.split(" ");
       if (nameParts.length >= 2) {
@@ -358,18 +358,18 @@ const PermissionAwareSidebar = memo(() => {
       }
       return user.name[0].toUpperCase();
     }
-    
+
     return user.email[0].toUpperCase();
   }, [user]);
 
   // Get user role badge
   const getUserRoleBadge = useCallback(() => {
     if (!user) return "";
-    
+
     if (permissions.isSuperuser()) return "Super Admin";
     if (permissions.isAdmin()) return "Admin";
     if (permissions.isManager()) return "Manager";
-    
+
     return user.role?.charAt(0).toUpperCase() + user.role?.slice(1) || "User";
   }, [user, permissions]);
 
@@ -386,7 +386,7 @@ const PermissionAwareSidebar = memo(() => {
         console.error('Failed to fetch version info:', error);
       }
     };
-    
+
     fetchVersionInfo();
   }, []);
 
@@ -412,9 +412,9 @@ const PermissionAwareSidebar = memo(() => {
     <div className="w-72 h-screen overflow-y-auto fixed left-0 top-0 z-10 bg-background border-r border-border">
       <div className="p-6 h-full flex flex-col">
         <div className="flex items-center gap-2 mb-8 bg-transparent relative">
-          <img 
-            src="/bedrock-logo.png" 
-            alt="Bedrock" 
+          <img
+            src="/bedrock-logo.png"
+            alt="Bedrock"
             className="h-16 w-auto"
             style={{ background: 'transparent' }}
           />
@@ -443,16 +443,16 @@ const PermissionAwareSidebar = memo(() => {
                   <span>{item.label}</span>
                 </div>
                 {item.expandable && (
-                  expandedItems.includes(item.id) ? 
-                    <ChevronDown className="w-4 h-4" /> : 
+                  expandedItems.includes(item.id) ?
+                    <ChevronDown className="w-4 h-4" /> :
                     <ChevronRight className="w-4 h-4" />
                 )}
               </div>
-              
+
               {item.expandable && item.children && expandedItems.includes(item.id) && (
                 <div className="ml-7 mt-1 space-y-1 relative">
                   <div className="absolute left-[-16px] top-[-4px] bottom-[14px] w-px bg-border"></div>
-                  
+
                   {item.children.map((child, idx) => (
                     <div key={idx} className="relative">
                       <div className="absolute left-[-16px] top-[14px] w-4 h-4">
@@ -485,7 +485,7 @@ const PermissionAwareSidebar = memo(() => {
         </nav>
 
         <div className="mt-8 relative">
-          <div 
+          <div
             className="flex items-center justify-between px-3 py-2 rounded-lg bg-card cursor-pointer hover:bg-muted transition-colors shadow-sm border border-border"
             onClick={handleProfileMenuToggle}
           >
@@ -522,7 +522,7 @@ const PermissionAwareSidebar = memo(() => {
                   <User className="w-4 h-4" />
                   <span>Profile Settings</span>
                 </a>
-                
+
                 {permissions.hasPermission('api.view_documentation') && (
                   <>
                     <hr className="my-1 border-border" />
@@ -542,7 +542,7 @@ const PermissionAwareSidebar = memo(() => {
                     </div>
                   </>
                 )}
-                
+
                 <hr className="my-1 border-border" />
                 <button
                   onClick={() => setShowSignOutModal(true)}
@@ -564,8 +564,8 @@ const PermissionAwareSidebar = memo(() => {
                 <>
                   <span className={cn(
                     "w-2 h-2 rounded-full animate-pulse",
-                    versionInfo.environment === 'production' ? 'bg-green-500' : 
-                    versionInfo.environment === 'staging' ? 'bg-yellow-500' : 
+                    versionInfo.environment === 'production' ? 'bg-green-500' :
+                    versionInfo.environment === 'staging' ? 'bg-yellow-500' :
                     versionInfo.environment === 'development' ? 'bg-blue-500' : 'bg-gray-500'
                   )} />
                   <span className="font-medium">
@@ -590,9 +590,9 @@ const PermissionAwareSidebar = memo(() => {
           </div>
         </div>
       </div>
-      
+
       {/* Sign Out Confirmation Modal */}
-      <SignOutConfirmModal 
+      <SignOutConfirmModal
         open={showSignOutModal}
         onOpenChange={setShowSignOutModal}
       />

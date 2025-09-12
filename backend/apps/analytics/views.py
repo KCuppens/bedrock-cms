@@ -4,7 +4,6 @@ from django.contrib.auth import get_user_model
 from django.db.models import Avg, Count
 from django.db.models.functions import TruncDate, TruncMonth, TruncWeek
 from django.utils import timezone
-
 from drf_spectacular.utils import OpenApiParameter, extend_schema, extend_schema_view
 from rest_framework import permissions, viewsets
 from rest_framework.decorators import action

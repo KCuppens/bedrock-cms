@@ -30,7 +30,7 @@ const DashboardHeader = memo(() => {
       {/* Language Selector - Top Right */}
       <div className="flex justify-end">
         <div className="relative">
-          <div 
+          <div
             className="flex items-center gap-2 px-3 py-1.5 bg-accent rounded-lg cursor-pointer hover:bg-accent/80 transition-colors"
             onClick={toggleLanguageDropdown}
           >

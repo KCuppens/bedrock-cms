@@ -95,25 +95,25 @@ interface MessageWithTranslations extends UIMessage {
 }
 
 const statusConfig = {
-  missing: { 
-    label: "Missing", 
-    color: "bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-400", 
-    icon: AlertCircle 
+  missing: {
+    label: "Missing",
+    color: "bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-400",
+    icon: AlertCircle
   },
-  draft: { 
-    label: "Draft", 
-    color: "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-400", 
-    icon: Edit 
+  draft: {
+    label: "Draft",
+    color: "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-400",
+    icon: Edit
   },
-  needs_review: { 
-    label: "Needs Review", 
-    color: "bg-orange-100 text-orange-800 dark:bg-orange-900/20 dark:text-orange-400", 
-    icon: Clock 
+  needs_review: {
+    label: "Needs Review",
+    color: "bg-orange-100 text-orange-800 dark:bg-orange-900/20 dark:text-orange-400",
+    icon: Clock
   },
-  approved: { 
-    label: "Approved", 
-    color: "bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400", 
-    icon: CheckCircle2 
+  approved: {
+    label: "Approved",
+    color: "bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400",
+    icon: CheckCircle2
   }
 };
 
@@ -131,7 +131,7 @@ const UIMessages = () => {
   const [locales, setLocales] = useState<any[]>([]);
   const [namespaces, setNamespaces] = useState<string[]>([]);
   const [selectedLocale, setSelectedLocale] = useState<string>("");
-  
+
   const [editingCell, setEditingCell] = useState<{messageId: number, localeCode: string} | null>(null);
   const [editingValue, setEditingValue] = useState("");
   const [syncing, setSyncing] = useState(false);
@@ -150,7 +150,7 @@ const UIMessages = () => {
     errors: 0,
     skipped: 0
   });
-  
+
   // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
@@ -179,7 +179,7 @@ const UIMessages = () => {
     } else {
       setLoadingMore(true);
     }
-    
+
     try {
       // Fetch locales first (only on initial load)
       if (page === 1) {
@@ -187,7 +187,7 @@ const UIMessages = () => {
         const activeLocales = localesResponse.results || [];
         setLocales(activeLocales);
         console.log('Loaded locales:', activeLocales);
-        
+
         // Set default selected locale (first non-default locale)
         if (activeLocales.length > 0) {
           const nonDefaultLocale = activeLocales.find((l: any) => !l.is_default) || activeLocales[0];
@@ -205,11 +205,11 @@ const UIMessages = () => {
           offset: offset
         }
       });
-      
+
       const messagesList = messagesResponse.results || messagesResponse || [];
       const totalMessages = messagesResponse.count || messagesList.length;
       console.log(`Loaded messages: ${messagesList.length} (page ${page})`);
-      
+
       setTotalCount(totalMessages);
       setHasMore(offset + messagesList.length < totalMessages);
 
@@ -223,7 +223,7 @@ const UIMessages = () => {
               limit: 1 // We only need the count, not the data
             }
           });
-          
+
           // Get all translations to calculate stats
           const allTranslationsForStats = await api.request<any>({
             method: 'GET',
@@ -232,10 +232,10 @@ const UIMessages = () => {
               limit: 5000 // Large limit to get all translations for stats
             }
           });
-          
+
           const allTranslations = allTranslationsForStats.results || allTranslationsForStats || [];
           const totalTranslationsCount = allTranslationsForStats.count || allTranslations.length;
-          
+
           // Calculate status counts
           const statusCounts = {
             totalMessages: totalMessages,
@@ -245,7 +245,7 @@ const UIMessages = () => {
             needsReview: 0,
             draft: 0
           };
-          
+
           allTranslations.forEach((translation: any) => {
             switch (translation.status) {
               case 'approved':
@@ -269,18 +269,18 @@ const UIMessages = () => {
                 break;
             }
           });
-          
+
           setStats(statusCounts);
         } catch (error) {
           console.error('Failed to fetch translation stats:', error);
         }
       }
-      
+
       // Fetch translations for these messages
       const messageIds = messagesList.map((m: any) => m.id);
       if (messageIds.length > 0) {
         console.log('Fetching translations for message IDs:', messageIds);
-        
+
         // Fetch all translations with a higher limit
         // We'll filter them client-side for the messages we need
         const allTranslationsResponse = await api.request<any>({
@@ -291,9 +291,9 @@ const UIMessages = () => {
             offset: 0
           }
         });
-        
+
         const allTranslationsRaw = allTranslationsResponse.results || allTranslationsResponse || [];
-        
+
         // Filter translations for only the messages we're displaying
         const messageIdSet = new Set(messageIds);
         const allTranslations = allTranslationsRaw.filter((t: any) => messageIdSet.has(t.message));
@@ -301,36 +301,36 @@ const UIMessages = () => {
         console.log('Sample translation:', allTranslations[0]);
         console.log('All translations raw count:', allTranslationsRaw.length);
         console.log('First 5 raw translations:', allTranslationsRaw.slice(0, 5));
-        
+
         // Get current locales (use existing if available)
         const activeLocales = locales.length > 0 ? locales : (await api.i18n.locales.list({ active_only: true })).results || [];
-        
+
         // Create a map of translations by message ID and locale ID
         const translationsByMessage: Record<number, Record<string, UIMessageTranslation>> = {};
-        
+
         for (const translation of allTranslations) {
           const locale = activeLocales.find((l: any) => l.id === translation.locale);
           if (locale) {
             if (!translationsByMessage[translation.message]) {
               translationsByMessage[translation.message] = {};
             }
-            
+
             // Log French translations to debug
             if (locale.code === 'fr' && translation.value) {
               console.log(`French translation found: Message ID ${translation.message}, Value: "${translation.value}"`);
             }
-            
+
             translationsByMessage[translation.message][locale.code] = {
               ...translation,
               locale_code: locale.code
             };
           }
         }
-        
+
         // Combine messages with their translations
         const messagesWithTranslations: MessageWithTranslations[] = messagesList.map((message: any) => {
           const translations = translationsByMessage[message.id] || {};
-          
+
           // Add missing translations for locales that don't have one
           for (const locale of activeLocales) {
             if (!translations[locale.code] && !locale.is_default) {
@@ -345,35 +345,35 @@ const UIMessages = () => {
               };
             }
           }
-          
+
           return {
             ...message,
             translations
           };
         });
-        
+
         // Either append or replace messages
         if (append) {
           setMessages(prev => [...prev, ...messagesWithTranslations]);
         } else {
           setMessages(messagesWithTranslations);
         }
-        
+
         console.log('Final messages with translations:', messagesWithTranslations.length);
         if (messagesWithTranslations.length > 0) {
           console.log('Sample message with translations:', messagesWithTranslations[0]);
           console.log('Translations for first message:', messagesWithTranslations[0].translations);
         }
       }
-      
+
       // Get unique namespaces (only update on initial load)
       if (page === 1) {
         const uniqueNamespaces = [...new Set(messagesList.map((msg: any) => msg.namespace))];
         setNamespaces(uniqueNamespaces);
       }
-      
+
       setCurrentPage(page);
-      
+
     } catch (error) {
       console.error('Failed to load data:', error);
       toast({
@@ -395,23 +395,23 @@ const UIMessages = () => {
 
   // Filter messages
   const filteredMessages = messages.filter(message => {
-    const matchesSearch = 
+    const matchesSearch =
       message.key.toLowerCase().includes(searchQuery.toLowerCase()) ||
       message.default_value.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      Object.values(message.translations).some(trans => 
+      Object.values(message.translations).some(trans =>
         trans.value && trans.value.toLowerCase().includes(searchQuery.toLowerCase())
       );
-    
+
     const matchesNamespace = namespaceFilter === "all" || message.namespace === namespaceFilter;
-    
-    const matchesStatus = statusFilter === "all" || 
+
+    const matchesStatus = statusFilter === "all" ||
       Object.values(message.translations).some(trans => trans.status === statusFilter);
-    
-    const matchesLocale = localeFilter === "all" || 
-      (localeFilter === "missing" && Object.values(message.translations).some(trans => 
+
+    const matchesLocale = localeFilter === "all" ||
+      (localeFilter === "missing" && Object.values(message.translations).some(trans =>
         trans.status === "missing" || !trans.value
       ));
-    
+
     return matchesSearch && matchesNamespace && matchesStatus && matchesLocale;
   });
 
@@ -426,8 +426,8 @@ const UIMessages = () => {
   };
 
   const handleMessageSelect = (messageId: string) => {
-    setSelectedMessages(prev => 
-      prev.includes(messageId) 
+    setSelectedMessages(prev =>
+      prev.includes(messageId)
         ? prev.filter(id => id !== messageId)
         : [...prev, messageId]
     );
@@ -458,13 +458,13 @@ const UIMessages = () => {
     try {
       const message = messages.find(m => m.id === editingCell.messageId);
       const locale = locales.find(l => l.code === editingCell.localeCode);
-      
+
       if (!message || !locale) {
         throw new Error('Message or locale not found');
       }
 
       const translation = message.translations[editingCell.localeCode];
-      
+
       if (translation && translation.id > 0) {
         // Update existing translation
         await api.request({
@@ -496,7 +496,7 @@ const UIMessages = () => {
 
       // Reload data to get updated translations
       await loadData();
-      
+
       cancelEditing();
     } catch (error) {
       console.error('Failed to save translation:', error);
@@ -522,7 +522,7 @@ const UIMessages = () => {
 
     try {
       setSaving(true);
-      
+
       const updates = [];
       for (const messageId of selectedMessages) {
         const message = messages.find(m => m.id.toString() === messageId);
@@ -629,12 +629,12 @@ const UIMessages = () => {
           title: "Sync successful",
           description: response.message,
         });
-        
+
         // Show details if available
         if (response.details) {
           console.log('Sync details:', response.details);
         }
-        
+
         // Reload data to show new/updated messages
         await loadData();
       } else {
@@ -670,7 +670,7 @@ const UIMessages = () => {
           title: "Import successful",
           description: "Django built-in strings imported successfully",
         });
-        
+
         // Reload data to show new messages
         await loadData();
       } else {
@@ -705,18 +705,18 @@ const UIMessages = () => {
       if (status === 'SUCCESS') {
         setAutoTranslating(false);
         setAutoTranslateTaskId(null);
-        
+
         toast({
           title: "Auto-translation completed",
           description: message,
         });
-        
+
         // Reload data to show new translations
         await loadData();
       } else if (status === 'FAILURE') {
         setAutoTranslating(false);
         setAutoTranslateTaskId(null);
-        
+
         toast({
           title: "Auto-translation failed",
           description: error || message,
@@ -730,7 +730,7 @@ const UIMessages = () => {
       console.error('Failed to check task status:', error);
       setAutoTranslating(false);
       setAutoTranslateTaskId(null);
-      
+
       toast({
         title: "Status check failed",
         description: "Failed to check auto-translation progress",
@@ -774,18 +774,18 @@ const UIMessages = () => {
       if (response.status === 'started') {
         const taskId = response.task_id;
         setAutoTranslateTaskId(taskId);
-        
+
         toast({
           title: "Auto-translation started",
           description: response.message,
         });
-        
+
         // Start polling for task status
         setTimeout(() => checkTaskStatus(taskId), 1000);
       } else if (response.status === 'success') {
         // Task completed (either no messages to translate or eager mode)
         setAutoTranslating(false);
-        
+
         if (response.eager_mode && response.results) {
           // Show detailed results for eager mode
           const details = response.results;
@@ -799,7 +799,7 @@ const UIMessages = () => {
             description: response.message,
           });
         }
-        
+
         // Reload data to show new translations
         await loadData();
       } else {
@@ -867,7 +867,7 @@ const UIMessages = () => {
           description: response.message,
           variant: "destructive",
         });
-        
+
         // Show errors in console
         if (details.errors && details.errors.length > 0) {
           console.error('Import errors:', details.errors);
@@ -887,7 +887,7 @@ const UIMessages = () => {
 
       // Reload data to show imported messages
       await loadData();
-      
+
       // Close modal and reset
       setShowImportModal(false);
       setImportFile(null);
@@ -926,13 +926,13 @@ const UIMessages = () => {
     <div className="min-h-screen">
       <div className="flex">
         <Sidebar />
-        
+
         <div className="flex-1 flex flex-col ml-72">
           <TopNavbar />
-          
+
           <main className="flex-1 p-8">
             <div className="max-w-full mx-auto space-y-6">
-              
+
               {/* Header */}
               <div className="flex items-center justify-between">
                 <div>
@@ -946,7 +946,7 @@ const UIMessages = () => {
                     <RefreshCw className={`w-4 h-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
                     {loading ? 'Loading...' : 'Refresh'}
                   </Button>
-                  
+
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                       <Button variant="outline" disabled={syncing}>
@@ -970,7 +970,7 @@ const UIMessages = () => {
                           Backend → DB
                         </span>
                       </DropdownMenuItem>
-                      
+
                       <DropdownMenuItem onClick={() => {
                         setSyncDirection('export');
                         handleSyncPoFiles();
@@ -981,7 +981,7 @@ const UIMessages = () => {
                           DB → Backend
                         </span>
                       </DropdownMenuItem>
-                      
+
                       <DropdownMenuItem onClick={() => {
                         setSyncDirection('sync');
                         handleSyncPoFiles();
@@ -992,10 +992,10 @@ const UIMessages = () => {
                           Merge both
                         </span>
                       </DropdownMenuItem>
-                      
-                      <DropdownMenuItem 
+
+                      <DropdownMenuItem
                         className="border-t"
-                        onClick={handleImportDjangoStrings} 
+                        onClick={handleImportDjangoStrings}
                         disabled={syncing}
                       >
                         <Database className="w-4 h-4 mr-2" />
@@ -1006,19 +1006,19 @@ const UIMessages = () => {
                       </DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>
-                  
+
                   <Button variant="outline" onClick={handleExport}>
                     <Download className="w-4 h-4 mr-2" />
                     Export JSON
                   </Button>
-                  
+
                   <Button variant="outline" onClick={() => setShowImportModal(true)}>
                     <Upload className="w-4 h-4 mr-2" />
                     Import JSON
                   </Button>
-                  
-                  <Button 
-                    variant="outline" 
+
+                  <Button
+                    variant="outline"
                     onClick={handleAutoTranslate}
                     disabled={autoTranslating || !selectedLocale}
                   >
@@ -1028,8 +1028,8 @@ const UIMessages = () => {
                       <Zap className="w-4 h-4 mr-2" />
                     )}
                     {autoTranslating ? (
-                      autoTranslateProgress.total > 0 
-                        ? `Translating... ${autoTranslateProgress.percentage}%` 
+                      autoTranslateProgress.total > 0
+                        ? `Translating... ${autoTranslateProgress.percentage}%`
                         : 'Starting translation...'
                     ) : 'Auto-translate All'}
                   </Button>
@@ -1047,14 +1047,14 @@ const UIMessages = () => {
                           {autoTranslateProgress.percentage}% Complete
                         </Badge>
                       </div>
-                      
+
                       <div className="w-full bg-muted rounded-full h-2">
-                        <div 
-                          className="bg-primary h-2 rounded-full transition-all duration-500" 
+                        <div
+                          className="bg-primary h-2 rounded-full transition-all duration-500"
                           style={{ width: `${autoTranslateProgress.percentage}%` }}
                         />
                       </div>
-                      
+
                       <div className="grid grid-cols-4 gap-4 text-sm">
                         <div>
                           <span className="text-muted-foreground">Progress:</span>
@@ -1121,7 +1121,7 @@ const UIMessages = () => {
                       <div className="text-sm text-muted-foreground">Draft</div>
                     </div>
                   </div>
-                  
+
                   {/* Progress Bar */}
                   {stats.totalTranslations > 0 && (
                     <div className="mt-4 space-y-2">
@@ -1130,8 +1130,8 @@ const UIMessages = () => {
                         <span>{Math.round((stats.translated / stats.totalTranslations) * 100)}% Complete</span>
                       </div>
                       <div className="w-full bg-muted rounded-full h-2">
-                        <div 
-                          className="bg-green-600 h-2 rounded-full transition-all duration-500" 
+                        <div
+                          className="bg-green-600 h-2 rounded-full transition-all duration-500"
                           style={{ width: `${(stats.translated / stats.totalTranslations) * 100}%` }}
                         />
                       </div>
@@ -1155,7 +1155,7 @@ const UIMessages = () => {
                         />
                       </div>
                     </div>
-                    
+
                     <Select value={selectedLocale} onValueChange={setSelectedLocale}>
                       <SelectTrigger className="w-[180px]">
                         <SelectValue placeholder="Select locale" />
@@ -1182,7 +1182,7 @@ const UIMessages = () => {
                         )}
                       </SelectContent>
                     </Select>
-                    
+
                     <Select value={namespaceFilter} onValueChange={setNamespaceFilter}>
                       <SelectTrigger className="w-[150px]">
                         <SelectValue placeholder="Namespace" />
@@ -1194,7 +1194,7 @@ const UIMessages = () => {
                         ))}
                       </SelectContent>
                     </Select>
-                    
+
                     <Select value={statusFilter} onValueChange={setStatusFilter}>
                       <SelectTrigger className="w-[150px]">
                         <SelectValue placeholder="Status" />
@@ -1207,8 +1207,8 @@ const UIMessages = () => {
                         <SelectItem value="approved">Approved</SelectItem>
                       </SelectContent>
                     </Select>
-                    
-                    <Button 
+
+                    <Button
                       variant="outline"
                       onClick={() => {
                         setSearchQuery("");
@@ -1240,9 +1240,9 @@ const UIMessages = () => {
                           <Clock className="w-4 h-4 mr-1" />
                           Mark for Review
                         </Button>
-                        <Button 
-                          size="sm" 
-                          variant="outline" 
+                        <Button
+                          size="sm"
+                          variant="outline"
                           onClick={handleAutoTranslate}
                           disabled={autoTranslating || !selectedLocale}
                         >
@@ -1288,16 +1288,16 @@ const UIMessages = () => {
                           console.log('Message translations:', message.translations);
                           console.log('Translation for selected locale:', message.translations[selectedLocale]);
                         }
-                        
+
                         const translation = message.translations[selectedLocale] || {
                           value: '',
                           status: 'missing',
                           updated_at: ''
                         };
                         const StatusIcon = statusConfig[translation.status]?.icon || AlertCircle;
-                        const isEditing = editingCell?.messageId === message.id && 
+                        const isEditing = editingCell?.messageId === message.id &&
                                         editingCell?.localeCode === selectedLocale;
-                        
+
                         return (
                           <TableRow key={message.id}>
                             <TableCell>
@@ -1306,7 +1306,7 @@ const UIMessages = () => {
                                 onCheckedChange={() => handleMessageSelect(message.id.toString())}
                               />
                             </TableCell>
-                            
+
                             <TableCell>
                               <div>
                                 <code className="text-sm font-mono">
@@ -1319,7 +1319,7 @@ const UIMessages = () => {
                                 </div>
                               </div>
                             </TableCell>
-                            
+
                             <TableCell className="max-w-xs">
                               <p className="text-sm truncate" title={message.default_value}>
                                 {message.default_value}
@@ -1330,7 +1330,7 @@ const UIMessages = () => {
                                 </p>
                               )}
                             </TableCell>
-                            
+
                             <TableCell className="max-w-xs">
                               {isEditing ? (
                                 <div className="flex items-center gap-2">
@@ -1352,7 +1352,7 @@ const UIMessages = () => {
                                   </Button>
                                 </div>
                               ) : (
-                                <div 
+                                <div
                                   className="group cursor-pointer p-1 -m-1 rounded hover:bg-accent"
                                   onClick={() => startEditingCell(message.id, selectedLocale, translation.value || message.default_value)}
                                 >
@@ -1369,20 +1369,20 @@ const UIMessages = () => {
                                 </div>
                               )}
                             </TableCell>
-                            
+
                             <TableCell>
                               <Badge className={statusConfig[translation.status]?.color}>
                                 <StatusIcon className="w-3 h-3 mr-1" />
                                 {statusConfig[translation.status]?.label}
                               </Badge>
                             </TableCell>
-                            
+
                             <TableCell>
                               <div className="text-sm text-muted-foreground">
                                 {formatDate(translation.updated_at || message.updated_at)}
                               </div>
                             </TableCell>
-                            
+
                             <TableCell>
                               <DropdownMenu>
                                 <DropdownMenuTrigger asChild>
@@ -1391,7 +1391,7 @@ const UIMessages = () => {
                                   </Button>
                                 </DropdownMenuTrigger>
                                 <DropdownMenuContent align="end">
-                                  <DropdownMenuItem 
+                                  <DropdownMenuItem
                                     onClick={() => startEditingCell(message.id, selectedLocale, translation.value || message.default_value)}
                                   >
                                     <Edit className="w-4 h-4 mr-2" />
@@ -1406,7 +1406,7 @@ const UIMessages = () => {
                     </TableBody>
                   </Table>
                 </CardContent>
-                
+
                 {/* Load More Button */}
                 {hasMore && (
                   <div className="p-4 border-t">
@@ -1414,7 +1414,7 @@ const UIMessages = () => {
                       <p className="text-sm text-muted-foreground">
                         Showing {messages.length} of {totalCount} messages
                       </p>
-                      <Button 
+                      <Button
                         onClick={handleLoadMore}
                         disabled={loadingMore}
                         variant="outline"
@@ -1453,16 +1453,16 @@ const UIMessages = () => {
               Choose how you want to synchronize translation files between the database and backend .po files.
             </DialogDescription>
           </DialogHeader>
-          
+
           <div className="space-y-4 py-4">
             <Alert>
               <AlertCircle className="h-4 w-4" />
               <AlertDescription>
-                This operation will sync messages for the <strong>{selectedLocale || 'all locales'}</strong> 
+                This operation will sync messages for the <strong>{selectedLocale || 'all locales'}</strong>
                 {namespaceFilter !== 'all' && ` in the ${namespaceFilter} namespace`}.
               </AlertDescription>
             </Alert>
-            
+
             <div className="space-y-3">
               <div className="flex items-start space-x-3">
                 <FileCode2 className="w-5 h-5 mt-0.5 text-muted-foreground" />
@@ -1473,7 +1473,7 @@ const UIMessages = () => {
                   </p>
                 </div>
               </div>
-              
+
               <div className="flex items-start space-x-3">
                 <Upload className="w-5 h-5 mt-0.5 text-muted-foreground" />
                 <div className="flex-1">
@@ -1483,7 +1483,7 @@ const UIMessages = () => {
                   </p>
                 </div>
               </div>
-              
+
               <div className="flex items-start space-x-3">
                 <RefreshCw className="w-5 h-5 mt-0.5 text-muted-foreground" />
                 <div className="flex-1">
@@ -1494,7 +1494,7 @@ const UIMessages = () => {
                 </div>
               </div>
             </div>
-            
+
             <div className="space-y-2">
               <Label>Sync Direction</Label>
               <Select value={syncDirection} onValueChange={(value: any) => setSyncDirection(value)}>
@@ -1509,7 +1509,7 @@ const UIMessages = () => {
               </Select>
             </div>
           </div>
-          
+
           <DialogFooter>
             <Button variant="outline" onClick={() => setShowSyncModal(false)} disabled={syncing}>
               Cancel
@@ -1543,7 +1543,7 @@ const UIMessages = () => {
               Import translations from a JSON file. The file should contain key-value pairs where keys are message keys and values are translations.
             </DialogDescription>
           </DialogHeader>
-          
+
           <div className="space-y-4 py-4">
             {/* Locale Selection */}
             <div className="space-y-2">
@@ -1654,20 +1654,20 @@ const UIMessages = () => {
               </AlertDescription>
             </Alert>
           </div>
-          
+
           <DialogFooter>
-            <Button 
-              variant="outline" 
+            <Button
+              variant="outline"
               onClick={() => {
                 setShowImportModal(false);
                 setImportFile(null);
-              }} 
+              }}
               disabled={importing}
             >
               Cancel
             </Button>
-            <Button 
-              onClick={handleImportJSON} 
+            <Button
+              onClick={handleImportJSON}
               disabled={importing || !importFile || !selectedLocale || locales.filter(l => !l.is_default && l.is_active).length === 0}
             >
               {importing ? (

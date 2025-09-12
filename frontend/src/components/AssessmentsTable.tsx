@@ -24,7 +24,7 @@ const AssessmentsTable = () => {
     {
       id: "LP-1459",
       assessor: {
-        name: "Casey Brown", 
+        name: "Casey Brown",
         avatar: "/placeholder.svg",
         initials: "CB"
       },
@@ -40,7 +40,7 @@ const AssessmentsTable = () => {
       id: "BV-1278",
       assessor: {
         name: "Anna Lee",
-        avatar: "/placeholder.svg", 
+        avatar: "/placeholder.svg",
         initials: "AL"
       },
       state: "Monitoring",

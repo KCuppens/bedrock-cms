@@ -17,14 +17,14 @@ const ForgotPassword = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
-    
+
     if (!email) {
       setError("Please enter your email address");
       return;
     }
 
     const result = await resetPassword(email);
-    
+
     if (result.success) {
       setSuccess(true);
     } else {
@@ -62,7 +62,7 @@ const ForgotPassword = () => {
 
               <p className="text-xs text-muted-foreground">
                 Didn't receive an email? Check your spam folder or{" "}
-                <button 
+                <button
                   onClick={() => setSuccess(false)}
                   className="text-primary hover:underline"
                 >

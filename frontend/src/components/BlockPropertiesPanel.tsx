@@ -6,14 +6,14 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
-import { 
-  X, 
-  Settings, 
-  Type, 
-  Image, 
+import {
+  X,
+  Settings,
+  Type,
+  Image,
   Palette,
   Layout,
-  Trash2 
+  Trash2
 } from "lucide-react";
 import { Block } from "@/pages/PageEditor";
 
@@ -24,11 +24,11 @@ interface BlockPropertiesPanelProps {
   onClose: () => void;
 }
 
-export const BlockPropertiesPanel = ({ 
-  block, 
-  onBlockUpdate, 
-  onBlockDelete, 
-  onClose 
+export const BlockPropertiesPanel = ({
+  block,
+  onBlockUpdate,
+  onBlockDelete,
+  onClose
 }: BlockPropertiesPanelProps) => {
   if (!block) return null;
 
@@ -150,9 +150,9 @@ export const BlockPropertiesPanel = ({
               <Input
                 id="cta-button-text"
                 value={block.content.button?.text || ""}
-                onChange={(e) => updateContent('button', { 
-                  ...block.content.button, 
-                  text: e.target.value 
+                onChange={(e) => updateContent('button', {
+                  ...block.content.button,
+                  text: e.target.value
                 })}
                 placeholder="Button text"
               />
@@ -162,9 +162,9 @@ export const BlockPropertiesPanel = ({
               <Input
                 id="cta-button-url"
                 value={block.content.button?.url || ""}
-                onChange={(e) => updateContent('button', { 
-                  ...block.content.button, 
-                  url: e.target.value 
+                onChange={(e) => updateContent('button', {
+                  ...block.content.button,
+                  url: e.target.value
                 })}
                 placeholder="https://example.com"
               />
@@ -265,8 +265,8 @@ export const BlockPropertiesPanel = ({
                 <Layout className="w-4 h-4 mr-2" />
                 Duplicate Block
               </Button>
-              <Button 
-                variant="destructive" 
+              <Button
+                variant="destructive"
                 className="w-full justify-start"
                 onClick={() => {
                   onBlockDelete(block.id);

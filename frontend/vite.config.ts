@@ -31,12 +31,12 @@ const seoRedirectHandler = (): Plugin => ({
   configureServer(server) {
     server.middlewares.use((req, res, next) => {
       const url = req.url;
-      
+
       // Check if it's a sitemap or robots.txt request
       if (url?.match(/^\/sitemap(-.*)?\.xml$/) || url === '/robots.txt') {
         // Proxy these requests directly to the backend
         const backendUrl = `http://localhost:8000${url}`;
-        
+
         fetch(backendUrl)
           .then(backendRes => {
             res.statusCode = backendRes.status;
@@ -53,7 +53,7 @@ const seoRedirectHandler = (): Plugin => ({
           });
         return; // Don't call next() - we handled the request
       }
-      
+
       next();
     });
   },
@@ -192,7 +192,7 @@ export default defineConfig(({ mode }) => ({
             // All other vendor code
             return 'vendor';
           }
-          
+
           // Split large pages into separate chunks
           if (id.includes('src/pages/')) {
             if (id.includes('PageEditor') || id.includes('BlogPostEditor')) {
@@ -211,17 +211,17 @@ export default defineConfig(({ mode }) => ({
               return 'admin-tools';
             }
           }
-          
+
           // Split UI components into separate chunk
           if (id.includes('src/components/ui')) {
             return 'ui-components';
           }
-          
+
           // Split modal components
           if (id.includes('src/components/modals')) {
             return 'modals';
           }
-          
+
           // Split contexts
           if (id.includes('src/contexts')) {
             return 'contexts';
@@ -247,16 +247,16 @@ export default defineConfig(({ mode }) => ({
   },
   optimizeDeps: {
     include: [
-      'react', 
-      'react-dom', 
-      'react-router-dom', 
+      'react',
+      'react-dom',
+      'react-router-dom',
       '@tanstack/react-query',
       'axios'
     ],
     exclude: [
-      '@dnd-kit/core', 
-      '@dnd-kit/sortable', 
-      '@dnd-kit/utilities', 
+      '@dnd-kit/core',
+      '@dnd-kit/sortable',
+      '@dnd-kit/utilities',
       'recharts'
     ],
   },

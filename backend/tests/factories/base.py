@@ -4,9 +4,9 @@ Base factory classes and utilities for test data generation.
 
 import factory
 import factory.django
-from faker import Faker
 from django.contrib.auth import get_user_model
 from django.utils import timezone
+from faker import Faker
 
 fake = Faker()
 

@@ -9,7 +9,7 @@ export interface PreloadableComponent<T extends ComponentType<any>> extends Lazy
 
 /**
  * Enhanced lazy loading with preload capability
- * 
+ *
  * @param importFunc Function that imports the component
  * @param chunkName Optional name for debugging
  * @returns Lazy component with preload method
@@ -19,7 +19,7 @@ export function lazyWithPreload<T extends ComponentType<any>>(
   chunkName?: string
 ): PreloadableComponent<T> {
   const cacheKey = chunkName || importFunc.toString();
-  
+
   const preload = () => {
     if (!preloadCache.has(cacheKey)) {
       preloadCache.set(cacheKey, importFunc());
@@ -32,7 +32,7 @@ export function lazyWithPreload<T extends ComponentType<any>>(
     if (preloadCache.has(cacheKey)) {
       return preloadCache.get(cacheKey)!;
     }
-    
+
     // Otherwise import and cache
     const promise = importFunc();
     preloadCache.set(cacheKey, promise);
@@ -47,7 +47,7 @@ export function lazyWithPreload<T extends ComponentType<any>>(
 
 /**
  * Preload components based on route or user interaction
- * 
+ *
  * @param components Array of preloadable components
  */
 export function preloadComponents(components: PreloadableComponent<any>[]): void {
@@ -62,7 +62,7 @@ export function preloadComponents(components: PreloadableComponent<any>[]): void
 
 /**
  * Preload component on hover or focus
- * 
+ *
  * @param component Component to preload
  * @returns Event handlers for preloading
  */
@@ -84,7 +84,7 @@ export function usePreloadOnInteraction<T extends ComponentType<any>>(
 
 /**
  * Intersection Observer based preloading
- * 
+ *
  * @param component Component to preload
  * @param rootMargin Margin for intersection observer
  */
@@ -113,7 +113,7 @@ export function preloadOnVisible<T extends ComponentType<any>>(
 
 /**
  * Preload components after main content is loaded
- * 
+ *
  * @param components Components to preload
  * @param delay Delay in milliseconds
  */
@@ -139,7 +139,7 @@ export function preloadOnIdle(
 /**
  * Network-aware preloading
  * Only preload on fast connections
- * 
+ *
  * @param components Components to preload
  */
 export function preloadOnFastConnection(
@@ -147,9 +147,9 @@ export function preloadOnFastConnection(
 ): void {
   if ('connection' in navigator) {
     const connection = (navigator as any).connection;
-    
+
     // Only preload on 4g or wifi
-    if (connection.effectiveType === '4g' || 
+    if (connection.effectiveType === '4g' ||
         connection.type === 'wifi' ||
         !connection.saveData) {
       preloadComponents(components);

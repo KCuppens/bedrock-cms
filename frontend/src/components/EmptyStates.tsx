@@ -2,12 +2,12 @@ import React, { memo, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { 
-  FileText, 
-  Plus, 
-  Globe, 
-  Upload, 
-  Image, 
+import {
+  FileText,
+  Plus,
+  Globe,
+  Upload,
+  Image,
   BookOpen,
   Lock,
   AlertTriangle,
@@ -48,7 +48,7 @@ export const EmptyState: React.FC<EmptyStateProps> = memo(({
       </div>
       <h3 className="text-xl font-semibold text-foreground mb-2">{title}</h3>
       <p className="text-muted-foreground mb-6 max-w-md leading-relaxed">{description}</p>
-      
+
       <div className="flex flex-col sm:flex-row gap-3">
         {action && (
           <Button onClick={action.onClick} variant={action.variant || "default"}>
@@ -84,7 +84,7 @@ export const PagesEmptyState: React.FC<{ onCreatePage: () => void }> = memo(({ o
 
 PagesEmptyState.displayName = 'PagesEmptyState';
 
-export const TranslationsEmptyState: React.FC<{ 
+export const TranslationsEmptyState: React.FC<{
   locale?: string;
   onAddLocale: () => void;
   onSeedTranslations?: () => void;
@@ -95,7 +95,7 @@ export const TranslationsEmptyState: React.FC<{
         icon={Globe}
         title={locale ? `No translations for ${locale}` : "No locales configured"}
         description={
-          locale 
+          locale
             ? "This locale doesn't have any translations yet. You can seed initial translations from your default locale or start adding them manually."
             : "Set up your first locale to start managing translations across different languages."
         }
@@ -104,7 +104,7 @@ export const TranslationsEmptyState: React.FC<{
           onClick: locale && onSeedTranslations ? onSeedTranslations : onAddLocale
         }}
       />
-      
+
       {locale && (
         <Card className="mt-8 bg-blue-50/50 border-blue-200">
           <CardHeader className="pb-3">
@@ -144,20 +144,20 @@ export const TranslationsEmptyState: React.FC<{
 
 TranslationsEmptyState.displayName = 'TranslationsEmptyState';
 
-export const MediaEmptyState: React.FC<{ 
+export const MediaEmptyState: React.FC<{
   onUpload: () => void;
   isDragActive?: boolean;
 }> = memo(({ onUpload, isDragActive = false }) => (
   <div className={`border-2 border-dashed rounded-lg transition-colors ${
-    isDragActive 
-      ? 'border-primary bg-primary/5' 
+    isDragActive
+      ? 'border-primary bg-primary/5'
       : 'border-muted-foreground/25 hover:border-muted-foreground/40'
   }`}>
     <EmptyState
       icon={Image}
       title={isDragActive ? "Drop files here" : "No media files"}
       description={
-        isDragActive 
+        isDragActive
           ? "Release to upload your files"
           : "Upload images, videos, and documents to use across your content. Drag and drop files here or click to browse."
       }
@@ -168,7 +168,7 @@ export const MediaEmptyState: React.FC<{
       }}
       className="py-20"
     />
-    
+
     <div className="px-8 pb-8">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-muted-foreground">
         <div>
@@ -194,14 +194,14 @@ export const MediaEmptyState: React.FC<{
 
 MediaEmptyState.displayName = 'MediaEmptyState';
 
-export const PermissionErrorState: React.FC<{ 
+export const PermissionErrorState: React.FC<{
   action?: string;
   resource?: string;
   onRequestAccess?: () => void;
-}> = memo(({ 
-  action = "access this content", 
+}> = memo(({
+  action = "access this content",
   resource = "resource",
-  onRequestAccess 
+  onRequestAccess
 }) => {
   const handleContactAdmin = useCallback(() => {
     window.open('mailto:admin@company.com?subject=Access Request', '_blank');
@@ -215,7 +215,7 @@ export const PermissionErrorState: React.FC<{
           <div className="rounded-full bg-destructive/10 p-3">
             <Lock className="h-8 w-8 text-destructive" />
           </div>
-          
+
           <div className="space-y-2">
             <h3 className="text-lg font-semibold text-foreground">Access Denied</h3>
             <p className="text-sm text-muted-foreground">
@@ -229,8 +229,8 @@ export const PermissionErrorState: React.FC<{
                 Request Access
               </Button>
             )}
-            <Button 
-              variant="outline" 
+            <Button
+              variant="outline"
               onClick={handleContactAdmin}
               className="w-full gap-2"
             >
@@ -265,14 +265,14 @@ export const PermissionErrorState: React.FC<{
 
 PermissionErrorState.displayName = 'PermissionErrorState';
 
-export const NotFoundState: React.FC<{ 
+export const NotFoundState: React.FC<{
   title?: string;
   description?: string;
   onGoBack: () => void;
-}> = memo(({ 
-  title = "Page not found", 
+}> = memo(({
+  title = "Page not found",
   description = "The page you're looking for doesn't exist or has been moved.",
-  onGoBack 
+  onGoBack
 }) => {
   const handleGoHome = useCallback(() => {
     window.location.href = '/';
@@ -299,8 +299,8 @@ export const NotFoundState: React.FC<{
 
 NotFoundState.displayName = 'NotFoundState';
 
-export const LoadingState: React.FC<{ message?: string }> = memo(({ 
-  message = "Loading..." 
+export const LoadingState: React.FC<{ message?: string }> = memo(({
+  message = "Loading..."
 }) => (
   <div className="flex flex-col items-center justify-center py-16 px-4">
     <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mb-4"></div>

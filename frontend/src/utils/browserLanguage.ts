@@ -6,12 +6,12 @@ export function getBrowserLanguage(): string | null {
   if (navigator.language) {
     return navigator.language.toLowerCase();
   }
-  
+
   // Fallback to navigator.userLanguage (IE)
   if ((navigator as any).userLanguage) {
     return (navigator as any).userLanguage.toLowerCase();
   }
-  
+
   return null;
 }
 
@@ -20,12 +20,12 @@ export function getBrowserLanguage(): string | null {
  */
 export function getBrowserLanguages(): string[] {
   const languages: string[] = [];
-  
+
   // Primary language
   if (navigator.language) {
     languages.push(navigator.language.toLowerCase());
   }
-  
+
   // All preferred languages
   if (navigator.languages && navigator.languages.length > 0) {
     navigator.languages.forEach(lang => {
@@ -35,12 +35,12 @@ export function getBrowserLanguages(): string[] {
       }
     });
   }
-  
+
   // IE fallback
   if ((navigator as any).userLanguage && !languages.includes((navigator as any).userLanguage.toLowerCase())) {
     languages.push((navigator as any).userLanguage.toLowerCase());
   }
-  
+
   return languages;
 }
 
@@ -49,12 +49,12 @@ export function getBrowserLanguages(): string[] {
  * Tries exact match first, then language code only
  */
 export function matchBrowserToLocale(
-  browserLangs: string[], 
+  browserLangs: string[],
   availableLocales: Array<{ code: string; is_active: boolean }>
 ): string | null {
   // Only consider active locales
   const activeLocales = availableLocales.filter(l => l.is_active);
-  
+
   for (const browserLang of browserLangs) {
     // Try exact match (e.g., "en-us" matches "en-US")
     const exactMatch = activeLocales.find(
@@ -63,7 +63,7 @@ export function matchBrowserToLocale(
     if (exactMatch) {
       return exactMatch.code;
     }
-    
+
     // Try language part only (e.g., "en-us" matches "en")
     const langPart = browserLang.split('-')[0];
     const partialMatch = activeLocales.find(
@@ -73,7 +73,7 @@ export function matchBrowserToLocale(
       return partialMatch.code;
     }
   }
-  
+
   return null;
 }
 

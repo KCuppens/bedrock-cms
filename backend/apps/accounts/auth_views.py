@@ -1,8 +1,7 @@
+from allauth.account.forms import ResetPasswordForm
 from django.contrib.auth import authenticate, get_user_model, login, logout
 from django.core.exceptions import ValidationError
 from django.core.validators import validate_email
-
-from allauth.account.forms import ResetPasswordForm
 from drf_spectacular.utils import extend_schema
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes, throttle_classes

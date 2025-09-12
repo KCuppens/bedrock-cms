@@ -15,7 +15,7 @@ export const PermissionErrorHandler: React.FC = () => {
     // Handle permission errors
     const handlePermissionError = (event: CustomEvent) => {
       const { message, url, data } = event.detail;
-      
+
       // Show user-friendly error message
       if (data?.detail?.includes('locale')) {
         toast.error('You don\'t have access to content in this locale');
@@ -34,7 +34,7 @@ export const PermissionErrorHandler: React.FC = () => {
     // Handle authentication errors
     const handleAuthError = () => {
       toast.error('Your session has expired. Please sign in again.');
-      
+
       // Redirect to login page
       setTimeout(() => {
         logout();

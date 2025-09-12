@@ -28,7 +28,7 @@ export const RichtextBlock: React.FC<BlockComponentProps> = ({
   };
 
   return (
-    <div 
+    <div
       className={`prose prose-lg max-w-none ${alignmentClasses[alignment as keyof typeof alignmentClasses] || 'text-left'} ${className}`}
       onClick={onSelect}
     >
@@ -58,11 +58,11 @@ export const RichtextBlock: React.FC<BlockComponentProps> = ({
           </div>
         </div>
       ) : (
-        <div 
+        <div
           className="rich-content"
-          dangerouslySetInnerHTML={{ 
-            __html: richContent || '<p>Add your rich text content here...</p>' 
-          }} 
+          dangerouslySetInnerHTML={{
+            __html: richContent || '<p>Add your rich text content here...</p>'
+          }}
         />
       )}
     </div>

@@ -24,64 +24,64 @@ const getVisibleData = (): ChartData[] => {
 
 const LightweightChart = memo(() => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  
+
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
-    
+
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
-    
+
     // Set canvas size
     canvas.width = canvas.offsetWidth;
     canvas.height = 200;
-    
+
     // Clear canvas
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    
+
     const data = getVisibleData();
     const maxValue = Math.max(...data.flatMap(d => [d.views, d.users]));
     const padding = 40;
     const width = canvas.width - padding * 2;
     const height = canvas.height - padding * 2;
-    
+
     // Draw simple line chart
     ctx.strokeStyle = 'hsl(var(--primary))';
     ctx.lineWidth = 2;
     ctx.beginPath();
-    
+
     data.forEach((point, index) => {
       const x = padding + (index * width) / (data.length - 1);
       const y = padding + height - (point.views / maxValue) * height;
-      
+
       if (index === 0) {
         ctx.moveTo(x, y);
       } else {
         ctx.lineTo(x, y);
       }
     });
-    
+
     ctx.stroke();
-    
+
     // Draw axis labels
     ctx.fillStyle = 'hsl(var(--muted-foreground))';
     ctx.font = '11px sans-serif';
-    
+
     data.forEach((point, index) => {
       const x = padding + (index * width) / (data.length - 1);
       ctx.fillText(point.date, x - 20, canvas.height - 10);
     });
-    
+
     // Cleanup
     return () => {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
     };
   }, []);
-  
+
   const data = getVisibleData();
   const totalViews = data.reduce((sum, d) => sum + d.views, 0);
   const totalUsers = data.reduce((sum, d) => sum + d.users, 0);
-  
+
   return (
     <Card className="bg-card shadow-card border-border/30">
       <CardHeader>
@@ -106,13 +106,13 @@ const LightweightChart = memo(() => {
       </CardHeader>
       <CardContent>
         <div className="w-full h-[200px] relative">
-          <canvas 
+          <canvas
             ref={canvasRef}
             className="w-full h-full"
             style={{ maxWidth: '100%' }}
           />
         </div>
-        
+
         <div className="grid grid-cols-2 gap-4 mt-6">
           <div className="p-3 bg-muted/30 rounded-lg text-center">
             <div className="text-xl font-bold text-primary">{totalViews.toLocaleString()}</div>

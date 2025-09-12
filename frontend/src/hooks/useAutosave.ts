@@ -102,7 +102,7 @@ export const useAutosave = <T extends Record<string, any>>(
 
     try {
       await saveFunction(dataToSave);
-      
+
       if (!isComponentMountedRef.current) return;
 
       setAutosaveState(prev => ({
@@ -122,7 +122,7 @@ export const useAutosave = <T extends Record<string, any>>(
       if (!isComponentMountedRef.current) return;
 
       const errorMessage = error?.message || 'Auto-save failed';
-      
+
       setAutosaveState(prev => ({
         ...prev,
         isSaving: false,
@@ -166,7 +166,7 @@ export const useAutosave = <T extends Record<string, any>>(
 
       // Save to localStorage immediately for recovery
       saveToLocalStorage(currentData);
-      
+
       // Trigger auto-save
       performSave(currentData);
     }

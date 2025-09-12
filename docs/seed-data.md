@@ -49,7 +49,7 @@ python manage.py seed_site --clear
 ```
 / (Home)
 ├── /about/ (About Us)
-├── /services/ (Our Services)  
+├── /services/ (Our Services)
 └── /contact/ (Contact Us)
 ```
 
@@ -117,7 +117,7 @@ Use the seeded data to test API endpoints:
 # Get homepage
 curl "http://localhost:8000/api/pages?path=/&locale=en-US"
 
-# Get blog posts  
+# Get blog posts
 curl "http://localhost:8000/api/content/blog.blogpost/"
 
 # Search content
@@ -143,7 +143,7 @@ The script is designed to be:
 
 ## Production Notes
 
-**Never run this command in production!** 
+**Never run this command in production!**
 
 The seed script is designed for development and testing environments only. It creates demo data that should not be used in live systems.
 
@@ -153,7 +153,7 @@ The seed script is designed for development and testing environments only. It cr
 # Block scaffolder
 python manage.py block_new testimonial
 
-# Registry scaffolder  
+# Registry scaffolder
 python manage.py cms_scaffold app.Model
 
 # Other useful development commands

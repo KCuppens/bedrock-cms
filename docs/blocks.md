@@ -94,7 +94,7 @@ The `columns` block supports nesting other blocks:
       }
     },
     {
-      "type": "image", 
+      "type": "image",
       "props": {
         "src": "/media/image.jpg",
         "alt": "Right column image"

@@ -31,7 +31,7 @@ const AutosaveIndicator: React.FC<AutosaveIndicatorProps> = ({
       case 'saving':
         return 'Saving...';
       case 'saved':
-        return autosaveState.lastSaved 
+        return autosaveState.lastSaved
           ? `Saved ${format(autosaveState.lastSaved, 'h:mm a')}`
           : 'Saved';
       case 'error':
@@ -55,8 +55,8 @@ const AutosaveIndicator: React.FC<AutosaveIndicatorProps> = ({
   };
 
   return (
-    <Badge 
-      variant={getVariant()} 
+    <Badge
+      variant={getVariant()}
       className={`flex items-center gap-1 ${className}`}
       title={autosaveState.error || getStatusText()}
     >

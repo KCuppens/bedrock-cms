@@ -1,10 +1,10 @@
 import { createContext, useContext, useState, useEffect, useMemo, useCallback, ReactNode } from 'react';
 import { api } from '@/lib/api';
-import { 
-  getBrowserLanguages, 
-  matchBrowserToLocale, 
-  isFirstVisit, 
-  markAutoDetected 
+import {
+  getBrowserLanguages,
+  matchBrowserToLocale,
+  isFirstVisit,
+  markAutoDetected
 } from '@/utils/browserLanguage';
 
 interface Locale {
@@ -139,13 +139,13 @@ const getLocaleFlag = (code: string): string => {
   if (LOCALE_FLAGS[code]) {
     return LOCALE_FLAGS[code];
   }
-  
+
   // Try language part only (e.g., 'en' from 'en-US')
   const langPart = code.split('-')[0].toLowerCase();
   if (LOCALE_FLAGS[langPart]) {
     return LOCALE_FLAGS[langPart];
   }
-  
+
   // Default world flag for unknown locales
   return '🌐';
 };
@@ -166,7 +166,7 @@ export const LocaleProvider = ({ children }: { children: ReactNode }) => {
         flag: getLocaleFlag(locale.code)
       }));
       setLocales(localesWithFlags);
-      
+
       // Only set current locale on initial load
       if (!currentLocale) {
         // Try to restore from localStorage first
@@ -183,26 +183,26 @@ export const LocaleProvider = ({ children }: { children: ReactNode }) => {
             // Invalid stored locale, continue to auto-detect
           }
         }
-        
+
         // Auto-detect browser language on first visit
         if (isFirstVisit() && localesWithFlags.length > 1) {
           const browserLanguages = getBrowserLanguages();
           const matchedLocaleCode = matchBrowserToLocale(browserLanguages, localesWithFlags);
-          
+
           if (matchedLocaleCode) {
             const matchedLocale = localesWithFlags.find((l: Locale) => l.code === matchedLocaleCode);
             if (matchedLocale) {
               setCurrentLocale(matchedLocale);
               localStorage.setItem('current_locale', JSON.stringify(matchedLocale));
               markAutoDetected();
-              
+
               // Optional: Show a notification that we auto-detected their language
               console.log(`Auto-detected language: ${matchedLocale.name}`);
               return;
             }
           }
         }
-        
+
         // Fall back to default locale
         const defaultLocale = localesWithFlags.find((l: Locale) => l.is_default);
         if (defaultLocale) {
@@ -250,13 +250,13 @@ export const LocaleProvider = ({ children }: { children: ReactNode }) => {
   }, []); // Remove currentLocale from dependencies to prevent infinite loop
 
   // Memoize expensive computations to prevent unnecessary re-renders
-  const activeLocales = useMemo(() => 
-    locales.filter(l => l.is_active), 
+  const activeLocales = useMemo(() =>
+    locales.filter(l => l.is_active),
     [locales]
   );
-  
-  const defaultLocale = useMemo(() => 
-    locales.find(l => l.is_default) || null, 
+
+  const defaultLocale = useMemo(() =>
+    locales.find(l => l.is_default) || null,
     [locales]
   );
 
@@ -264,10 +264,10 @@ export const LocaleProvider = ({ children }: { children: ReactNode }) => {
     setCurrentLocale(locale);
     // Persist to localStorage
     localStorage.setItem('current_locale', JSON.stringify(locale));
-    
+
     // Set document direction based on RTL
     document.documentElement.dir = locale.rtl ? 'rtl' : 'ltr';
-    
+
     // Set lang attribute
     document.documentElement.lang = locale.code;
   }, []);

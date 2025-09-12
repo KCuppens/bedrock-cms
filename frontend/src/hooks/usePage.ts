@@ -81,11 +81,11 @@ const pathCache = new Map<string, Promise<PageData>>();
 
 /**
  * Performance-optimized hook for fetching page data by path.
- * 
+ *
  * Features:
  * - Automatic locale detection from context
  * - Request deduplication for same paths
- * - Optimized caching strategy 
+ * - Optimized caching strategy
  * - Error boundary integration
  * - SEO data resolution
  */
@@ -123,7 +123,7 @@ export const usePage = (
       ).then(response => {
         // Extract the page data from ApiResponse wrapper
         const pageData = response.data || response;
-        
+
         // Validate response structure
         if (!pageData || typeof pageData !== 'object') {
           throw new Error('Invalid page data received from server');
@@ -131,7 +131,7 @@ export const usePage = (
 
         // Clean up cache entry after successful request
         pathCache.delete(cacheKey);
-        
+
         return pageData as PageData;
       }).catch(error => {
         // Clean up cache entry on error
@@ -185,7 +185,7 @@ export const usePrefetchPage = () => {
   return useCallback((path: string, previewToken?: string) => {
     const normalizedPath = path?.startsWith('/') ? path : `/${path}`;
     const cacheKey = `${normalizedPath}-${currentLocale?.code || 'en'}${previewToken ? `-preview-${previewToken}` : ''}`;
-    
+
     // Only prefetch if not already cached or in progress
     if (!pathCache.has(cacheKey)) {
       const requestPromise = api.cms.pages.getByPath(
@@ -195,7 +195,7 @@ export const usePrefetchPage = () => {
         .catch(() => null); // Ignore errors for prefetch
 
       pathCache.set(cacheKey, requestPromise);
-      
+
       // Clean up prefetch cache after delay
       setTimeout(() => {
         pathCache.delete(cacheKey);
@@ -216,7 +216,7 @@ export const usePageMetadata = (path: string) => {
       // For now, we'll use the main endpoint but extract only what we need
       const response = await api.cms.pages.getByPath(path);
       const page = response.data || response;
-      
+
       return {
         id: page.id,
         title: page.title,

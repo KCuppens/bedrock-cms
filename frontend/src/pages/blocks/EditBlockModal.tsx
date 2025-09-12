@@ -54,12 +54,12 @@ const EDITING_MODES = [
   { value: 'sidebar', label: 'Sidebar' }
 ];
 
-export default function EditBlockModal({ 
-  open, 
-  onOpenChange, 
-  onSubmit, 
+export default function EditBlockModal({
+  open,
+  onOpenChange,
+  onSubmit,
   blockType,
-  categories 
+  categories
 }: EditBlockModalProps) {
   const [formData, setFormData] = useState<Partial<BlockType>>({});
 
@@ -95,7 +95,7 @@ export default function EditBlockModal({
             Update the block type configuration. Type cannot be changed after creation.
           </DialogDescription>
         </DialogHeader>
-        
+
         <div className="space-y-4">
           <div>
             <Label htmlFor="edit-component">Component</Label>
@@ -105,7 +105,7 @@ export default function EditBlockModal({
               onChange={(e) => setFormData(prev => ({ ...prev, component: e.target.value }))}
             />
           </div>
-          
+
           <div>
             <Label htmlFor="edit-label">Label</Label>
             <Input
@@ -114,7 +114,7 @@ export default function EditBlockModal({
               onChange={(e) => setFormData(prev => ({ ...prev, label: e.target.value }))}
             />
           </div>
-          
+
           <div>
             <Label htmlFor="edit-description">Description</Label>
             <Textarea
@@ -123,12 +123,12 @@ export default function EditBlockModal({
               onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
             />
           </div>
-          
+
           <div className="grid grid-cols-2 gap-4">
             <div>
               <Label htmlFor="edit-category">Category</Label>
-              <Select 
-                value={formData.category || "content"} 
+              <Select
+                value={formData.category || "content"}
                 onValueChange={(value) => setFormData(prev => ({ ...prev, category: value }))}
               >
                 <SelectTrigger>
@@ -145,8 +145,8 @@ export default function EditBlockModal({
             </div>
             <div>
               <Label htmlFor="edit-editing_mode">Editing Mode</Label>
-              <Select 
-                value={formData.editing_mode || "inline"} 
+              <Select
+                value={formData.editing_mode || "inline"}
                 onValueChange={(value) => setFormData(prev => ({ ...prev, editing_mode: value }))}
               >
                 <SelectTrigger>
@@ -162,7 +162,7 @@ export default function EditBlockModal({
               </Select>
             </div>
           </div>
-          
+
           <div>
             <Label htmlFor="edit-icon">Icon</Label>
             <Input
@@ -171,7 +171,7 @@ export default function EditBlockModal({
               onChange={(e) => setFormData(prev => ({ ...prev, icon: e.target.value }))}
             />
           </div>
-          
+
           <div className="flex items-center space-x-4">
             <div className="flex items-center space-x-2">
               <Switch
