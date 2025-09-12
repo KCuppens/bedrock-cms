@@ -1,16 +1,17 @@
-"""
-Tests for search functionality.
-"""
-
 from django.contrib.auth import get_user_model
 from django.contrib.contenttypes.models import ContentType
 from django.db.models.signals import post_delete, post_save
 from django.test import TestCase
-
 from apps.blog.models import BlogPost, Category
 from apps.i18n.models import Locale
-
 from .models import SearchIndex, SearchQuery, SearchSuggestion
+        from apps.search.signals import auto_index_content, auto_remove_from_index
+"""
+Tests for search functionality.
+"""
+
+
+
 
 User = get_user_model()
 
@@ -21,7 +22,6 @@ class SearchModelTests(TestCase):
     def setUp(self):
         """Set up test data."""
         # Disconnect search signals to avoid conflicts during tests
-        from apps.search.signals import auto_index_content, auto_remove_from_index
 
         post_save.disconnect(auto_index_content)
         post_delete.disconnect(auto_remove_from_index)

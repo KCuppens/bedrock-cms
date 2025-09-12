@@ -1,12 +1,13 @@
+import time
+from django.core.cache import cache
+from rest_framework.throttling import AnonRateThrottle, UserRateThrottle
+            import logging
 """
 Custom throttling classes for enhanced API security.
 """
 
-import time
 
-from django.core.cache import cache
 
-from rest_framework.throttling import AnonRateThrottle, UserRateThrottle
 
 
 class WriteOperationThrottle(UserRateThrottle):
@@ -188,7 +189,6 @@ class SecurityScanThrottle(AnonRateThrottle):
         """
         if self.is_suspicious_request(request):
             # Log the suspicious request
-            import logging
 
             logger = logging.getLogger(__name__)
             logger.warning(

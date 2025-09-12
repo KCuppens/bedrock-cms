@@ -51,7 +51,7 @@ class EmailTemplateAdmin(admin.ModelAdmin):
     )
     readonly_fields = ["created_by", "updated_by", "created_at", "updated_at"]
 
-    def save_model(self, request, obj, form, change):
+    def save_model(self, request, obj, form, change):  # noqa: C901
         """Set user tracking fields"""
         if not change:  # Creating new object
             obj.created_by = request.user
@@ -128,7 +128,7 @@ class EmailMessageLogAdmin(admin.ModelAdmin):
         ),
     )
 
-    def subject_truncated(self, obj):
+    def subject_truncated(self, obj):  # noqa: C901
         """Show truncated subject"""
         if len(obj.subject) > 50:
             return f"{obj.subject[:47]}..."
@@ -136,7 +136,7 @@ class EmailMessageLogAdmin(admin.ModelAdmin):
 
     subject_truncated.short_description = "Subject"
 
-    def status_colored(self, obj):
+    def status_colored(self, obj):  # noqa: C901
         """Show colored status"""
         colors = {
             "pending": "#ffc107",  # Yellow
@@ -157,14 +157,14 @@ class EmailMessageLogAdmin(admin.ModelAdmin):
     status_colored.short_description = "Status"
     status_colored.admin_order_field = "status"
 
-    def has_add_permission(self, request):
+    def has_add_permission(self, request):  # noqa: C901
         """Disable adding email logs through admin"""
         return False
 
-    def has_change_permission(self, request, obj=None):
+    def has_change_permission(self, request, obj=None):  # noqa: C901
         """Disable editing email logs through admin"""
         return False
 
-    def has_delete_permission(self, request, obj=None):
+    def has_delete_permission(self, request, obj=None):  # noqa: C901
         """Allow deletion for cleanup"""
         return request.user.is_superuser

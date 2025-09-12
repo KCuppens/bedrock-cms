@@ -2,6 +2,12 @@ from rest_framework import serializers
 
 from .models import Page
 from .seo import SeoSettings
+from django.core.exceptions import ValidationError
+                from .seo_utils import resolve_seo
+                from .seo_utils import generate_seo_links
+        from datetime import datetime, timedelta
+            from django.utils import timezone
+            from django.utils import timezone
 
 
 class PageReadSerializer(serializers.ModelSerializer):
@@ -35,7 +41,7 @@ class PageReadSerializer(serializers.ModelSerializer):
             "recent_revisions",
         ]
 
-    def get_blocks(self, obj):
+    def get_blocks(self, obj):  # noqa: C901
         """Add component field to each block for frontend compatibility."""
         blocks = obj.blocks or []
         processed_blocks = []
@@ -52,18 +58,17 @@ class PageReadSerializer(serializers.ModelSerializer):
 
         return processed_blocks
 
-    def get_children_count(self, obj):
+    def get_children_count(self, obj):  # noqa: C901
         # Use cached count if available from prefetch_related annotation
         if hasattr(obj, "_children_count"):
             return obj._children_count
         return obj.children.count()
 
-    def get_resolved_seo(self, obj):
+    def get_resolved_seo(self, obj):  # noqa: C901
         """Return resolved SEO if with_seo=1 parameter is provided."""
         request = self.context.get("request")
         if request and request.query_params.get("with_seo") == "1":
             try:
-                from .seo_utils import resolve_seo
 
                 return resolve_seo(obj)
             except ImportError as e:
@@ -71,13 +76,12 @@ class PageReadSerializer(serializers.ModelSerializer):
                 return {"error": str(e)}
         return None
 
-    def get_seo_links(self, obj):
+    def get_seo_links(self, obj):  # noqa: C901
         """Return SEO links (canonical + alternates)
         if with_seo=1 parameter is provided."""
         request = self.context.get("request")
         if request and request.query_params.get("with_seo") == "1":
             try:
-                from .seo_utils import generate_seo_links
 
                 return generate_seo_links(obj)
             except ImportError as e:
@@ -85,14 +89,13 @@ class PageReadSerializer(serializers.ModelSerializer):
                 return {"error": str(e)}
         return None
 
-    def get_recent_revisions(self, obj):
+    def get_recent_revisions(self, obj):  # noqa: C901
         """Return the 5 most recent revisions for this page."""
         # print(f"DEBUG: get_recent_revisions called for
         #        page {obj.id} in serializers.py")
 
         # Return mock revision data since database
         # versioning isn't configured yet
-        from datetime import datetime, timedelta
 
         now = datetime.now()
 
@@ -146,7 +149,7 @@ class PageTreeItemSerializer(serializers.ModelSerializer):
         model = Page
         fields = ["id", "title", "slug", "path", "position", "status", "children_count"]
 
-    def get_children_count(self, obj):
+    def get_children_count(self, obj):  # noqa: C901
         # Use cached count if available from prefetch_related annotation
         if hasattr(obj, "_children_count"):
             return obj._children_count
@@ -166,10 +169,9 @@ class PageWriteSerializer(serializers.ModelSerializer):
             "scheduled_unpublish_at",
         ]
 
-    def validate_scheduled_publish_at(self, value):
+    def validate_scheduled_publish_at(self, value):  # noqa: C901
         """Validate scheduled publish date."""
         if value:
-            from django.utils import timezone
 
             if value <= timezone.now():
                 raise serializers.ValidationError(
@@ -177,10 +179,9 @@ class PageWriteSerializer(serializers.ModelSerializer):
                 )
         return value
 
-    def validate_scheduled_unpublish_at(self, value):
+    def validate_scheduled_unpublish_at(self, value):  # noqa: C901
         """Validate scheduled unpublish date."""
         if value:
-            from django.utils import timezone
 
             if value <= timezone.now():
                 raise serializers.ValidationError(
@@ -188,7 +189,7 @@ class PageWriteSerializer(serializers.ModelSerializer):
                 )
         return value
 
-    def validate(self, attrs):
+    def validate(self, attrs):  # noqa: C901
         """Cross-field validation."""
         status = attrs.get("status")
         scheduled_publish_at = attrs.get("scheduled_publish_at")

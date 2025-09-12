@@ -1,10 +1,10 @@
-"""
-Deactivate a locale.
-"""
-
 from django.core.management.base import BaseCommand
 
 from apps.i18n.models import Locale
+
+"""
+Deactivate a locale.
+"""
 
 
 class Command(BaseCommand):

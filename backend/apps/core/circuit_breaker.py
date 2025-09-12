@@ -1,9 +1,3 @@
-"""
-Circuit breaker implementation for external service calls.
-
-Prevents cascading failures by failing fast when services are unavailable.
-"""
-
 import functools
 import logging
 import time
@@ -12,6 +6,13 @@ from enum import Enum
 from typing import Any
 
 from django.core.cache import cache
+
+"""
+Circuit breaker implementation for external service calls.
+
+Prevents cascading failures by failing fast when services are unavailable.
+"""
+
 
 logger = logging.getLogger(__name__)
 

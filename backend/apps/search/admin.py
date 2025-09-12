@@ -1,12 +1,12 @@
-"""
-Admin interface for search functionality.
-"""
-
 from django.contrib import admin
 from django.urls import reverse
 from django.utils.html import format_html
 
 from .models import SearchIndex, SearchQuery, SearchSuggestion
+
+"""
+Admin interface for search functionality.
+"""
 
 
 @admin.register(SearchIndex)
@@ -79,17 +79,17 @@ class SearchIndexAdmin(admin.ModelAdmin):
         ),
     )
 
-    def get_queryset(self, request):
+    def get_queryset(self, request):  # noqa: C901
         """Optimize queryset with related data."""
         return super().get_queryset(request).select_related("content_type")
 
-    def content_type_display(self, obj):
+    def content_type_display(self, obj):  # noqa: C901
         """Display content type in a readable format."""
         return f"{obj.content_type.app_label}.{obj.content_type.model}"
 
     content_type_display.short_description = "Content Type"
 
-    def content_object_link(self, obj):
+    def content_object_link(self, obj):  # noqa: C901
         """Display link to the original content object."""
         if not obj.content_object:
             return "Object not found"
@@ -101,7 +101,7 @@ class SearchIndexAdmin(admin.ModelAdmin):
                 args=[obj.object_id],
             )
             return format_html('<a href="{}">{}</a>', url, obj.content_object)
-        except:
+        except Exception:
             return str(obj.content_object)
 
     content_object_link.short_description = "Original Object"
@@ -139,15 +139,15 @@ class SearchQueryAdmin(admin.ModelAdmin):
     date_hierarchy = "created_at"
     ordering = ["-created_at"]
 
-    def has_add_permission(self, request):
+    def has_add_permission(self, request):  # noqa: C901
         """Disable manual creation of query logs."""
         return False
 
-    def has_change_permission(self, request, obj=None):
+    def has_change_permission(self, request, obj=None):  # noqa: C901
         """Make query logs read-only."""
         return False
 
-    def user_display(self, obj):
+    def user_display(self, obj):  # noqa: C901
         """Display user information."""
         if obj.user:
             return obj.user.email

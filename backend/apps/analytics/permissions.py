@@ -1,8 +1,8 @@
+from rest_framework.permissions import BasePermission
+
 """
 Custom permissions for analytics functionality.
 """
-
-from rest_framework.permissions import BasePermission
 
 
 class AnalyticsViewPermission(BasePermission):

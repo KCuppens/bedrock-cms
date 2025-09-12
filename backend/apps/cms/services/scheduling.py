@@ -1,15 +1,17 @@
+from django.contrib.contenttypes.models import ContentType
+from django.core.exceptions import ValidationError
+from django.db import transaction
+from django.utils import timezone
+from ..scheduling import ScheduledTask
+                    from ..models import Page
+                    from apps.blog.models import BlogPost
 """
 Scheduling service for CMS content.
 
 This module provides services for scheduling content publishing and unpublishing.
 """
 
-from django.contrib.contenttypes.models import ContentType
-from django.core.exceptions import ValidationError
-from django.db import transaction
-from django.utils import timezone
 
-from ..scheduling import ScheduledTask
 
 
 class SchedulingService:
@@ -174,11 +176,9 @@ class SchedulingService:
             if isinstance(content_type, str):
                 # Convert string to ContentType
                 if content_type.lower() == "page":
-                    from ..models import Page
 
                     content_type = ContentType.objects.get_for_model(Page)
                 elif content_type.lower() in ["blogpost", "blog"]:
-                    from apps.blog.models import BlogPost
 
                     content_type = ContentType.objects.get_for_model(BlogPost)
             queryset = queryset.filter(content_type=content_type)

@@ -1,17 +1,22 @@
+import json
+from django.contrib.auth import get_user_model
+from django.test import TestCase, TransactionTestCase
+from rest_framework import status
+from apps.cms.models import Page
+from apps.i18n.models import Locale, TranslationUnit, UiMessage, UiMessageTranslation
+from apps.i18n.translation import (
+        from django.contrib.auth import get_user_model
+        from django.contrib.auth import get_user_model
+        from django.contrib.auth import get_user_model
+        from rest_framework.test import APIClient
+        from django.contrib.auth import get_user_model
 """
 Tests for translation functionality.
 """
 
-import json
 
-from django.contrib.auth import get_user_model
-from django.test import TestCase, TransactionTestCase
 
-from rest_framework import status
 
-from apps.cms.models import Page
-from apps.i18n.models import Locale, TranslationUnit, UiMessage, UiMessageTranslation
-from apps.i18n.translation import (
     TranslationManager,
     TranslationResolver,
     UiMessageResolver,
@@ -118,7 +123,6 @@ class TranslationUnitModelTests(TestCase):
 
     def tearDown(self):
         """Clean up after test."""
-        from django.contrib.auth import get_user_model
 
         User = get_user_model()
 
@@ -230,7 +234,6 @@ class TranslationManagerTests(TestCase):
 
     def tearDown(self):
         """Clean up after test."""
-        from django.contrib.auth import get_user_model
 
         User = get_user_model()
 
@@ -459,7 +462,6 @@ class TranslationAPITests(TransactionTestCase):
     def setUp(self):
         """Set up test data."""
         # Ensure clean state for each test - delete in proper order
-        from django.contrib.auth import get_user_model
 
         TranslationUnit.objects.all().delete()
         Page.objects.all().delete()  # Delete pages before locales
@@ -468,7 +470,6 @@ class TranslationAPITests(TransactionTestCase):
         User.objects.filter(email="test@example.com").delete()
 
         # Set up test client for API requests
-        from rest_framework.test import APIClient
 
         self.client = APIClient()
 
@@ -521,7 +522,6 @@ class TranslationAPITests(TransactionTestCase):
 
     def tearDown(self):
         """Clean up after test."""
-        from django.contrib.auth import get_user_model
 
         User = get_user_model()
 

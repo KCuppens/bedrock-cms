@@ -1,4 +1,12 @@
-from .base import *
+from .base import (  # noqa: F403
+    BASE_DIR,  # noqa: F405
+    INSTALLED_APPS,  # noqa: F405
+    DATABASES,  # noqa: F405
+    REST_FRAMEWORK,  # noqa: F405
+    LOGGING,  # noqa: F405
+    env,  # noqa: F405
+)
+from typing import Any
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -10,8 +18,8 @@ ALLOWED_HOSTS = ["localhost", "127.0.0.1"]
 # Override with DATABASE_URL env var for PostgreSQL/MySQL:
 # DATABASE_URL=postgres://user:pass@localhost:5432/dbname
 # DATABASE_URL=mysql://user:pass@localhost:3306/dbname
-DATABASES = {
-    "default": env.db("DATABASE_URL", default=f"sqlite:///{BASE_DIR}/db.sqlite3")
+DATABASES = {  # noqa: F811
+    "default": env.db("DATABASE_URL", default=f"sqlite:///{BASE_DIR}/db.sqlite3")  # noqa: F405
 }
 
 # Email backend for development
@@ -71,7 +79,7 @@ CSRF_COOKIE_SAMESITE = "Lax"
 CSRF_COOKIE_HTTPONLY = False  # Allow JavaScript to read the cookie
 
 # Static files (CSS, JavaScript, Images)
-STATICFILES_DIRS = [BASE_DIR / "static"]
+STATICFILES_DIRS = [BASE_DIR / "static"]  # noqa: F405
 
 # Celery settings for development - run tasks synchronously
 CELERY_TASK_ALWAYS_EAGER = True  # Execute tasks locally instead of sending to queue
@@ -82,13 +90,11 @@ CELERY_BROKER_URL = "memory://localhost/"
 CELERY_RESULT_BACKEND = "cache+memory://"
 
 # Django Extensions (if you want to add it later)
-if "django_extensions" in INSTALLED_APPS:
-    INSTALLED_APPS += ["django_extensions"]
+if "django_extensions" in INSTALLED_APPS:  # noqa: F405
+    INSTALLED_APPS += ["django_extensions"]  # noqa: F405
 
 # Development logging
-from typing import Any
-
-LOGGING_DICT: dict[str, Any] = LOGGING
+LOGGING_DICT: dict[str, Any] = LOGGING  # noqa: F405
 LOGGING_DICT["handlers"]["console"]["formatter"] = "simple"
 LOGGING_DICT["root"]["level"] = "DEBUG"
 
@@ -111,14 +117,14 @@ CACHES = {
 SESSION_ENGINE = "django.contrib.sessions.backends.db"
 
 # Frontend URL for redirects
-FRONTEND_URL = env.str("FRONTEND_URL", default="http://localhost:8082")
+FRONTEND_URL = env.str("FRONTEND_URL", default="http://localhost:8082")  # noqa: F405
 
 # Override Allauth to send password reset emails to frontend
 ACCOUNT_ADAPTER = "apps.accounts.custom_adapter.CustomAccountAdapter"
 
 # Disable throttling for development to avoid rate limit issues
 # Option 1: Keep throttle classes but set very high rates for development
-REST_FRAMEWORK = REST_FRAMEWORK.copy()
+REST_FRAMEWORK = REST_FRAMEWORK.copy()  # noqa: F405
 REST_FRAMEWORK["DEFAULT_THROTTLE_RATES"] = {
     "anon": "10000/hour",
     "user": "10000/hour",

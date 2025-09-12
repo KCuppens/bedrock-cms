@@ -2,6 +2,13 @@ from rest_framework import serializers
 
 from apps.cms.models import Page
 from apps.i18n.serializers import LocaleSerializer
+from django.core.exceptions import ValidationError
+            from apps.cms.seo_utils import resolve_seo
+            from apps.cms.seo_utils import generate_seo_links
+            from datetime import datetime, timedelta
+        from datetime import datetime, timedelta
+        from apps.i18n.models import Locale
+        from apps.i18n.models import Locale
 
 
 class PageTreeItemSerializer(serializers.ModelSerializer):
@@ -132,7 +139,6 @@ class PageReadSerializer(serializers.ModelSerializer):
             return None
 
         try:
-            from apps.cms.seo_utils import resolve_seo
 
             return resolve_seo(obj)
         except ImportError:
@@ -152,7 +158,6 @@ class PageReadSerializer(serializers.ModelSerializer):
             return None
 
         try:
-            from apps.cms.seo_utils import generate_seo_links
 
             return generate_seo_links(obj)
         except ImportError:
@@ -168,7 +173,6 @@ class PageReadSerializer(serializers.ModelSerializer):
             # print(f"DEBUG: get_recent_revisions called for page {obj.id}")
 
             # Return mock revision data for demonstration
-            from datetime import datetime, timedelta
 
             now = datetime.now()
 
@@ -210,7 +214,6 @@ class PageReadSerializer(serializers.ModelSerializer):
         # print(f"DEBUG: Fields in data before: {list(data.keys())}")
 
         # Force add recent revisions since SerializerMethodField isn't working
-        from datetime import datetime, timedelta
 
         now = datetime.now()
 
@@ -272,7 +275,6 @@ class PageWriteSerializer(serializers.ModelSerializer):
 
     def validate_locale(self, value):
         """Convert locale code to locale instance"""
-        from apps.i18n.models import Locale
 
         try:
             # Try lowercase first (as stored in the database)
@@ -305,7 +307,6 @@ class PageWriteSerializer(serializers.ModelSerializer):
         )
 
         # Convert locale code to locale instance if needed
-        from apps.i18n.models import Locale
 
         if locale_code:
             try:

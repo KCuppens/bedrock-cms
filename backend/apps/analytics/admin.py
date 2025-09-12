@@ -65,7 +65,7 @@ class PageViewAdmin(admin.ModelAdmin):
         ("Performance Metrics", {"fields": ("load_time", "time_on_page", "viewed_at")}),
     )
 
-    def page_title_link(self, obj):
+    def page_title_link(self, obj):  # noqa: C901
         """Display page title as link to page admin"""
         if obj.page:
             url = reverse("admin:cms_page_change", args=[obj.page.pk])
@@ -75,7 +75,7 @@ class PageViewAdmin(admin.ModelAdmin):
     page_title_link.short_description = "Page"
     page_title_link.admin_order_field = "page__title"
 
-    def user_link(self, obj):
+    def user_link(self, obj):  # noqa: C901
         """Display user as link to user admin"""
         if obj.user:
             url = reverse("admin:accounts_user_change", args=[obj.user.pk])
@@ -85,7 +85,7 @@ class PageViewAdmin(admin.ModelAdmin):
     user_link.short_description = "User"
     user_link.admin_order_field = "user__email"
 
-    def get_queryset(self, request):
+    def get_queryset(self, request):  # noqa: C901
         return super().get_queryset(request).select_related("page", "user")
 
 
@@ -115,7 +115,7 @@ class UserActivityAdmin(admin.ModelAdmin):
         ("Timestamp", {"fields": ("created_at",)}),
     )
 
-    def user_link(self, obj):
+    def user_link(self, obj):  # noqa: C901
         """Display user as link to user admin"""
         url = reverse("admin:accounts_user_change", args=[obj.user.pk])
         return format_html('<a href="{}">{}</a>', url, obj.user.email)
@@ -123,7 +123,7 @@ class UserActivityAdmin(admin.ModelAdmin):
     user_link.short_description = "User"
     user_link.admin_order_field = "user__email"
 
-    def content_object_link(self, obj):
+    def content_object_link(self, obj):  # noqa: C901
         """Display content object as link if possible"""
         if obj.content_object:
             try:
@@ -132,13 +132,13 @@ class UserActivityAdmin(admin.ModelAdmin):
                     args=[obj.object_id],
                 )
                 return format_html('<a href="{}">{}</a>', url, str(obj.content_object))
-            except:
+            except Exception:
                 return str(obj.content_object)
         return "-"
 
     content_object_link.short_description = "Related Object"
 
-    def get_queryset(self, request):
+    def get_queryset(self, request):  # noqa: C901
         return (
             super()
             .get_queryset(request)
@@ -184,7 +184,7 @@ class ContentMetricsAdmin(admin.ModelAdmin):
         ("Metadata", {"fields": ("updated_at",)}),
     )
 
-    def content_object_link(self, obj):
+    def content_object_link(self, obj):  # noqa: C901
         """Display content object as link"""
         if obj.content_object:
             try:
@@ -193,13 +193,13 @@ class ContentMetricsAdmin(admin.ModelAdmin):
                     args=[obj.object_id],
                 )
                 return format_html('<a href="{}">{}</a>', url, str(obj.content_object))
-            except:
+            except Exception:
                 return str(obj.content_object)
         return f"{obj.content_type.model} #{obj.object_id}"
 
     content_object_link.short_description = "Content"
 
-    def get_queryset(self, request):
+    def get_queryset(self, request):  # noqa: C901
         return super().get_queryset(request).select_related("content_type")
 
 
@@ -251,7 +251,7 @@ class AssessmentAdmin(admin.ModelAdmin):
         ("Metadata", {"fields": ("id", "created_at", "updated_at")}),
     )
 
-    def assigned_to_link(self, obj):
+    def assigned_to_link(self, obj):  # noqa: C901
         """Display assigned user as link"""
         if obj.assigned_to:
             url = reverse("admin:accounts_user_change", args=[obj.assigned_to.pk])
@@ -263,7 +263,7 @@ class AssessmentAdmin(admin.ModelAdmin):
     assigned_to_link.short_description = "Assigned To"
     assigned_to_link.admin_order_field = "assigned_to__name"
 
-    def get_queryset(self, request):
+    def get_queryset(self, request):  # noqa: C901
         return super().get_queryset(request).select_related("assigned_to", "created_by")
 
 
@@ -316,7 +316,7 @@ class RiskAdmin(admin.ModelAdmin):
         ("Timeline", {"fields": ("identified_at", "last_reviewed")}),
     )
 
-    def owner_link(self, obj):
+    def owner_link(self, obj):  # noqa: C901
         """Display owner as link"""
         if obj.owner:
             url = reverse("admin:accounts_user_change", args=[obj.owner.pk])
@@ -326,7 +326,7 @@ class RiskAdmin(admin.ModelAdmin):
     owner_link.short_description = "Owner"
     owner_link.admin_order_field = "owner__name"
 
-    def get_queryset(self, request):
+    def get_queryset(self, request):  # noqa: C901
         return (
             super()
             .get_queryset(request)
@@ -394,7 +394,7 @@ class ThreatAdmin(admin.ModelAdmin):
         ("Timeline", {"fields": ("detected_at", "resolved_at", "updated_at")}),
     )
 
-    def assigned_to_link(self, obj):
+    def assigned_to_link(self, obj):  # noqa: C901
         """Display assigned user as link"""
         if obj.assigned_to:
             url = reverse("admin:accounts_user_change", args=[obj.assigned_to.pk])
@@ -406,7 +406,7 @@ class ThreatAdmin(admin.ModelAdmin):
     assigned_to_link.short_description = "Assigned To"
     assigned_to_link.admin_order_field = "assigned_to__name"
 
-    def get_queryset(self, request):
+    def get_queryset(self, request):  # noqa: C901
         return (
             super().get_queryset(request).select_related("assigned_to", "reported_by")
         )

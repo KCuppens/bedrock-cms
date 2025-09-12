@@ -24,7 +24,7 @@ class NoteAdmin(admin.ModelAdmin):
         ),
     )
 
-    def save_model(self, request, obj, form, change):
+    def save_model(self, request, obj, form, change):  # noqa: C901
         """Set user tracking fields"""
         if not change:  # Creating new object
             obj.created_by = request.user

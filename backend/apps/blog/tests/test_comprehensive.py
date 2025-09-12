@@ -8,12 +8,11 @@ from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
 from django.test import TestCase, TransactionTestCase
 from django.urls import reverse
-
 from rest_framework import status
 from rest_framework.test import APIClient, APITestCase
 
 from apps.accounts.serializers import UserSerializer
-from apps.blog.models import BlogPost, Group, Tag
+from apps.blog.models import BlogPost, Group, PostVersion, Tag
 from apps.blog.serializers import (
     BlogPostListSerializer,
     BlogPostSerializer,
@@ -256,7 +255,6 @@ class BlogVersioningTests(TestCase):
 
         try:
             # Create version with original content
-            from apps.blog.models import PostVersion
 
             version = PostVersion.objects.create(
                 post=self.post,

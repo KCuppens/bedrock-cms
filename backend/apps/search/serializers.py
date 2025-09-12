@@ -1,10 +1,10 @@
-"""
-Serializers for search functionality.
-"""
-
 from rest_framework import serializers
 
 from .models import SearchIndex, SearchQuery, SearchSuggestion
+
+"""
+Serializers for search functionality.
+"""
 
 
 class SearchResultSerializer(serializers.Serializer):

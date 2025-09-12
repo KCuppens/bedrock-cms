@@ -1,6 +1,5 @@
-from django.contrib.auth import get_user_model
-
 from allauth.account import app_settings as allauth_settings
+from django.contrib.auth import get_user_model
 from drf_spectacular.utils import extend_schema, extend_schema_view
 from rest_framework import permissions, status
 from rest_framework.decorators import action
@@ -47,11 +46,11 @@ class UserViewSet(RetrieveModelMixin, UpdateModelMixin, GenericViewSet):
     permission_classes = [permissions.IsAuthenticated]
     throttle_classes = [UserRateThrottle]
 
-    def get_object(self):
+    def get_object(self):  # noqa: C901
         """Return the current user"""
         return self.request.user
 
-    def get_serializer_class(self):
+    def get_serializer_class(self):  # noqa: C901
         """Return appropriate serializer class"""
         if self.action in ["update", "partial_update"]:
             return UserUpdateSerializer
@@ -70,7 +69,7 @@ class UserViewSet(RetrieveModelMixin, UpdateModelMixin, GenericViewSet):
         throttle_classes=[AuthThrottle],
         url_path="register",
     )
-    def register(self, request):
+    def register(self, request):  # noqa: C901
         """Register a new user"""
         serializer = UserRegistrationSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -102,7 +101,7 @@ class UserViewSet(RetrieveModelMixin, UpdateModelMixin, GenericViewSet):
         },
     )
     @action(detail=False, methods=["post"], url_path="change-password")
-    def change_password(self, request):
+    def change_password(self, request):  # noqa: C901
         """Change user password"""
         serializer = PasswordChangeSerializer(
             data=request.data, context={"request": request}
@@ -120,7 +119,7 @@ class UserViewSet(RetrieveModelMixin, UpdateModelMixin, GenericViewSet):
         },
     )
     @action(detail=False, methods=["post"], url_path="ping")
-    def ping(self, request):
+    def ping(self, request):  # noqa: C901
         """Update user's last seen timestamp"""
         request.user.update_last_seen()
         return Response(
@@ -133,7 +132,7 @@ class UserViewSet(RetrieveModelMixin, UpdateModelMixin, GenericViewSet):
         responses={204: None},
     )
     @action(detail=False, methods=["delete"], url_path="delete-account")
-    def delete_account(self, request):
+    def delete_account(self, request):  # noqa: C901
         """Delete user account"""
         user = request.user
         user.is_active = False

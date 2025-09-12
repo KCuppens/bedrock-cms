@@ -1,8 +1,8 @@
+from django.db import migrations
+
 """
 Migration to add custom permissions to CMS models.
 """
-
-from django.db import migrations
 
 
 class Migration(migrations.Migration):

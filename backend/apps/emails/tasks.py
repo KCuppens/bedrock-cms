@@ -5,12 +5,23 @@ from django.conf import settings
 from celery import shared_task
 
 from .models import EmailMessageLog
+        from .services import EmailService
+        from datetime import timedelta
+        from django.utils import timezone
+        from django.db import transaction
+        from .models import EmailMessageLog, EmailTemplate
+        from .services import EmailService
+        from datetime import timedelta
+        from django.db import transaction
+        from django.db.models import F, Q
+        from django.utils import timezone
+        from apps.core.enums import EmailStatus
 
 logger = logging.getLogger(__name__)
 
 
 @shared_task(name="apps.emails.tasks.send_email_task", bind=True)
-def send_email_task(self, email_log_id: int):
+def send_email_task(self, email_log_id: int):  # noqa: C901
     """
     Celery task to send email asynchronously
 
@@ -21,7 +32,6 @@ def send_email_task(self, email_log_id: int):
         dict: Task result with success status and details
     """
     try:
-        from .services import EmailService
 
         # Get email log
         email_log = EmailMessageLog.objects.get(id=email_log_id)
@@ -67,7 +77,7 @@ def send_email_task(self, email_log_id: int):
 
 
 @shared_task(name="apps.emails.tasks.cleanup_old_email_logs")
-def cleanup_old_email_logs(days_to_keep: int = 30):
+def cleanup_old_email_logs(days_to_keep: int = 30):  # noqa: C901
     """
     Celery task to clean up old email logs
 
@@ -78,9 +88,7 @@ def cleanup_old_email_logs(days_to_keep: int = 30):
         dict: Task result with cleanup details
     """
     try:
-        from datetime import timedelta
 
-        from django.utils import timezone
 
         cutoff_date = timezone.now() - timedelta(days=days_to_keep)
 
@@ -120,10 +128,7 @@ def send_bulk_email_task(
         dict: Task result with bulk send details
     """
     try:
-        from django.db import transaction
 
-        from .models import EmailMessageLog, EmailTemplate
-        from .services import EmailService
 
         # Get template once and cache it
         template = EmailTemplate.get_template(template_key, "en")
@@ -206,7 +211,7 @@ def send_bulk_email_task(
 
 
 @shared_task(name="apps.emails.tasks.retry_failed_emails")
-def retry_failed_emails(max_retries: int = 3):
+def retry_failed_emails(max_retries: int = 3):  # noqa: C901
     """
     Celery task to retry failed emails with exponential backoff
 
@@ -217,13 +222,8 @@ def retry_failed_emails(max_retries: int = 3):
         dict: Task result with retry details
     """
     try:
-        from datetime import timedelta
 
-        from django.db import transaction
-        from django.db.models import F, Q
-        from django.utils import timezone
 
-        from apps.core.enums import EmailStatus
 
         # Get failed emails from the last 24 hours that haven't exceeded retry limit
         cutoff_time = timezone.now() - timedelta(hours=24)

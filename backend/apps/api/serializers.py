@@ -44,14 +44,14 @@ class NoteSerializer(serializers.ModelSerializer):
             "updated_by_name",
         ]
 
-    def to_internal_value(self, data):
+    def to_internal_value(self, data):  # noqa: C901
         """Convert tag_list to tags field"""
         if "tag_list" in data and isinstance(data["tag_list"], list):
             data = data.copy()
             data["tags"] = ", ".join(data["tag_list"])
         return super().to_internal_value(data)
 
-    def to_representation(self, instance):
+    def to_representation(self, instance):  # noqa: C901
         """Convert tags field to tag_list"""
         data = super().to_representation(instance)
         if instance.tags:

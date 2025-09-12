@@ -1,6 +1,10 @@
 import logging
 
 from django.apps import AppConfig
+from django.conf import settings
+from django.db import connection
+
+from .settings_sync import DjangoSettingsSync
 
 logger = logging.getLogger(__name__)
 
@@ -20,10 +24,7 @@ class I18nConfig(AppConfig):
     def _initialize_dynamic_languages(self):
         """Load languages from database and update Django settings."""
         try:
-            from django.conf import settings
-            from django.db import connection
 
-            from .settings_sync import DjangoSettingsSync
 
             # Check if we're in a migration or other special context
             if (

@@ -5,6 +5,9 @@ from pydantic import BaseModel, Field, ValidationError
 from rest_framework.exceptions import ValidationError as DRFValidationError
 
 from ..security import sanitize_blocks
+from django.core.exceptions import ValidationError
+    from django.db import connection
+    from ..models import BlockType
 
 
 class BaseBlockModel(BaseModel):
@@ -155,9 +158,7 @@ def validate_blocks(blocks: list[dict[str, Any]]) -> list[dict[str, Any]]:
         )
 
     # Import here to avoid circular imports
-    from django.db import connection
 
-    from ..models import BlockType
 
     # Check if database is available and BlockType table exists
     db_block_types = {}

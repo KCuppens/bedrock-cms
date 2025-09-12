@@ -1,12 +1,12 @@
+from django.urls import include, path
+from rest_framework.routers import DefaultRouter
+
+from . import views
+
 """
 URL configuration for i18n app.
 """
 
-from django.urls import include, path
-
-from rest_framework.routers import DefaultRouter
-
-from . import views
 
 router = DefaultRouter()
 router.register(r"locales", views.LocaleViewSet, basename="locales")

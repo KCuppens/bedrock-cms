@@ -12,6 +12,10 @@ from apps.core.circuit_breaker import storage_circuit_breaker
 from apps.core.enums import FileType
 
 from .models import FileUpload
+        from django.urls import reverse
+        from django.urls import reverse
+        from django.db import transaction
+        from django.utils import timezone
 
 logger = logging.getLogger(__name__)
 
@@ -140,7 +144,6 @@ class FileService:
                 logger.error("Failed to generate presigned URL: %s", str(e))
 
         # Fallback to local file serving (development)
-        from django.urls import reverse
 
         return reverse("file_download", kwargs={"file_id": file_upload.id})
 
@@ -169,7 +172,6 @@ class FileService:
                 logger.error("Failed to generate presigned upload URL: %s", str(e))
 
         # Fallback for local development
-        from django.urls import reverse
 
         return {"url": reverse("file_upload"), "fields": {}}
 
@@ -269,8 +271,6 @@ class FileService:
     def cleanup_expired_files(cls) -> dict[str, int]:
         """Clean up expired files with batch processing"""
 
-        from django.db import transaction
-        from django.utils import timezone
 
         expired_files = FileUpload.objects.filter(expires_at__lt=timezone.now())
 

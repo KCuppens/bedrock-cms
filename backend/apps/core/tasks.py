@@ -1,19 +1,34 @@
+import logging
+from django.core.cache import cache
+from django.utils import timezone
+from celery import shared_task
+            from apps.blog.models import BlogPost
+            from apps.blog.versioning import BlogPostViewTracker
+            from apps.analytics.models import PageView
+            from apps.cms.models import Page
+        from apps.search.services import search_service
+        from django.core.mail import send_mail
+        from django.template.loader import render_to_string
+        import io
+        from PIL import Image
+        from apps.files.models import File
+        from django.db.models import Count
+        from apps.blog.versioning import BlogPostRevision
+        from apps.cms.versioning import PageRevision
+        from apps.core.cache import cache_manager
+        from django.db import connection
 """
 Async tasks for heavy operations using Celery.
 """
 
-import logging
 
-from django.core.cache import cache
-from django.utils import timezone
 
-from celery import shared_task
 
 logger = logging.getLogger(__name__)
 
 
 @shared_task(bind=True, max_retries=3)
-def track_view_async(self, content_type, object_id, user_id=None):
+def track_view_async(self, content_type, object_id, user_id=None):  # noqa: C901
     """
     Asynchronously track view counts for any content.
 
@@ -24,8 +39,6 @@ def track_view_async(self, content_type, object_id, user_id=None):
     """
     try:
         if content_type == "blog_post":
-            from apps.blog.models import BlogPost
-            from apps.blog.versioning import BlogPostViewTracker
 
             post = BlogPost.objects.get(id=object_id)
             tracker, created = BlogPostViewTracker.objects.get_or_create(
@@ -34,8 +47,6 @@ def track_view_async(self, content_type, object_id, user_id=None):
             tracker.increment_view(user_id=user_id)
 
         elif content_type == "page":
-            from apps.analytics.models import PageView
-            from apps.cms.models import Page
 
             page = Page.objects.get(id=object_id)
             PageView.objects.create(
@@ -85,7 +96,7 @@ def warm_cache_async(
 
 
 @shared_task
-def bulk_warm_cache(cache_configs):
+def bulk_warm_cache(cache_configs):  # noqa: C901
     """
     Warm multiple cache entries in parallel.
 
@@ -107,7 +118,7 @@ def bulk_warm_cache(cache_configs):
 
 
 @shared_task(bind=True, max_retries=3)
-def process_search_index_async(self, model_label, object_id, action="update"):
+def process_search_index_async(self, model_label, object_id, action="update"):  # noqa: C901
     """
     Asynchronously update search index.
 
@@ -117,7 +128,6 @@ def process_search_index_async(self, model_label, object_id, action="update"):
         action: 'update' or 'delete'
     """
     try:
-        from apps.search.services import search_service
 
         if action == "update":
             search_service.index_object(model_label, object_id)
@@ -137,7 +147,7 @@ def process_search_index_async(self, model_label, object_id, action="update"):
 
 
 @shared_task
-def send_email_async(to_email, subject, template_name, context):
+def send_email_async(to_email, subject, template_name, context):  # noqa: C901
     """
     Send email asynchronously.
 
@@ -148,8 +158,6 @@ def send_email_async(to_email, subject, template_name, context):
         context: Template context dictionary
     """
     try:
-        from django.core.mail import send_mail
-        from django.template.loader import render_to_string
 
         html_message = render_to_string(f"emails/{template_name}.html", context)
         text_message = render_to_string(f"emails/{template_name}.txt", context)
@@ -171,7 +179,7 @@ def send_email_async(to_email, subject, template_name, context):
 
 
 @shared_task
-def generate_thumbnails_async(image_id):
+def generate_thumbnails_async(image_id):  # noqa: C901
     """
     Generate image thumbnails asynchronously.
 
@@ -179,11 +187,8 @@ def generate_thumbnails_async(image_id):
         image_id: ID of the image to process
     """
     try:
-        import io
 
-        from PIL import Image
 
-        from apps.files.models import File
 
         file_obj = File.objects.get(id=image_id)
 
@@ -216,16 +221,13 @@ def generate_thumbnails_async(image_id):
 
 
 @shared_task
-def cleanup_old_revisions():
+def cleanup_old_revisions():  # noqa: C901
     """
     Clean up old revisions to prevent database bloat.
     Keeps only the last 50 revisions per content item.
     """
     try:
-        from django.db.models import Count
 
-        from apps.blog.versioning import BlogPostRevision
-        from apps.cms.versioning import PageRevision
 
         # Clean up page revisions
         pages_with_many_revisions = (
@@ -266,7 +268,7 @@ def cleanup_old_revisions():
 
 
 @shared_task
-def invalidate_cache_pattern_async(pattern):
+def invalidate_cache_pattern_async(pattern):  # noqa: C901
     """
     Asynchronously invalidate cache by pattern.
 
@@ -274,7 +276,6 @@ def invalidate_cache_pattern_async(pattern):
         pattern: Cache key pattern to invalidate
     """
     try:
-        from apps.core.cache import cache_manager
 
         cache_manager.delete_pattern(pattern)
         return {"status": "success", "pattern": pattern}
@@ -284,13 +285,12 @@ def invalidate_cache_pattern_async(pattern):
 
 
 @shared_task
-def optimize_database_async():
+def optimize_database_async():  # noqa: C901
     """
     Run database optimization tasks.
     Should be scheduled to run during low-traffic periods.
     """
     try:
-        from django.db import connection
 
         with connection.cursor() as cursor:
             # Analyze tables for query optimization (PostgreSQL)

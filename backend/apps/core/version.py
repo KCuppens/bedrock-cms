@@ -1,16 +1,18 @@
-"""
-Version tracking service using GitPython
-"""
-
 import json
 import os
 from datetime import datetime
 from functools import lru_cache
 from pathlib import Path
 from typing import Any
+    from git import Repo
+        import sys
+                        import re
+"""
+Version tracking service using GitPython
+"""
+
 
 try:
-    from git import Repo
 
     GIT_AVAILABLE = True
 except ImportError:
@@ -51,7 +53,6 @@ class VersionService:
         info.update(package_info)
 
         # Get Python version
-        import sys
 
         info["python_version"] = (
             f"{sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}"
@@ -121,7 +122,7 @@ class VersionService:
             if tags:
                 try:
                     ahead = len(list(repo.iter_commits(f"{latest_tag}..HEAD")))
-                except:
+                except Exception:
                     ahead = 0
 
             # Get last commit date
@@ -173,7 +174,6 @@ class VersionService:
                 with open(pyproject) as f:
                     content = f.read()
                     if "version = " in content:
-                        import re
 
                         match = re.search(r'version\s*=\s*"([^"]+)"', content)
                         if match:

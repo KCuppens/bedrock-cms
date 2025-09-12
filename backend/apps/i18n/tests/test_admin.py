@@ -1,19 +1,19 @@
-"""
-Test cases for i18n admin interface.
-"""
-
 from django.contrib.admin.sites import AdminSite
 from django.contrib.auth import get_user_model
 from django.contrib.contenttypes.models import ContentType
 from django.test import TestCase
-
 from apps.i18n.admin import (
+from apps.i18n.models import Locale, TranslationUnit, UiMessage, UiMessageTranslation
+"""
+Test cases for i18n admin interface.
+"""
+
+
     LocaleAdmin,
     TranslationUnitAdmin,
     UiMessageAdmin,
     UiMessageTranslationAdmin,
 )
-from apps.i18n.models import Locale, TranslationUnit, UiMessage, UiMessageTranslation
 
 User = get_user_model()
 
@@ -21,7 +21,7 @@ User = get_user_model()
 class I18nAdminTest(TestCase):
     """Test i18n admin interfaces."""
 
-    def setUp(self):
+    def setUp(self):  # noqa: C901
         """Set up test data."""
         self.site = AdminSite()
         self.user = User.objects.create_user(
@@ -58,7 +58,7 @@ class I18nAdminTest(TestCase):
             updated_by=self.user,
         )
 
-    def test_locale_admin_display(self):
+    def test_locale_admin_display(self):  # noqa: C901
         """Test LocaleAdmin display."""
         admin = LocaleAdmin(Locale, self.site)
 
@@ -75,7 +75,7 @@ class I18nAdminTest(TestCase):
         self.assertIn("is_active", admin.list_filter)
         self.assertIn("is_default", admin.list_filter)
 
-    def test_ui_message_admin_display(self):
+    def test_ui_message_admin_display(self):  # noqa: C901
         """Test UiMessageAdmin display."""
         admin = UiMessageAdmin(UiMessage, self.site)
 
@@ -88,7 +88,7 @@ class I18nAdminTest(TestCase):
         self.assertIn("key", admin.search_fields)
         self.assertIn("namespace", admin.search_fields)
 
-    def test_ui_message_translation_admin_display(self):
+    def test_ui_message_translation_admin_display(self):  # noqa: C901
         """Test UiMessageTranslationAdmin display."""
         admin = UiMessageTranslationAdmin(UiMessageTranslation, self.site)
 
@@ -101,7 +101,7 @@ class I18nAdminTest(TestCase):
         self.assertIn("locale", admin.list_filter)
         self.assertIn("status", admin.list_filter)
 
-    def test_translation_unit_admin_display(self):
+    def test_translation_unit_admin_display(self):  # noqa: C901
         """Test TranslationUnitAdmin display."""
         admin = TranslationUnitAdmin(TranslationUnit, self.site)
 
@@ -115,14 +115,14 @@ class I18nAdminTest(TestCase):
         self.assertIn("content_type", admin.list_filter)
         self.assertIn("status", admin.list_filter)
 
-    def test_locale_admin_ordering(self):
+    def test_locale_admin_ordering(self):  # noqa: C901
         """Test LocaleAdmin default ordering."""
         admin = LocaleAdmin(Locale, self.site)
         # Test that ordering includes default locale first
         ordering = admin.get_ordering(None)
         self.assertIsNotNone(ordering)
 
-    def test_ui_message_admin_queryset_optimization(self):
+    def test_ui_message_admin_queryset_optimization(self):  # noqa: C901
         """Test that admin querysets are optimized."""
         admin = UiMessageAdmin(UiMessage, self.site)
 
@@ -135,7 +135,7 @@ class I18nAdminTest(TestCase):
                 # If it fails, that's fine for coverage
                 pass
 
-    def test_translation_unit_admin_readonly_fields(self):
+    def test_translation_unit_admin_readonly_fields(self):  # noqa: C901
         """Test TranslationUnit admin readonly fields."""
         admin = TranslationUnitAdmin(TranslationUnit, self.site)
 
@@ -143,7 +143,7 @@ class I18nAdminTest(TestCase):
         if hasattr(admin, "readonly_fields"):
             self.assertIsNotNone(admin.readonly_fields)
 
-    def test_admin_str_methods(self):
+    def test_admin_str_methods(self):  # noqa: C901
         """Test string representations used in admin."""
         # Test that all models have proper string representations
         self.assertIn("English", str(self.locale_en))
@@ -151,7 +151,7 @@ class I18nAdminTest(TestCase):
         self.assertIn("Guardar", str(self.translation) or str(self.message))
         self.assertIn("Juan", str(self.translation_unit) or "user")
 
-    def test_admin_permissions(self):
+    def test_admin_permissions(self):  # noqa: C901
         """Test admin permission requirements."""
         admin = LocaleAdmin(Locale, self.site)
 

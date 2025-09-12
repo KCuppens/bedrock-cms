@@ -1,15 +1,15 @@
-"""
-Analytics aggregation functions for calculating metrics and summaries.
-"""
-
 from datetime import date, datetime, timedelta
-
 from django.contrib.auth import get_user_model
 from django.db.models import Avg, Count, Sum
 from django.db.models.functions import TruncDate, TruncHour, TruncMonth, TruncWeek
 from django.utils import timezone
-
 from .models import (
+"""
+Analytics aggregation functions for calculating metrics and summaries.
+"""
+
+
+
     AnalyticsSummary,
     Assessment,
     ContentMetrics,

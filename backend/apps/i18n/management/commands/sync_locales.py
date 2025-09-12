@@ -1,10 +1,3 @@
-"""
-Management command to synchronize database locales with Django settings.
-
-This command provides comprehensive synchronization between the Locale model
-and Django's i18n settings (LANGUAGE_CODE and LANGUAGES).
-"""
-
 import json
 
 from django.conf import settings
@@ -12,6 +5,13 @@ from django.core.management.base import BaseCommand, CommandError
 
 from apps.i18n.models import Locale
 from apps.i18n.settings_sync import DjangoSettingsSync
+
+"""
+Management command to synchronize database locales with Django settings.
+
+This command provides comprehensive synchronization between the Locale model
+and Django's i18n settings (LANGUAGE_CODE and LANGUAGES).
+"""
 
 
 class Command(BaseCommand):

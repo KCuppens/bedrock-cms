@@ -9,6 +9,11 @@ from rest_framework.response import Response
 from apps.blog.models import Category, Tag
 from apps.cms.model_parts.category import Collection
 from apps.cms.serializers.category import (
+            from datetime import timedelta
+            from django.utils import timezone
+        from datetime import timedelta
+        from django.utils import timezone
+            from django.utils import timezone
     CategorySerializer,
     CollectionSerializer,
     TagSerializer,
@@ -94,9 +99,7 @@ class TagViewSet(viewsets.ModelViewSet):
         # Filter by trending (has posts in last 30 days)
         trending = self.request.query_params.get("trending")
         if trending and trending.lower() == "true":
-            from datetime import timedelta
 
-            from django.utils import timezone
 
             thirty_days_ago = timezone.now() - timedelta(days=30)
             queryset = queryset.filter(
@@ -130,9 +133,7 @@ class TagViewSet(viewsets.ModelViewSet):
     @action(detail=False, methods=["get"])
     def trending(self, request):
         """Get trending tags (with recent posts)"""
-        from datetime import timedelta
 
-        from django.utils import timezone
 
         thirty_days_ago = timezone.now() - timedelta(days=30)
 
@@ -208,7 +209,6 @@ class CollectionViewSet(viewsets.ModelViewSet):
         collection = self.get_object()
         collection.status = "published"
         if not collection.published_at:
-            from django.utils import timezone
 
             collection.published_at = timezone.now()
         collection.save()

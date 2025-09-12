@@ -6,6 +6,9 @@ from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 
 from apps.cms.models import Page
+            from apps.i18n.models import Locale
+            from apps.i18n.models import Locale
+                from apps.i18n.models import Locale
 
 
 class NavigationView(views.APIView):
@@ -59,7 +62,6 @@ class NavigationView(views.APIView):
         if menu_items is None:
             # Get all pages marked for main menu, ordered by position
             # Filter by locale if provided
-            from apps.i18n.models import Locale
 
             filters = {"in_main_menu": True, "status": "published"}
 
@@ -159,7 +161,6 @@ class FooterView(views.APIView):
         if footer_items is None:
             # Get all pages marked for footer, ordered by position
             # Filter by locale if provided
-            from apps.i18n.models import Locale
 
             filters = {"in_footer": True, "status": "published"}
 
@@ -241,7 +242,6 @@ class SiteSettingsView(views.APIView):
             # Get homepage
             homepage = None
             try:
-                from apps.i18n.models import Locale
 
                 homepage_filters = {"is_homepage": True, "status": "published"}
 

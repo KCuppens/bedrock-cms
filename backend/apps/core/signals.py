@@ -6,8 +6,14 @@ Automatically invalidates relevant cache entries when content changes.
 
 import logging
 
+import requests
+from django.conf import settings
 from django.db.models.signals import m2m_changed, post_delete, post_save
 from django.dispatch import receiver
+from django.utils import timezone
+
+from apps.blog.models import BlogPost
+from apps.registry.registry import content_registry
 
 from .cache import cache_manager
 
@@ -155,7 +161,6 @@ def invalidate_content_cache(instance, model_label):
         model_label: Model label (app.model)
     """
     try:
-        from apps.registry.registry import content_registry
 
         config = content_registry.get_config(model_label)
         if not config:
@@ -262,9 +267,7 @@ def send_cdn_purge_webhook(keys: list, tags: list = None):
         tags: List of cache tags to purge (if CDN supports tag-based purging)
     """
     try:
-        from django.conf import settings
 
-        import requests
 
         # Check if CDN webhook is configured
         webhook_url = getattr(settings, "CDN_PURGE_WEBHOOK_URL", None)
@@ -317,7 +320,6 @@ def invalidate_content_type_cache(model_label: str):
         model_label: Model label (e.g., 'blog.blogpost')
     """
     try:
-        from apps.registry.registry import content_registry
 
         config = content_registry.get_config(model_label)
         if not config:
@@ -347,7 +349,6 @@ def invalidate_blog_settings_cache(blog_settings):
         blog_settings: BlogSettings instance
     """
     try:
-        from apps.blog.models import BlogPost
 
         # Get all published blog posts for this locale
         posts = BlogPost.objects.filter(locale=blog_settings.locale, status="published")

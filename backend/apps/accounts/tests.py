@@ -1,9 +1,8 @@
+import pytest
 from django.contrib.auth import get_user_model
 from django.urls import reverse
-
-import pytest
 from rest_framework import status
-from rest_framework.test import APITestCase
+from rest_framework.test import APIClient, APITestCase
 
 from apps.accounts.models import UserProfile
 
@@ -98,7 +97,6 @@ def admin_user():
 @pytest.fixture
 def auth_client(user):
     """Create an authenticated API client"""
-    from rest_framework.test import APIClient
 
     client = APIClient()
     client.force_authenticate(user=user)

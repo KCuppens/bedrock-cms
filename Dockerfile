@@ -36,7 +36,7 @@ COPY backend/pyproject.toml backend/poetry.lock* ./
 COPY backend/requirements*.txt ./
 
 # Install runtime dependencies
-RUN poetry install --no-dev --no-root || pip install -r requirements.txt
+RUN poetry install --only main --no-root || pip install -r requirements.txt
 
 # Development stage
 FROM python-base as development

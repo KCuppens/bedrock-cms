@@ -1,10 +1,11 @@
+from rest_framework import serializers
+from .models import Page, Redirect
+                from .seo_utils import resolve_seo
 """
 Optimized serializers for CMS with reduced field loading.
 """
 
-from rest_framework import serializers
 
-from .models import Page, Redirect
 
 
 class PageListSerializer(serializers.ModelSerializer):
@@ -64,7 +65,6 @@ class PageDetailSerializer(serializers.ModelSerializer):
         request = self.context.get("request")
         if request and request.query_params.get("with_seo") == "1":
             try:
-                from .seo_utils import resolve_seo
 
                 return resolve_seo(obj)
             except ImportError:

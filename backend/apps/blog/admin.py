@@ -1,13 +1,13 @@
-"""
-Blog admin interface.
-"""
-
 from django.contrib import admin
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.html import format_html
 
 from .models import BlogPost, BlogSettings, Category, Tag
+
+"""
+Blog admin interface.
+"""
 
 
 @admin.register(Category)
@@ -36,7 +36,7 @@ class CategoryAdmin(admin.ModelAdmin):
         ),
     )
 
-    def color_display(self, obj):
+    def color_display(self, obj):  # noqa: C901
         """Display color as a colored box."""
         return format_html(
             '<div style="width: 20px; height: 20px; background-color: {}; display: inline-block; border: 1px solid #ccc;"></div>',
@@ -45,7 +45,7 @@ class CategoryAdmin(admin.ModelAdmin):
 
     color_display.short_description = "Color"
 
-    def post_count(self, obj):
+    def post_count(self, obj):  # noqa: C901
         """Display number of posts in this category."""
         return obj.posts.filter(status="published").count()
 
@@ -70,7 +70,7 @@ class TagAdmin(admin.ModelAdmin):
         ),
     )
 
-    def post_count(self, obj):
+    def post_count(self, obj):  # noqa: C901
         """Display number of posts with this tag."""
         return obj.posts.filter(status="published").count()
 
@@ -153,7 +153,7 @@ class BlogPostAdmin(admin.ModelAdmin):
         ),
     )
 
-    def get_queryset(self, request):
+    def get_queryset(self, request):  # noqa: C901
         """Optimize queryset with related data."""
         return (
             super()
@@ -162,14 +162,14 @@ class BlogPostAdmin(admin.ModelAdmin):
             .prefetch_related("tags")
         )
 
-    def reading_time_display(self, obj):
+    def reading_time_display(self, obj):  # noqa: C901
         """Display reading time."""
         reading_time = obj.get_reading_time()
         return f"{reading_time} min" if reading_time > 1 else "1 min"
 
     reading_time_display.short_description = "Reading Time"
 
-    def related_posts_display(self, obj):
+    def related_posts_display(self, obj):  # noqa: C901
         """Display related posts."""
         if not obj.pk:
             return "Save the post to see related posts"
@@ -187,7 +187,7 @@ class BlogPostAdmin(admin.ModelAdmin):
 
     related_posts_display.short_description = "Related Posts"
 
-    def save_model(self, request, obj, form, change):
+    def save_model(self, request, obj, form, change):  # noqa: C901
         """Custom save logic."""
         # Set author to current user if creating new post
         if not change:
@@ -204,28 +204,28 @@ class BlogPostAdmin(admin.ModelAdmin):
 
     actions = ["make_published", "make_draft", "make_featured", "remove_featured"]
 
-    def make_published(self, request, queryset):
+    def make_published(self, request, queryset):  # noqa: C901
         """Bulk action to publish posts."""
         updated = queryset.update(status="published", published_at=timezone.now())
         self.message_user(request, f"{updated} posts were published.")
 
     make_published.short_description = "Publish selected posts"
 
-    def make_draft(self, request, queryset):
+    def make_draft(self, request, queryset):  # noqa: C901
         """Bulk action to make posts draft."""
         updated = queryset.update(status="draft", published_at=None)
         self.message_user(request, f"{updated} posts were set to draft.")
 
     make_draft.short_description = "Set selected posts to draft"
 
-    def make_featured(self, request, queryset):
+    def make_featured(self, request, queryset):  # noqa: C901
         """Bulk action to make posts featured."""
         updated = queryset.update(featured=True)
         self.message_user(request, f"{updated} posts were marked as featured.")
 
     make_featured.short_description = "Mark selected posts as featured"
 
-    def remove_featured(self, request, queryset):
+    def remove_featured(self, request, queryset):  # noqa: C901
         """Bulk action to remove featured status."""
         updated = queryset.update(featured=False)
         self.message_user(request, f"{updated} posts had featured status removed.")
@@ -270,12 +270,12 @@ class BlogSettingsAdmin(admin.ModelAdmin):
 
     readonly_fields = ("created_at", "updated_at")
 
-    def has_add_permission(self, request):
+    def has_add_permission(self, request):  # noqa: C901
         """Only allow one settings instance per locale."""
         # Check if user can add based on available locales without settings
         return super().has_add_permission(request)
 
-    def get_queryset(self, request):
+    def get_queryset(self, request):  # noqa: C901
         """Optimize queryset."""
         return (
             super()

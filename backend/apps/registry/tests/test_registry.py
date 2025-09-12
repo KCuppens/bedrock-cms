@@ -1,24 +1,27 @@
-"""
-Tests for content registry functionality.
-"""
-
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
 from django.test import TestCase
-
 from rest_framework import status
 from rest_framework.test import APITestCase
-
 from apps.cms.models import Page
 from apps.i18n.models import Locale
 from apps.registry.config import ContentConfig
 from apps.registry.registry import (
+from apps.registry.serializers import ContentSerializerFactory, get_serializer_for_model
+from apps.registry.viewsets import ContentViewSetFactory, get_viewset_for_model
+        from apps.registry.registry import register_core_models
+        from django.contrib.auth import get_user_model
+        from apps.registry.registry import register_core_models
+"""
+Tests for content registry functionality.
+"""
+
+
+
     ContentRegistry,
     ContentRegistryError,
     content_registry,
 )
-from apps.registry.serializers import ContentSerializerFactory, get_serializer_for_model
-from apps.registry.viewsets import ContentViewSetFactory, get_viewset_for_model
 
 User = get_user_model()
 
@@ -360,17 +363,15 @@ class RegistryAPITests(APITestCase):
         )
 
         # Manually register Page model for tests since auto-registration doesn't run
-        from apps.registry.registry import register_core_models
 
         try:
             register_core_models()
-        except:
+        except Exception:
             # If it fails because already registered, that's fine
             pass
 
     def tearDown(self):
         """Clean up after test."""
-        from django.contrib.auth import get_user_model
 
         User = get_user_model()
 
@@ -430,11 +431,10 @@ class RegistryIntegrationTests(TestCase):
         )
 
         # Manually register Page model for tests since auto-registration doesn't run
-        from apps.registry.registry import register_core_models
 
         try:
             register_core_models()
-        except:
+        except Exception:
             # If it fails because already registered, that's fine
             pass
 

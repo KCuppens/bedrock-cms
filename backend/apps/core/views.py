@@ -1,7 +1,3 @@
-"""
-Core application views
-"""
-
 from drf_spectacular.utils import extend_schema
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
@@ -9,6 +5,10 @@ from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 
 from .version import VersionService
+
+"""
+Core application views
+"""
 
 
 @extend_schema(
@@ -35,7 +35,7 @@ from .version import VersionService
 )
 @api_view(["GET"])
 @permission_classes([AllowAny])
-def version_info(request):
+def version_info(request):  # noqa: C901
     """
     Get application version and environment information.
 
@@ -59,7 +59,7 @@ def version_info(request):
 )
 @api_view(["GET"])
 @permission_classes([AllowAny])
-def version_simple(request):
+def version_simple(request):  # noqa: C901
     """
     Get a simple version string.
 

@@ -1,16 +1,15 @@
+from pathlib import Path
+
+import polib
+from django.apps import apps
+from django.core.management.base import BaseCommand
+
+from apps.i18n.models import Locale, UiMessage, UiMessageTranslation
+
 """
 Management command to sync .po files with database translations.
 Imports Django's .po files into the database and exports database translations back to .po files.
 """
-
-from pathlib import Path
-
-from django.apps import apps
-from django.core.management.base import BaseCommand
-
-import polib
-
-from apps.i18n.models import Locale, UiMessage, UiMessageTranslation
 
 
 class Command(BaseCommand):

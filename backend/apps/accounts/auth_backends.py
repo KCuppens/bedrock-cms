@@ -5,6 +5,8 @@ Custom authentication backends for RBAC scope enforcement.
 from django.contrib.auth.backends import BaseBackend
 from django.contrib.auth.models import Permission
 
+from apps.i18n.models import Locale
+
 from .rbac import ScopedLocale, ScopedSection
 
 
@@ -105,7 +107,6 @@ class ScopedPermissionBackend(BaseBackend):
     def get_user_scoped_locales(self, user_obj):
         """Get all locales this user has access to."""
         if user_obj.is_superuser:
-            from apps.i18n.models import Locale
 
             return Locale.objects.filter(is_active=True)
 
@@ -114,7 +115,6 @@ class ScopedPermissionBackend(BaseBackend):
             "locale_id", flat=True
         )
 
-        from apps.i18n.models import Locale
 
         return Locale.objects.filter(id__in=locale_ids, is_active=True)
 

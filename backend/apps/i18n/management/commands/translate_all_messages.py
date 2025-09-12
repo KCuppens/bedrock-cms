@@ -1,13 +1,13 @@
-"""
-Translate ALL UI messages to a target locale using DeepL.
-"""
-
 import time
 
 from django.core.management.base import BaseCommand
 
 from apps.i18n.models import Locale, UiMessage, UiMessageTranslation
 from apps.i18n.services import DeepLTranslationService
+
+"""
+Translate ALL UI messages to a target locale using DeepL.
+"""
 
 
 class Command(BaseCommand):

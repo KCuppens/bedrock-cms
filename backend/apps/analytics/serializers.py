@@ -1,5 +1,4 @@
 from django.contrib.auth import get_user_model
-
 from rest_framework import serializers
 
 from .models import (
@@ -63,7 +62,7 @@ class PageViewCreateSerializer(serializers.ModelSerializer):
             "os",
         ]
 
-    def create(self, validated_data):
+    def create(self, validated_data):  # noqa: C901
         # Extract additional data from request context
         request = self.context.get("request")
         if request:
@@ -74,7 +73,7 @@ class PageViewCreateSerializer(serializers.ModelSerializer):
                 validated_data["user"] = request.user
         return super().create(validated_data)
 
-    def get_client_ip(self, request):
+    def get_client_ip(self, request):  # noqa: C901
         """Get client IP address from request"""
         x_forwarded_for = request.META.get("HTTP_X_FORWARDED_FOR")
         if x_forwarded_for:
@@ -117,7 +116,7 @@ class UserActivitySerializer(serializers.ModelSerializer):
             "content_object_name",
         ]
 
-    def get_content_object_name(self, obj):
+    def get_content_object_name(self, obj):  # noqa: C901
         """Get string representation of related object"""
         if obj.content_object:
             return str(obj.content_object)
@@ -131,7 +130,7 @@ class UserActivityCreateSerializer(serializers.ModelSerializer):
         model = UserActivity
         fields = ["action", "description", "content_type", "object_id", "metadata"]
 
-    def create(self, validated_data):
+    def create(self, validated_data):  # noqa: C901
         request = self.context.get("request")
         if request:
             validated_data["user"] = request.user
@@ -140,7 +139,7 @@ class UserActivityCreateSerializer(serializers.ModelSerializer):
             validated_data["session_id"] = request.session.session_key or ""
         return super().create(validated_data)
 
-    def get_client_ip(self, request):
+    def get_client_ip(self, request):  # noqa: C901
         x_forwarded_for = request.META.get("HTTP_X_FORWARDED_FOR")
         if x_forwarded_for:
             ip = x_forwarded_for.split(",")[0]
@@ -180,7 +179,7 @@ class ContentMetricsSerializer(serializers.ModelSerializer):
         ]
         read_only_fields = ["updated_at", "content_type_name", "content_object_name"]
 
-    def get_content_object_name(self, obj):
+    def get_content_object_name(self, obj):  # noqa: C901
         if obj.content_object:
             return str(obj.content_object)
         return None
@@ -257,7 +256,7 @@ class AssessmentCreateSerializer(serializers.ModelSerializer):
             "scheduled_for",
         ]
 
-    def create(self, validated_data):
+    def create(self, validated_data):  # noqa: C901
         request = self.context.get("request")
         if request and request.user:
             validated_data["created_by"] = request.user
@@ -402,7 +401,7 @@ class ThreatCreateSerializer(serializers.ModelSerializer):
             "assigned_to",
         ]
 
-    def create(self, validated_data):
+    def create(self, validated_data):  # noqa: C901
         request = self.context.get("request")
         if request and request.user:
             validated_data["reported_by"] = request.user

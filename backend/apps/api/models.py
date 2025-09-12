@@ -25,16 +25,16 @@ class Note(TimestampMixin, UserTrackingMixin):
             models.Index(fields=["is_public", "created_at"]),
         ]
 
-    def __str__(self):
+    def __str__(self):  # noqa: C901
         return self.title
 
     @property
-    def tag_list(self):
+    def tag_list(self):  # noqa: C901
         """Get tags as a list"""
         return [tag.strip() for tag in self.tags.split(",") if tag.strip()]
 
     @tag_list.setter
-    def tag_list(self, value):
+    def tag_list(self, value):  # noqa: C901
         """Set tags from a list"""
         if isinstance(value, list):
             self.tags = ", ".join(value)

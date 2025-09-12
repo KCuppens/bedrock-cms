@@ -1,12 +1,12 @@
+from django.contrib.auth import get_user_model
+from rest_framework import serializers
+
+from .versioning import AuditEntry, PageRevision
+
 """
 Serializers for versioning and audit functionality.
 """
 
-from django.contrib.auth import get_user_model
-
-from rest_framework import serializers
-
-from .versioning import AuditEntry, PageRevision
 
 User = get_user_model()
 
@@ -36,11 +36,11 @@ class PageRevisionSerializer(serializers.ModelSerializer):
         ]
         read_only_fields = ["id", "created_at"]
 
-    def get_block_count(self, obj):
+    def get_block_count(self, obj):  # noqa: C901
         """Get the number of blocks in this revision."""
         return obj.get_block_count()
 
-    def get_revision_type(self, obj):
+    def get_revision_type(self, obj):  # noqa: C901
         """Get human-readable revision type."""
         if obj.is_published_snapshot:
             return "published"
@@ -100,7 +100,7 @@ class AuditEntrySerializer(serializers.ModelSerializer):
         ]
         read_only_fields = ["id", "created_at"]
 
-    def get_object_name(self, obj):
+    def get_object_name(self, obj):  # noqa: C901
         """Get human-readable name of the object."""
         try:
             if obj.content_object and hasattr(obj.content_object, "title"):
@@ -119,7 +119,7 @@ class AutosaveSerializer(serializers.Serializer):
         required=False, allow_blank=True, help_text="Optional comment for the autosave"
     )
 
-    def validate(self, attrs):
+    def validate(self, attrs):  # noqa: C901
         """Validate autosave creation."""
         page = self.context["page"]
         user = self.context["user"]

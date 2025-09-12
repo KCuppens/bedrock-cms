@@ -1,16 +1,17 @@
-"""
-Test cases for i18n management commands.
-"""
-
 import tempfile
 from io import StringIO
 from pathlib import Path
 from unittest.mock import MagicMock, patch
-
 from django.core.management import call_command
 from django.test import TestCase
-
 from apps.i18n.models import Locale, UiMessage, UiMessageTranslation
+        import shutil
+"""
+Test cases for i18n management commands.
+"""
+
+
+
 
 
 class InitLocalesCommandTest(TestCase):
@@ -149,7 +150,6 @@ class SyncPoFilesCommandTest(TestCase):
 
     def tearDown(self):
         """Clean up temp directory."""
-        import shutil
 
         shutil.rmtree(self.temp_dir, ignore_errors=True)
 

@@ -1,6 +1,7 @@
 import os
 
 from celery import Celery
+from celery.schedules import crontab
 from kombu import Exchange, Queue
 
 # Set the default Django settings module for the 'celery' program.
@@ -56,7 +57,6 @@ app.conf.result_compression = "gzip"  # Compress results
 app.autodiscover_tasks()
 
 # Celery Beat Schedule with optimized timing
-from celery.schedules import crontab
 
 app.conf.beat_schedule = {
     "process-scheduled-publishing": {

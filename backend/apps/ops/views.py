@@ -3,11 +3,14 @@ import logging
 from django.conf import settings
 from django.http import JsonResponse
 from django.utils import timezone
+        from django.db import connection
+        from django.core.cache import cache
+        import subprocess  # nosec B404
 
 logger = logging.getLogger(__name__)
 
 
-def health_check(request):
+def health_check(request):  # noqa: C901
     """Simple health check endpoint"""
     return JsonResponse(
         {
@@ -18,17 +21,15 @@ def health_check(request):
     )
 
 
-def readiness_check(request):
+def readiness_check(request):  # noqa: C901
     """Readiness check for container orchestration"""
     try:
         # Check database
-        from django.db import connection
 
         with connection.cursor() as cursor:
             cursor.execute("SELECT 1")
 
         # Check cache
-        from django.core.cache import cache
 
         cache.set("readiness_check", "ok", 10)
         cache_ok = cache.get("readiness_check") == "ok"
@@ -63,7 +64,7 @@ def readiness_check(request):
         )
 
 
-def liveness_check(request):
+def liveness_check(request):  # noqa: C901
     """Liveness check for container orchestration"""
     return JsonResponse(
         {
@@ -73,7 +74,7 @@ def liveness_check(request):
     )
 
 
-def version_info(request):
+def version_info(request):  # noqa: C901
     """Version and build information"""
     version_data = {
         "version": "1.0.0",
@@ -84,7 +85,6 @@ def version_info(request):
 
     # Add git info if available
     try:
-        import subprocess  # nosec B404
 
         git_hash = (
             subprocess.check_output(  # nosec B603

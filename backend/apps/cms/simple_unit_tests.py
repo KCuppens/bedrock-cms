@@ -1,11 +1,18 @@
+import os
+import sys
+from unittest.mock import Mock, patch
+        from apps.cms.views.pages import PagesViewSet
+        from apps.cms.views.pages import PagesViewSet
+        from apps.cms.views.pages import PagesViewSet
+        from apps.cms.views.pages import PagesViewSet
+        from rest_framework.response import Response
+        from apps.cms.views.pages import PagesViewSet
+    import unittest
 """
 Simple unit tests for CMS views without full Django test framework.
 These tests focus on specific methods and logic that can be tested in isolation.
 """
 
-import os
-import sys
-from unittest.mock import Mock, patch
 
 # Add the project root to the path so we can import apps
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
@@ -15,7 +22,6 @@ def test_pages_viewset_get_serializer_class():
     """Test serializer class selection in PagesViewSet."""
     # Mock minimal Django setup
     with patch("django.conf.settings"):
-        from apps.cms.views.pages import PagesViewSet
 
         viewset = PagesViewSet()
 
@@ -45,7 +51,6 @@ def test_pages_viewset_get_serializer_class():
 def test_pages_viewset_get_permissions():
     """Test permission selection in PagesViewSet."""
     with patch("django.conf.settings"):
-        from apps.cms.views.pages import PagesViewSet
 
         viewset = PagesViewSet()
 
@@ -80,7 +85,6 @@ def test_pages_viewset_get_permissions():
 def test_pages_viewset_get_queryset(mock_page_objects):
     """Test queryset optimization in PagesViewSet."""
     with patch("django.conf.settings"):
-        from apps.cms.views.pages import PagesViewSet
 
         # Setup mock chain
         mock_queryset = Mock()
@@ -102,7 +106,6 @@ def test_pages_viewset_get_queryset(mock_page_objects):
 def test_pages_viewset_throttle_classes():
     """Test that throttle classes are properly configured."""
     with patch("django.conf.settings"):
-        from apps.cms.views.pages import PagesViewSet
 
         viewset = PagesViewSet()
 
@@ -126,9 +129,7 @@ def test_pages_viewset_get_by_path_validation(
 ):
     """Test get_by_path parameter validation."""
     with patch("django.conf.settings"):
-        from rest_framework.response import Response
 
-        from apps.cms.views.pages import PagesViewSet
 
         viewset = PagesViewSet()
         viewset.request = Mock()
@@ -163,7 +164,6 @@ def test_pages_viewset_get_by_path_validation(
 
 if __name__ == "__main__":
     # Run tests directly
-    import unittest
 
     # Convert pytest functions to unittest methods
     class TestPagesViewSet(unittest.TestCase):

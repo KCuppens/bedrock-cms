@@ -1,5 +1,4 @@
 from django.core.cache import cache
-
 from rest_framework import status, viewsets
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
@@ -85,7 +84,7 @@ class SeoSettingsViewSet(viewsets.ModelViewSet):
             instance = self.get_object()
             serializer = self.get_serializer(instance)
             return Response(serializer.data)
-        except:
+        except Exception:
             pass
 
         # Try to get by locale code

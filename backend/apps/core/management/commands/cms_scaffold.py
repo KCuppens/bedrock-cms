@@ -1,16 +1,31 @@
+from pathlib import Path
+from django.apps import apps
+from django.core.management.base import BaseCommand, CommandError
+from django.template import Context, Template
+import inflection
+from apps.registry.registry import content_registry
+from django.utils import timezone
+from rest_framework import serializers
+from {{ app_label }}.models import {{ model_class }}
+from rest_framework import viewsets, status, filters
+from rest_framework.decorators import action
+from rest_framework.response import Response
+from rest_framework.permissions import IsAuthenticated
+from django_filters.rest_framework import DjangoFilterBackend
+from drf_spectacular.utils import extend_schema, OpenApiParameter
+from {{ app_label }}.models import {{ model_class }}
+from .{{ snake_name }}_serializers import (
+from rest_framework.routers import DefaultRouter
+from .{{ snake_name }}_views import {{ model_class }}ViewSet
+from django.contrib import admin
+from {{ app_label }}.models import {{ model_class }}
 """
 Management command to scaffold CRUD API endpoints for registered models.
 """
 
-from pathlib import Path
 
-from django.apps import apps
-from django.core.management.base import BaseCommand, CommandError
-from django.template import Context, Template
 
-import inflection
 
-from apps.registry.registry import content_registry
 
 
 class Command(BaseCommand):
@@ -191,8 +206,6 @@ class Command(BaseCommand):
 Serializers for {{ model_class }} model.
 """
 
-from rest_framework import serializers
-from {{ app_label }}.models import {{ model_class }}
 
 
 class {{ model_class }}ListSerializer(serializers.ModelSerializer):
@@ -255,15 +268,7 @@ class {{ model_class }}WriteSerializer(serializers.ModelSerializer):
 API views for {{ model_class }} model.
 """
 
-from rest_framework import viewsets, status, filters
-from rest_framework.decorators import action
-from rest_framework.response import Response
-from rest_framework.permissions import IsAuthenticated
-from django_filters.rest_framework import DjangoFilterBackend
-from drf_spectacular.utils import extend_schema, OpenApiParameter
 
-from {{ app_label }}.models import {{ model_class }}
-from .{{ snake_name }}_serializers import (
     {{ model_class }}ListSerializer,
     {{ model_class }}DetailSerializer,
     {{ model_class }}WriteSerializer,{% if config.can_publish %}
@@ -383,8 +388,6 @@ class {{ model_class }}ViewSet(viewsets.ModelViewSet):
 URL configuration for {{ model_class }} API.
 """
 
-from rest_framework.routers import DefaultRouter
-from .{{ snake_name }}_views import {{ model_class }}ViewSet
 
 # Create router and register viewset
 router = DefaultRouter()
@@ -405,8 +408,6 @@ urlpatterns = router.urls
 Admin configuration for {{ model_class }} model.
 """
 
-from django.contrib import admin
-from {{ app_label }}.models import {{ model_class }}
 
 
 @admin.register({{ model_class }})

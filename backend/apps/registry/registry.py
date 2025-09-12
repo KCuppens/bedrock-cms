@@ -1,16 +1,18 @@
+import json
+from typing import Any
+from django.core.exceptions import ValidationError
+from django.db import models
+from .config import ContentConfig
+        from apps.cms.models import Page
+        from apps.blog.models import BlogPost, Category, Tag
 """
 Global content registry for CMS content types.
 """
 
 # mypy: ignore-errors
 
-import json
-from typing import Any
 
-from django.core.exceptions import ValidationError
-from django.db import models
 
-from .config import ContentConfig
 
 
 class ContentRegistryError(Exception):
@@ -254,7 +256,6 @@ def validate_registry():
 def register_core_models():
     """Register core CMS models with sensible defaults."""
     try:
-        from apps.cms.models import Page
 
         register_model(
             model=Page,
@@ -277,7 +278,6 @@ def register_core_models():
 
     # Register blog models
     try:
-        from apps.blog.models import BlogPost, Category, Tag
 
         # Register BlogPost as a collection
         register_model(

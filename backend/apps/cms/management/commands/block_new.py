@@ -1,11 +1,15 @@
+from pathlib import Path
+from django.core.management.base import BaseCommand, CommandError
+from django.template import Context, Template
+from django.core.exceptions import ValidationError
+import pytest
+from apps.cms.blocks.validation import validate_blocks, {{ block_class }}BlockModel
+from rest_framework.exceptions import ValidationError
 """
 Management command to scaffold new block types.
 """
 
-from pathlib import Path
 
-from django.core.management.base import BaseCommand, CommandError
-from django.template import Context, Template
 
 
 class Command(BaseCommand):
@@ -244,9 +248,6 @@ class {{ block_class }}BlockModel(BaseBlockModel):
 Tests for {{ block_type }} block.
 """
 
-import pytest
-from apps.cms.blocks.validation import validate_blocks, {{ block_class }}BlockModel
-from rest_framework.exceptions import ValidationError
 
 
 class Test{{ block_class }}Block:

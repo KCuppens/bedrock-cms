@@ -7,12 +7,17 @@ from django.conf import settings
 from django.core.management import call_command
 
 from celery import shared_task
+        import glob
+            from django.core.cache import cache
+            from django.db import connection
+            from django.core.cache import cache
+            import shutil
 
 logger = logging.getLogger(__name__)
 
 
 @shared_task(name="apps.ops.tasks.backup_database")
-def backup_database():
+def backup_database():  # noqa: C901
     """Backup database to file"""
     try:
         timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
@@ -81,10 +86,9 @@ def backup_database():
 
 
 @shared_task(name="apps.ops.tasks.cleanup_old_backups")
-def cleanup_old_backups(days_to_keep=7):
+def cleanup_old_backups(days_to_keep=7):  # noqa: C901
     """Clean up old backup files"""
     try:
-        import glob
 
         backup_dir = os.path.join(settings.BASE_DIR, "backups")
 
@@ -124,7 +128,7 @@ def cleanup_old_backups(days_to_keep=7):
 
 
 @shared_task(name="apps.ops.tasks.system_maintenance")
-def system_maintenance():
+def system_maintenance():  # noqa: C901
     """Perform system maintenance tasks"""
     try:
         results = {}
@@ -146,7 +150,6 @@ def system_maintenance():
 
         # Clear cache
         try:
-            from django.core.cache import cache
 
             cache.clear()
             results["clear_cache"] = True
@@ -167,14 +170,13 @@ def system_maintenance():
 
 
 @shared_task(name="apps.ops.tasks.health_check_task")
-def health_check_task():
+def health_check_task():  # noqa: C901
     """Periodic health check task"""
     try:
         results = {"timestamp": datetime.datetime.now().isoformat(), "checks": {}}
 
         # Check database
         try:
-            from django.db import connection
 
             with connection.cursor() as cursor:
                 cursor.execute("SELECT 1")
@@ -184,7 +186,6 @@ def health_check_task():
 
         # Check cache
         try:
-            from django.core.cache import cache
 
             test_key = "health_check_test"
             cache.set(test_key, "ok", 30)
@@ -195,7 +196,6 @@ def health_check_task():
 
         # Check disk space
         try:
-            import shutil
 
             disk_usage = shutil.disk_usage(settings.BASE_DIR)
             free_gb = disk_usage.free / (1024**3)

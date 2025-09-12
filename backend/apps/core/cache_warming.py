@@ -1,14 +1,29 @@
+import logging
+from django.core.cache import cache
+from django.db.models.signals import post_delete, post_save
+from django.dispatch import receiver
+from apps.core.tasks import bulk_warm_cache, warm_cache_async
+        from apps.cms.models import Page
+        from apps.core.cache import cache_manager
+        from apps.i18n.models import Locale
+        from apps.blog.models import BlogPost
+        from apps.core.cache import cache_manager
+        from apps.core.cache import cache_manager
+        from apps.core.cache import cache_manager
+        from apps.i18n.models import Locale
+    from apps.core.cache import cache_manager
+    from apps.core.cache import cache_manager
+    from apps.core.cache import cache_manager
+    from apps.core.cache import cache_manager
+from django.core.management.base import BaseCommand
+        from apps.core.cache import cache_manager
+        from django.core.cache import cache
 """
 Cache warming and invalidation strategies.
 """
 
-import logging
 
-from django.core.cache import cache
-from django.db.models.signals import post_delete, post_save
-from django.dispatch import receiver
 
-from apps.core.tasks import bulk_warm_cache, warm_cache_async
 
 logger = logging.getLogger(__name__)
 
@@ -21,9 +36,6 @@ class CacheWarmer:
     @staticmethod
     def warm_homepage_cache():
         """Warm cache for homepage and main navigation."""
-        from apps.cms.models import Page
-        from apps.core.cache import cache_manager
-        from apps.i18n.models import Locale
 
         configs = []
 
@@ -68,8 +80,6 @@ class CacheWarmer:
     @staticmethod
     def warm_popular_content():
         """Warm cache for popular/featured content."""
-        from apps.blog.models import BlogPost
-        from apps.core.cache import cache_manager
 
         configs = []
 
@@ -118,7 +128,6 @@ class CacheWarmer:
     @staticmethod
     def warm_api_endpoints():
         """Warm cache for frequently accessed API endpoints."""
-        from apps.core.cache import cache_manager
 
         configs = []
 
@@ -163,8 +172,6 @@ class CacheWarmer:
     @staticmethod
     def warm_sitemaps():
         """Warm sitemap caches."""
-        from apps.core.cache import cache_manager
-        from apps.i18n.models import Locale
 
         configs = []
 
@@ -188,7 +195,6 @@ class CacheWarmer:
 @receiver(post_save, sender="cms.Page")
 def invalidate_page_cache(sender, instance, created, **kwargs):
     """Invalidate page cache on save."""
-    from apps.core.cache import cache_manager
 
     if instance.locale and instance.path:
         # Invalidate specific page
@@ -216,7 +222,6 @@ def invalidate_page_cache(sender, instance, created, **kwargs):
 @receiver(post_delete, sender="cms.Page")
 def invalidate_page_cache_on_delete(sender, instance, **kwargs):
     """Invalidate page cache on delete."""
-    from apps.core.cache import cache_manager
 
     if instance.locale and instance.path:
         cache_manager.invalidate_page(locale=instance.locale.code, path=instance.path)
@@ -226,7 +231,6 @@ def invalidate_page_cache_on_delete(sender, instance, **kwargs):
 @receiver(post_save, sender="blog.BlogPost")
 def invalidate_blog_cache(sender, instance, created, **kwargs):
     """Invalidate blog post cache on save."""
-    from apps.core.cache import cache_manager
 
     if instance.locale and instance.slug:
         # Invalidate specific post
@@ -254,7 +258,6 @@ def invalidate_blog_cache(sender, instance, created, **kwargs):
 @receiver(post_delete, sender="blog.BlogPost")
 def invalidate_blog_cache_on_delete(sender, instance, **kwargs):
     """Invalidate blog post cache on delete."""
-    from apps.core.cache import cache_manager
 
     if instance.locale and instance.slug:
         cache_manager.invalidate_blog_post(
@@ -263,7 +266,6 @@ def invalidate_blog_cache_on_delete(sender, instance, **kwargs):
 
 
 # Management command for cache warming
-from django.core.management.base import BaseCommand
 
 
 class Command(BaseCommand):
@@ -312,7 +314,6 @@ class Command(BaseCommand):
 
     def clear_cache(self, target):
         """Clear cache based on target."""
-        from apps.core.cache import cache_manager
 
         self.stdout.write("Clearing cache...")
 
@@ -335,7 +336,6 @@ class Command(BaseCommand):
 
         # Show slow endpoints
 
-        from django.core.cache import cache
 
         self.stdout.write("\nSlow Endpoints:")
         # This is a simplified example - in production you'd query Redis directly

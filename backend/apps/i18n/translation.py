@@ -1,14 +1,17 @@
+import json
+from typing import Any, Optional
+from django.contrib.contenttypes.models import ContentType
+from django.db.models import QuerySet
+from .models import Locale, TranslationUnit
+        from .models import UiMessage, UiMessageTranslation
+        from .models import UiMessage
+        from .models import UiMessage
 """
 Translation utilities for content fallback and resolution.
 """
 
-import json
-from typing import Any, Optional
 
-from django.contrib.contenttypes.models import ContentType
-from django.db.models import QuerySet
 
-from .models import Locale, TranslationUnit
 
 
 class TranslationResolver:
@@ -461,7 +464,6 @@ class UiMessageResolver:
         Returns:
             Translated message text
         """
-        from .models import UiMessage, UiMessageTranslation
 
         try:
             message = UiMessage.objects.get(key=key)
@@ -525,7 +527,6 @@ class UiMessageResolver:
         Returns:
             Dict mapping message keys to translated values
         """
-        from .models import UiMessage
 
         messages = UiMessage.objects.all()
         if namespace:
@@ -544,7 +545,6 @@ class UiMessageResolver:
         Returns:
             Dict mapping namespaces to message dicts
         """
-        from .models import UiMessage
 
         # Get all namespaces
         namespaces = UiMessage.objects.values_list("namespace", flat=True).distinct()

@@ -1,13 +1,13 @@
-"""
-Content configuration and registry for CMS content types.
-"""
-
 from dataclasses import dataclass, field
 from typing import Any
 
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ValidationError
 from django.db import models
+
+"""
+Content configuration and registry for CMS content types.
+"""
 
 
 @dataclass

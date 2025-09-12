@@ -1,8 +1,9 @@
+from django.apps import AppConfig
+            from . import signals  # noqa
 """
 Search app configuration.
 """
 
-from django.apps import AppConfig
 
 
 class SearchConfig(AppConfig):
@@ -16,6 +17,5 @@ class SearchConfig(AppConfig):
         """Initialize search functionality when the app is ready."""
         # Import signals to ensure they're connected
         try:
-            from . import signals  # noqa
         except ImportError:
             pass

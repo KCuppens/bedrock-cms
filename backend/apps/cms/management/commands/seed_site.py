@@ -1,7 +1,3 @@
-"""
-Management command to seed the site with demo data.
-"""
-
 import uuid
 from datetime import timedelta
 
@@ -13,6 +9,10 @@ from apps.blog.models import BlogPost, Category, Tag
 from apps.cms.models import Page, Redirect
 from apps.i18n.models import Locale
 from apps.media.models import Asset
+
+"""
+Management command to seed the site with demo data.
+"""
 
 
 class Command(BaseCommand):

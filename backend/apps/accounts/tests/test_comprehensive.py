@@ -7,11 +7,11 @@ from django.contrib.auth.models import Group, Permission
 from django.core.exceptions import ValidationError
 from django.test import TestCase, TransactionTestCase
 from django.urls import reverse
-
 from rest_framework import status
 from rest_framework.test import APIClient, APITestCase
 
 from apps.accounts import rbac
+from apps.accounts.auth_backends import ScopedPermissionBackend
 from apps.accounts.models import UserProfile
 from apps.accounts.serializers import UserProfileSerializer, UserSerializer
 
@@ -181,7 +181,6 @@ class AccountsAuthTests(TestCase):
     def test_custom_auth_backend(self):
         """Test custom authentication backend."""
         try:
-            from apps.accounts.auth_backends import ScopedPermissionBackend
 
             backend = ScopedPermissionBackend()
 

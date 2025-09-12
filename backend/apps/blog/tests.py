@@ -1,14 +1,17 @@
+from django.contrib.auth import get_user_model
+from django.core.exceptions import ValidationError
+from django.test import TestCase
+from apps.i18n.models import Locale
+from .models import BlogPost, Category, Tag
+        from apps.registry.registry import content_registry
+        from apps.registry.serializers import get_serializer_for_model
+        from apps.registry.viewsets import get_viewset_for_model
 """
 Tests for blog functionality.
 """
 
-from django.contrib.auth import get_user_model
-from django.core.exceptions import ValidationError
-from django.test import TestCase
 
-from apps.i18n.models import Locale
 
-from .models import BlogPost, Category, Tag
 
 User = get_user_model()
 
@@ -245,7 +248,6 @@ class BlogIntegrationTests(TestCase):
 
     def test_content_registry_integration(self):
         """Test that blog models are registered with content registry."""
-        from apps.registry.registry import content_registry
 
         # Check that blog models are registered
         self.assertTrue(content_registry.is_registered("blog.blogpost"))
@@ -262,8 +264,6 @@ class BlogIntegrationTests(TestCase):
 
     def test_blog_api_endpoints_exist(self):
         """Test that blog API endpoints are auto-generated."""
-        from apps.registry.serializers import get_serializer_for_model
-        from apps.registry.viewsets import get_viewset_for_model
 
         # Test that serializers can be created
         blog_serializer = get_serializer_for_model("blog.blogpost")

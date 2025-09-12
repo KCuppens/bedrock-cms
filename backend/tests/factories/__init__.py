@@ -10,7 +10,11 @@ from .base import BaseFactory, UserFactory
 
 # Then import other factories
 try:
-    from .accounts import ScopedLocaleFactory, ScopedSectionFactory, UserProfileFactory  # noqa: F401
+    from .accounts import (
+        ScopedLocaleFactory,
+        ScopedSectionFactory,
+        UserProfileFactory,
+    )  # noqa: F401
 except ImportError:
     pass
 

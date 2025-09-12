@@ -1,10 +1,10 @@
-"""
-Optimized serializers for Blog with reduced field loading.
-"""
-
 from rest_framework import serializers
 
 from .models import BlogPost, Category, Tag
+
+"""
+Optimized serializers for Blog with reduced field loading.
+"""
 
 
 class BlogPostMinimalSerializer(serializers.ModelSerializer):

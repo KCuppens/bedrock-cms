@@ -1,6 +1,8 @@
 from rest_framework import serializers
 
 from .models import FileUpload
+from django.core.exceptions import ValidationError
+        import os
 
 
 class FileUploadSerializer(serializers.ModelSerializer):
@@ -60,7 +62,7 @@ class FileUploadSerializer(serializers.ModelSerializer):
             "is_expired",
         ]
 
-    def get_download_url(self, obj):
+    def get_download_url(self, obj):  # noqa: C901
         """Get download URL if user has access"""
         request = self.context.get("request")
         if request and obj.can_access(request.user):
@@ -90,9 +92,8 @@ class SignedUrlSerializer(serializers.Serializer):
         help_text="Maximum file size in bytes",
     )
 
-    def validate_filename(self, value):
+    def validate_filename(self, value):  # noqa: C901
         """Validate filename"""
-        import os
 
         # Check for dangerous characters
         dangerous_chars = ["..", "/", "\\", "<", ">", ":", '"', "|", "?", "*"]

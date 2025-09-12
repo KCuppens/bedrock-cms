@@ -10,6 +10,9 @@ from django.http import HttpResponse
 from apps.api.models import Note
 from apps.emails.models import EmailMessageLog
 from apps.files.models import FileUpload
+            from django.core.cache import cache
+            import psutil
+        from django.core.cache import cache
 
 logger = logging.getLogger(__name__)
 
@@ -135,7 +138,6 @@ def prometheus_metrics(request):
 
         # Cache metrics (if Redis/cache available)
         try:
-            from django.core.cache import cache
 
             cache_start = time.time()
             cache.set("metrics_test", "ok", 10)
@@ -161,7 +163,6 @@ def prometheus_metrics(request):
 
         # System uptime (approximate)
         try:
-            import psutil
 
             boot_time = psutil.boot_time()
             uptime = time.time() - boot_time
@@ -245,7 +246,6 @@ def health_metrics(request):
 
     # Cache check
     try:
-        from django.core.cache import cache
 
         cache.set("health_check", "ok", 10)
         metrics["checks"]["cache"] = cache.get("health_check") == "ok"

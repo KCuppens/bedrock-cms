@@ -1,10 +1,9 @@
+from allauth.account.adapter import DefaultAccountAdapter
+from django.conf import settings
+
 """
 Custom Allauth adapter to send password reset emails to frontend.
 """
-
-from django.conf import settings
-
-from allauth.account.adapter import DefaultAccountAdapter
 
 
 class CustomAccountAdapter(DefaultAccountAdapter):

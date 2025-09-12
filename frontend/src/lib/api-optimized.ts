@@ -1,6 +1,6 @@
-import type { 
-  ApiResponse, 
-  PaginatedResponse, 
+import type {
+  ApiResponse,
+  PaginatedResponse,
   Page,
   PageCreateRequest,
   PageUpdateRequest,
@@ -15,7 +15,7 @@ import type {
   Redirect,
   RedirectCreateRequest,
   AuditLogEntry,
-  RequestConfig 
+  RequestConfig
 } from '@/types/api';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || '/api/v1';
@@ -41,7 +41,7 @@ function debounce<T extends (...args: any[]) => any>(
     return new Promise<ReturnType<T>>((resolve) => {
       if (timeout) clearTimeout(timeout);
       resolvePromise = resolve;
-      
+
       timeout = setTimeout(async () => {
         const result = await func(...args);
         if (resolvePromise) resolvePromise(result);
@@ -198,24 +198,24 @@ class OptimizedApiClient {
     }
   }
 
-  private async request<T>({ 
-    method, 
-    url, 
-    params, 
-    data, 
+  private async request<T>({
+    method,
+    url,
+    params,
+    data,
     headers = {},
     useCache = true,
     cacheKey,
     signal,
     skipQueue = false
-  }: RequestConfig & { 
-    useCache?: boolean; 
+  }: RequestConfig & {
+    useCache?: boolean;
     cacheKey?: string;
     signal?: AbortSignal;
     skipQueue?: boolean;
   }): Promise<T> {
     const fullUrl = new URL(url, this.baseURL);
-    
+
     // Add query parameters
     if (params) {
       Object.entries(params).forEach(([key, value]) => {
@@ -239,7 +239,7 @@ class OptimizedApiClient {
     // Create abort controller
     const abortController = new AbortController();
     const requestKey = `${method}:${url}`;
-    
+
     // Cancel previous request to same endpoint
     this.cancelRequest(requestKey);
     this.abortControllers.set(requestKey, abortController);
@@ -267,9 +267,9 @@ class OptimizedApiClient {
       }
 
       const response = await fetch(fullUrl.toString(), config);
-      
+
       if (!response.ok) {
-        const errorData = await response.json().catch(() => ({ 
+        const errorData = await response.json().catch(() => ({
           error: 'Request failed',
           message: `HTTP ${response.status} ${response.statusText}`,
           status: response.status
@@ -337,67 +337,67 @@ class OptimizedApiClient {
   // Pages API with optimizations
   pages = {
     list: (filters?: PageFilters): Promise<PaginatedResponse<Page>> =>
-      this.request({ 
-        method: 'GET', 
-        url: '/pages', 
+      this.request({
+        method: 'GET',
+        url: '/pages',
         params: filters,
-        useCache: true 
+        useCache: true
       }),
-    
+
     get: (id: number): Promise<ApiResponse<Page>> =>
-      this.request({ 
-        method: 'GET', 
+      this.request({
+        method: 'GET',
         url: `/pages/${id}`,
         useCache: true,
         cacheKey: `page:${id}`
       }),
-    
+
     create: (data: PageCreateRequest): Promise<ApiResponse<Page>> =>
-      this.request({ 
-        method: 'POST', 
-        url: '/pages', 
+      this.request({
+        method: 'POST',
+        url: '/pages',
         data,
         skipQueue: true // Priority for creates
       }),
-    
+
     update: (id: number, data: PageUpdateRequest): Promise<ApiResponse<Page>> =>
       this.optimisticUpdate(
         `page:${id}`,
         { data: { ...data, id } as Page } as ApiResponse<Page>,
-        () => this.request({ 
-          method: 'PATCH', 
-          url: `/pages/${id}`, 
+        () => this.request({
+          method: 'PATCH',
+          url: `/pages/${id}`,
           data,
           skipQueue: true
         })
       ),
-    
+
     delete: (id: number): Promise<void> =>
-      this.request({ 
-        method: 'DELETE', 
+      this.request({
+        method: 'DELETE',
         url: `/pages/${id}`,
         skipQueue: true
       }),
-    
+
     publish: (id: number): Promise<ApiResponse<Page>> =>
-      this.request({ 
-        method: 'POST', 
+      this.request({
+        method: 'POST',
         url: `/pages/${id}/publish`,
         skipQueue: true
       }),
-    
+
     unpublish: (id: number): Promise<ApiResponse<Page>> =>
-      this.request({ 
-        method: 'POST', 
+      this.request({
+        method: 'POST',
         url: `/pages/${id}/unpublish`,
         skipQueue: true
       }),
-    
+
     // Debounced search
     search: debounce((query: string): Promise<PaginatedResponse<Page>> =>
-      this.request({ 
-        method: 'GET', 
-        url: '/pages/search', 
+      this.request({
+        method: 'GET',
+        url: '/pages/search',
         params: { q: query },
         useCache: true
       }), 300),
@@ -406,21 +406,21 @@ class OptimizedApiClient {
   // Media API with upload progress
   media = {
     list: (filters?: MediaFilters): Promise<PaginatedResponse<MediaAsset>> =>
-      this.request({ 
-        method: 'GET', 
-        url: '/media', 
+      this.request({
+        method: 'GET',
+        url: '/media',
         params: filters,
         useCache: true
       }),
-    
+
     get: (id: number): Promise<ApiResponse<MediaAsset>> =>
-      this.request({ 
-        method: 'GET', 
+      this.request({
+        method: 'GET',
         url: `/media/${id}`,
         useCache: true,
         cacheKey: `media:${id}`
       }),
-    
+
     upload: async (
       data: MediaUploadRequest,
       onProgress?: (progress: number) => void
@@ -431,18 +431,18 @@ class OptimizedApiClient {
       if (data.description) formData.append('description', data.description);
       if (data.alt_texts) formData.append('alt_texts', JSON.stringify(data.alt_texts));
       if (data.tags) formData.append('tags', JSON.stringify(data.tags));
-      
+
       // Use XMLHttpRequest for progress tracking
       return new Promise((resolve, reject) => {
         const xhr = new XMLHttpRequest();
-        
+
         xhr.upload.addEventListener('progress', (e) => {
           if (e.lengthComputable && onProgress) {
             const percentComplete = (e.loaded / e.total) * 100;
             onProgress(percentComplete);
           }
         });
-        
+
         xhr.addEventListener('load', () => {
           if (xhr.status >= 200 && xhr.status < 300) {
             resolve(JSON.parse(xhr.responseText));
@@ -450,27 +450,27 @@ class OptimizedApiClient {
             reject(new Error(`Upload failed: ${xhr.statusText}`));
           }
         });
-        
+
         xhr.addEventListener('error', () => {
           reject(new Error('Upload failed'));
         });
-        
+
         xhr.open('POST', `${this.baseURL}/media/upload`);
         xhr.withCredentials = true;
         xhr.send(formData);
       });
     },
-    
+
     delete: (id: number): Promise<void> =>
-      this.request({ 
-        method: 'DELETE', 
+      this.request({
+        method: 'DELETE',
         url: `/media/${id}`,
         skipQueue: true
       }),
-    
+
     generateRenditions: (id: number): Promise<ApiResponse<MediaAsset>> =>
-      this.request({ 
-        method: 'POST', 
+      this.request({
+        method: 'POST',
         url: `/media/${id}/renditions`
       }),
   };
@@ -478,52 +478,52 @@ class OptimizedApiClient {
   // Translations API
   translations = {
     list: (filters?: TranslationFilters): Promise<PaginatedResponse<TranslationUnit>> =>
-      this.request({ 
-        method: 'GET', 
-        url: '/translations', 
+      this.request({
+        method: 'GET',
+        url: '/translations',
         params: filters,
         useCache: true
       }),
-    
+
     get: (id: string): Promise<ApiResponse<TranslationUnit>> =>
-      this.request({ 
-        method: 'GET', 
+      this.request({
+        method: 'GET',
         url: `/translations/${id}`,
         useCache: true,
         cacheKey: `translation:${id}`
       }),
-    
+
     update: (id: string, data: TranslationUpdateRequest): Promise<ApiResponse<TranslationUnit>> =>
       this.optimisticUpdate(
         `translation:${id}`,
         { data: { ...data, id } as TranslationUnit } as ApiResponse<TranslationUnit>,
-        () => this.request({ 
-          method: 'PATCH', 
-          url: `/translations/${id}`, 
+        () => this.request({
+          method: 'PATCH',
+          url: `/translations/${id}`,
           data,
           skipQueue: true
         })
       ),
-    
+
     bulkUpdate: (updates: Array<{ id: string; data: TranslationUpdateRequest }>): Promise<ApiResponse<TranslationUnit[]>> =>
-      this.request({ 
-        method: 'PATCH', 
-        url: '/translations/bulk', 
+      this.request({
+        method: 'PATCH',
+        url: '/translations/bulk',
         data: { updates },
         skipQueue: true
       }),
-    
+
     suggest: (id: string): Promise<ApiResponse<{ suggestion: string }>> =>
-      this.request({ 
-        method: 'POST', 
+      this.request({
+        method: 'POST',
         url: `/translations/${id}/suggest`,
         useCache: true,
         cacheKey: `translation-suggestion:${id}`
       }),
-    
+
     approve: (id: string): Promise<ApiResponse<TranslationUnit>> =>
-      this.request({ 
-        method: 'POST', 
+      this.request({
+        method: 'POST',
         url: `/translations/${id}/approve`,
         skipQueue: true
       }),
@@ -532,23 +532,23 @@ class OptimizedApiClient {
   // Users API
   users = {
     list: (): Promise<PaginatedResponse<User>> =>
-      this.request({ 
-        method: 'GET', 
+      this.request({
+        method: 'GET',
         url: '/users',
         useCache: true
       }),
-    
+
     get: (id: number): Promise<ApiResponse<User>> =>
-      this.request({ 
-        method: 'GET', 
+      this.request({
+        method: 'GET',
         url: `/users/${id}`,
         useCache: true,
         cacheKey: `user:${id}`
       }),
-    
+
     me: (): Promise<ApiResponse<User>> =>
-      this.request({ 
-        method: 'GET', 
+      this.request({
+        method: 'GET',
         url: '/users/me',
         useCache: true,
         cacheKey: 'user:me'
@@ -558,63 +558,63 @@ class OptimizedApiClient {
   // SEO & Redirects API
   redirects = {
     list: (): Promise<PaginatedResponse<Redirect>> =>
-      this.request({ 
-        method: 'GET', 
+      this.request({
+        method: 'GET',
         url: '/redirects',
         useCache: true
       }),
-    
+
     create: (data: RedirectCreateRequest): Promise<ApiResponse<Redirect>> =>
-      this.request({ 
-        method: 'POST', 
-        url: '/redirects', 
+      this.request({
+        method: 'POST',
+        url: '/redirects',
         data,
         skipQueue: true
       }),
-    
+
     update: (id: number, data: Partial<RedirectCreateRequest>): Promise<ApiResponse<Redirect>> =>
-      this.request({ 
-        method: 'PATCH', 
-        url: `/redirects/${id}`, 
+      this.request({
+        method: 'PATCH',
+        url: `/redirects/${id}`,
         data,
         skipQueue: true
       }),
-    
+
     delete: (id: number): Promise<void> =>
-      this.request({ 
-        method: 'DELETE', 
+      this.request({
+        method: 'DELETE',
         url: `/redirects/${id}`,
         skipQueue: true
       }),
-    
+
     test: (id: number): Promise<ApiResponse<{ status: number; location?: string }>> =>
-      this.request({ 
-        method: 'POST', 
+      this.request({
+        method: 'POST',
         url: `/redirects/${id}/test`
       }),
   };
 
   // Audit Log API
   audit = {
-    list: (filters?: { 
-      actor?: string; 
-      action?: string; 
-      model?: string; 
-      start_date?: string; 
+    list: (filters?: {
+      actor?: string;
+      action?: string;
+      model?: string;
+      start_date?: string;
       end_date?: string;
       page?: number;
-      limit?: number; 
+      limit?: number;
     }): Promise<PaginatedResponse<AuditLogEntry>> =>
-      this.request({ 
-        method: 'GET', 
-        url: '/audit', 
+      this.request({
+        method: 'GET',
+        url: '/audit',
         params: filters,
         useCache: true
       }),
-    
+
     get: (id: number): Promise<ApiResponse<AuditLogEntry>> =>
-      this.request({ 
-        method: 'GET', 
+      this.request({
+        method: 'GET',
         url: `/audit/${id}`,
         useCache: true,
         cacheKey: `audit:${id}`
@@ -624,17 +624,17 @@ class OptimizedApiClient {
   // Schema & Documentation
   schema = {
     openapi: (): Promise<any> =>
-      this.request({ 
-        method: 'GET', 
+      this.request({
+        method: 'GET',
         url: '/schema',
         useCache: true,
         cacheKey: 'schema:openapi'
       }),
-    
+
     openApiYaml: async (): Promise<string> => {
       const cached = this.cache.get('schema:yaml');
       if (cached) return cached as string;
-      
+
       const response = await fetch(`${this.baseURL}/schema.yaml`);
       const text = await response.text();
       this.cache.set('schema:yaml', text);

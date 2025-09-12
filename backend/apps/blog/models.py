@@ -1,15 +1,25 @@
+import uuid
+from django.contrib.auth import get_user_model
+from django.core.exceptions import ValidationError
+from django.db import models
+from django.db.models import (
+from django.utils.text import slugify
+from django.utils.translation import gettext_lazy as _
+from apps.accounts.rbac import RBACMixin
+from apps.core.validators import JSONSizeValidator, validate_json_structure
+            from django.utils import timezone
+        from django.utils import timezone
+        import re
+        from django.utils.html import strip_tags
+        from django.utils import timezone
+from .versioning import BlogPostRevision, BlogPostViewTracker  # noqa: F401
 """
 Blog models for the CMS.
 
 This module provides blog functionality including posts, categories, and tags.
 """
 
-import uuid
 
-from django.contrib.auth import get_user_model
-from django.core.exceptions import ValidationError
-from django.db import models
-from django.db.models import (
     AutoField,
     BooleanField,
     CharField,
@@ -21,11 +31,7 @@ from django.db.models import (
     TextField,
     UUIDField,
 )
-from django.utils.text import slugify
-from django.utils.translation import gettext_lazy as _
 
-from apps.accounts.rbac import RBACMixin
-from apps.core.validators import JSONSizeValidator, validate_json_structure
 
 User = get_user_model()
 
@@ -57,15 +63,15 @@ class Category(models.Model, RBACMixin):
         verbose_name_plural = _("Categories")
         ordering = ["name"]
 
-    def __str__(self):
+    def __str__(self):  # noqa: C901
         return self.name
 
-    def save(self, *args, **kwargs):
+    def save(self, *args, **kwargs):  # noqa: C901
         if not self.slug:
             self.slug = slugify(self.name)
         super().save(*args, **kwargs)
 
-    def get_absolute_url(self):
+    def get_absolute_url(self):  # noqa: C901
         return f"/blog/category/{self.slug}/"
 
 
@@ -85,15 +91,15 @@ class Tag(models.Model, RBACMixin):
         verbose_name_plural = _("Tags")
         ordering = ["name"]
 
-    def __str__(self):
+    def __str__(self):  # noqa: C901
         return self.name
 
-    def save(self, *args, **kwargs):
+    def save(self, *args, **kwargs):  # noqa: C901
         if not self.slug:
             self.slug = slugify(self.name)
         super().save(*args, **kwargs)
 
-    def get_absolute_url(self):
+    def get_absolute_url(self):  # noqa: C901
         return f"/blog/tag/{self.slug}/"
 
 
@@ -211,23 +217,21 @@ class BlogPost(models.Model, RBACMixin):
             ("bulk_delete_blogpost", _("Can bulk delete blog posts")),
         ]
 
-    def __str__(self):
+    def __str__(self):  # noqa: C901
         return self.title
 
-    def save(self, *args, **kwargs):
+    def save(self, *args, **kwargs):  # noqa: C901
         if not self.slug:
             self.slug = slugify(self.title)
 
         # Auto-set published_at when status changes to published
         if self.status == "published" and not self.published_at:
-            from django.utils import timezone
 
             self.published_at = timezone.now()
 
         super().save(*args, **kwargs)
 
-    def clean(self):
-        from django.utils import timezone
+    def clean(self):  # noqa: C901
 
         errors = {}
 
@@ -268,14 +272,12 @@ class BlogPost(models.Model, RBACMixin):
         if errors:
             raise ValidationError(errors)
 
-    def get_absolute_url(self):
+    def get_absolute_url(self):  # noqa: C901
         return f"/blog/{self.slug}/"
 
-    def get_reading_time(self):
+    def get_reading_time(self):  # noqa: C901
         """Calculate estimated reading time in minutes."""
-        import re
 
-        from django.utils.html import strip_tags
 
         # Combine content and blocks for word count using list for efficiency
         text_parts = [strip_tags(self.content)]
@@ -310,7 +312,7 @@ class BlogPost(models.Model, RBACMixin):
         word_count = len(re.findall(r"\w+", text_content))
         return max(1, round(word_count / 250))
 
-    def get_related_posts(self, limit=5):
+    def get_related_posts(self, limit=5):  # noqa: C901
         """Get related posts based on category and tags."""
         # Use select_related and prefetch_related to avoid N+1 queries
         related = (
@@ -333,17 +335,16 @@ class BlogPost(models.Model, RBACMixin):
         return related[:limit]
 
     @property
-    def is_published(self):
+    def is_published(self):  # noqa: C901
         """Check if the post is published."""
         return self.status == "published" and self.published_at
 
     @property
-    def is_scheduled(self):
+    def is_scheduled(self):  # noqa: C901
         """Check if the post is scheduled for future publication."""
         if self.status != "scheduled" or not self.scheduled_publish_at:
             return False
 
-        from django.utils import timezone
 
         return self.scheduled_publish_at > timezone.now()
 
@@ -423,10 +424,10 @@ class BlogSettings(models.Model):
         verbose_name = _("Blog Settings")
         verbose_name_plural = _("Blog Settings")
 
-    def __str__(self):
+    def __str__(self):  # noqa: C901
         return f"Blog Settings ({self.locale.code})"
 
-    def get_display_options(self, category=None, post=None):
+    def get_display_options(self, category=None, post=None):  # noqa: C901
         """
         Get effective display options with precedence:
         post override -> category override -> global settings
@@ -449,7 +450,7 @@ class BlogSettings(models.Model):
 
         return options
 
-    def get_presentation_page(self, category=None, post=None):
+    def get_presentation_page(self, category=None, post=None):  # noqa: C901
         """
         Get the effective presentation page with precedence:
         post override -> category override -> global default
@@ -467,4 +468,3 @@ class BlogSettings(models.Model):
 
 
 # Import versioning models to ensure they are registered
-from .versioning import BlogPostRevision, BlogPostViewTracker  # noqa: F401

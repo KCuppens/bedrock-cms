@@ -1,14 +1,17 @@
+import logging
+from django.contrib.auth import get_user_model
+from django.core.cache import cache
+from django.utils import timezone
+from celery import shared_task
+from datetime import timedelta
+from django.contrib.sessions.models import Session
+
 """
 Celery tasks for accounts app.
 """
 
-import logging
 
-from django.contrib.auth import get_user_model
-from django.core.cache import cache
-from django.utils import timezone
 
-from celery import shared_task
 
 logger = logging.getLogger(__name__)
 User = get_user_model()
@@ -22,7 +25,7 @@ User = get_user_model()
     queue="low",
     ignore_result=True,
 )
-def update_user_last_seen(self, user_id):
+def update_user_last_seen(self, user_id):  # noqa: C901
     """
     Update user's last_seen timestamp asynchronously.
 
@@ -52,7 +55,7 @@ def update_user_last_seen(self, user_id):
 
 
 @shared_task(bind=True, max_retries=3, soft_time_limit=30, time_limit=60, queue="low")
-def bulk_update_last_seen(self, user_ids):
+def bulk_update_last_seen(self, user_ids):  # noqa: C901
     """
     Bulk update last_seen for multiple users.
 
@@ -86,7 +89,7 @@ def bulk_update_last_seen(self, user_ids):
 
 
 @shared_task(bind=True, max_retries=3, soft_time_limit=60, time_limit=120, queue="low")
-def cleanup_inactive_sessions(self, days=30):
+def cleanup_inactive_sessions(self, days=30):  # noqa: C901
     """
     Clean up sessions for inactive users.
 
@@ -94,9 +97,7 @@ def cleanup_inactive_sessions(self, days=30):
         days: Number of days of inactivity before cleanup
     """
     try:
-        from datetime import timedelta
 
-        from django.contrib.sessions.models import Session
 
         cutoff_date = timezone.now() - timedelta(days=days)
 

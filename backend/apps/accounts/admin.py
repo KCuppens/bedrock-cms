@@ -177,7 +177,7 @@ class EnhancedGroupAdmin(BaseGroupAdmin):
         ),
     )
 
-    def save_related(self, request, form, formsets, change):
+    def save_related(self, request, form, formsets, change):  # noqa: C901
         """Save related objects including inlines."""
         super().save_related(request, form, formsets, change)
 

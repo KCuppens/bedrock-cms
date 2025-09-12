@@ -1,3 +1,11 @@
+from typing import Any
+from django.core.exceptions import ValidationError
+from django.http import Http404
+from apps.core.cache import cache_manager
+from apps.registry.registry import get_all_configs
+            from apps.blog.models import BlogPost
+        from apps.blog.models import BlogPost
+        from apps.blog.models import BlogSettings
 """
 Presentation page resolver for content_detail blocks.
 
@@ -7,13 +15,8 @@ registered content models, with support for precedence and caching.
 
 # mypy: ignore-errors
 
-from typing import Any
 
-from django.core.exceptions import ValidationError
-from django.http import Http404
 
-from apps.core.cache import cache_manager
-from apps.registry.registry import get_all_configs
 
 
 class PresentationPageResolver:
@@ -72,7 +75,6 @@ class PresentationPageResolver:
             Dict containing 'content', 'presentation_page', 'display_options'
         """
         if content_label == "blog.blogpost":
-            from apps.blog.models import BlogPost
 
             try:
                 post = BlogPost.objects.select_related("category", "locale").get(
@@ -90,7 +92,6 @@ class PresentationPageResolver:
 
     def _resolve_blog_post(self, slug: str, locale_code: str) -> dict[str, Any]:
         """Resolve blog post by slug."""
-        from apps.blog.models import BlogPost
 
         try:
             post = BlogPost.objects.select_related("category", "locale").get(
@@ -105,7 +106,6 @@ class PresentationPageResolver:
 
     def _resolve_blog_post_from_instance(self, post) -> dict[str, Any]:
         """Resolve presentation page and options for a blog post instance."""
-        from apps.blog.models import BlogSettings
 
         # Get blog settings for this locale
         try:

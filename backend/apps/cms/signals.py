@@ -3,6 +3,10 @@ from django.dispatch import receiver
 from django.utils import timezone
 
 from .models import Page
+        from apps.media.usage import update_usage_for_instance
+        from apps.media.usage import cleanup_usage_for_instance
+        from django.conf import settings
+        from .versioning import AuditEntry, PageRevision
 
 
 @receiver(post_save, sender=Page)
@@ -36,7 +40,6 @@ def store_old_path(sender, instance, **kwargs):
 def update_asset_usage(sender, instance, created, **kwargs):
     """Update asset usage tracking when page is saved."""
     try:
-        from apps.media.usage import update_usage_for_instance
 
         update_usage_for_instance(instance)
     except ImportError:
@@ -48,7 +51,6 @@ def update_asset_usage(sender, instance, created, **kwargs):
 def cleanup_asset_usage(sender, instance, **kwargs):
     """Clean up asset usage records when page is deleted."""
     try:
-        from apps.media.usage import cleanup_usage_for_instance
 
         cleanup_usage_for_instance(instance)
     except ImportError:
@@ -60,9 +62,7 @@ def cleanup_asset_usage(sender, instance, **kwargs):
 def create_page_revision(sender, instance, created, **kwargs):
     """Create revision snapshots when pages are saved."""
     try:
-        from django.conf import settings
 
-        from .versioning import AuditEntry, PageRevision
 
         # Skip if this is being called during revision restoration
         if getattr(instance, "_skip_revision_creation", False):

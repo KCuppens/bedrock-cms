@@ -1,15 +1,18 @@
+import re
+from datetime import date, datetime, timedelta
+from django.contrib.contenttypes.models import ContentType
+from django.contrib.gis.geoip2 import GeoIP2
+from django.utils import timezone
+from user_agents import parse
+        from urllib.parse import parse_qs, urlencode, urlparse, urlunparse
+    from .models import PageView
+        from urllib.parse import urlparse
 """
 Utility functions for analytics functionality.
 """
 
-import re
-from datetime import date, datetime, timedelta
 
-from django.contrib.contenttypes.models import ContentType
-from django.contrib.gis.geoip2 import GeoIP2
-from django.utils import timezone
 
-from user_agents import parse
 
 
 def parse_user_agent(user_agent_string: str) -> dict[str, str]:
@@ -104,7 +107,6 @@ def sanitize_url(url: str, max_length: int = 1024) -> str:
     sensitive_params = ["password", "token", "key", "secret", "auth"]
 
     try:
-        from urllib.parse import parse_qs, urlencode, urlparse, urlunparse
 
         parsed = urlparse(url)
         query_params = parse_qs(parsed.query)
@@ -150,7 +152,6 @@ def calculate_session_duration(session_id: str, end_time: datetime = None) -> in
     Returns:
         Session duration in seconds
     """
-    from .models import PageView
 
     if end_time is None:
         end_time = timezone.now()
@@ -327,7 +328,6 @@ def clean_referrer(referrer: str) -> str:
         return ""
 
     try:
-        from urllib.parse import urlparse
 
         parsed = urlparse(referrer)
 

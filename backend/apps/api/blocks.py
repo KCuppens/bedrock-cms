@@ -1,12 +1,12 @@
+from rest_framework.permissions import IsAuthenticatedOrReadOnly
+from rest_framework.response import Response
+from rest_framework.views import APIView
+
 """
 Standalone blocks API endpoint.
 """
 
 # Force reload
-
-from rest_framework.permissions import IsAuthenticatedOrReadOnly
-from rest_framework.response import Response
-from rest_framework.views import APIView
 
 
 class BlockTypesAPIView(APIView):

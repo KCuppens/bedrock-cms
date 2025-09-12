@@ -9,7 +9,6 @@ from django.contrib.contenttypes.models import ContentType
 from django.core.management import call_command
 from django.core.management.base import CommandError
 from django.db import models
-
 from django_filters.rest_framework import DjangoFilterBackend
 from drf_spectacular.utils import OpenApiParameter, extend_schema
 from rest_framework import filters, permissions, status, viewsets
@@ -1190,8 +1189,7 @@ class UiMessageViewSet(viewsets.ModelViewSet):
             translated = UiMessageTranslation.objects.filter(
                 locale=locale, status="approved"
             ).values_list("message_id", flat=True)
-            untranslated_count = UiMessage.objects.exclude(id__in=translated).c
-                ount()
+            untranslated_count = UiMessage.objects.exclude(id__in=translated).count()
 
             untranslated[locale.code] = untranslated_count
 
@@ -1211,8 +1209,7 @@ class UiMessageViewSet(viewsets.ModelViewSet):
                 "untranslated_by_locale": untranslated,
                 "needs_review": needs_review,
                 "missing_keys_today": len(missing_today),
-                "last_sync": request.session.get("last_translation_sync", "Neve
-                    r"),
+                "last_sync": request.session.get("last_translation_sync", "Never"),
             }
         )
 
@@ -1228,17 +1225,14 @@ class UiMessageViewSet(viewsets.ModelViewSet):
                         "format": "binary",
                         "description": "JSON file containing translations",
                     },
-                    "locale": {"type": "string", "description": "Target locale 
-                        code"},
+                    "locale": {"type": "string", "description": "Target locale code"},
                     "namespace": {
                         "type": "string",
-                        "description": "Namespace for messages (default: genera
-                            l)",
+                        "description": "Namespace for messages (default: general)",
                     },
                     "flatten_keys": {
                         "type": "boolean",
-                        "description": "Whether to flatten nested keys (default
-                            : true)",
+                        "description": "Whether to flatten nested keys (default: true)",
                     },
                 },
             }
@@ -1262,8 +1256,7 @@ class UiMessageViewSet(viewsets.ModelViewSet):
         json_file = request.FILES["file"]
         locale_code = request.data.get("locale")
         namespace = request.data.get("namespace", "general")
-        flatten_keys = request.data.get("flatten_keys", "true").lower() == "tru
-            e"
+        flatten_keys = request.data.get("flatten_keys", "true").lower() == "true"
 
         if not locale_code:
             return Response(
@@ -1276,8 +1269,7 @@ class UiMessageViewSet(viewsets.ModelViewSet):
             locale = Locale.objects.get(code=locale_code)
         except Locale.DoesNotExist:
             return Response(
-                {"status": "error", "message": f"Locale {locale_code} not found
-                    "},
+                {"status": "error", "message": f"Locale {locale_code} not found"},
                 status=status.HTTP_404_NOT_FOUND,
             )
 
@@ -1291,8 +1283,7 @@ class UiMessageViewSet(viewsets.ModelViewSet):
                 return Response(
                     {
                         "status": "error",
-                        "message": "JSON must be an object with key-value pairs
-                            ",
+                        "message": "JSON must be an object with key-value pairs",
                     },
                     status=status.HTTP_400_BAD_REQUEST,
                 )
@@ -1319,8 +1310,7 @@ class UiMessageViewSet(viewsets.ModelViewSet):
 
             for key, value in translations.items():
                 try:
-                    # Get or create UI message (key is unique, so only look up 
-                        by key)
+                    # Get or create UI message (key is unique, so only look up by key)
                     try:
                         message = UiMessage.objects.get(key=key)
                         message_created = False
@@ -1337,8 +1327,7 @@ class UiMessageViewSet(viewsets.ModelViewSet):
                         message = UiMessage.objects.create(
                             key=key,
                             namespace=namespace,
-                            description=f"Imported from JSON on {datetime.now()
-                                .strftime('%Y-%m-%d')}",
+                            description=f"Imported from JSON on {datetime.now().strftime('%Y-%m-%d')}",
                             default_value=value,
                         )
                         message_created = True
@@ -1404,8 +1393,7 @@ class UiMessageViewSet(viewsets.ModelViewSet):
                         ),  # Show first 10 errors
                     },
                 }
-                return Response(response_data, status=status.HTTP_400_BAD_REQUE
-                    ST)
+                return Response(response_data, status=status.HTTP_400_BAD_REQUEST)
             elif errors:
                 # Partial success
                 response_data = {
@@ -1484,8 +1472,7 @@ class UiMessageTranslationViewSet(viewsets.ModelViewSet):
 
     @extend_schema(
         summary="Bulk update UI message translations",
-        description="Update multiple UI message translations in a single reques
-            t.",
+        description="Update multiple UI message translations in a single request.",
         request=BulkUiMessageUpdateSerializer,
     )
     @action(detail=False, methods=["post"])
@@ -1505,8 +1492,7 @@ class UiMessageTranslationViewSet(viewsets.ModelViewSet):
                 value = update_data["value"]
                 status_val = update_data.get("status", "draft")
                 # Get or create translation
-                translation, created = UiMessageTranslation.objects.get_or_crea
-                    te(
+                translation, created = UiMessageTranslation.objects.get_or_create(
                     message_id=message_id,
                     locale_id=locale_id,
                     defaults={
@@ -1622,8 +1608,7 @@ class UiMessageTranslationViewSet(viewsets.ModelViewSet):
             OpenApiParameter(
                 "max_translations",
                 int,
-                description="Maximum number of translations to create (optional
-                    )",
+                description="Maximum number of translations to create (optional)",
                 required=False,
             ),
         ],
@@ -1717,8 +1702,7 @@ class UiMessageTranslationViewSet(viewsets.ModelViewSet):
                 return Response(
                     {
                         "status": "started",
-                        "message": f"Auto-translation task started for {total_m
-                            essages} messages",
+                        "message": f"Auto-translation task started for {total_messages} messages",
                         "task_id": task.id,
                         "details": {
                             "total_messages": total_messages,
@@ -1811,8 +1795,7 @@ class UiMessageTranslationViewSet(viewsets.ModelViewSet):
                 result = task_result.get()
                 response_data.update(
                     {
-                        "message": result.get("message", "Task completed succes
-                            sfully"),
+                        "message": result.get("message", "Task completed successfully"),
                         "results": result.get("details", {}),
                         "progress": {
                             "current": result.get("details", {}).get(
@@ -1873,8 +1856,7 @@ class TranslationGlossaryViewSet(viewsets.ModelViewSet):
         filters.SearchFilter,
         filters.OrderingFilter,
     ]
-    filterset_fields = ["source_locale", "target_locale", "category", "is_verif
-        ied"]
+    filterset_fields = ["source_locale", "target_locale", "category", "is_verified"]
     search_fields = ["term", "translation", "context"]
     ordering_fields = ["term", "created_at", "updated_at"]
     ordering = ["term"]
@@ -1907,8 +1889,7 @@ class TranslationGlossaryViewSet(viewsets.ModelViewSet):
 
         # Filter by term (search in both term and translation)
         queryset = queryset.filter(
-            models.Q(term__icontains=term) | models.Q(translation__icontains=te
-                rm)
+            models.Q(term__icontains=term) | models.Q(translation__icontains=term)
         )
 
         # Filter by locales if provided
@@ -1980,8 +1961,7 @@ class TranslationQueueViewSet(viewsets.ModelViewSet):
         return Response(serializer.data)
 
     @extend_schema(
-        summary="Get overdue items", description="Get all overdue translation i
-            tems."
+        summary="Get overdue items", description="Get all overdue translation items."
     )
     @action(detail=False, methods=["get"])
     def overdue(self, request):
@@ -2026,8 +2006,7 @@ class TranslationQueueViewSet(viewsets.ModelViewSet):
                 .order_by("status")
             )
 
-            status_dict = {item["status"]: item["count"] for item in status_cou
-                nts}
+            status_dict = {item["status"]: item["count"] for item in status_counts}
 
             # Count by priority
             priority_counts = (
@@ -2052,8 +2031,7 @@ class TranslationQueueViewSet(viewsets.ModelViewSet):
             in_progress = status_dict.get("in_progress", 0)
             completed = status_dict.get("completed", 0)
             # Calculate completion percentage
-            completion_percentage = (completed / total * 100) if total > 0 else
-                100
+            completion_percentage = (completed / total * 100) if total > 0 else 100
 
             locale_summaries.append(
                 {
@@ -2079,8 +2057,7 @@ class TranslationQueueViewSet(viewsets.ModelViewSet):
                 }
             )
 
-        # Sort by completion percentage (ascending) to show locales needing mos
-            t work first
+        # Sort by completion percentage (ascending) to show locales needing most work first
         locale_summaries.sort(key=lambda x: x["completion_percentage"])
 
         # Overall summary

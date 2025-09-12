@@ -1,7 +1,3 @@
-"""
-Comprehensive tests for RBAC (Role-Based Access Control) functionality.
-"""
-
 from django.contrib.auth.models import Group, Permission
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ValidationError
@@ -12,6 +8,10 @@ from apps.accounts.models import User
 from apps.accounts.rbac import ScopedLocale, ScopedSection
 from apps.cms.models import Page
 from apps.i18n.models import Locale
+
+"""
+Comprehensive tests for RBAC (Role-Based Access Control) functionality.
+"""
 
 
 def create_test_page(**kwargs):

@@ -1,5 +1,6 @@
 from django.contrib.auth import get_user_model
 from django.db import models
+            from django.utils import timezone
 
 User = get_user_model()
 
@@ -65,7 +66,6 @@ class SoftDeleteMixin(models.Model):
     def delete(self, using=None, keep_parents=False, soft=True):
         """Override delete to provide soft delete by default"""
         if soft:
-            from django.utils import timezone
 
             self.is_deleted = True
             self.deleted_at = timezone.now()

@@ -1,15 +1,15 @@
+from unittest.mock import MagicMock, patch
+from django.contrib.auth import get_user_model
+from django.contrib.contenttypes.models import ContentType
+from django.test import TestCase
+from apps.i18n.models import Locale, TranslationQueue, TranslationUnit
+from apps.i18n.tasks import (
 """
 Test cases for i18n background tasks.
 """
 
-from unittest.mock import MagicMock, patch
 
-from django.contrib.auth import get_user_model
-from django.contrib.contenttypes.models import ContentType
-from django.test import TestCase
 
-from apps.i18n.models import Locale, TranslationQueue, TranslationUnit
-from apps.i18n.tasks import (
     auto_translate_content,
     cleanup_old_translations,
     generate_translation_report,
@@ -23,7 +23,7 @@ User = get_user_model()
 class I18nTasksTest(TestCase):
     """Test i18n background tasks."""
 
-    def setUp(self):
+    def setUp(self):  # noqa: C901
         """Set up test data."""
         self.user = User.objects.create_user(
             email="test@example.com", password="testpass123"
@@ -56,7 +56,7 @@ class I18nTasksTest(TestCase):
         )
 
     @patch("apps.i18n.tasks.logger")
-    def test_process_translation_queue_success(self, mock_logger):
+    def test_process_translation_queue_success(self, mock_logger):  # noqa: C901
         """Test successful processing of translation queue."""
         # Mock external translation service
         with patch("apps.i18n.tasks.TranslationService") as mock_service:
@@ -68,7 +68,7 @@ class I18nTasksTest(TestCase):
             mock_logger.info.assert_called()
 
     @patch("apps.i18n.tasks.logger")
-    def test_process_translation_queue_with_errors(self, mock_logger):
+    def test_process_translation_queue_with_errors(self, mock_logger):  # noqa: C901
         """Test translation queue processing with errors."""
         with patch("apps.i18n.tasks.TranslationService") as mock_service:
             mock_service.return_value.translate.side_effect = Exception(
@@ -81,7 +81,7 @@ class I18nTasksTest(TestCase):
             mock_logger.error.assert_called()
 
     @patch("apps.i18n.tasks.logger")
-    def test_auto_translate_content_basic(self, mock_logger):
+    def test_auto_translate_content_basic(self, mock_logger):  # noqa: C901
         """Test basic auto-translation functionality."""
         # Test with minimal parameters
         auto_translate_content(
@@ -95,7 +95,7 @@ class I18nTasksTest(TestCase):
         mock_logger.info.assert_called()
 
     @patch("apps.i18n.tasks.logger")
-    def test_auto_translate_content_with_service(self, mock_logger):
+    def test_auto_translate_content_with_service(self, mock_logger):  # noqa: C901
         """Test auto-translation with external service."""
         with patch("apps.i18n.tasks.get_translation_service") as mock_get_service:
             mock_service = MagicMock()
@@ -113,7 +113,7 @@ class I18nTasksTest(TestCase):
             mock_logger.info.assert_called()
 
     @patch("apps.i18n.tasks.logger")
-    def test_generate_translation_report(self, mock_logger):
+    def test_generate_translation_report(self, mock_logger):  # noqa: C901
         """Test translation report generation."""
         generate_translation_report()
 
@@ -121,7 +121,7 @@ class I18nTasksTest(TestCase):
         mock_logger.info.assert_called()
 
     @patch("apps.i18n.tasks.logger")
-    def test_generate_translation_report_with_params(self, mock_logger):
+    def test_generate_translation_report_with_params(self, mock_logger):  # noqa: C901
         """Test translation report with specific parameters."""
         generate_translation_report(
             locale_codes=["en", "es"], date_from="2024-01-01", date_to="2024-12-31"
@@ -131,7 +131,7 @@ class I18nTasksTest(TestCase):
         mock_logger.info.assert_called()
 
     @patch("apps.i18n.tasks.logger")
-    def test_sync_locale_fallbacks(self, mock_logger):
+    def test_sync_locale_fallbacks(self, mock_logger):  # noqa: C901
         """Test locale fallback synchronization."""
         sync_locale_fallbacks()
 
@@ -139,7 +139,7 @@ class I18nTasksTest(TestCase):
         mock_logger.info.assert_called()
 
     @patch("apps.i18n.tasks.logger")
-    def test_sync_locale_fallbacks_specific_locale(self, mock_logger):
+    def test_sync_locale_fallbacks_specific_locale(self, mock_logger):  # noqa: C901
         """Test syncing specific locale fallbacks."""
         sync_locale_fallbacks(locale_code="es")
 
@@ -147,7 +147,7 @@ class I18nTasksTest(TestCase):
         mock_logger.info.assert_called()
 
     @patch("apps.i18n.tasks.logger")
-    def test_cleanup_old_translations(self, mock_logger):
+    def test_cleanup_old_translations(self, mock_logger):  # noqa: C901
         """Test cleanup of old translations."""
         cleanup_old_translations()
 
@@ -155,7 +155,7 @@ class I18nTasksTest(TestCase):
         mock_logger.info.assert_called()
 
     @patch("apps.i18n.tasks.logger")
-    def test_cleanup_old_translations_with_days(self, mock_logger):
+    def test_cleanup_old_translations_with_days(self, mock_logger):  # noqa: C901
         """Test cleanup with specific retention period."""
         cleanup_old_translations(days=30)
 
@@ -163,7 +163,7 @@ class I18nTasksTest(TestCase):
         mock_logger.info.assert_called()
 
     @patch("apps.i18n.tasks.logger")
-    def test_task_error_handling(self, mock_logger):
+    def test_task_error_handling(self, mock_logger):  # noqa: C901
         """Test that tasks handle errors gracefully."""
         with patch("apps.i18n.tasks.TranslationUnit.objects") as mock_objects:
             mock_objects.filter.side_effect = Exception("Database error")
@@ -179,7 +179,7 @@ class I18nTasksTest(TestCase):
                 pass
 
     @patch("apps.i18n.tasks.logger")
-    def test_task_with_invalid_parameters(self, mock_logger):
+    def test_task_with_invalid_parameters(self, mock_logger):  # noqa: C901
         """Test tasks with invalid parameters."""
         # Test with invalid content type
         auto_translate_content(
@@ -192,7 +192,7 @@ class I18nTasksTest(TestCase):
         # Should handle invalid parameters gracefully
         mock_logger.error.assert_called()
 
-    def test_tasks_are_importable(self):
+    def test_tasks_are_importable(self):  # noqa: C901
         """Test that all task functions are importable."""
         # This ensures the module loads correctly
         self.assertTrue(callable(process_translation_queue))

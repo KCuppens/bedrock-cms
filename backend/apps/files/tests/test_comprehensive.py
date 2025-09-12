@@ -1,15 +1,11 @@
-"""
-Files app tests with high coverage and real database operations.
-"""
-
 import tempfile
 from io import BytesIO
 
 from django.contrib.auth import get_user_model
+from django.core.exceptions import ValidationError
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase, override_settings
 from django.urls import reverse
-
 from PIL import Image
 from rest_framework import status
 from rest_framework.test import APIClient, APITestCase
@@ -18,6 +14,14 @@ from apps.files import services
 from apps.files.models import File, FileTag, FileVersion, MediaCategory
 from apps.files.serializers import FileSerializer, FileUploadSerializer
 from apps.files.views import FileViewSet
+
+"""
+Files app tests with high coverage and real database operations.
+"""
+
+
+
+
 
 User = get_user_model()
 
@@ -100,7 +104,6 @@ class FilesModelTests(TestCase):
         # Empty name should fail
 
         if hasattr(file_obj, "clean"):
-            from django.core.exceptions import ValidationError
 
             with self.assertRaises(ValidationError):
                 file_obj.clean()

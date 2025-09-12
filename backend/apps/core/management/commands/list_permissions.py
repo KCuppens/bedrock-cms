@@ -1,10 +1,10 @@
-"""
-Management command to list all permissions in the system.
-"""
-
 from django.contrib.auth.models import Permission
 from django.contrib.contenttypes.models import ContentType
 from django.core.management.base import BaseCommand
+
+"""
+Management command to list all permissions in the system.
+"""
 
 
 class Command(BaseCommand):

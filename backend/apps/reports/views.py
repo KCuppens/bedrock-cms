@@ -1,12 +1,7 @@
-"""
-Reports API views for CMS background jobs and analytics.
-"""
-
-from django.db.models import Count, Q
-from django.utils import timezone
-
 from celery import current_app
 from celery.result import AsyncResult
+from django.db.models import Count, Q
+from django.utils import timezone
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAdminUser, IsAuthenticated
@@ -17,10 +12,14 @@ from apps.cms.tasks import check_internal_links, check_single_page_links
 from apps.i18n.models import Locale, TranslationUnit
 from apps.i18n.tasks import seed_locale_translation_units
 
+"""
+Reports API views for CMS background jobs and analytics.
+"""
+
 
 @api_view(["GET", "POST"])
 @permission_classes([IsAuthenticated, IsAdminUser])
-def broken_links_report(request):
+def broken_links_report(request):  # noqa: C901
     """
     Get broken links report or trigger a new link check.
 
@@ -86,7 +85,7 @@ def broken_links_report(request):
 
 @api_view(["GET"])
 @permission_classes([IsAuthenticated, IsAdminUser])
-def translation_digest(request):
+def translation_digest(request):  # noqa: C901
     """
     Get missing translations digest per locale.
 
@@ -163,7 +162,7 @@ def translation_digest(request):
 
 @api_view(["GET"])
 @permission_classes([IsAuthenticated, IsAdminUser])
-def task_status(request, task_id):
+def task_status(request, task_id):  # noqa: C901
     """
     Get status of a Celery task.
 
@@ -201,7 +200,7 @@ def task_status(request, task_id):
 
 @api_view(["POST"])
 @permission_classes([IsAuthenticated, IsAdminUser])
-def seed_locale(request):
+def seed_locale(request):  # noqa: C901
     """
     Trigger locale seeding task.
 
@@ -247,7 +246,7 @@ def seed_locale(request):
 
 @api_view(["GET"])
 @permission_classes([IsAuthenticated, IsAdminUser])
-def reports_overview(request):
+def reports_overview(request):  # noqa: C901
     """
     Get overview of available reports and recent activity.
 

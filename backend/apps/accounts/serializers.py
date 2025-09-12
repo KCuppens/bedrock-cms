@@ -1,8 +1,7 @@
-from django.contrib.auth import get_user_model
-from django.contrib.auth.password_validation import validate_password
-
 from allauth.account.adapter import get_adapter
 from allauth.account.utils import setup_user_email
+from django.contrib.auth import get_user_model
+from django.contrib.auth.password_validation import validate_password
 from rest_framework import serializers
 
 from .models import UserProfile
@@ -66,7 +65,7 @@ class UserSerializer(serializers.ModelSerializer):
             "updated_at",
         ]
 
-    def get_avatar_url(self, obj):
+    def get_avatar_url(self, obj):  # noqa: C901
         """Get avatar URL"""
         if obj.avatar:
             request = self.context.get("request")
@@ -84,7 +83,7 @@ class UserRegistrationSerializer(serializers.Serializer):
     password1 = serializers.CharField(write_only=True)
     password2 = serializers.CharField(write_only=True)
 
-    def validate_email(self, email):
+    def validate_email(self, email):  # noqa: C901
         """Validate email is not already registered"""
         email = get_adapter().clean_email(email)
         if User.objects.filter(email__iexact=email).exists():
@@ -93,7 +92,7 @@ class UserRegistrationSerializer(serializers.Serializer):
             )
         return email
 
-    def validate(self, data):
+    def validate(self, data):  # noqa: C901
         """Validate passwords match and meet requirements"""
         if data["password1"] != data["password2"]:
             raise serializers.ValidationError("The two password fields didn't match.")
@@ -106,7 +105,7 @@ class UserRegistrationSerializer(serializers.Serializer):
 
         return data
 
-    def save(self, request):
+    def save(self, request):  # noqa: C901
         """Create and return a new user"""
         adapter = get_adapter()
         user = adapter.new_user(request)
@@ -127,7 +126,7 @@ class PasswordChangeSerializer(serializers.Serializer):
     new_password1 = serializers.CharField(write_only=True)
     new_password2 = serializers.CharField(write_only=True)
 
-    def validate_old_password(self, value):
+    def validate_old_password(self, value):  # noqa: C901
         """Validate old password is correct"""
         user = self.context["request"].user
         if not user.check_password(value):
@@ -136,7 +135,7 @@ class PasswordChangeSerializer(serializers.Serializer):
             )
         return value
 
-    def validate(self, data):
+    def validate(self, data):  # noqa: C901
         """Validate new passwords match and meet requirements"""
         if data["new_password1"] != data["new_password2"]:
             raise serializers.ValidationError("The two password fields didn't match.")
@@ -150,7 +149,7 @@ class PasswordChangeSerializer(serializers.Serializer):
 
         return data
 
-    def save(self):
+    def save(self):  # noqa: C901
         """Change user password"""
         user = self.context["request"].user
         password = self.validated_data["new_password1"]
@@ -168,7 +167,7 @@ class UserUpdateSerializer(serializers.ModelSerializer):
         model = User
         fields = ["first_name", "last_name", "name", "avatar", "profile"]
 
-    def update(self, instance, validated_data):
+    def update(self, instance, validated_data):  # noqa: C901
         """Update user and profile"""
         profile_data = validated_data.pop("profile", None)
 

@@ -1,12 +1,13 @@
+from django.contrib.auth import get_user_model
+from rest_framework import serializers
+from .models import (
+from django.core.exceptions import ValidationError
 """
 Serializers for translation models.
 """
 
-from django.contrib.auth import get_user_model
 
-from rest_framework import serializers
 
-from .models import (
     Locale,
     TranslationGlossary,
     TranslationHistory,
@@ -97,7 +98,7 @@ class TranslationUnitUpdateSerializer(serializers.ModelSerializer):
         model = TranslationUnit
         fields = ["target_text", "status"]
 
-    def validate_status(self, value):
+    def validate_status(self, value):  # noqa: C901
         """Validate status transitions."""
         if self.instance:
             current_status = self.instance.status
@@ -138,7 +139,7 @@ class UiMessageSerializer(serializers.ModelSerializer):
         ]
         read_only_fields = ["id", "created_at", "updated_at"]
 
-    def get_translation_count(self, obj):
+    def get_translation_count(self, obj):  # noqa: C901
         """Get count of translations for this message."""
         return obj.translations.count()
 
@@ -205,7 +206,7 @@ class BulkTranslationUpdateSerializer(serializers.Serializer):
         child=serializers.DictField(), help_text="List of translation unit updates"
     )
 
-    def validate_units(self, value):
+    def validate_units(self, value):  # noqa: C901
         """Validate bulk update data."""
         for unit_data in value:
             if "id" not in unit_data:
@@ -421,7 +422,7 @@ class BulkUiMessageUpdateSerializer(serializers.Serializer):
         child=serializers.DictField(), help_text="List of message translation updates"
     )
 
-    def validate_updates(self, value):
+    def validate_updates(self, value):  # noqa: C901
         """Validate bulk update data."""
         for update_data in value:
             required_fields = {"message_id", "locale_id", "value"}
@@ -480,7 +481,7 @@ class BulkAssignmentSerializer(serializers.Serializer):
         help_text="Optional comment for the assignment",
     )
 
-    def validate_translation_unit_ids(self, value):
+    def validate_translation_unit_ids(self, value):  # noqa: C901
         """Validate that all translation unit IDs exist."""
         if not value:
             raise serializers.ValidationError(

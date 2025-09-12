@@ -10,6 +10,10 @@ from apps.cms.models import Page, Redirect
 from apps.cms.seo import SeoSettings
 from apps.cms.seo_utils import deep_merge_dicts, resolve_seo
 from apps.i18n.models import Locale
+        from django.contrib.auth.models import Permission
+        from django.core.management import call_command
+        from apps.cms.seo_utils import generate_canonical_url
+        from apps.cms.seo_utils import generate_hreflang_alternates
 
 User = get_user_model()
 
@@ -17,12 +21,12 @@ User = get_user_model()
 class LocaleModelTest(TestCase):
     """Test cases for Locale model."""
 
-    def test_create_locale(self):
+    def test_create_locale(self):  # noqa: C901
         """Test creating a locale."""
         locale = Locale.objects.create(code="en", name="English", native_name="English")
         self.assertEqual(str(locale), "English (en)")
 
-    def test_default_locale_constraint(self):
+    def test_default_locale_constraint(self):  # noqa: C901
         """Test that only one locale can be default."""
         Locale.objects.create(
             code="en", name="English", native_name="English", is_default=True
@@ -40,18 +44,18 @@ class LocaleModelTest(TestCase):
 class PageModelTest(TestCase):
     """Test cases for Page model."""
 
-    def setUp(self):
+    def setUp(self):  # noqa: C901
         self.locale = Locale.objects.create(
             code="en", name="English", native_name="English"
         )
 
-    def test_create_page(self):
+    def test_create_page(self):  # noqa: C901
         """Test creating a basic page."""
         page = Page.objects.create(title="Home", slug="home", locale=self.locale)
         self.assertEqual(page.path, "/home")
         self.assertEqual(str(page), "Home (English (en))")
 
-    def test_compute_path_nested(self):
+    def test_compute_path_nested(self):  # noqa: C901
         """Test path computation for nested pages."""
         parent = Page.objects.create(title="About", slug="about", locale=self.locale)
         child = Page.objects.create(
@@ -65,7 +69,7 @@ class PageModelTest(TestCase):
         self.assertEqual(child.path, "/about/team")
         self.assertEqual(grandchild.path, "/about/team/leadership")
 
-    def test_reparent_updates_descendant_paths(self):
+    def test_reparent_updates_descendant_paths(self):  # noqa: C901
         """Test that reparenting a page updates descendant paths."""
         # Create initial structure: /products/software/features
         products = Page.objects.create(
@@ -95,7 +99,7 @@ class PageModelTest(TestCase):
         self.assertEqual(software.path, "/solutions/software")
         self.assertEqual(features.path, "/solutions/software/features")
 
-    def test_siblings_resequence(self):
+    def test_siblings_resequence(self):  # noqa: C901
         """Test sibling position resequencing."""
         parent = Page.objects.create(title="Parent", slug="parent", locale=self.locale)
 
@@ -130,7 +134,7 @@ class PageModelTest(TestCase):
         positions = [child.position for child in children]
         self.assertEqual(positions, [0, 1, 2])
 
-    def test_unique_constraint(self):
+    def test_unique_constraint(self):  # noqa: C901
         """Test unique constraint on (locale, parent, slug)."""
         parent = Page.objects.create(title="Parent", slug="parent", locale=self.locale)
         Page.objects.create(
@@ -143,7 +147,7 @@ class PageModelTest(TestCase):
                 title="Child 2", slug="child", parent=parent, locale=self.locale
             )
 
-    def test_same_slug_different_parent_allowed(self):
+    def test_same_slug_different_parent_allowed(self):  # noqa: C901
         """Test same slug under different parents is allowed."""
         parent1 = Page.objects.create(
             title="Parent 1", slug="parent1", locale=self.locale
@@ -166,19 +170,19 @@ class PageModelTest(TestCase):
 class RedirectModelTest(TestCase):
     """Test cases for Redirect model."""
 
-    def setUp(self):
+    def setUp(self):  # noqa: C901
         self.locale = Locale.objects.create(
             code="en", name="English", native_name="English"
         )
 
-    def test_create_redirect(self):
+    def test_create_redirect(self):  # noqa: C901
         """Test creating a redirect."""
         redirect = Redirect.objects.create(
             from_path="/old-page", to_path="/new-page", locale=self.locale
         )
         self.assertEqual(str(redirect), "/old-page -> /new-page (301)")
 
-    def test_clean_normalizes_paths(self):
+    def test_clean_normalizes_paths(self):  # noqa: C901
         """Test that clean method normalizes paths."""
         redirect = Redirect(
             from_path="old-page/", to_path="new-page/", locale=self.locale
@@ -188,7 +192,7 @@ class RedirectModelTest(TestCase):
         self.assertEqual(redirect.from_path, "/old-page")
         self.assertEqual(redirect.to_path, "/new-page")
 
-    def test_self_redirect_blocked(self):
+    def test_self_redirect_blocked(self):  # noqa: C901
         """Test that self-redirects are blocked."""
         redirect = Redirect(
             from_path="/same-page", to_path="/same-page", locale=self.locale
@@ -201,7 +205,7 @@ class RedirectModelTest(TestCase):
 class BlockValidationTest(TestCase):
     """Test cases for block validation."""
 
-    def test_valid_blocks(self):
+    def test_valid_blocks(self):  # noqa: C901
         """Test validation of valid blocks."""
         valid_blocks = [
             {"type": "hero", "props": {"title": "Welcome", "subtitle": "To our site"}},
@@ -223,14 +227,14 @@ class BlockValidationTest(TestCase):
         for block in result:
             self.assertEqual(block["schema_version"], 1)
 
-    def test_invalid_block_type(self):
+    def test_invalid_block_type(self):  # noqa: C901
         """Test validation fails for invalid block type."""
         invalid_blocks = [{"type": "invalid_type", "props": {}}]
 
         with self.assertRaises(Exception):
             validate_blocks(invalid_blocks)
 
-    def test_missing_block_type(self):
+    def test_missing_block_type(self):  # noqa: C901
         """Test validation fails for missing block type."""
         invalid_blocks = [{"props": {"title": "No type"}}]
 
@@ -241,7 +245,7 @@ class BlockValidationTest(TestCase):
 class PagesAPITest(APITestCase):
     """Test cases for Pages API endpoints."""
 
-    def setUp(self):
+    def setUp(self):  # noqa: C901
         self.locale = Locale.objects.create(
             code="en", name="English", native_name="English", is_default=True
         )
@@ -249,7 +253,6 @@ class PagesAPITest(APITestCase):
             email="test@example.com", password="testpass123"
         )
         # Add CMS permissions
-        from django.contrib.auth.models import Permission
 
         permissions = Permission.objects.filter(content_type__app_label="cms")
         self.user.user_permissions.set(permissions)
@@ -258,7 +261,7 @@ class PagesAPITest(APITestCase):
             title="Home", slug="home", locale=self.locale, status="published"
         )
 
-    def test_get_page_by_path_public(self):
+    def test_get_page_by_path_public(self):  # noqa: C901
         """Test getting published page by path (public access)."""
         url = reverse("pages-get-by-path")
         response = self.client.get(url, {"path": "/home", "locale": "en"})
@@ -266,7 +269,7 @@ class PagesAPITest(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data["title"], "Home")
 
-    def test_get_page_by_path_draft_unauthorized(self):
+    def test_get_page_by_path_draft_unauthorized(self):  # noqa: C901
         """Test getting draft page without authentication fails."""
         self.page.status = "draft"
         self.page.save()
@@ -276,7 +279,7 @@ class PagesAPITest(APITestCase):
 
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
-    def test_get_page_by_path_with_preview_token(self):
+    def test_get_page_by_path_with_preview_token(self):  # noqa: C901
         """Test getting draft page with valid preview token."""
         self.page.status = "draft"
         self.page.save()
@@ -289,7 +292,7 @@ class PagesAPITest(APITestCase):
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-    def test_create_page_authenticated(self):
+    def test_create_page_authenticated(self):  # noqa: C901
         """Test creating a page with authentication."""
         self.client.force_authenticate(user=self.user)
 
@@ -306,7 +309,7 @@ class PagesAPITest(APITestCase):
         page = Page.objects.get(slug="about")
         self.assertEqual(page.position, 1)  # After existing 'home' page
 
-    def test_create_page_unauthenticated_fails(self):
+    def test_create_page_unauthenticated_fails(self):  # noqa: C901
         """Test creating a page without authentication fails."""
         url = reverse("pages-list")
         data = {"title": "About Us", "slug": "about", "locale": self.locale.code}
@@ -314,7 +317,7 @@ class PagesAPITest(APITestCase):
 
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
-    def test_move_page(self):
+    def test_move_page(self):  # noqa: C901
         """Test moving a page."""
         self.client.force_authenticate(user=self.user)
 
@@ -335,7 +338,7 @@ class PagesAPITest(APITestCase):
         self.assertEqual(self.page.parent, parent)
         self.assertEqual(self.page.path, "/products/home")
 
-    def test_publish_page(self):
+    def test_publish_page(self):  # noqa: C901
         """Test publishing a page."""
         self.client.force_authenticate(user=self.user)
 
@@ -351,7 +354,7 @@ class PagesAPITest(APITestCase):
         self.assertEqual(self.page.status, "published")
         self.assertIsNotNone(self.page.published_at)
 
-    def test_block_editing(self):
+    def test_block_editing(self):  # noqa: C901
         """Test inline block editing."""
         self.client.force_authenticate(user=self.user)
 
@@ -369,7 +372,7 @@ class PagesAPITest(APITestCase):
         self.page.refresh_from_db()
         self.assertEqual(self.page.blocks[0]["props"]["title"], "Updated Title")
 
-    def test_insert_block(self):
+    def test_insert_block(self):  # noqa: C901
         """Test inserting a new block."""
         self.client.force_authenticate(user=self.user)
 
@@ -386,7 +389,7 @@ class PagesAPITest(APITestCase):
         self.assertEqual(len(self.page.blocks), 1)
         self.assertEqual(self.page.blocks[0]["type"], "rich_text")
 
-    def test_tree_endpoint(self):
+    def test_tree_endpoint(self):  # noqa: C901
         """Test getting navigation tree."""
         # Create tree structure
         products = Page.objects.create(
@@ -416,7 +419,7 @@ class PagesAPITest(APITestCase):
 class SitemapTest(TestCase):
     """Test cases for sitemap generation."""
 
-    def setUp(self):
+    def setUp(self):  # noqa: C901
         self.locale = Locale.objects.create(
             code="en", name="English", native_name="English", is_active=True
         )
@@ -431,7 +434,7 @@ class SitemapTest(TestCase):
             title="Draft", slug="draft", locale=self.locale, status="draft"
         )
 
-    def test_sitemap_generation(self):
+    def test_sitemap_generation(self):  # noqa: C901
         """Test XML sitemap generation."""
         response = self.client.get("/api/v1/cms/sitemap-en.xml")
 
@@ -443,7 +446,7 @@ class SitemapTest(TestCase):
         self.assertIn("<loc>http://localhost:8000/about</loc>", content)
         self.assertNotIn("/draft", content)  # Draft should not appear
 
-    def test_sitemap_invalid_locale(self):
+    def test_sitemap_invalid_locale(self):  # noqa: C901
         """Test sitemap with invalid locale returns 404."""
         response = self.client.get("/api/v1/cms/sitemap-invalid.xml")
         self.assertEqual(response.status_code, 404)
@@ -452,7 +455,7 @@ class SitemapTest(TestCase):
 class ManagementCommandTest(TestCase):
     """Test cases for management commands."""
 
-    def setUp(self):
+    def setUp(self):  # noqa: C901
         self.locale = Locale.objects.create(
             code="en", name="English", native_name="English"
         )
@@ -470,9 +473,8 @@ class ManagementCommandTest(TestCase):
             path="/also-wrong",  # Intentionally wrong
         )
 
-    def test_rebuild_paths_command(self):
+    def test_rebuild_paths_command(self):  # noqa: C901
         """Test the rebuild_paths management command."""
-        from django.core.management import call_command
 
         # Manually corrupt the paths using update() to bypass save()
         Page.objects.filter(id=self.parent.id).update(path="/wrong-path")
@@ -500,12 +502,12 @@ class ManagementCommandTest(TestCase):
 class SeoModelsTest(TestCase):
     """Test cases for SEO models."""
 
-    def setUp(self):
+    def setUp(self):  # noqa: C901
         self.locale = Locale.objects.create(
             code="en", name="English", native_name="English", is_default=True
         )
 
-    def test_seo_settings_creation(self):
+    def test_seo_settings_creation(self):  # noqa: C901
         """Test creating SEO settings."""
         seo_settings = SeoSettings.objects.create(
             locale=self.locale,
@@ -517,7 +519,7 @@ class SeoModelsTest(TestCase):
         self.assertEqual(str(seo_settings), "SEO Settings for English")
         self.assertEqual(seo_settings.title_suffix, " - My Site")
 
-    def test_seo_settings_removed_section_defaults(self):
+    def test_seo_settings_removed_section_defaults(self):  # noqa: C901
         """Test that section-based SEO defaults were removed for simplicity."""
         # Note: SeoDefaults model was removed. All SEO configuration
         # is now handled at the global (per-locale) level via SeoSettings.
@@ -527,7 +529,7 @@ class SeoModelsTest(TestCase):
 class SeoUtilsTest(TestCase):
     """Test cases for SEO utilities."""
 
-    def setUp(self):
+    def setUp(self):  # noqa: C901
         self.locale = Locale.objects.create(
             code="en", name="English", native_name="English", is_default=True
         )
@@ -539,7 +541,7 @@ class SeoUtilsTest(TestCase):
             title="Test Page", slug="test", locale=self.locale, status="published"
         )
 
-    def test_deep_merge_dicts(self):
+    def test_deep_merge_dicts(self):  # noqa: C901
         """Test deep dictionary merging."""
         base = {"title": "Base Title", "meta": {"description": "Base desc"}}
         override = {
@@ -555,7 +557,7 @@ class SeoUtilsTest(TestCase):
         self.assertEqual(result["meta"]["robots"], "noindex")
         self.assertEqual(result["new_field"], "new value")
 
-    def test_resolve_seo_page_only(self):
+    def test_resolve_seo_page_only(self):  # noqa: C901
         """Test SEO resolution with page data only."""
         self.page.seo = {"title": "Page Title", "description": "Page description"}
         self.page.save()
@@ -566,7 +568,7 @@ class SeoUtilsTest(TestCase):
         self.assertEqual(resolved["description"], "Page description")
         self.assertEqual(resolved["robots"], "index,follow")
 
-    def test_resolve_seo_with_global_settings(self):
+    def test_resolve_seo_with_global_settings(self):  # noqa: C901
         """Test SEO resolution with global settings."""
         # Create global SEO settings
         SeoSettings.objects.create(
@@ -585,7 +587,7 @@ class SeoUtilsTest(TestCase):
         self.assertEqual(resolved["description"], "Global description")
         self.assertEqual(resolved["robots"], "index,follow,noarchive")
 
-    def test_resolve_seo_with_section_defaults(self):
+    def test_resolve_seo_with_section_defaults(self):  # noqa: C901
         """Test SEO resolution with global defaults."""
         # Create global settings
         SeoSettings.objects.create(
@@ -603,7 +605,7 @@ class SeoUtilsTest(TestCase):
         self.assertIsInstance(resolved, dict)
         self.assertIn("title", resolved)
 
-    def test_resolve_seo_draft_forces_noindex(self):
+    def test_resolve_seo_draft_forces_noindex(self):  # noqa: C901
         """Test that draft pages get noindex robots."""
         self.page.status = "draft"
         self.page.seo = {"robots": "index,follow"}
@@ -613,16 +615,14 @@ class SeoUtilsTest(TestCase):
 
         self.assertEqual(resolved["robots"], "noindex,nofollow")
 
-    def test_generate_canonical_url(self):
+    def test_generate_canonical_url(self):  # noqa: C901
         """Test canonical URL generation."""
-        from apps.cms.seo_utils import generate_canonical_url
 
         canonical = generate_canonical_url(self.page, "https://example.com")
         self.assertEqual(canonical, "https://example.com/test")
 
-    def test_generate_hreflang_alternates(self):
+    def test_generate_hreflang_alternates(self):  # noqa: C901
         """Test hreflang alternates generation."""
-        from apps.cms.seo_utils import generate_hreflang_alternates
 
         # Create French version of same page
         Page.objects.create(
@@ -649,7 +649,7 @@ class SeoUtilsTest(TestCase):
 class SeoAPITest(APITestCase):
     """Test cases for SEO API functionality."""
 
-    def setUp(self):
+    def setUp(self):  # noqa: C901
         self.locale = Locale.objects.create(
             code="en", name="English", native_name="English", is_default=True
         )
@@ -672,7 +672,7 @@ class SeoAPITest(APITestCase):
             default_description="Default description",
         )
 
-    def test_page_api_without_seo(self):
+    def test_page_api_without_seo(self):  # noqa: C901
         """Test page API without SEO data."""
         url = reverse("pages-get-by-path")
         response = self.client.get(url, {"path": "/test", "locale": "en"})
@@ -681,7 +681,7 @@ class SeoAPITest(APITestCase):
         self.assertIsNone(response.data.get("resolved_seo"))
         self.assertIsNone(response.data.get("seo_links"))
 
-    def test_page_api_with_seo(self):
+    def test_page_api_with_seo(self):  # noqa: C901
         """Test page API with SEO data."""
         url = "/api/v1/cms/api/pages/get_by_path/"
         response = self.client.get(
@@ -702,7 +702,7 @@ class SeoAPITest(APITestCase):
         self.assertIn("canonical", seo_links)
         self.assertIn("alternates", seo_links)
 
-    def test_page_retrieve_with_seo(self):
+    def test_page_retrieve_with_seo(self):  # noqa: C901
         """Test page retrieve endpoint with SEO."""
         self.client.force_authenticate(user=self.user)
 
@@ -717,7 +717,7 @@ class SeoAPITest(APITestCase):
 class SitemapEnhancedTest(TestCase):
     """Test cases for enhanced sitemap functionality."""
 
-    def setUp(self):
+    def setUp(self):  # noqa: C901
         self.locale_en = Locale.objects.create(
             code="en", name="English", native_name="English", is_active=True
         )
@@ -739,7 +739,7 @@ class SitemapEnhancedTest(TestCase):
             group_id=self.page_en.group_id,  # Same content group
         )
 
-    def test_sitemap_basic(self):
+    def test_sitemap_basic(self):  # noqa: C901
         """Test basic sitemap generation."""
         response = self.client.get("/api/v1/cms/sitemap-en.xml")
 
@@ -750,7 +750,7 @@ class SitemapEnhancedTest(TestCase):
         self.assertIn("<loc>http://localhost:8000/home</loc>", content)
         self.assertNotIn("xhtml:link", content)  # No alternates by default
 
-    def test_sitemap_with_alternates(self):
+    def test_sitemap_with_alternates(self):  # noqa: C901
         """Test sitemap with hreflang alternates."""
         response = self.client.get("/api/v1/cms/sitemap-en.xml?alternates=1")
 
@@ -766,7 +766,7 @@ class SitemapEnhancedTest(TestCase):
         self.assertIn('href="http://localhost:8000/home"', content)
         self.assertIn('href="http://localhost:8000/accueil"', content)
 
-    def test_sitemap_invalid_locale(self):
+    def test_sitemap_invalid_locale(self):  # noqa: C901
         """Test sitemap with invalid locale."""
         response = self.client.get("/api/v1/cms/sitemap-invalid.xml")
         self.assertEqual(response.status_code, 404)

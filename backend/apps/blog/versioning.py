@@ -1,3 +1,15 @@
+import uuid
+from datetime import datetime, timedelta
+from typing import TYPE_CHECKING, Optional
+from django.contrib.auth import get_user_model
+from django.db import models, transaction
+from django.db.models import (
+from django.utils import timezone
+    from .models import BlogPost
+    from django.contrib.auth.models import AbstractUser as User
+        from .models import Tag
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 """
 Versioning and revision tracking for blog posts.
 
@@ -7,13 +19,7 @@ for blog posts, similar to the CMS page versioning system.
 
 # mypy: ignore-errors
 
-import uuid
-from datetime import datetime, timedelta
-from typing import TYPE_CHECKING, Optional
 
-from django.contrib.auth import get_user_model
-from django.db import models, transaction
-from django.db.models import (
     BooleanField,
     DateTimeField,
     ForeignKey,
@@ -22,16 +28,13 @@ from django.db.models import (
     TextField,
     UUIDField,
 )
-from django.utils import timezone
 
 if TYPE_CHECKING:
-    from .models import BlogPost
 else:
     BlogPost = "BlogPost"
 
 # Define User type properly for mypy
 if TYPE_CHECKING:
-    from django.contrib.auth.models import AbstractUser as User
 else:
     User = get_user_model()
 
@@ -207,7 +210,6 @@ class BlogPostRevision(models.Model):
         Returns:
             Updated BlogPost instance
         """
-        from .models import Tag
 
         blog_post = self.blog_post
         snapshot = self.snapshot
@@ -307,8 +309,6 @@ class BlogPostViewTracker(models.Model):
 
 
 # Signal handlers for automatic revision creation
-from django.db.models.signals import post_save
-from django.dispatch import receiver
 
 
 @receiver(post_save, sender="blog.BlogPost")

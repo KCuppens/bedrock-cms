@@ -1,16 +1,16 @@
-"""
-Basic CMS Views tests - simplified approach for quick coverage gains.
-"""
-
 from django.contrib.auth import get_user_model
 from django.test import TestCase
-
 from rest_framework import status
 from rest_framework.test import APIClient, APITestCase
 
 from apps.cms.models import Page
 from apps.cms.views import PagesViewSet
 from apps.i18n.models import Locale
+
+"""
+Basic CMS Views tests - simplified approach for quick coverage gains.
+"""
+
 
 User = get_user_model()
 

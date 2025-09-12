@@ -1,20 +1,26 @@
-"""
-Files app advanced coverage booster - deep testing of file operations.
-"""
-
 import io
 import os
 from datetime import datetime
 from unittest.mock import Mock, patch
-
 import django
+        from apps.files.models import File, FileCategory, FileTag, FileVersion  # noqa: F401
+        from apps.files.views import FileBulkOperationView, FileUploadView, FileViewSet  # noqa: F401
+        from apps.files import services  # noqa: F401
+        from apps.files.serializers import (  # noqa: F401
+        from apps.files import permissions  # noqa: F401
+        from apps.files import tasks  # noqa: F401
+"""
+Files app advanced coverage booster - deep testing of file operations.
+"""
+
+
 
 # Configure minimal Django
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "apps.config.settings.base")
 
 try:
     django.setup()
-except:
+except Exception:
     pass
 
 
@@ -22,7 +28,6 @@ def test_files_models_advanced():
     """Advanced testing of file models."""
 
     try:
-        from apps.files.models import File, FileCategory, FileTag, FileVersion
 
         # Test File model deeply
         mock_file = Mock(spec=File)
@@ -48,7 +53,7 @@ def test_files_models_advanced():
 
                 mock_file.size = 1073741824  # 1 GB
                 File.get_size_display(mock_file)
-            except:
+            except Exception:
                 pass
 
         # Test file type detection
@@ -64,14 +69,14 @@ def test_files_models_advanced():
                 mock_file.name = filename
                 try:
                     File.get_file_type(mock_file)
-                except:
+                except Exception:
                     pass
 
         # Test file validation
         if hasattr(File, "clean"):
             try:
                 File.clean(mock_file)
-            except:
+            except Exception:
                 pass
 
         # Test FileVersion model
@@ -83,7 +88,7 @@ def test_files_models_advanced():
         if hasattr(FileVersion, "__str__"):
             try:
                 FileVersion.__str__(mock_version)
-            except:
+            except Exception:
                 pass
 
         # Test FileCategory model
@@ -96,7 +101,7 @@ def test_files_models_advanced():
                 with patch.object(mock_category, "files") as mock_files:
                     mock_files.count.return_value = 10
                     FileCategory.get_file_count(mock_category)
-            except:
+            except Exception:
                 pass
 
     except ImportError:
@@ -107,7 +112,6 @@ def test_files_views_advanced():
     """Advanced testing of file views."""
 
     try:
-        from apps.files.views import FileBulkOperationView, FileUploadView, FileViewSet
 
         # Test FileViewSet advanced features
         viewset = FileViewSet()
@@ -136,7 +140,7 @@ def test_files_views_advanced():
                 # Test upload action
                 if hasattr(viewset, "upload"):
                     viewset.upload(viewset.request)
-            except:
+            except Exception:
                 pass
 
         # Test file search and filtering
@@ -144,7 +148,7 @@ def test_files_views_advanced():
             viewset.request.query_params = {"q": "test", "type": "image"}
             try:
                 viewset.search(viewset.request)
-            except:
+            except Exception:
                 pass
 
         # Test file download
@@ -156,14 +160,14 @@ def test_files_views_advanced():
 
             try:
                 viewset.download(viewset.request, pk=1)
-            except:
+            except Exception:
                 pass
 
         # Test file preview
         if hasattr(viewset, "preview"):
             try:
                 viewset.preview(viewset.request, pk=1)
-            except:
+            except Exception:
                 pass
 
         # Test bulk operations
@@ -171,14 +175,14 @@ def test_files_views_advanced():
             viewset.request.data = {"ids": [1, 2, 3]}
             try:
                 viewset.bulk_delete(viewset.request)
-            except:
+            except Exception:
                 pass
 
         if hasattr(viewset, "bulk_move"):
             viewset.request.data = {"ids": [1, 2], "category_id": 5}
             try:
                 viewset.bulk_move(viewset.request)
-            except:
+            except Exception:
                 pass
 
     except ImportError:
@@ -189,7 +193,6 @@ def test_files_services_advanced():
     """Advanced testing of file services."""
 
     try:
-        from apps.files import services
 
         # Test FileStorageService
         if hasattr(services, "FileStorageService"):
@@ -201,21 +204,21 @@ def test_files_services_advanced():
                 mock_file.name = "test.txt"
                 try:
                     storage.save(mock_file, "test.txt")
-                except:
+                except Exception:
                     pass
 
             # Test delete file
             if hasattr(storage, "delete"):
                 try:
                     storage.delete("/media/files/test.txt")
-                except:
+                except Exception:
                     pass
 
             # Test file exists
             if hasattr(storage, "exists"):
                 try:
                     storage.exists("/media/files/test.txt")
-                except:
+                except Exception:
                     pass
 
         # Test FileProcessingService
@@ -227,21 +230,21 @@ def test_files_services_advanced():
                 mock_image = Mock()
                 try:
                     processor.process_image(mock_image, width=800, height=600)
-                except:
+                except Exception:
                     pass
 
             # Test thumbnail generation
             if hasattr(processor, "generate_thumbnail"):
                 try:
                     processor.generate_thumbnail(mock_image, size=(150, 150))
-                except:
+                except Exception:
                     pass
 
             # Test file compression
             if hasattr(processor, "compress"):
                 try:
                     processor.compress("/path/to/file.zip")
-                except:
+                except Exception:
                     pass
 
         # Test FileValidationService
@@ -255,14 +258,14 @@ def test_files_services_advanced():
                 mock_file.name = "test.pdf"
                 try:
                     validator.validate(mock_file)
-                except:
+                except Exception:
                     pass
 
             # Test virus scanning
             if hasattr(validator, "scan_for_virus"):
                 try:
                     validator.scan_for_virus(mock_file)
-                except:
+                except Exception:
                     pass
 
     except ImportError:
@@ -273,7 +276,6 @@ def test_files_serializers_advanced():
     """Advanced testing of file serializers."""
 
     try:
-        from apps.files.serializers import (
             FileBulkSerializer,
             FileDetailSerializer,
             FileSerializer,
@@ -298,10 +300,10 @@ def test_files_serializers_advanced():
                 mock_file.size = 100 * 1024 * 1024  # 100MB
                 try:
                     serializer.validate_file(mock_file)
-                except:
+                except Exception:
                     pass
 
-        except:
+        except Exception:
             pass
 
         # Test FileDetailSerializer with nested relations
@@ -315,7 +317,7 @@ def test_files_serializers_advanced():
         serializer = FileDetailSerializer(mock_file)
         try:
             pass
-        except:
+        except Exception:
             pass
 
     except ImportError:
@@ -326,7 +328,6 @@ def test_files_permissions_advanced():
     """Advanced testing of file permissions."""
 
     try:
-        from apps.files import permissions
 
         # Test FilePermission
         if hasattr(permissions, "FilePermission"):
@@ -352,7 +353,7 @@ def test_files_permissions_advanced():
 
                 try:
                     perm.has_object_permission(mock_request, mock_view, mock_file)
-                except:
+                except Exception:
                     pass
 
     except ImportError:
@@ -363,7 +364,6 @@ def test_files_tasks_advanced():
     """Advanced testing of file tasks."""
 
     try:
-        from apps.files import tasks
 
         # Test file cleanup task
         if hasattr(tasks, "cleanup_orphaned_files"):
@@ -372,21 +372,21 @@ def test_files_tasks_advanced():
                 mock_filter.return_value = mock_files
                 try:
                     tasks.cleanup_orphaned_files()
-                except:
+                except Exception:
                     pass
 
         # Test file indexing task
         if hasattr(tasks, "index_file_content"):
             try:
                 tasks.index_file_content(file_id=1)
-            except:
+            except Exception:
                 pass
 
         # Test thumbnail generation task
         if hasattr(tasks, "generate_thumbnails"):
             try:
                 tasks.generate_thumbnails(file_id=1)
-            except:
+            except Exception:
                 pass
 
     except ImportError:

@@ -4,12 +4,12 @@ from django.contrib import admin
 from django.urls import include, path
 
 from drf_spectacular.views import (
+from apps.cms.views import default_sitemap_view, sitemap_view
     SpectacularAPIView,
     SpectacularRedocView,
     SpectacularSwaggerView,
 )
 
-from apps.cms.views import default_sitemap_view, sitemap_view
 
 urlpatterns = [
     # Admin

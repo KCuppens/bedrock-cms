@@ -3,9 +3,11 @@ from typing import TYPE_CHECKING
 from django.contrib.auth import get_user_model
 
 from waffle import flag_is_active, sample_is_active, switch_is_active
+    from django.contrib.auth.models import AbstractUser as User
+                    from django.http import Http404
+                    from django.http import Http404
 
 if TYPE_CHECKING:
-    from django.contrib.auth.models import AbstractUser as User
 else:
     User = get_user_model()
 
@@ -158,7 +160,6 @@ def require_feature_flag(flag_name: str):
 
             def dispatch(self, request, *args, **kwargs):
                 if not is_feature_enabled(flag_name, request):
-                    from django.http import Http404
 
                     raise Http404("Feature not available")
                 return original_dispatch(self, request, *args, **kwargs)
@@ -176,7 +177,6 @@ def require_feature_flag(flag_name: str):
                         break
 
                 if not is_feature_enabled(flag_name, request):
-                    from django.http import Http404
 
                     raise Http404("Feature not available")
 

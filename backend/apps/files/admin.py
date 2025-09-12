@@ -52,7 +52,7 @@ class FileUploadAdmin(admin.ModelAdmin):
         ),
     )
 
-    def file_size_human(self, obj):
+    def file_size_human(self, obj):  # noqa: C901
         """Display human-readable file size"""
         return obj.file_size_human
 

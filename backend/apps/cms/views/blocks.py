@@ -1,7 +1,3 @@
-"""
-API views for CMS blocks registry.
-"""
-
 from drf_spectacular.utils import extend_schema
 from rest_framework import status, views
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
@@ -9,6 +5,10 @@ from rest_framework.response import Response
 
 from ..blocks.validation import BLOCK_MODELS
 from ..models import BlockType
+
+"""
+API views for CMS blocks registry.
+"""
 
 
 class BlockTypesView(views.APIView):

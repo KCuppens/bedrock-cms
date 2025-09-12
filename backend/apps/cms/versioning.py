@@ -1,3 +1,12 @@
+import uuid
+from datetime import timedelta
+from typing import TYPE_CHECKING, Any
+from django.contrib.auth import get_user_model
+from django.contrib.contenttypes.fields import GenericForeignKey
+from django.contrib.contenttypes.models import ContentType
+from django.db import models
+from django.utils import timezone
+    from .models import Page
 """
 Versioning and audit models for the CMS.
 
@@ -6,18 +15,9 @@ This module provides content versioning, autosave, and audit trail functionality
 
 # mypy: ignore-errors
 
-import uuid
-from datetime import timedelta
-from typing import TYPE_CHECKING, Any
 
-from django.contrib.auth import get_user_model
-from django.contrib.contenttypes.fields import GenericForeignKey
-from django.contrib.contenttypes.models import ContentType
-from django.db import models
-from django.utils import timezone
 
 if TYPE_CHECKING:
-    from .models import Page
 
 
 User = get_user_model()

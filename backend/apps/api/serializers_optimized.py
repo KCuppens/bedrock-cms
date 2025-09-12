@@ -1,13 +1,13 @@
+from rest_framework import serializers
+
+from .models import Note
+
 """
 Optimized serializers for list views to prevent over-fetching.
 
 These serializers provide lightweight representations for list views,
 reducing the amount of data transferred and processed.
 """
-
-from rest_framework import serializers
-
-from .models import Note
 
 
 class NoteListSerializer(serializers.ModelSerializer):

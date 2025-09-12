@@ -1,3 +1,10 @@
+from django.contrib.auth.models import Permission
+from django.contrib.contenttypes.models import ContentType
+from django.core.management.base import BaseCommand
+from django.db import transaction
+
+from apps.core.model_permissions import get_all_custom_permissions
+
 """
 Management command to apply custom permissions to all models.
 
@@ -5,13 +12,6 @@ Usage:
     python manage.py apply_model_permissions
     python manage.py apply_model_permissions --dry-run
 """
-
-from django.contrib.auth.models import Permission
-from django.contrib.contenttypes.models import ContentType
-from django.core.management.base import BaseCommand
-from django.db import transaction
-
-from apps.core.model_permissions import get_all_custom_permissions
 
 
 class Command(BaseCommand):
@@ -110,7 +110,7 @@ class Command(BaseCommand):
                     try:
                         # Try to access the model class
                         perm.content_type.model_class()
-                    except:
+                    except Exception:
                         orphaned.append(perm)
 
                 if orphaned:

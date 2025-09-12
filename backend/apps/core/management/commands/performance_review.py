@@ -1,7 +1,3 @@
-"""
-Management command for comprehensive performance review of Bedrock CMS.
-"""
-
 import json
 import statistics
 import time
@@ -17,6 +13,10 @@ from apps.blog.models import BlogPost
 from apps.cms.blocks.validation import validate_blocks
 from apps.cms.models import Page
 from apps.media.models import Asset
+
+"""
+Management command for comprehensive performance review of Bedrock CMS.
+"""
 
 
 class Command(BaseCommand):

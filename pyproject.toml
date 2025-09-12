@@ -34,7 +34,7 @@ profile = "black"
 line_length = 88
 skip = [
     ".venv",
-    "venv", 
+    "venv",
     "env",
     "ENV",
     ".env",

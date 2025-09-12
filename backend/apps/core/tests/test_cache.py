@@ -1,21 +1,25 @@
+from unittest.mock import MagicMock, patch
+from django.contrib.auth import get_user_model
+from django.core.cache import cache
+from django.test import TestCase, override_settings
+from apps.core.cache import CacheKeyBuilder, CacheManager, cache_manager
+from apps.core.signals import (
+from apps.i18n.models import Locale
+        from apps.core.cache import CACHE_TIMEOUTS
+        from apps.core.cache import CACHE_PREFIXES
+        import time
+        import time
 """
 Tests for caching functionality.
 """
 
-from unittest.mock import MagicMock, patch
 
-from django.contrib.auth import get_user_model
-from django.core.cache import cache
-from django.test import TestCase, override_settings
 
-from apps.core.cache import CacheKeyBuilder, CacheManager, cache_manager
-from apps.core.signals import (
     invalidate_all_cache,
     invalidate_blog_cache,
     invalidate_content_cache,
     invalidate_page_cache,
 )
-from apps.i18n.models import Locale
 
 User = get_user_model()
 
@@ -276,7 +280,6 @@ class CacheIntegrationTests(TestCase):
 
     def test_cache_timeouts_configuration(self):
         """Test that cache timeouts are properly configured."""
-        from apps.core.cache import CACHE_TIMEOUTS
 
         self.assertIn("page", CACHE_TIMEOUTS)
         self.assertIn("content", CACHE_TIMEOUTS)
@@ -290,7 +293,6 @@ class CacheIntegrationTests(TestCase):
 
     def test_cache_key_prefixes(self):
         """Test cache key prefix configuration."""
-        from apps.core.cache import CACHE_PREFIXES
 
         self.assertIn("page", CACHE_PREFIXES)
         self.assertIn("content", CACHE_PREFIXES)
@@ -377,7 +379,6 @@ class CachePerformanceTests(TestCase):
 
     def test_cache_key_generation_performance(self):
         """Test that cache key generation is fast."""
-        import time
 
         key_builder = CacheKeyBuilder()
 
@@ -396,7 +397,6 @@ class CachePerformanceTests(TestCase):
 
     def test_cache_operations_performance(self):
         """Test basic cache operations performance."""
-        import time
 
         start_time = time.time()
 

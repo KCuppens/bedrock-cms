@@ -1,19 +1,26 @@
+import os
+from datetime import datetime
+from unittest.mock import Mock, patch
+import django
+        from apps.cms.views import blocks, pages, registry  # noqa: F401
+            from apps.cms.views.blocks import BlockViewSet  # noqa: F401
+            from apps.cms.views.registry import RegistryViewSet  # noqa: F401
+        from apps.cms.views import permissions  # noqa: F401
+        from apps.cms.views import mixins  # noqa: F401
+        from apps.cms.views import filters  # noqa: F401
+        from apps.cms.views import pagination  # noqa: F401
 """
 CMS views deep coverage booster - targeting untested view methods.
 """
 
-import os
-from datetime import datetime
-from unittest.mock import Mock, patch
 
-import django
 
 # Configure minimal Django
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "apps.config.settings.base")
 
 try:
     django.setup()
-except:
+except Exception:
     pass
 
 
@@ -21,7 +28,6 @@ def test_cms_views_deep():
     """Deep test of CMS views focusing on uncovered areas."""
 
     try:
-        from apps.cms.views import blocks, pages, registry
 
         # Test PageViewSet deeply
         try:
@@ -50,7 +56,7 @@ def test_cms_views_deep():
                 # Test serializer selection
                 try:
                     viewset.get_serializer_class()
-                except:
+                except Exception:
                     pass
 
                 # Test permissions
@@ -58,7 +64,7 @@ def test_cms_views_deep():
                     perms = viewset.get_permissions()
                     for perm in perms:
                         perm.has_permission(viewset.request, viewset)
-                except:
+                except Exception:
                     pass
 
             # Test queryset filtering
@@ -81,14 +87,14 @@ def test_cms_views_deep():
                 }
                 try:
                     viewset.get_queryset()
-                except:
+                except Exception:
                     pass
 
                 # Test with draft status
                 viewset.request.query_params = {"status": "draft"}
                 try:
                     viewset.get_queryset()
-                except:
+                except Exception:
                     pass
 
             # Test custom actions
@@ -98,7 +104,7 @@ def test_cms_views_deep():
                 viewset.get_object = Mock(return_value=mock_page)
                 try:
                     viewset.publish(viewset.request, pk=1)
-                except:
+                except Exception:
                     pass
 
             if hasattr(viewset, "unpublish"):
@@ -107,7 +113,7 @@ def test_cms_views_deep():
                 viewset.get_object = Mock(return_value=mock_page)
                 try:
                     viewset.unpublish(viewset.request, pk=1)
-                except:
+                except Exception:
                     pass
 
             if hasattr(viewset, "schedule"):
@@ -120,7 +126,7 @@ def test_cms_views_deep():
                 viewset.get_object = Mock(return_value=mock_page)
                 try:
                     viewset.schedule(viewset.request, pk=1)
-                except:
+                except Exception:
                     pass
 
             if hasattr(viewset, "duplicate"):
@@ -129,7 +135,7 @@ def test_cms_views_deep():
                 viewset.get_object = Mock(return_value=mock_page)
                 try:
                     viewset.duplicate(viewset.request, pk=1)
-                except:
+                except Exception:
                     pass
 
             if hasattr(viewset, "preview"):
@@ -138,7 +144,7 @@ def test_cms_views_deep():
                 viewset.get_object = Mock(return_value=mock_page)
                 try:
                     viewset.preview(viewset.request, pk=1)
-                except:
+                except Exception:
                     pass
 
             if hasattr(viewset, "versions"):
@@ -150,7 +156,7 @@ def test_cms_views_deep():
                 viewset.get_object = Mock(return_value=mock_page)
                 try:
                     viewset.versions(viewset.request, pk=1)
-                except:
+                except Exception:
                     pass
 
             if hasattr(viewset, "revert"):
@@ -160,7 +166,7 @@ def test_cms_views_deep():
                 viewset.get_object = Mock(return_value=mock_page)
                 try:
                     viewset.revert(viewset.request, pk=1)
-                except:
+                except Exception:
                     pass
 
         except Exception:
@@ -168,7 +174,6 @@ def test_cms_views_deep():
 
         # Test BlockViewSet deeply
         try:
-            from apps.cms.views.blocks import BlockViewSet
 
             viewset = BlockViewSet()
             viewset.request = Mock()
@@ -182,7 +187,7 @@ def test_cms_views_deep():
                 viewset.request.data["type"] = block_type
                 try:
                     viewset.get_serializer_class()
-                except:
+                except Exception:
                     pass
 
             # Test queryset
@@ -191,7 +196,7 @@ def test_cms_views_deep():
                 MockBlock.objects.all.return_value = mock_qs
                 try:
                     viewset.get_queryset()
-                except:
+                except Exception:
                     pass
 
             # Test custom actions
@@ -201,15 +206,14 @@ def test_cms_views_deep():
                 }
                 try:
                     viewset.reorder(viewset.request)
-                except:
+                except Exception:
                     pass
 
-        except:
+        except Exception:
             pass
 
         # Test RegistryViewSet deeply
         try:
-            from apps.cms.views.registry import RegistryViewSet
 
             viewset = RegistryViewSet()
             viewset.request = Mock()
@@ -218,16 +222,16 @@ def test_cms_views_deep():
             # Test list action
             try:
                 viewset.list(viewset.request)
-            except:
+            except Exception:
                 pass
 
             # Test retrieve action
             try:
                 viewset.retrieve(viewset.request, pk="text-block")
-            except:
+            except Exception:
                 pass
 
-        except:
+        except Exception:
             pass
 
     except ImportError:
@@ -238,7 +242,6 @@ def test_cms_view_permissions():
     """Test CMS view permission classes."""
 
     try:
-        from apps.cms.views import permissions
 
         # Test all permission classes
         for attr_name in dir(permissions):
@@ -256,7 +259,7 @@ def test_cms_view_permissions():
                     # Test has_permission
                     try:
                         perm.has_permission(mock_request, mock_view)
-                    except:
+                    except Exception:
                         pass
 
                     # Test has_object_permission
@@ -264,10 +267,10 @@ def test_cms_view_permissions():
                     mock_obj.author = mock_request.user
                     try:
                         perm.has_object_permission(mock_request, mock_view, mock_obj)
-                    except:
+                    except Exception:
                         pass
 
-                except:
+                except Exception:
                     pass
 
     except ImportError:
@@ -278,7 +281,6 @@ def test_cms_view_mixins():
     """Test CMS view mixins."""
 
     try:
-        from apps.cms.views import mixins
 
         # Test all mixin classes
         for attr_name in dir(mixins):
@@ -295,23 +297,23 @@ def test_cms_view_mixins():
                     if hasattr(MixinClass, "get_queryset"):
                         try:
                             MixinClass.get_queryset(instance)
-                        except:
+                        except Exception:
                             pass
 
                     if hasattr(MixinClass, "get_serializer_context"):
                         try:
                             MixinClass.get_serializer_context(instance)
-                        except:
+                        except Exception:
                             pass
 
                     if hasattr(MixinClass, "perform_create"):
                         mock_serializer = Mock()
                         try:
                             MixinClass.perform_create(instance, mock_serializer)
-                        except:
+                        except Exception:
                             pass
 
-                except:
+                except Exception:
                     pass
 
     except ImportError:
@@ -322,7 +324,6 @@ def test_cms_view_filters():
     """Test CMS view filters and filterset."""
 
     try:
-        from apps.cms.views import filters
 
         # Test filter classes
         for attr_name in dir(filters):
@@ -342,10 +343,10 @@ def test_cms_view_filters():
                             filter_instance.filter_queryset(
                                 mock_request, mock_queryset, None
                             )
-                        except:
+                        except Exception:
                             pass
 
-                except:
+                except Exception:
                     pass
 
     except ImportError:
@@ -356,7 +357,6 @@ def test_cms_view_pagination():
     """Test CMS view pagination."""
 
     try:
-        from apps.cms.views import pagination
 
         # Test pagination classes
         for attr_name in dir(pagination):
@@ -375,7 +375,7 @@ def test_cms_view_pagination():
                         paginator.paginate_queryset(
                             mock_queryset, mock_request, mock_view
                         )
-                    except:
+                    except Exception:
                         pass
 
                     # Test get_paginated_response

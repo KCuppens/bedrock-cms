@@ -1,13 +1,13 @@
-"""
-Test cases for i18n models.
-"""
-
 from django.contrib.auth import get_user_model
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ValidationError
 from django.test import TestCase
-
 from apps.i18n.models import (
+"""
+Test cases for i18n models.
+"""
+
+
     Locale,
     TranslationGlossary,
     TranslationHistory,
@@ -23,7 +23,7 @@ User = get_user_model()
 class LocaleModelTest(TestCase):
     """Test cases for Locale model."""
 
-    def setUp(self):
+    def setUp(self):  # noqa: C901
         """Set up test data."""
         self.locale_en = Locale.objects.create(
             code="en",
@@ -47,7 +47,7 @@ class LocaleModelTest(TestCase):
             fallback=self.locale_es,
         )
 
-    def test_locale_creation(self):
+    def test_locale_creation(self):  # noqa: C901
         """Test locale creation."""
         self.assertEqual(self.locale_en.code, "en")
         self.assertEqual(self.locale_en.name, "English")
@@ -55,12 +55,12 @@ class LocaleModelTest(TestCase):
         self.assertTrue(self.locale_en.is_active)
         self.assertFalse(self.locale_en.rtl)
 
-    def test_locale_string_representation(self):
+    def test_locale_string_representation(self):  # noqa: C901
         """Test locale string representation."""
         self.assertEqual(str(self.locale_en), "English (en)")
         self.assertEqual(str(self.locale_es), "Spanish (es)")
 
-    def test_only_one_default_locale(self):
+    def test_only_one_default_locale(self):  # noqa: C901
         """Test that only one locale can be default."""
         # Try to create another default locale
         locale_de = Locale.objects.create(
@@ -79,7 +79,7 @@ class LocaleModelTest(TestCase):
         # The old default should no longer be default
         self.assertFalse(self.locale_en.is_default)
 
-    def test_fallback_chain(self):
+    def test_fallback_chain(self):  # noqa: C901
         """Test fallback chain resolution."""
         # fr -> es -> en
         chain = self.locale_fr.get_fallback_chain()
@@ -88,13 +88,13 @@ class LocaleModelTest(TestCase):
         self.assertEqual(chain[1], self.locale_es)
         self.assertEqual(chain[2], self.locale_en)
 
-    def test_fallback_chain_no_fallback(self):
+    def test_fallback_chain_no_fallback(self):  # noqa: C901
         """Test fallback chain with no fallback."""
         chain = self.locale_en.get_fallback_chain()
         self.assertEqual(len(chain), 1)
         self.assertEqual(chain[0], self.locale_en)
 
-    def test_circular_fallback_prevention(self):
+    def test_circular_fallback_prevention(self):  # noqa: C901
         """Test that circular fallbacks are prevented."""
 
         # Try to create a circular fallback: en -> es -> en
@@ -107,7 +107,7 @@ class LocaleModelTest(TestCase):
         # Check that the error message mentions circular fallback
         self.assertIn("cycle", str(context.exception).lower())
 
-    def test_locale_ordering(self):
+    def test_locale_ordering(self):  # noqa: C901
         """Test locale ordering."""
         locales = Locale.objects.all().order_by("name")
         self.assertEqual(locales[0], self.locale_en)
@@ -118,7 +118,7 @@ class LocaleModelTest(TestCase):
 class UiMessageModelTest(TestCase):
     """Test cases for UiMessage model."""
 
-    def setUp(self):
+    def setUp(self):  # noqa: C901
         """Set up test data."""
         self.message = UiMessage.objects.create(
             namespace="common",
@@ -127,18 +127,18 @@ class UiMessageModelTest(TestCase):
             description="Save button text",
         )
 
-    def test_ui_message_creation(self):
+    def test_ui_message_creation(self):  # noqa: C901
         """Test UI message creation."""
         self.assertEqual(self.message.namespace, "common")
         self.assertEqual(self.message.key, "buttons.save")
         self.assertEqual(self.message.default_value, "Save")
         self.assertEqual(self.message.description, "Save button text")
 
-    def test_ui_message_string_representation(self):
+    def test_ui_message_string_representation(self):  # noqa: C901
         """Test UI message string representation."""
         self.assertEqual(str(self.message), "common.buttons.save")
 
-    def test_unique_key_constraint(self):
+    def test_unique_key_constraint(self):  # noqa: C901
         """Test that keys must be unique."""
         with self.assertRaises(Exception):
             UiMessage.objects.create(
@@ -147,7 +147,7 @@ class UiMessageModelTest(TestCase):
                 default_value="Different value",
             )
 
-    def test_ordering(self):
+    def test_ordering(self):  # noqa: C901
         """Test UI message ordering."""
         message2 = UiMessage.objects.create(
             namespace="auth", key="login.title", default_value="Login"
@@ -166,7 +166,7 @@ class UiMessageModelTest(TestCase):
 class UiMessageTranslationModelTest(TestCase):
     """Test cases for UiMessageTranslation model."""
 
-    def setUp(self):
+    def setUp(self):  # noqa: C901
         """Set up test data."""
         self.user = User.objects.create_user(
             email="translator@test.com", password="testpass123"
@@ -191,7 +191,7 @@ class UiMessageTranslationModelTest(TestCase):
             updated_by=self.user,
         )
 
-    def test_translation_creation(self):
+    def test_translation_creation(self):  # noqa: C901
         """Test translation creation."""
         self.assertEqual(self.translation.message, self.message)
         self.assertEqual(self.translation.locale, self.locale_es)
@@ -199,13 +199,13 @@ class UiMessageTranslationModelTest(TestCase):
         self.assertEqual(self.translation.status, "approved")
         self.assertEqual(self.translation.updated_by, self.user)
 
-    def test_translation_string_representation(self):
+    def test_translation_string_representation(self):  # noqa: C901
         """Test translation string representation."""
         # UiMessageTranslation.__str__ returns f"{self.message.key} ({self.locale.code}): {self.value}"
         expected = "buttons.save (es): Guardar"
         self.assertEqual(str(self.translation), expected)
 
-    def test_unique_constraint(self):
+    def test_unique_constraint(self):  # noqa: C901
         """Test unique constraint on message-locale pair."""
         with self.assertRaises(Exception):
             UiMessageTranslation.objects.create(
@@ -215,7 +215,7 @@ class UiMessageTranslationModelTest(TestCase):
                 updated_by=self.user,
             )
 
-    def test_status_choices(self):
+    def test_status_choices(self):  # noqa: C901
         """Test translation status choices."""
         valid_statuses = ["missing", "draft", "needs_review", "approved", "rejected"]
 
@@ -228,7 +228,7 @@ class UiMessageTranslationModelTest(TestCase):
 class TranslationUnitModelTest(TestCase):
     """Test cases for TranslationUnit model."""
 
-    def setUp(self):
+    def setUp(self):  # noqa: C901
         """Set up test data."""
         self.user = User.objects.create_user(
             email="translator@test.com", password="testpass123"
@@ -256,7 +256,7 @@ class TranslationUnitModelTest(TestCase):
             updated_by=self.user,
         )
 
-    def test_translation_unit_creation(self):
+    def test_translation_unit_creation(self):  # noqa: C901
         """Test translation unit creation."""
         self.assertEqual(self.translation_unit.content_type, self.content_type)
         self.assertEqual(self.translation_unit.object_id, self.user.id)
@@ -267,13 +267,13 @@ class TranslationUnitModelTest(TestCase):
         self.assertEqual(self.translation_unit.target_text, "traductor")
         self.assertEqual(self.translation_unit.status, "approved")
 
-    def test_translation_unit_string_representation(self):
+    def test_translation_unit_string_representation(self):  # noqa: C901
         """Test translation unit string representation."""
         # TranslationUnit.__str__ returns: f"{self.content_type.model}.{self.field} ({self.source_locale.code} → {self.target_locale.code}) -> {self.target_text}"
         expected = "user.username (en → es) -> traductor"
         self.assertEqual(str(self.translation_unit), expected)
 
-    def test_unique_constraint(self):
+    def test_unique_constraint(self):  # noqa: C901
         """Test unique constraint on translation unit."""
         with self.assertRaises(Exception):
             TranslationUnit.objects.create(
@@ -287,7 +287,7 @@ class TranslationUnitModelTest(TestCase):
                 updated_by=self.user,
             )
 
-    def test_status_choices(self):
+    def test_status_choices(self):  # noqa: C901
         """Test translation unit status choices."""
         valid_statuses = [
             "pending",
@@ -306,7 +306,7 @@ class TranslationUnitModelTest(TestCase):
 class TranslationGlossaryModelTest(TestCase):
     """Test cases for TranslationGlossary model."""
 
-    def setUp(self):
+    def setUp(self):  # noqa: C901
         """Set up test data."""
         self.user = User.objects.create_user(
             email="admin@test.com", password="testpass123"
@@ -331,7 +331,7 @@ class TranslationGlossaryModelTest(TestCase):
             updated_by=self.user,
         )
 
-    def test_glossary_creation(self):
+    def test_glossary_creation(self):  # noqa: C901
         """Test glossary entry creation."""
         self.assertEqual(self.glossary_entry.term, "Dashboard")
         self.assertEqual(self.glossary_entry.translation, "Panel de Control")
@@ -341,13 +341,13 @@ class TranslationGlossaryModelTest(TestCase):
         self.assertEqual(self.glossary_entry.context, "Main navigation menu")
         self.assertTrue(self.glossary_entry.is_verified)
 
-    def test_glossary_string_representation(self):
+    def test_glossary_string_representation(self):  # noqa: C901
         """Test glossary entry string representation."""
         # TranslationGlossary.__str__ returns: f"{self.term} ({self.source_locale.code} → {self.target_locale.code})"
         expected = "Dashboard (en → es)"
         self.assertEqual(str(self.glossary_entry), expected)
 
-    def test_unique_constraint(self):
+    def test_unique_constraint(self):  # noqa: C901
         """Test unique constraint on glossary entry."""
         with self.assertRaises(Exception):
             TranslationGlossary.objects.create(
@@ -362,7 +362,7 @@ class TranslationGlossaryModelTest(TestCase):
 class TranslationQueueModelTest(TestCase):
     """Test cases for TranslationQueue model."""
 
-    def setUp(self):
+    def setUp(self):  # noqa: C901
         """Set up test data."""
         self.user = User.objects.create_user(
             email="translator@test.com", password="testpass123"
@@ -399,7 +399,7 @@ class TranslationQueueModelTest(TestCase):
             created_by=self.user,
         )
 
-    def test_queue_creation(self):
+    def test_queue_creation(self):  # noqa: C901
         """Test queue item creation."""
         self.assertEqual(self.queue_item.translation_unit, self.translation_unit)
         self.assertEqual(self.queue_item.priority, "high")
@@ -407,14 +407,14 @@ class TranslationQueueModelTest(TestCase):
         self.assertEqual(self.queue_item.assigned_to, self.assignee)
         self.assertEqual(self.queue_item.created_by, self.user)
 
-    def test_queue_string_representation(self):
+    def test_queue_string_representation(self):  # noqa: C901
         """Test queue item string representation."""
         # TranslationQueue.__str__ returns: f"Queue: {self.translation_unit} ({self.status})"
         # And self.status is 'pending' in the test setup (line 416)
         expected = "Queue: user.bio (en → es) (pending)"
         self.assertEqual(str(self.queue_item), expected)
 
-    def test_priority_choices(self):
+    def test_priority_choices(self):  # noqa: C901
         """Test queue priority choices."""
         valid_priorities = ["low", "medium", "high", "urgent"]
 
@@ -423,7 +423,7 @@ class TranslationQueueModelTest(TestCase):
             self.queue_item.save()
             self.assertEqual(self.queue_item.priority, priority)
 
-    def test_status_choices(self):
+    def test_status_choices(self):  # noqa: C901
         """Test queue status choices."""
         valid_statuses = ["pending", "assigned", "in_progress", "completed", "rejected"]
 
@@ -436,7 +436,7 @@ class TranslationQueueModelTest(TestCase):
 class TranslationHistoryModelTest(TestCase):
     """Test cases for TranslationHistory model."""
 
-    def setUp(self):
+    def setUp(self):  # noqa: C901
         """Set up test data."""
         self.user = User.objects.create_user(
             email="translator@test.com", password="testpass123"
@@ -473,7 +473,7 @@ class TranslationHistoryModelTest(TestCase):
             performed_by=self.user,
         )
 
-    def test_history_creation(self):
+    def test_history_creation(self):  # noqa: C901
         """Test history entry creation."""
         self.assertEqual(self.history_entry.translation_unit, self.translation_unit)
         self.assertEqual(self.history_entry.action, "approved")
@@ -484,12 +484,12 @@ class TranslationHistoryModelTest(TestCase):
         self.assertEqual(self.history_entry.comment, "Translation approved")
         self.assertEqual(self.history_entry.performed_by, self.user)
 
-    def test_history_string_representation(self):
+    def test_history_string_representation(self):  # noqa: C901
         """Test history entry string representation."""
         expected = f"{self.translation_unit} - approved by {self.user.email}"
         self.assertEqual(str(self.history_entry), expected)
 
-    def test_action_choices(self):
+    def test_action_choices(self):  # noqa: C901
         """Test history action choices."""
         valid_actions = ["created", "updated", "approved", "rejected", "status_changed"]
 

@@ -1,17 +1,21 @@
+from django.contrib.auth import get_user_model
+from django.test import TestCase
+from django.utils import timezone
+from rest_framework import status
+from rest_framework.test import APITestCase
+from apps.cms.models import Page
+from apps.cms.versioning import AuditEntry, PageRevision, RevisionDiffer
+from apps.i18n.models import Locale
+        from unittest.mock import Mock
+        import copy
+        from django.contrib.auth.models import Permission
+        from django.contrib.contenttypes.models import ContentType
 """
 Tests for versioning and audit functionality.
 """
 
-from django.contrib.auth import get_user_model
-from django.test import TestCase
-from django.utils import timezone
 
-from rest_framework import status
-from rest_framework.test import APITestCase
 
-from apps.cms.models import Page
-from apps.cms.versioning import AuditEntry, PageRevision, RevisionDiffer
-from apps.i18n.models import Locale
 
 User = get_user_model()
 
@@ -152,7 +156,6 @@ class AuditEntryModelTests(TestCase):
 
     def test_log_audit_entry(self):
         """Test creating an audit log entry."""
-        from unittest.mock import Mock
 
         # Create a mock request with IP address
         mock_request = Mock()
@@ -213,7 +216,6 @@ class RevisionDifferTests(TestCase):
         # Modify page and create second revision
         self.page.title = "Updated Title"
         # Need to reassign blocks array for Django to detect the change
-        import copy
 
         blocks = copy.deepcopy(self.page.blocks)
         blocks[0]["props"]["content"] = "Updated content"
@@ -281,8 +283,6 @@ class VersioningAPITests(APITestCase):
 
     def setUp(self):
         """Set up test data."""
-        from django.contrib.auth.models import Permission
-        from django.contrib.contenttypes.models import ContentType
 
         self.user = User.objects.create_user(
             email="test@example.com", password="testpass123"

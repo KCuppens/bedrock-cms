@@ -1,15 +1,15 @@
-"""
-Signals for automatic search indexing.
-
-Automatically indexes content when it's created, updated, or deleted.
-"""
-
 from django.db.models.signals import post_delete, post_save
 from django.dispatch import receiver
 
 from apps.registry.registry import content_registry
 
 from .services import search_service
+
+"""
+Signals for automatic search indexing.
+
+Automatically indexes content when it's created, updated, or deleted.
+"""
 
 
 @receiver(post_save)

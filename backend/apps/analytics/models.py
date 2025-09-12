@@ -74,7 +74,7 @@ class PageView(models.Model):
         ]
         ordering = ["-viewed_at"]
 
-    def __str__(self):
+    def __str__(self):  # noqa: C901
         return f"View of {self.url} at {self.viewed_at}"
 
 
@@ -132,7 +132,7 @@ class UserActivity(models.Model):
         ]
         ordering = ["-created_at"]
 
-    def __str__(self):
+    def __str__(self):  # noqa: C901
         return f"{self.user.email} - {self.get_action_display()} at {self.created_at}"
 
 
@@ -192,7 +192,7 @@ class ContentMetrics(models.Model):
         ]
         ordering = ["-date"]
 
-    def __str__(self):
+    def __str__(self):  # noqa: C901
         return f"Metrics for {self.content_object} on {self.date}"
 
 
@@ -270,7 +270,7 @@ class Assessment(models.Model):
         ]
         ordering = ["-created_at"]
 
-    def __str__(self):
+    def __str__(self):  # noqa: C901
         return f"{self.title} ({self.get_assessment_type_display()})"
 
 
@@ -366,7 +366,7 @@ class Risk(models.Model):
         ]
         ordering = ["-risk_score", "-identified_at"]
 
-    def save(self, *args, **kwargs):
+    def save(self, *args, **kwargs):  # noqa: C901
         # Calculate risk score
         self.risk_score = self.probability * self.impact
 
@@ -384,7 +384,7 @@ class Risk(models.Model):
 
         super().save(*args, **kwargs)
 
-    def __str__(self):
+    def __str__(self):  # noqa: C901
         return f"{self.title} (Risk Score: {self.risk_score})"
 
 
@@ -472,7 +472,7 @@ class Threat(models.Model):
         ]
         ordering = ["-detected_at"]
 
-    def __str__(self):
+    def __str__(self):  # noqa: C901
         return f"{self.title} ({self.get_severity_display()})"
 
 
@@ -536,5 +536,5 @@ class AnalyticsSummary(models.Model):
         ]
         ordering = ["-date"]
 
-    def __str__(self):
+    def __str__(self):  # noqa: C901
         return f"{self.get_period_type_display()} summary for {self.date}"

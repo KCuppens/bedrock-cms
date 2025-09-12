@@ -10,13 +10,16 @@ from rest_framework.response import Response
 
 from apps.cms.models import BlockType, BlockTypeCategory
 from apps.cms.serializers.block_types import (
+from apps.core.permissions import RBACPermission
+        import json
+        from django.db.models import Q
+        from rest_framework import serializers
     BlockTypeCategorySerializer,
     BlockTypeCreateSerializer,
     BlockTypeListSerializer,
     BlockTypeSerializer,
     BlockTypeUpdateSerializer,
 )
-from apps.core.permissions import RBACPermission
 
 
 @extend_schema_view(
@@ -305,9 +308,7 @@ class BlockTypeViewSet(viewsets.ModelViewSet):
     @action(detail=False, methods=["get"])
     def fetch_data(self, request):
         """Fetch dynamic data for a block based on its model configuration."""
-        import json
 
-        from django.db.models import Q
 
         block_type_str = request.query_params.get("block_type")
         if not block_type_str:
@@ -430,7 +431,6 @@ class BlockTypeViewSet(viewsets.ModelViewSet):
 
     def _get_model_serializer(self, model_class, instance, many=False):
         """Get the appropriate serializer for a model."""
-        from rest_framework import serializers
 
         # Try to find a registered serializer for this model
         # For now, create a dynamic serializer

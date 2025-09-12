@@ -1,13 +1,13 @@
+from django.contrib.auth import get_user_model
+from django.contrib.contenttypes.models import ContentType
+from django.test import TestCase
+from apps.i18n.models import Locale, TranslationUnit, UiMessage, UiMessageTranslation
+from apps.i18n.translation import (
 """
 Test cases for translation utilities.
 """
 
-from django.contrib.auth import get_user_model
-from django.contrib.contenttypes.models import ContentType
-from django.test import TestCase
 
-from apps.i18n.models import Locale, TranslationUnit, UiMessage, UiMessageTranslation
-from apps.i18n.translation import (
     TranslationManager,
     TranslationResolver,
     UiMessageResolver,

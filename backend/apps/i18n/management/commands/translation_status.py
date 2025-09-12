@@ -1,10 +1,10 @@
-"""
-Show translation status for a locale.
-"""
-
 from django.core.management.base import BaseCommand
 
 from apps.i18n.models import Locale, UiMessage, UiMessageTranslation
+
+"""
+Show translation status for a locale.
+"""
 
 
 class Command(BaseCommand):

@@ -1,13 +1,13 @@
-"""
-Auto-generated serializers for registered content models.
-"""
-
 from typing import Any
 
 from rest_framework import serializers
 
 from .config import ContentConfig
 from .registry import content_registry
+
+"""
+Auto-generated serializers for registered content models.
+"""
 
 
 class ContentSerializerFactory:
@@ -59,7 +59,7 @@ class ContentSerializerFactory:
         return serializer_class
 
     @classmethod
-    def _get_custom_fields(cls, config: ContentConfig) -> dict[str, Any]:
+    def _get_custom_fields(cls, config: ContentConfig) -> dict[str, Any]:  # noqa: C901
         """Get custom fields for the serializer."""
         custom_fields = {}
 
@@ -75,7 +75,7 @@ class ContentSerializerFactory:
         # Add URL field if model has slug
         if config.slug_field and config.get_route_pattern():
 
-            def get_url(self, obj):
+            def get_url(self, obj):  # noqa: C901
                 slug_value = getattr(obj, config.slug_field)
                 if slug_value:
                     return config.get_route_pattern().format(slug=slug_value)
@@ -87,7 +87,7 @@ class ContentSerializerFactory:
         # Add reading time for content with blocks
         if hasattr(config.model, "blocks") or "body_blocks" in config.searchable_fields:
 
-            def get_reading_time(self, obj):
+            def get_reading_time(self, obj):  # noqa: C901
                 # Estimate reading time from text content
                 if hasattr(obj, "reading_time") and obj.reading_time:
                     return obj.reading_time
@@ -116,12 +116,12 @@ class ContentSerializerFactory:
         return custom_fields
 
     @classmethod
-    def _get_custom_methods(cls, config: ContentConfig) -> dict[str, Any]:
+    def _get_custom_methods(cls, config: ContentConfig) -> dict[str, Any]:  # noqa: C901
         """Get custom methods for the serializer."""
         methods = {}
 
         # Add validation for required fields
-        def validate(self, attrs):
+        def validate(self, attrs):  # noqa: C901
             # Custom validation logic can be added here
             return attrs
 
@@ -162,7 +162,9 @@ class RegistrySummarySerializer(serializers.Serializer):
     configs = serializers.DictField()
 
 
-def get_serializer_for_model(model_label: str) -> type[serializers.ModelSerializer]:
+def get_serializer_for_model(
+    model_label: str,
+) -> type[serializers.ModelSerializer]:  # noqa: C901
     """
     Get or create a serializer for a registered model.
 

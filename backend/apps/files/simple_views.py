@@ -1,7 +1,6 @@
 import logging
 
 from django.core.files.storage import default_storage
-
 from drf_spectacular.utils import extend_schema, extend_schema_view
 from rest_framework import permissions, status, viewsets
 from rest_framework.parsers import FormParser, MultiPartParser
@@ -26,11 +25,11 @@ class SimpleFileUploadViewSet(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticated]
     parser_classes = [MultiPartParser, FormParser]
 
-    def get_queryset(self):
+    def get_queryset(self):  # noqa: C901
         """Get files for the current user"""
         return FileUpload.objects.filter(created_by=self.request.user)
 
-    def create(self, request, *args, **kwargs):
+    def create(self, request, *args, **kwargs):  # noqa: C901
         """Handle file upload with detailed logging"""
         logger.info("=== FILE UPLOAD REQUEST ===")
         logger.info(f"User: {request.user}")

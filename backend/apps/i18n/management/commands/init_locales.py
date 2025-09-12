@@ -1,10 +1,10 @@
-"""
-Management command to initialize default locales.
-"""
-
 from django.core.management.base import BaseCommand
 
 from apps.i18n.models import Locale
+
+"""
+Management command to initialize default locales.
+"""
 
 
 class Command(BaseCommand):

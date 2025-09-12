@@ -1,12 +1,13 @@
+from rest_framework import serializers
+from apps.cms.models import Page
+from apps.cms.seo_utils import generate_seo_links, resolve_seo
+                        import re
 """
 Public-facing serializers optimized for frontend consumption.
 Includes resolved SEO data and minimal field exposure.
 """
 
-from rest_framework import serializers
 
-from apps.cms.models import Page
-from apps.cms.seo_utils import generate_seo_links, resolve_seo
 
 
 class PublicPageSerializer(serializers.ModelSerializer):
@@ -131,7 +132,6 @@ class PublicPageListSerializer(serializers.ModelSerializer):
                     content = block.get("props", {}).get("content", "")
                     if content:
                         # Strip HTML and truncate
-                        import re
 
                         clean_text = re.sub(r"<[^>]+>", "", str(content))
                         return (

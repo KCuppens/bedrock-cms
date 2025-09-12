@@ -1,6 +1,6 @@
 [flake8]
 # Exclude directories
-exclude = 
+exclude =
     .git,
     __pycache__,
     .venv,
@@ -31,7 +31,7 @@ exclude =
 max-line-length = 88
 
 # Ignore specific errors
-ignore = 
+ignore =
     # E203: whitespace before ':' (conflicts with Black)
     E203,
     # W503: line break before binary operator (conflicts with Black)

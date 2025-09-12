@@ -1,3 +1,10 @@
+import logging
+from django.conf import settings
+from django.core.cache import cache
+from django.utils.deprecation import MiddlewareMixin
+            import time
+            from apps.i18n.settings_sync import DjangoSettingsSync
+                    from django.utils import translation
 """
 Dynamic language middleware for i18n.
 
@@ -5,11 +12,7 @@ This middleware ensures that the available languages are always
 up-to-date with the database configuration.
 """
 
-import logging
 
-from django.conf import settings
-from django.core.cache import cache
-from django.utils.deprecation import MiddlewareMixin
 
 logger = logging.getLogger(__name__)
 
@@ -40,7 +43,6 @@ class DynamicLanguageMiddleware(MiddlewareMixin):
 
         # Only update periodically to avoid performance impact
         try:
-            import time
 
             last_update = cache.get(self.LAST_UPDATE_KEY, 0)
             current_time = time.time()
@@ -57,7 +59,6 @@ class DynamicLanguageMiddleware(MiddlewareMixin):
     def _update_language_settings(self):
         """Update Django's language settings from database."""
         try:
-            from apps.i18n.settings_sync import DjangoSettingsSync
 
             # Get current settings from database
             locale_settings = DjangoSettingsSync.get_locale_settings()
@@ -80,7 +81,6 @@ class DynamicLanguageMiddleware(MiddlewareMixin):
                     )
 
                     # Clear Django's language cache to pick up new languages
-                    from django.utils import translation
 
                     translation._trans = None
 

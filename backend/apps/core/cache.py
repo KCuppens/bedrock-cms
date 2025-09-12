@@ -1,3 +1,8 @@
+import hashlib
+from django.core.cache import cache
+                from apps.cms.models import Page
+                from apps.registry.registry import content_registry
+                from apps.blog.models import BlogPost
 """
 Cache utilities and key management for CMS.
 
@@ -6,9 +11,7 @@ Provides consistent cache key generation and invalidation strategies.
 
 # mypy: ignore-errors
 
-import hashlib
 
-from django.core.cache import cache
 
 # Cache TTL settings
 CACHE_TIMEOUTS = {
@@ -258,11 +261,10 @@ class CacheManager:
         elif page_id:
             # Look up page and invalidate
             try:
-                from apps.cms.models import Page
 
                 page = Page.objects.get(id=page_id)
                 self.invalidate_page(locale=page.locale.code, path=page.path)
-            except:
+            except Exception:
                 pass  # Page not found, nothing to invalidate
 
         # Delete specific keys
@@ -293,7 +295,6 @@ class CacheManager:
         elif object_id:
             # Try to look up object and invalidate
             try:
-                from apps.registry.registry import content_registry
 
                 config = content_registry.get_config(model_label)
                 if config:
@@ -309,7 +310,7 @@ class CacheManager:
 
                     if slug_value:
                         self.invalidate_content(model_label, locale_code, slug_value)
-            except:
+            except Exception:
                 pass  # Object not found or error
 
         # Delete specific keys
@@ -330,11 +331,10 @@ class CacheManager:
         elif post_id:
             # Look up post and invalidate
             try:
-                from apps.blog.models import BlogPost
 
                 post = BlogPost.objects.get(id=post_id)
                 self.invalidate_blog_post(locale=post.locale.code, slug=post.slug)
-            except:
+            except Exception:
                 pass
 
     def invalidate_search(self, query: str = None):

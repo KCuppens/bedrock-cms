@@ -1,15 +1,19 @@
 import tempfile
 from pathlib import Path
 
-from .base import *
+from .base import (  # noqa: F403
+    DATABASES,  # noqa: F405
+    REST_FRAMEWORK,  # noqa: F405
+    env,  # noqa: F405
+)
 
 # Database configuration - use DATABASE_URL if provided (for CI), otherwise SQLite
-if env("DATABASE_URL", default=""):
+if env("DATABASE_URL", default=""):  # noqa: F405
     # CI environment - use the configured database and run migrations
-    DATABASES = {"default": env.db("DATABASE_URL")}
+    DATABASES = {"default": env.db("DATABASE_URL")}  # noqa: F405, F811
 else:
     # Local test environment - use fast SQLite in-memory
-    DATABASES = {
+    DATABASES = {  # noqa: F811
         "default": {
             "ENGINE": "django.db.backends.sqlite3",
             "NAME": ":memory:",
@@ -27,8 +31,8 @@ else:
     MIGRATION_MODULES = DisableMigrations()
 
 # Use locmem cache backend for tests unless Redis is configured
-if env("REDIS_URL", default=""):
-    CACHES = {"default": env.cache("REDIS_URL")}
+if env("REDIS_URL", default=""):  # noqa: F405
+    CACHES = {"default": env.cache("REDIS_URL")}  # noqa: F405
 else:
     CACHES = {
         "default": {
@@ -59,13 +63,13 @@ MEDIA_ROOT = Path(tempfile.mkdtemp(prefix="test_media_"))
 STATIC_ROOT = Path(tempfile.mkdtemp(prefix="test_static_"))
 
 # Security settings (can be relaxed for tests)
-SECRET_KEY = env(
+SECRET_KEY = env(  # noqa: F405
     "SECRET_KEY", default="test-secret-key-not-for-production"
 )  # nosec B105
 
 # Disable CSRF for API tests
 REST_FRAMEWORK = {
-    **REST_FRAMEWORK,
+    **REST_FRAMEWORK,  # noqa: F405
     "DEFAULT_AUTHENTICATION_CLASSES": [
         "rest_framework.authentication.SessionAuthentication",
     ],

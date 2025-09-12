@@ -6,6 +6,7 @@ from django.core.cache import cache
 from django.http import HttpRequest
 
 from rest_framework.response import Response
+                from apps.core.cache import cache_manager
 
 
 def cache_response(
@@ -177,7 +178,6 @@ def invalidate_cache(pattern=None, exact_key=None):
                 cache.delete(exact_key)
             elif pattern:
                 # Use cache manager for pattern deletion
-                from apps.core.cache import cache_manager
 
                 cache_manager.delete_pattern(pattern)
 

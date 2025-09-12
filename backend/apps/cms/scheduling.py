@@ -1,15 +1,16 @@
-"""
-Scheduling models for the CMS.
-
-This module provides scheduling functionality for pages and blog posts.
-"""
-
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
+        from django.db import transaction
+"""
+Scheduling models for the CMS.
+
+This module provides scheduling functionality for pages and blog posts.
+"""
+
 
 
 class ScheduledTask(models.Model):
@@ -109,7 +110,6 @@ class ScheduledTask(models.Model):
 
     def execute(self):
         """Execute the scheduled task"""
-        from django.db import transaction
 
         if self.status != "pending":
             raise ValidationError(_("Only pending tasks can be executed"))

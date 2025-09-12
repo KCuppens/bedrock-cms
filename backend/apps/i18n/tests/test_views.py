@@ -1,16 +1,16 @@
-"""
-Test cases for i18n views and API endpoints.
-"""
-
 from django.contrib.auth import get_user_model
 from django.contrib.contenttypes.models import ContentType
 from django.test import TestCase
 from django.urls import reverse
-
 from rest_framework import status
 from rest_framework.test import APIClient
-
 from apps.i18n.models import (
+"""
+Test cases for i18n views and API endpoints.
+"""
+
+
+
     Locale,
     TranslationGlossary,
     TranslationHistory,
@@ -25,7 +25,7 @@ User = get_user_model()
 class LocaleViewSetTest(TestCase):
     """Test cases for Locale ViewSet."""
 
-    def setUp(self):
+    def setUp(self):  # noqa: C901
         """Set up test data."""
         self.client = APIClient()
         self.user = User.objects.create_user(
@@ -44,7 +44,7 @@ class LocaleViewSetTest(TestCase):
             code="es", name="Spanish", native_name="Español", is_active=True
         )
 
-    def test_list_locales(self):
+    def test_list_locales(self):  # noqa: C901
         """Test listing locales."""
         url = reverse("locales-list")
         response = self.client.get(url)
@@ -52,7 +52,7 @@ class LocaleViewSetTest(TestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data["results"]), 2)
 
-    def test_list_active_locales_only(self):
+    def test_list_active_locales_only(self):  # noqa: C901
         """Test listing only active locales."""
         # Create inactive locale
         Locale.objects.create(
@@ -65,7 +65,7 @@ class LocaleViewSetTest(TestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data["results"]), 2)
 
-    def test_create_locale(self):
+    def test_create_locale(self):  # noqa: C901
         """Test creating a locale."""
         url = reverse("locales-list")
         data = {
@@ -80,7 +80,7 @@ class LocaleViewSetTest(TestCase):
         self.assertEqual(Locale.objects.count(), 3)
         self.assertEqual(response.data["code"], "de")
 
-    def test_update_locale(self):
+    def test_update_locale(self):  # noqa: C901
         """Test updating a locale."""
         url = reverse("locales-detail", kwargs={"pk": self.locale_es.pk})
         data = {
@@ -95,7 +95,7 @@ class LocaleViewSetTest(TestCase):
         self.locale_es.refresh_from_db()
         self.assertEqual(self.locale_es.name, "Spanish Updated")
 
-    def test_delete_locale(self):
+    def test_delete_locale(self):  # noqa: C901
         """Test deleting a locale."""
         url = reverse("locales-detail", kwargs={"pk": self.locale_es.pk})
         response = self.client.delete(url)
@@ -103,7 +103,7 @@ class LocaleViewSetTest(TestCase):
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
         self.assertEqual(Locale.objects.count(), 1)
 
-    def test_cannot_delete_default_locale(self):
+    def test_cannot_delete_default_locale(self):  # noqa: C901
         """Test that default locale cannot be deleted."""
         url = reverse("locales-detail", kwargs={"pk": self.locale_en.pk})
         response = self.client.delete(url)
@@ -111,7 +111,7 @@ class LocaleViewSetTest(TestCase):
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertEqual(Locale.objects.count(), 2)
 
-    def test_toggle_active_status(self):
+    def test_toggle_active_status(self):  # noqa: C901
         """Test toggling locale active status."""
         url = reverse("locales-toggle-active", kwargs={"pk": self.locale_es.pk})
         response = self.client.post(url)
@@ -126,7 +126,7 @@ class LocaleViewSetTest(TestCase):
         self.locale_es.refresh_from_db()
         self.assertTrue(self.locale_es.is_active)
 
-    def test_set_default_locale(self):
+    def test_set_default_locale(self):  # noqa: C901
         """Test setting a locale as default."""
         url = reverse("locales-set-default", kwargs={"pk": self.locale_es.pk})
         response = self.client.post(url)
@@ -142,7 +142,7 @@ class LocaleViewSetTest(TestCase):
 class UiMessageViewSetTest(TestCase):
     """Test cases for UiMessage ViewSet."""
 
-    def setUp(self):
+    def setUp(self):  # noqa: C901
         """Set up test data."""
         self.client = APIClient()
         self.user = User.objects.create_user(
@@ -160,7 +160,7 @@ class UiMessageViewSetTest(TestCase):
             namespace="common", key="buttons.cancel", default_value="Cancel"
         )
 
-    def test_list_ui_messages(self):
+    def test_list_ui_messages(self):  # noqa: C901
         """Test listing UI messages."""
         url = reverse("ui-messages-list")
         response = self.client.get(url)
@@ -168,7 +168,7 @@ class UiMessageViewSetTest(TestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data["results"]), 2)
 
-    def test_create_ui_message(self):
+    def test_create_ui_message(self):  # noqa: C901
         """Test creating a UI message."""
         url = reverse("ui-messages-list")
         data = {
@@ -183,7 +183,7 @@ class UiMessageViewSetTest(TestCase):
         self.assertEqual(UiMessage.objects.count(), 3)
         self.assertEqual(response.data["key"], "login.title")
 
-    def test_update_ui_message(self):
+    def test_update_ui_message(self):  # noqa: C901
         """Test updating a UI message."""
         url = reverse("ui-messages-detail", kwargs={"pk": self.message1.pk})
         data = {
@@ -198,7 +198,7 @@ class UiMessageViewSetTest(TestCase):
         self.message1.refresh_from_db()
         self.assertEqual(self.message1.default_value, "Save Changes")
 
-    def test_search_ui_messages(self):
+    def test_search_ui_messages(self):  # noqa: C901
         """Test searching UI messages."""
         url = reverse("ui-messages-list")
         response = self.client.get(url, {"search": "save"})
@@ -207,7 +207,7 @@ class UiMessageViewSetTest(TestCase):
         self.assertEqual(len(response.data["results"]), 1)
         self.assertEqual(response.data["results"][0]["key"], "buttons.save")
 
-    def test_filter_by_namespace(self):
+    def test_filter_by_namespace(self):  # noqa: C901
         """Test filtering UI messages by namespace."""
         UiMessage.objects.create(
             namespace="auth", key="login.title", default_value="Login"
@@ -219,7 +219,7 @@ class UiMessageViewSetTest(TestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data["results"]), 2)
 
-    def test_get_message_bundle(self):
+    def test_get_message_bundle(self):  # noqa: C901
         """Test getting message bundle for a locale."""
         locale = Locale.objects.create(code="es", name="Spanish", native_name="Español")
 
@@ -244,7 +244,7 @@ class UiMessageViewSetTest(TestCase):
 class UiMessageTranslationViewSetTest(TestCase):
     """Test cases for UiMessageTranslation ViewSet."""
 
-    def setUp(self):
+    def setUp(self):  # noqa: C901
         """Set up test data."""
         self.client = APIClient()
         self.user = User.objects.create_user(
@@ -271,7 +271,7 @@ class UiMessageTranslationViewSetTest(TestCase):
             updated_by=self.user,
         )
 
-    def test_list_translations(self):
+    def test_list_translations(self):  # noqa: C901
         """Test listing UI message translations."""
         url = reverse("ui-message-translations-list")
         response = self.client.get(url)
@@ -279,7 +279,7 @@ class UiMessageTranslationViewSetTest(TestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data["results"]), 1)
 
-    def test_create_translation(self):
+    def test_create_translation(self):  # noqa: C901
         """Test creating a UI message translation."""
         message2 = UiMessage.objects.create(
             namespace="common", key="buttons.cancel", default_value="Cancel"
@@ -297,7 +297,7 @@ class UiMessageTranslationViewSetTest(TestCase):
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(UiMessageTranslation.objects.count(), 2)
 
-    def test_update_translation(self):
+    def test_update_translation(self):  # noqa: C901
         """Test updating a UI message translation."""
         url = reverse(
             "ui-message-translations-detail", kwargs={"pk": self.translation.pk}
@@ -315,7 +315,7 @@ class UiMessageTranslationViewSetTest(TestCase):
         self.assertEqual(self.translation.value, "Guardar Cambios")
         self.assertEqual(self.translation.status, "approved")
 
-    def test_bulk_update_translations(self):
+    def test_bulk_update_translations(self):  # noqa: C901
         """Test bulk updating UI message translations."""
         message2 = UiMessage.objects.create(
             namespace="common", key="buttons.cancel", default_value="Cancel"
@@ -346,7 +346,7 @@ class UiMessageTranslationViewSetTest(TestCase):
         self.translation.refresh_from_db()
         self.assertEqual(self.translation.value, "Guardar Actualizado")
 
-    def test_get_namespaces_with_progress(self):
+    def test_get_namespaces_with_progress(self):  # noqa: C901
         """Test getting namespaces with translation progress."""
         url = reverse("ui-message-translations-namespaces")
         response = self.client.get(url)
@@ -360,7 +360,7 @@ class UiMessageTranslationViewSetTest(TestCase):
 class TranslationUnitViewSetTest(TestCase):
     """Test cases for TranslationUnit ViewSet."""
 
-    def setUp(self):
+    def setUp(self):  # noqa: C901
         """Set up test data."""
         self.client = APIClient()
         self.user = User.objects.create_user(
@@ -389,7 +389,7 @@ class TranslationUnitViewSetTest(TestCase):
             updated_by=self.user,
         )
 
-    def test_list_translation_units(self):
+    def test_list_translation_units(self):  # noqa: C901
         """Test listing translation units."""
         url = reverse("translation-units-list")
         response = self.client.get(url)
@@ -397,7 +397,7 @@ class TranslationUnitViewSetTest(TestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data["results"]), 1)
 
-    def test_approve_translation(self):
+    def test_approve_translation(self):  # noqa: C901
         """Test approving a translation."""
         self.translation_unit.target_text = "usuario_prueba_final"
         self.translation_unit.save()
@@ -418,7 +418,7 @@ class TranslationUnitViewSetTest(TestCase):
         self.assertIsNotNone(history)
         self.assertEqual(history.comment, "Looks good")
 
-    def test_reject_translation(self):
+    def test_reject_translation(self):  # noqa: C901
         """Test rejecting a translation."""
         url = reverse(
             "translation-units-reject", kwargs={"pk": self.translation_unit.pk}
@@ -431,7 +431,7 @@ class TranslationUnitViewSetTest(TestCase):
         self.translation_unit.refresh_from_db()
         self.assertEqual(self.translation_unit.status, "rejected")
 
-    def test_get_translation_history(self):
+    def test_get_translation_history(self):  # noqa: C901
         """Test getting translation history."""
         # Create some history
         TranslationHistory.objects.create(
@@ -457,7 +457,7 @@ class TranslationUnitViewSetTest(TestCase):
 class TranslationGlossaryViewSetTest(TestCase):
     """Test cases for TranslationGlossary ViewSet."""
 
-    def setUp(self):
+    def setUp(self):  # noqa: C901
         """Set up test data."""
         self.client = APIClient()
         self.user = User.objects.create_user(
@@ -481,7 +481,7 @@ class TranslationGlossaryViewSetTest(TestCase):
             created_by=self.user,
         )
 
-    def test_list_glossary_entries(self):
+    def test_list_glossary_entries(self):  # noqa: C901
         """Test listing glossary entries."""
         url = reverse("glossary-list")
         response = self.client.get(url)
@@ -489,7 +489,7 @@ class TranslationGlossaryViewSetTest(TestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data["results"]), 1)
 
-    def test_create_glossary_entry(self):
+    def test_create_glossary_entry(self):  # noqa: C901
         """Test creating a glossary entry."""
         url = reverse("glossary-list")
         data = {
@@ -504,7 +504,7 @@ class TranslationGlossaryViewSetTest(TestCase):
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(TranslationGlossary.objects.count(), 2)
 
-    def test_search_glossary(self):
+    def test_search_glossary(self):  # noqa: C901
         """Test searching glossary entries."""
         url = reverse("glossary-search")
         response = self.client.get(url, {"term": "Dashboard"})

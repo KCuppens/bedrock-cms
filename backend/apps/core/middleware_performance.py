@@ -1,16 +1,17 @@
-"""
-Performance monitoring and optimization middleware.
-"""
-
 import json
 import logging
 import time
-
 from django.conf import settings
 from django.core.cache import cache
 from django.db import connection
 from django.http import JsonResponse
 from django.utils.deprecation import MiddlewareMixin
+                import brotli
+"""
+Performance monitoring and optimization middleware.
+"""
+
+
 
 logger = logging.getLogger("performance")
 
@@ -256,7 +257,6 @@ class CompressionMiddleware(MiddlewareMixin):
         # Try Brotli first (better compression)
         if "br" in accepted:
             try:
-                import brotli
 
                 compressed = brotli.compress(response.content, quality=4)
                 if len(compressed) < len(response.content):

@@ -1,23 +1,23 @@
-"""
-Auto-generated ViewSets for registered content models.
-"""
-
 from typing import Any
-
 from django.db.models import Q
 from django.shortcuts import get_object_or_404
-
 from django_filters.rest_framework import DjangoFilterBackend
 from drf_spectacular.utils import OpenApiParameter, extend_schema
 from rest_framework import filters, permissions, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
-
 from apps.i18n.models import Locale
-
 from .config import ContentConfig
 from .registry import content_registry
 from .serializers import (
+"""
+Auto-generated ViewSets for registered content models.
+"""
+
+
+
+
+
     RegistrySerializer,
     RegistrySummarySerializer,
     get_serializer_for_config,

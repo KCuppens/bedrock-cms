@@ -1,11 +1,11 @@
-"""
-Custom validators for the core app.
-"""
-
 import json
 
 from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
+
+"""
+Custom validators for the core app.
+"""
 
 
 def validate_json_size(value, max_size_mb=1):

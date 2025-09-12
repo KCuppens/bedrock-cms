@@ -9,20 +9,34 @@ from rest_framework.response import Response
 from rest_framework.throttling import UserRateThrottle
 
 from apps.cms.serializers import (
+from apps.cms.serializers.public import PublicPageSerializer
+from apps.core.throttling import (
+from apps.i18n.models import Locale
+from ..models import Page
+from ..versioning_views import VersioningMixin
+        from django.db.models import Count
+        from django.db.models import Count
+            from django.db.models import Case, IntegerField, Value, When
+        import copy
+        import uuid
+        from django.utils import timezone
+        import copy
+        import uuid
+            from ..versioning import AuditEntry
+                from ..versioning import AuditEntry
+from django.shortcuts import redirect
+from django.views.decorators.cache import cache_page
+from django_ratelimit.decorators import ratelimit
+            from ..seo_utils import generate_hreflang_alternates
     PageReadSerializer,
     PageTreeItemSerializer,
     PageWriteSerializer,
 )
-from apps.cms.serializers.public import PublicPageSerializer
-from apps.core.throttling import (
     BurstWriteThrottle,
     PublishOperationThrottle,
     WriteOperationThrottle,
 )
-from apps.i18n.models import Locale
 
-from ..models import Page
-from ..versioning_views import VersioningMixin
 
 
 class PagesViewSet(VersioningMixin, viewsets.ModelViewSet):
@@ -36,7 +50,6 @@ class PagesViewSet(VersioningMixin, viewsets.ModelViewSet):
     ]
 
     def get_queryset(self):
-        from django.db.models import Count
 
         return (
             Page.objects.select_related("locale", "parent")
@@ -257,7 +270,6 @@ class PagesViewSet(VersioningMixin, viewsets.ModelViewSet):
         queryset = queryset.order_by("position")
 
         # Annotate with children count for the serializer
-        from django.db.models import Count
 
         queryset = queryset.annotate(_children_count=Count("children"))
 
@@ -444,7 +456,6 @@ class PagesViewSet(VersioningMixin, viewsets.ModelViewSet):
                 )
 
             # Bulk update positions using CASE statement for efficiency
-            from django.db.models import Case, IntegerField, Value, When
 
             cases = [
                 When(id=page_id, then=Value(position))
@@ -622,8 +633,6 @@ class PagesViewSet(VersioningMixin, viewsets.ModelViewSet):
             )
 
         # Duplicate the block
-        import copy
-        import uuid
 
         original_block = page.blocks[index]
         duplicated_block = copy.deepcopy(original_block)
@@ -680,7 +689,6 @@ class PagesViewSet(VersioningMixin, viewsets.ModelViewSet):
         """Publish a page."""
         page = self.get_object()
 
-        from django.utils import timezone
 
         page.status = "published"
         page.published_at = timezone.now()
@@ -708,8 +716,6 @@ class PagesViewSet(VersioningMixin, viewsets.ModelViewSet):
     @action(detail=True, methods=["post"])
     def duplicate(self, request, pk=None):
         """Duplicate a page with all its content."""
-        import copy
-        import uuid
 
         page = self.get_object()
 
@@ -755,7 +761,6 @@ class PagesViewSet(VersioningMixin, viewsets.ModelViewSet):
             duplicated_page.refresh_from_db()
 
             # Create audit entry for duplication
-            from ..versioning import AuditEntry
 
             AuditEntry.objects.create(
                 content_object=duplicated_page,
@@ -799,7 +804,6 @@ class PagesViewSet(VersioningMixin, viewsets.ModelViewSet):
         try:
             with transaction.atomic():
                 # Create audit entry before deletion
-                from ..versioning import AuditEntry
 
                 AuditEntry.objects.create(
                     content_object=page,
@@ -824,10 +828,7 @@ class PagesViewSet(VersioningMixin, viewsets.ModelViewSet):
             )
 
 
-from django.shortcuts import redirect
-from django.views.decorators.cache import cache_page
 
-from django_ratelimit.decorators import ratelimit
 
 
 def default_sitemap_view(request):
@@ -891,7 +892,6 @@ def sitemap_view(request, locale_code):
 
         # Add hreflang alternates if requested
         if include_alternates:
-            from ..seo_utils import generate_hreflang_alternates
 
             alternates = generate_hreflang_alternates(page, base_url)
             for alternate in alternates:

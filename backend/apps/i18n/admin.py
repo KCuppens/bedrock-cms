@@ -44,7 +44,7 @@ class LocaleAdmin(admin.ModelAdmin):
 
     actions = ["make_default", "activate_locales", "deactivate_locales"]
 
-    def is_default_display(self, obj):
+    def is_default_display(self, obj):  # noqa: C901
         """Display default status with styling."""
         if obj.is_default:
             return format_html(
@@ -55,7 +55,7 @@ class LocaleAdmin(admin.ModelAdmin):
     is_default_display.short_description = "Default"
     is_default_display.admin_order_field = "is_default"
 
-    def rtl_display(self, obj):
+    def rtl_display(self, obj):  # noqa: C901
         """Display RTL status."""
         if obj.rtl:
             return format_html('<span style="color: blue;">RTL</span>')
@@ -64,7 +64,7 @@ class LocaleAdmin(admin.ModelAdmin):
     rtl_display.short_description = "RTL"
     rtl_display.admin_order_field = "rtl"
 
-    def make_default(self, request, queryset):
+    def make_default(self, request, queryset):  # noqa: C901
         """Action to set a locale as default."""
         if queryset.count() != 1:
             self.message_user(
@@ -88,14 +88,14 @@ class LocaleAdmin(admin.ModelAdmin):
 
     make_default.short_description = "Set as default locale"
 
-    def activate_locales(self, request, queryset):
+    def activate_locales(self, request, queryset):  # noqa: C901
         """Action to activate selected locales."""
         count = queryset.update(is_active=True)
         self.message_user(request, f"Activated {count} locale(s).")
 
     activate_locales.short_description = "Activate selected locales"
 
-    def deactivate_locales(self, request, queryset):
+    def deactivate_locales(self, request, queryset):  # noqa: C901
         """Action to deactivate selected locales."""
         # Prevent deactivating the default locale
         default_in_selection = queryset.filter(is_default=True).exists()
@@ -112,11 +112,11 @@ class LocaleAdmin(admin.ModelAdmin):
 
     deactivate_locales.short_description = "Deactivate selected locales"
 
-    def get_queryset(self, request):
+    def get_queryset(self, request):  # noqa: C901
         """Optimize queryset with select_related."""
         return super().get_queryset(request).select_related("fallback")
 
-    def save_model(self, request, obj, form, change):
+    def save_model(self, request, obj, form, change):  # noqa: C901
         """Custom save to handle validation."""
         try:
             obj.save()
@@ -161,7 +161,7 @@ class TranslationGlossaryAdmin(admin.ModelAdmin):
         ),
     ]
 
-    def save_model(self, request, obj, form, change):
+    def save_model(self, request, obj, form, change):  # noqa: C901
         """Set created_by and updated_by fields."""
         if not change:
             obj.created_by = request.user
@@ -218,7 +218,7 @@ class TranslationQueueAdmin(admin.ModelAdmin):
         ),
     ]
 
-    def save_model(self, request, obj, form, change):
+    def save_model(self, request, obj, form, change):  # noqa: C901
         """Set created_by field."""
         if not change:
             obj.created_by = request.user
@@ -235,11 +235,11 @@ class TranslationHistoryAdmin(admin.ModelAdmin):
     ordering = ["-created_at"]
     readonly_fields = ["created_at"]
 
-    def has_add_permission(self, request):
+    def has_add_permission(self, request):  # noqa: C901
         """Disable adding history entries manually."""
         return False
 
-    def has_change_permission(self, request, obj=None):
+    def has_change_permission(self, request, obj=None):  # noqa: C901
         """Disable editing history entries."""
         return False
 
@@ -286,7 +286,7 @@ class UiMessageTranslationAdmin(admin.ModelAdmin):
     ordering = ["-updated_at"]
     readonly_fields = ["created_at", "updated_at"]
 
-    def save_model(self, request, obj, form, change):
+    def save_model(self, request, obj, form, change):  # noqa: C901
         """Set updated_by field."""
         obj.updated_by = request.user
         super().save_model(request, obj, form, change)

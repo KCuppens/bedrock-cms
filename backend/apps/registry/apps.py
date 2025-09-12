@@ -2,6 +2,7 @@ import logging
 
 from django.apps import AppConfig
 from django.core.exceptions import ValidationError
+        from .registry import content_registry, register_core_models
 
 logger = logging.getLogger(__name__)
 
@@ -14,7 +15,6 @@ class RegistryConfig(AppConfig):
     def ready(self):
         """Initialize the content registry when the app is ready."""
         # Import registry to ensure it's initialized
-        from .registry import content_registry, register_core_models
 
         # Register core models
         try:

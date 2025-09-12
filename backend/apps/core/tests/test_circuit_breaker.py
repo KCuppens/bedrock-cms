@@ -1,13 +1,13 @@
-"""
-Test cases for circuit breaker functionality.
-"""
-
 import time
 
 from django.core.cache import cache
 from django.test import TestCase
 
 from apps.core.circuit_breaker import CircuitOpenException, circuit_breaker
+
+"""
+Test cases for circuit breaker functionality.
+"""
 
 
 class CircuitBreakerTest(TestCase):

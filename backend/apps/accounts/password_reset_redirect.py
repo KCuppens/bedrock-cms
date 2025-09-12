@@ -1,12 +1,14 @@
-"""
-Handle password reset URL redirects from Allauth to frontend.
-"""
-
 from django.conf import settings
 from django.shortcuts import redirect
 from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode
 from django.views.decorators.http import require_GET
+from django.contrib.auth import get_user_model
+
+"""
+Handle password reset URL redirects from Allauth to frontend.
+"""
+
 
 
 @require_GET
@@ -20,7 +22,6 @@ def password_reset_redirect(request, uidb36, key):
     We need to redirect to:
     /password-reset/{uid}/{token}
     """
-    from django.contrib.auth import get_user_model
 
     User = get_user_model()
 

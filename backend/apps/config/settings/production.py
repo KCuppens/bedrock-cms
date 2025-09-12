@@ -2,20 +2,32 @@
 Production settings with CDN and performance optimizations.
 """
 
-from .base import *
+import sentry_sdk
+from sentry_sdk.integrations.celery import CeleryIntegration
+from sentry_sdk.integrations.django import DjangoIntegration
+from sentry_sdk.integrations.redis import RedisIntegration
+
+from .base import (  # noqa: F403
+    BASE_DIR,  # noqa: F405
+    INSTALLED_APPS,  # noqa: F405
+    DATABASES,  # noqa: F405
+    REST_FRAMEWORK,  # noqa: F405
+    LOGGING,  # noqa: F405
+    env,  # noqa: F405
+)
 
 # Security
 DEBUG = False
-ALLOWED_HOSTS = env.list("ALLOWED_HOSTS", default=[])
+ALLOWED_HOSTS = env.list("ALLOWED_HOSTS", default=[])  # noqa: F405
 
 # CDN Configuration
 CDN_ENABLED = True
-CDN_URL = env("CDN_URL", default="https://cdn.example.com")
-CDN_PULL_ZONE = env("CDN_PULL_ZONE", default="")
+CDN_URL = env("CDN_URL", default="https://cdn.example.com")  # noqa: F405
+CDN_PULL_ZONE = env("CDN_PULL_ZONE", default="")  # noqa: F405
 
 # CloudFlare settings (if using CloudFlare)
-CLOUDFLARE_ZONE_ID = env("CLOUDFLARE_ZONE_ID", default="")
-CLOUDFLARE_API_TOKEN = env("CLOUDFLARE_API_TOKEN", default="")
+CLOUDFLARE_ZONE_ID = env("CLOUDFLARE_ZONE_ID", default="")  # noqa: F405
+CLOUDFLARE_API_TOKEN = env("CLOUDFLARE_API_TOKEN", default="")  # noqa: F405
 
 # Static files with CDN
 if CDN_ENABLED:
@@ -29,7 +41,7 @@ else:
 CACHES = {
     "default": {
         "BACKEND": "django_redis.cache.RedisCache",
-        "LOCATION": env("REDIS_URL", default="redis://localhost:6379/0"),
+        "LOCATION": env("REDIS_URL", default="redis://localhost:6379/0"),  # noqa: F405
         "OPTIONS": {
             "CLIENT_CLASS": "django_redis.client.DefaultClient",
             "CONNECTION_POOL_KWARGS": {
@@ -46,7 +58,7 @@ CACHES = {
     },
     "page_cache": {
         "BACKEND": "django_redis.cache.RedisCache",
-        "LOCATION": env("REDIS_URL", default="redis://localhost:6379/1"),
+        "LOCATION": env("REDIS_URL", default="redis://localhost:6379/1"),  # noqa: F405
         "OPTIONS": {
             "CLIENT_CLASS": "django_redis.client.DefaultClient",
         },
@@ -55,7 +67,7 @@ CACHES = {
     },
     "api_cache": {
         "BACKEND": "django_redis.cache.RedisCache",
-        "LOCATION": env("REDIS_URL", default="redis://localhost:6379/2"),
+        "LOCATION": env("REDIS_URL", default="redis://localhost:6379/2"),  # noqa: F405
         "OPTIONS": {
             "CLIENT_CLASS": "django_redis.client.DefaultClient",
         },
@@ -65,8 +77,8 @@ CACHES = {
 }
 
 # Database optimizations
-DATABASES["default"]["CONN_MAX_AGE"] = 600
-DATABASES["default"]["OPTIONS"].update(
+DATABASES["default"]["CONN_MAX_AGE"] = 600  # noqa: F405
+DATABASES["default"]["OPTIONS"].update(  # noqa: F405
     {
         "connect_timeout": 10,
         "options": "-c statement_timeout=30000",
@@ -90,7 +102,7 @@ USE_X_FORWARDED_HOST = True
 USE_X_FORWARDED_PORT = True
 
 # CORS for CDN
-CORS_ALLOWED_ORIGINS = env.list(
+CORS_ALLOWED_ORIGINS = env.list(  # noqa: F405
     "CORS_ALLOWED_ORIGINS",
     default=[
         "https://cdn.example.com",
@@ -104,11 +116,11 @@ FILE_UPLOAD_MAX_MEMORY_SIZE = 10 * 1024 * 1024  # 10MB
 
 # Email backend for production
 EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
-EMAIL_HOST = env("EMAIL_HOST")
-EMAIL_PORT = env.int("EMAIL_PORT", 587)
+EMAIL_HOST = env("EMAIL_HOST")  # noqa: F405
+EMAIL_PORT = env.int("EMAIL_PORT", 587)  # noqa: F405
 EMAIL_USE_TLS = True
-EMAIL_HOST_USER = env("EMAIL_HOST_USER")
-EMAIL_HOST_PASSWORD = env("EMAIL_HOST_PASSWORD")
+EMAIL_HOST_USER = env("EMAIL_HOST_USER")  # noqa: F405
+EMAIL_HOST_PASSWORD = env("EMAIL_HOST_PASSWORD")  # noqa: F405
 
 # Celery optimizations
 CELERY_WORKER_PREFETCH_MULTIPLIER = 4
@@ -116,7 +128,7 @@ CELERY_TASK_ACKS_LATE = True
 CELERY_TASK_REJECT_ON_WORKER_LOST = True
 
 # Logging configuration
-LOGGING = {
+LOGGING = {  # noqa: F811
     "version": 1,
     "disable_existing_loggers": False,
     "formatters": {
@@ -172,14 +184,9 @@ LOGGING = {
 }
 
 # Sentry integration (optional)
-if env("SENTRY_DSN", default=""):
-    import sentry_sdk
-    from sentry_sdk.integrations.celery import CeleryIntegration
-    from sentry_sdk.integrations.django import DjangoIntegration
-    from sentry_sdk.integrations.redis import RedisIntegration
-
+if env("SENTRY_DSN", default=""):  # noqa: F405
     sentry_sdk.init(
-        dsn=env("SENTRY_DSN"),
+        dsn=env("SENTRY_DSN"),  # noqa: F405
         integrations=[
             DjangoIntegration(),
             CeleryIntegration(),

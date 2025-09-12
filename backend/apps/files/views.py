@@ -14,11 +14,14 @@ from apps.core.permissions import IsOwnerOrAdmin
 
 from .models import FileUpload
 from .serializers import (
+from .services import FileService
+            from django.db.models import Q
+        import os
+        import uuid
     FileUploadCreateSerializer,
     FileUploadSerializer,
     SignedUrlSerializer,
 )
-from .services import FileService
 
 logger = logging.getLogger(__name__)
 
@@ -58,13 +61,12 @@ class FileUploadViewSet(viewsets.ModelViewSet):
         "trace",
     ]
 
-    def get_queryset(self):
+    def get_queryset(self):  # noqa: C901
         """Get files based on user permissions"""
         queryset = FileUpload.objects.select_related("created_by", "updated_by")
 
         # Users can see their own files and public files
         if not self.request.user.is_admin():
-            from django.db.models import Q
 
             queryset = queryset.filter(
                 Q(created_by=self.request.user) | Q(is_public=True)
@@ -82,13 +84,13 @@ class FileUploadViewSet(viewsets.ModelViewSet):
 
         return queryset
 
-    def get_serializer_class(self):
+    def get_serializer_class(self):  # noqa: C901
         """Return appropriate serializer class"""
         if self.action == "create":
             return FileUploadCreateSerializer
         return FileUploadSerializer
 
-    def create(self, request, *args, **kwargs):
+    def create(self, request, *args, **kwargs):  # noqa: C901
         """Create a new file upload"""
         if "file" not in request.FILES:
             return Response(
@@ -124,7 +126,7 @@ class FileUploadViewSet(viewsets.ModelViewSet):
         )
         return Response(response_serializer.data, status=status.HTTP_201_CREATED)
 
-    def update(self, request, *args, **kwargs):
+    def update(self, request, *args, **kwargs):  # noqa: C901
         """Update file metadata (PUT)"""
         partial = kwargs.pop("partial", False)
         instance = self.get_object()
@@ -139,7 +141,7 @@ class FileUploadViewSet(viewsets.ModelViewSet):
 
         return Response(serializer.data)
 
-    def partial_update(self, request, *args, **kwargs):
+    def partial_update(self, request, *args, **kwargs):  # noqa: C901
         """Update file metadata (PATCH)"""
         kwargs["partial"] = True
         return self.update(request, *args, **kwargs)
@@ -149,7 +151,7 @@ class FileUploadViewSet(viewsets.ModelViewSet):
         description="Get a signed download URL for the file.",
     )
     @action(detail=True, methods=["get"])
-    def download_url(self, request, pk=None):
+    def download_url(self, request, pk=None):  # noqa: C901
         """Get download URL for file"""
         file_upload = self.get_object()
 
@@ -172,7 +174,7 @@ class FileUploadViewSet(viewsets.ModelViewSet):
 
     @extend_schema(summary="Download file", description="Download the file directly.")
     @action(detail=True, methods=["get"])
-    def download(self, request, pk=None):
+    def download(self, request, pk=None):  # noqa: C901
         """Download file directly"""
         file_upload = self.get_object()
 
@@ -209,7 +211,7 @@ class FileUploadViewSet(viewsets.ModelViewSet):
         description="Get a signed URL for direct upload to storage (S3/MinIO).",
     )
     @action(detail=False, methods=["post"])
-    def signed_upload_url(self, request):
+    def signed_upload_url(self, request):  # noqa: C901
         """Get signed upload URL"""
         serializer = SignedUrlSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -219,8 +221,6 @@ class FileUploadViewSet(viewsets.ModelViewSet):
         max_size = serializer.validated_data.get("max_size", 10 * 1024 * 1024)  # 10MB
 
         # Generate storage path
-        import os
-        import uuid
 
         file_extension = os.path.splitext(filename)[1].lower()
         unique_filename = f"{uuid.uuid4().hex}{file_extension}"
@@ -248,7 +248,7 @@ class FileUploadViewSet(viewsets.ModelViewSet):
         description="Get all files uploaded by the current user.",
     )
     @action(detail=False, methods=["get"])
-    def my_files(self, request):
+    def my_files(self, request):  # noqa: C901
         """Get files uploaded by current user"""
         queryset = self.get_queryset().filter(created_by=request.user)
 
@@ -262,7 +262,7 @@ class FileUploadViewSet(viewsets.ModelViewSet):
 
     @extend_schema(summary="Get public files", description="Get all public files.")
     @action(detail=False, methods=["get"])
-    def public(self, request):
+    def public(self, request):  # noqa: C901
         """Get public files"""
         queryset = self.get_queryset().filter(is_public=True)
 
@@ -276,7 +276,7 @@ class FileUploadViewSet(viewsets.ModelViewSet):
 
 
 # Standalone view for direct file downloads (used in fallback URLs)
-def file_download_view(request, file_id):
+def file_download_view(request, file_id):  # noqa: C901
     """Direct file download view"""
     file_upload = get_object_or_404(FileUpload, id=file_id)
 

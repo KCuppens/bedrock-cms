@@ -9,6 +9,15 @@ from rest_framework.permissions import IsAdminUser
 from rest_framework.response import Response
 
 from .serializers import UserSerializer
+from django.core.exceptions import ValidationError
+from django.contrib.auth.tokens import default_token_generator
+from django.utils.encoding import force_bytes
+from django.utils.http import urlsafe_base64_encode
+from django.conf import settings
+from django.core.mail import send_mail
+import secrets
+from apps.i18n.models import Locale
+from .rbac import ScopedLocale
 
 User = get_user_model()
 
@@ -37,7 +46,7 @@ class RoleSerializer(serializers.ModelSerializer):
             "locale_scope_ids",
         ]
 
-    def get_permissions(self, obj):
+    def get_permissions(self, obj):  # noqa: C901
         """Get permissions for the role"""
         return [
             {
@@ -49,7 +58,7 @@ class RoleSerializer(serializers.ModelSerializer):
             for perm in obj.permissions.all()
         ]
 
-    def get_locale_scopes(self, obj):
+    def get_locale_scopes(self, obj):  # noqa: C901
         """Get locale scopes for the role"""
         return [
             {
@@ -86,7 +95,7 @@ class UserInviteSerializer(serializers.Serializer):
     message = serializers.CharField(required=False)
     resend = serializers.BooleanField(default=False)  # Flag for resending invites
 
-    def validate(self, data):
+    def validate(self, data):  # noqa: C901
         """Custom validation for invite/resend logic"""
         email = data["email"]
         resend = data.get("resend", False)
@@ -129,7 +138,7 @@ class UserManagementViewSet(viewsets.ModelViewSet):
     serializer_class = UserSerializer
     permission_classes = [IsAdminUser]
 
-    def get_queryset(self):
+    def get_queryset(self):  # noqa: C901
         """Filter users based on query parameters"""
         queryset = self.queryset
 
@@ -158,7 +167,7 @@ class UserManagementViewSet(viewsets.ModelViewSet):
         summary="Invite new user or resend invitation", tags=["User Management"]
     )
     @action(detail=False, methods=["post"])
-    def invite(self, request):
+    def invite(self, request):  # noqa: C901
         """Send invitation to new user or resend invitation to existing user"""
         serializer = UserInviteSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -177,17 +186,12 @@ class UserManagementViewSet(viewsets.ModelViewSet):
                 user = User.objects.get(email=email)
 
                 # Generate new password reset token for the invite
-                from django.contrib.auth.tokens import default_token_generator
-                from django.utils.encoding import force_bytes
-                from django.utils.http import urlsafe_base64_encode
 
                 # Create reset token for password setup
                 token = default_token_generator.make_token(user)
                 urlsafe_base64_encode(force_bytes(user.pk))
 
                 # Send resend invitation email
-                from django.conf import settings
-                from django.core.mail import send_mail
 
                 send_mail(
                     subject=f"Invitation Reminder - {settings.SITE_NAME}",
@@ -218,7 +222,6 @@ class UserManagementViewSet(viewsets.ModelViewSet):
                 )
         else:
             # Create new user invitation
-            import secrets
 
             temp_password = secrets.token_urlsafe(16)
 
@@ -246,17 +249,12 @@ class UserManagementViewSet(viewsets.ModelViewSet):
                     pass
 
             # Generate password reset token for new user
-            from django.contrib.auth.tokens import default_token_generator
-            from django.utils.encoding import force_bytes
-            from django.utils.http import urlsafe_base64_encode
 
             # Create reset token for password setup
             token = default_token_generator.make_token(user)
             urlsafe_base64_encode(force_bytes(user.pk))
 
             # Send invitation email
-            from django.conf import settings
-            from django.core.mail import send_mail
 
             send_mail(
                 subject=f"Invitation to {settings.SITE_NAME}",
@@ -280,7 +278,7 @@ class UserManagementViewSet(viewsets.ModelViewSet):
 
     @extend_schema(summary="Update user roles", tags=["User Management"])
     @action(detail=True, methods=["put"])
-    def roles(self, request, pk=None):
+    def roles(self, request, pk=None):  # noqa: C901
         """Update user's roles"""
         user = self.get_object()
         role_ids = request.data.get("role_ids", [])
@@ -305,7 +303,7 @@ class UserManagementViewSet(viewsets.ModelViewSet):
 
     @extend_schema(summary="Deactivate user", tags=["User Management"])
     @action(detail=True, methods=["post"])
-    def deactivate(self, request, pk=None):
+    def deactivate(self, request, pk=None):  # noqa: C901
         """Deactivate a user account"""
         user = self.get_object()
         user.is_active = False
@@ -315,7 +313,7 @@ class UserManagementViewSet(viewsets.ModelViewSet):
 
     @extend_schema(summary="Reactivate user", tags=["User Management"])
     @action(detail=True, methods=["post"])
-    def reactivate(self, request, pk=None):
+    def reactivate(self, request, pk=None):  # noqa: C901
         """Reactivate a user account"""
         user = self.get_object()
         user.is_active = True
@@ -324,7 +322,7 @@ class UserManagementViewSet(viewsets.ModelViewSet):
         return Response({"message": f"User {user.email} has been reactivated"})
 
     @extend_schema(summary="Delete user", tags=["User Management"])
-    def destroy(self, request, pk=None):
+    def destroy(self, request, pk=None):  # noqa: C901
         """Delete a user with validation"""
         user = self.get_object()
 
@@ -368,11 +366,11 @@ class RoleViewSet(viewsets.ModelViewSet):
     serializer_class = RoleSerializer
     permission_classes = [IsAdminUser]
 
-    def get_queryset(self):
+    def get_queryset(self):  # noqa: C901
         """Get roles with user count"""
         return self.queryset.annotate(user_count=Count("user"))
 
-    def create(self, request, *args, **kwargs):
+    def create(self, request, *args, **kwargs):  # noqa: C901
         """Create a new role/group"""
         data = getattr(request, "data", request.POST)
         name = data.get("name")
@@ -389,9 +387,7 @@ class RoleViewSet(viewsets.ModelViewSet):
 
             # Create locale scopes if provided
             if locale_scope_ids:
-                from apps.i18n.models import Locale
 
-                from .rbac import ScopedLocale
 
                 for locale_id in locale_scope_ids:
                     try:
@@ -409,7 +405,7 @@ class RoleViewSet(viewsets.ModelViewSet):
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
-    def update(self, request, *args, **kwargs):
+    def update(self, request, *args, **kwargs):  # noqa: C901
         """Update an existing role/group"""
         kwargs.pop("partial", False)
         instance = self.get_object()
@@ -425,9 +421,7 @@ class RoleViewSet(viewsets.ModelViewSet):
 
         # Update locale scopes if provided
         if "locale_scope_ids" in data:
-            from apps.i18n.models import Locale
 
-            from .rbac import ScopedLocale
 
             # Clear existing locale scopes
             ScopedLocale.objects.filter(group=instance).delete()
@@ -446,7 +440,7 @@ class RoleViewSet(viewsets.ModelViewSet):
 
     @extend_schema(summary="Manage role permissions", tags=["Role Management"])
     @action(detail=True, methods=["get", "post", "put"])
-    def permissions(self, request, pk=None):
+    def permissions(self, request, pk=None):  # noqa: C901
         """Get or update permissions for a role"""
         role = self.get_object()
 
@@ -501,7 +495,7 @@ class PermissionViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = PermissionSerializer
     permission_classes = [IsAdminUser]
 
-    def get_queryset(self):
+    def get_queryset(self):  # noqa: C901
         """Filter permissions"""
         queryset = self.queryset
 
@@ -523,7 +517,7 @@ class PermissionViewSet(viewsets.ReadOnlyModelViewSet):
 @extend_schema(summary="Get available scopes", tags=["Permission Management"])
 @api_view(["GET"])
 @permission_classes([IsAdminUser])
-def get_scopes(request):
+def get_scopes(request):  # noqa: C901
     """Get available permission scopes"""
 
     # These would be defined in your RBAC system
@@ -539,7 +533,3 @@ def get_scopes(request):
     ]
 
     return Response(scopes)
-
-
-from rest_framework import serializers
-from rest_framework.decorators import api_view, permission_classes

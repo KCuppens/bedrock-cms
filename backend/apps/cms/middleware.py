@@ -3,6 +3,7 @@ from django.http import HttpResponsePermanentRedirect, HttpResponseRedirect
 from django.utils.deprecation import MiddlewareMixin
 
 from .models import Redirect
+            from django.db import transaction
 
 
 class RedirectMiddleware(MiddlewareMixin):
@@ -108,7 +109,6 @@ class RedirectMiddleware(MiddlewareMixin):
     def _track_redirect_hit(self, redirect_id):
         """Track redirect hit."""
         try:
-            from django.db import transaction
 
             # Use a transaction to safely increment the counter
             with transaction.atomic():

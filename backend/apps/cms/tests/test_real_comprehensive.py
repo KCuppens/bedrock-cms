@@ -1,18 +1,19 @@
-"""
-Real comprehensive CMS tests using actual models and targeting high coverage.
-"""
-
 from datetime import datetime, timedelta
 
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
 from django.test import TestCase, TransactionTestCase
-
 from rest_framework.test import APIClient, APITestCase
 
-# Import actual models
 from apps.cms.models import Page, Redirect
 from apps.i18n.models import Locale
+
+"""
+Real comprehensive CMS tests using actual models and targeting high coverage.
+"""
+
+
+# Import actual models
 
 User = get_user_model()
 

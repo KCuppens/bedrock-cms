@@ -12,6 +12,11 @@ from rest_framework.throttling import AnonRateThrottle
 from rest_framework.views import APIView
 
 from .serializers import UserSerializer
+from django.utils.encoding import force_str
+from django.utils.http import urlsafe_base64_decode
+from allauth.account.forms import default_token_generator
+from django.contrib.auth.tokens import default_token_generator as django_token_generator
+from django.contrib.auth.password_validation import validate_password
 
 User = get_user_model()
 
@@ -49,7 +54,7 @@ class PasswordResetThrottle(AnonRateThrottle):
 @api_view(["POST"])
 @permission_classes([AllowAny])
 @throttle_classes([LoginThrottle])
-def login_view(request):
+def login_view(request):  # noqa: C901
     """REST API endpoint for user login"""
     email = request.data.get("email", "").lower().strip()
     password = request.data.get("password", "")
@@ -101,7 +106,7 @@ def login_view(request):
 )
 @api_view(["POST"])
 @permission_classes([IsAuthenticated])
-def logout_view(request):
+def logout_view(request):  # noqa: C901
     """REST API endpoint for user logout"""
     logout(request)
     return Response(
@@ -120,7 +125,7 @@ def logout_view(request):
 )
 @api_view(["GET"])
 @permission_classes([IsAuthenticated])
-def current_user_view(request):
+def current_user_view(request):  # noqa: C901
     """REST API endpoint to get current user"""
     serializer = UserSerializer(request.user, context={"request": request})
     return Response(serializer.data, status=status.HTTP_200_OK)
@@ -144,7 +149,7 @@ def current_user_view(request):
 @api_view(["POST"])
 @permission_classes([AllowAny])
 @throttle_classes([PasswordResetThrottle])
-def password_reset_view(request):
+def password_reset_view(request):  # noqa: C901
     """REST API endpoint for password reset request"""
     email = request.data.get("email", "").lower().strip()
 
@@ -187,14 +192,12 @@ def password_reset_view(request):
     )
 
 
-def _parse_token_from_formats(uid_param, token_param):
+def _parse_token_from_formats(uid_param, token_param):  # noqa: C901
     """
     Parse UID and token from different formats:
     1. Standard Django format: separate uid and token
     2. Allauth format: combined token like "4-cvtit9-cc6628ec2531c2cc114f2d6d8f06d72d"
     """
-    from django.utils.encoding import force_str
-    from django.utils.http import urlsafe_base64_decode
 
     if uid_param and token_param:
         # Standard format: /password-reset/uid/token
@@ -239,7 +242,7 @@ def _parse_token_from_formats(uid_param, token_param):
 )
 @api_view(["POST"])
 @permission_classes([AllowAny])
-def password_reset_verify_token(request):
+def password_reset_verify_token(request):  # noqa: C901
     """REST API endpoint for verifying password reset token"""
     uid = request.data.get("uid")
     token = request.data.get("token")
@@ -255,7 +258,6 @@ def password_reset_verify_token(request):
         )
 
     # Check if token is valid using allauth's token generator
-    from allauth.account.forms import default_token_generator
 
     # Try allauth token generator first
     if default_token_generator.check_token(user, parsed_token):
@@ -265,9 +267,6 @@ def password_reset_verify_token(request):
         )
 
     # Fallback to Django's token generator
-    from django.contrib.auth.tokens import (
-        default_token_generator as django_token_generator,
-    )
 
     if django_token_generator.check_token(user, parsed_token):
         return Response(
@@ -302,7 +301,7 @@ def password_reset_verify_token(request):
 )
 @api_view(["POST"])
 @permission_classes([AllowAny])
-def password_reset_confirm_view(request):
+def password_reset_confirm_view(request):  # noqa: C901
     """REST API endpoint for password reset confirmation"""
     uid = request.data.get("uid")
     token = request.data.get("token")
@@ -332,7 +331,6 @@ def password_reset_confirm_view(request):
         )
 
     # Check if token is valid using allauth's token generator
-    from allauth.account.forms import default_token_generator
 
     token_valid = False
 
@@ -341,9 +339,6 @@ def password_reset_confirm_view(request):
         token_valid = True
     else:
         # Fallback to Django's token generator
-        from django.contrib.auth.tokens import (
-            default_token_generator as django_token_generator,
-        )
 
         if django_token_generator.check_token(user, parsed_token):
             token_valid = True
@@ -355,7 +350,6 @@ def password_reset_confirm_view(request):
         )
 
     # Validate password strength
-    from django.contrib.auth.password_validation import validate_password
 
     try:
         validate_password(new_password1, user)
@@ -393,7 +387,7 @@ class SessionCheckView(APIView):
             401: {"description": "Not authenticated"},
         },
     )
-    def get(self, request):
+    def get(self, request):  # noqa: C901
         if request.user.is_authenticated:
             serializer = UserSerializer(request.user, context={"request": request})
             return Response(serializer.data, status=status.HTTP_200_OK)

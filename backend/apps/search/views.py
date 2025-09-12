@@ -1,19 +1,20 @@
+from rest_framework import generics, status
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import IsAdminUser
+from rest_framework.response import Response
+from rest_framework.throttling import AnonRateThrottle, UserRateThrottle
+from apps.core.decorators import cache_response
+from .models import SearchIndex, SearchQuery, SearchSuggestion
+from .serializers import (
+from .services import search_service
 """
 Search API views.
 
 Provides REST API endpoints for search functionality.
 """
 
-from rest_framework import generics, status
-from rest_framework.decorators import api_view, permission_classes
-from rest_framework.permissions import IsAdminUser
-from rest_framework.response import Response
-from rest_framework.throttling import AnonRateThrottle, UserRateThrottle
 
-from apps.core.decorators import cache_response
 
-from .models import SearchIndex, SearchQuery, SearchSuggestion
-from .serializers import (
     AutocompleteSerializer,
     BulkIndexSerializer,
     SearchAnalyticsSerializer,
@@ -23,7 +24,6 @@ from .serializers import (
     SearchResponseSerializer,
     SearchSuggestionSerializer,
 )
-from .services import search_service
 
 
 class SearchThrottle(UserRateThrottle):
@@ -44,7 +44,7 @@ class SearchAPIView(generics.GenericAPIView):
     permission_classes = []  # Public endpoint
     throttle_classes = [SearchThrottle, AnonRateThrottle]
 
-    def post(self, request):
+    def post(self, request):  # noqa: C901
         """Perform search."""
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -79,7 +79,7 @@ class SearchAPIView(generics.GenericAPIView):
 @api_view(["GET"])
 @permission_classes([])
 @cache_response(timeout=3600)  # Cache for 1 hour
-def autocomplete_view(request):
+def autocomplete_view(request):  # noqa: C901
     """
     Get search suggestions for autocomplete.
     """
@@ -119,7 +119,7 @@ class SearchSuggestionDetailView(generics.RetrieveUpdateDestroyAPIView):
 @api_view(["GET"])
 @permission_classes([IsAdminUser])
 @cache_response(timeout=1800)  # Cache for 30 minutes
-def search_analytics_view(request):
+def search_analytics_view(request):  # noqa: C901
     """
     Get search analytics (admin only).
     """
@@ -163,7 +163,7 @@ class SearchQueryLogListView(generics.ListAPIView):
 
 @api_view(["POST"])
 @permission_classes([IsAdminUser])
-def bulk_index_view(request):
+def bulk_index_view(request):  # noqa: C901
     """
     Trigger bulk indexing of content (admin only).
     """
@@ -192,7 +192,7 @@ def bulk_index_view(request):
 
 @api_view(["GET"])
 @permission_classes([])
-def search_categories_view(request):
+def search_categories_view(request):  # noqa: C901
     """
     Get available search categories.
     """

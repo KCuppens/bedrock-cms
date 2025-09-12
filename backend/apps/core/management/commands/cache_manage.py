@@ -1,3 +1,12 @@
+import time
+from django.core.cache import cache
+from django.core.management.base import BaseCommand
+from apps.core.cache import cache_manager
+from apps.core.signals import invalidate_all_cache, invalidate_content_type_cache
+        from apps.core.cache import CACHE_PREFIXES
+            from apps.cms.models import Page
+            from apps.blog.models import BlogPost
+            from apps.i18n.models import Locale
 """
 Django management command for cache management.
 
@@ -8,13 +17,8 @@ Usage:
     python manage.py cache_manage --warm-cache
 """
 
-import time
 
-from django.core.cache import cache
-from django.core.management.base import BaseCommand
 
-from apps.core.cache import cache_manager
-from apps.core.signals import invalidate_all_cache, invalidate_content_type_cache
 
 
 class Command(BaseCommand):
@@ -132,7 +136,6 @@ class Command(BaseCommand):
 
         self.stdout.write("")
         self.stdout.write("Cache Key Prefixes:")
-        from apps.core.cache import CACHE_PREFIXES
 
         for cache_type, prefix in CACHE_PREFIXES.items():
             self.stdout.write(f"  {cache_type}: {prefix}")
@@ -152,7 +155,7 @@ class Command(BaseCommand):
             elif hasattr(cache, "get_stats"):
                 stats = cache.get_stats()
                 info.update(stats)
-        except:
+        except Exception:
             pass
 
         # Test cache connectivity
@@ -230,7 +233,6 @@ class Command(BaseCommand):
         warmed = 0
 
         try:
-            from apps.cms.models import Page
 
             # Get published pages
             pages = Page.objects.filter(status="published").select_related("locale")[
@@ -262,7 +264,6 @@ class Command(BaseCommand):
         warmed = 0
 
         try:
-            from apps.blog.models import BlogPost
 
             # Get published blog posts
             posts = BlogPost.objects.filter(status="published").select_related(
@@ -292,7 +293,6 @@ class Command(BaseCommand):
         warmed = 0
 
         try:
-            from apps.i18n.models import Locale
 
             locales = Locale.objects.filter(is_active=True)
 

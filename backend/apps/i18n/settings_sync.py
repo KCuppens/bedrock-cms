@@ -1,11 +1,5 @@
-"""
-Django settings synchronization utilities for i18n locales.
-
-This module provides utilities to keep Django's LANGUAGE_CODE and LANGUAGES
-settings in sync with the database Locale model.
-"""
-
 import logging
+import re
 from pathlib import Path
 from typing import Any
 
@@ -13,6 +7,17 @@ from django.conf import settings
 from django.core.cache import cache
 from django.db import connection
 from django.db.utils import OperationalError, ProgrammingError
+
+from .models import Locale
+
+"""
+Django settings synchronization utilities for i18n locales.
+
+This module provides utilities to keep Django's LANGUAGE_CODE and LANGUAGES
+settings in sync with the database Locale model.
+"""
+
+
 
 logger = logging.getLogger(__name__)
 
@@ -41,7 +46,6 @@ class DjangoSettingsSync:
             if not cls._database_ready():
                 return [("en", "English")]
 
-            from .models import Locale
 
             languages = [
                 (locale.code, locale.name)
@@ -81,7 +85,6 @@ class DjangoSettingsSync:
             if not cls._database_ready():
                 return "en"
 
-            from .models import Locale
 
             default_locale = Locale.objects.filter(
                 is_default=True, is_active=True
@@ -119,7 +122,6 @@ class DjangoSettingsSync:
                     "LOCALE_CODES": ["en"],
                 }
 
-            from .models import Locale
 
             active_locales = Locale.objects.filter(is_active=True).order_by(
                 "sort_order"
@@ -228,7 +230,6 @@ class DjangoSettingsSync:
             # Update LANGUAGE_CODE
             language_code = locale_settings["LANGUAGE_CODE"]
             if "LANGUAGE_CODE" in content:
-                import re
 
                 content = re.sub(
                     r'LANGUAGE_CODE\s*=\s*["\'].*?["\']',
@@ -245,7 +246,6 @@ class DjangoSettingsSync:
                 "LANGUAGES" in content
                 and "LANGUAGE_CODE" not in content.split("LANGUAGES")[0].split("\n")[-1]
             ):
-                import re
 
                 content = re.sub(
                     r"LANGUAGES\s*=\s*\[.*?\]",

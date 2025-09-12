@@ -4,6 +4,8 @@ from django.conf import settings
 from django.core.cache import cache
 from django.utils import timezone
 from django.utils.deprecation import MiddlewareMixin
+from django.contrib.auth import get_user_model
+from .tasks import update_user_last_seen
 
 logger = logging.getLogger(__name__)
 
@@ -27,7 +29,6 @@ class LastSeenMiddleware(MiddlewareMixin):
                     # Check if Celery is in eager mode (local development)
                     if getattr(settings, "CELERY_TASK_ALWAYS_EAGER", False):
                         # In local development, update directly but still use cache throttling
-                        from django.contrib.auth import get_user_model
 
                         User = get_user_model()
 
@@ -41,7 +42,6 @@ class LastSeenMiddleware(MiddlewareMixin):
                     else:
                         # In production, use Celery task
                         try:
-                            from .tasks import update_user_last_seen
 
                             update_user_last_seen.delay(request.user.id)
                             logger.debug(
@@ -49,7 +49,6 @@ class LastSeenMiddleware(MiddlewareMixin):
                             )
                         except Exception:
                             # If Celery fails, update directly as fallback
-                            from django.contrib.auth import get_user_model
 
                             User = get_user_model()
                             User.objects.filter(id=request.user.id).update(

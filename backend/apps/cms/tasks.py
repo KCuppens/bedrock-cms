@@ -1,20 +1,21 @@
-"""
-Background tasks for CMS operations.
-"""
-
 import logging
 import re
 from typing import Any
 from urllib.parse import urljoin
-
 from django.db import transaction
 from django.utils import timezone
-
 import requests
 from celery import shared_task
-
 from .models import Page
 from .scheduling import ScheduledTask
+    from apps.blog.models import BlogPost
+"""
+Background tasks for CMS operations.
+"""
+
+
+
+
 
 logger = logging.getLogger(__name__)
 
@@ -31,7 +32,7 @@ class LinkExtractor:
         r'"href":\s*["\']([^"\']+)["\']',  # JSON href properties
     ]
 
-    def __init__(self, base_url: str = "http://localhost:8000"):
+    def __init__(self, base_url: str = "http://localhost:8000"):  # noqa: C901
         self.base_url = base_url.rstrip("/")
         self.session = requests.Session()
         self.session.headers.update({"User-Agent": "Bedrock-CMS-LinkChecker/1.0"})
@@ -92,7 +93,7 @@ class LinkExtractor:
 
         return links
 
-    def _find_urls_in_text(self, text: str) -> list[str]:
+    def _find_urls_in_text(self, text: str) -> list[str]:  # noqa: C901
         """Find URLs in text using regex patterns."""
         urls = set()
 
@@ -102,7 +103,7 @@ class LinkExtractor:
 
         return list(urls)
 
-    def _is_internal_link(self, url: str) -> bool:
+    def _is_internal_link(self, url: str) -> bool:  # noqa: C901
         """Check if URL is an internal link that should be checked."""
         if not url:
             return False
@@ -123,7 +124,7 @@ class LinkExtractor:
 
         return True
 
-    def _get_link_context(self, block: dict[str, Any], url: str) -> str:
+    def _get_link_context(self, block: dict[str, Any], url: str) -> str:  # noqa: C901
         """Get context information about where the link appears."""
         props = block.get("props", {})
 
@@ -141,7 +142,7 @@ class LinkExtractor:
 
         return f"Found in {block.get('type', 'unknown')} block"
 
-    def check_link_status(self, url: str, timeout: int = 10) -> dict[str, Any]:
+    def check_link_status(self, url: str, timeout: int = 10) -> dict[str, Any]:  # noqa: C901
         """Check if a link is accessible."""
         # Convert relative URLs to absolute
         if not url.startswith(("http://", "https://")):
@@ -182,7 +183,7 @@ class LinkExtractor:
 
 
 @shared_task(bind=True)
-def check_internal_links(self, page_ids: list[int] | None = None) -> dict[str, Any]:
+def check_internal_links(self, page_ids: list[int] | None = None) -> dict[str, Any]:  # noqa: C901
     """
     Check internal links in pages and report broken ones.
 
@@ -291,7 +292,7 @@ def check_internal_links(self, page_ids: list[int] | None = None) -> dict[str, A
 
 
 @shared_task
-def nightly_link_check():
+def nightly_link_check():  # noqa: C901
     """
     Nightly task to check all internal links.
     """
@@ -301,18 +302,17 @@ def nightly_link_check():
 
 
 @shared_task(bind=True)
-def check_single_page_links(self, page_id: int) -> dict[str, Any]:
+def check_single_page_links(self, page_id: int) -> dict[str, Any]:  # noqa: C901
     """Check links for a single page."""
     return check_internal_links(self, page_ids=[page_id])
 
 
 @shared_task
-def publish_scheduled_content():
+def publish_scheduled_content():  # noqa: C901
     """
     Publish scheduled content that's ready to be published.
     This task should run every minute to check for content ready to publish.
     """
-    from apps.blog.models import BlogPost
 
     now = timezone.now()
     published_count = 0
@@ -388,7 +388,7 @@ def publish_scheduled_content():
     default_retry_delay=60,  # Retry after 1 minute
     autoretry_for=(Exception,),
 )
-def process_scheduled_publishing(self):
+def process_scheduled_publishing(self):  # noqa: C901
     """
     Process all pending scheduled publishing tasks.
     This task should be run periodically (e.g., every minute) via Celery Beat.

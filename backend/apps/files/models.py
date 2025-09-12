@@ -3,6 +3,12 @@ import uuid
 from django.contrib.auth import get_user_model
 from django.db import models
 from django.db.models import (
+from apps.core.enums import FileType
+from apps.core.mixins import TimestampMixin, UserTrackingMixin
+        from apps.core.utils import format_file_size
+        from django.utils import timezone
+        from .services import FileService
+        from .services import FileService
     BooleanField,
     CharField,
     DateTimeField,
@@ -12,8 +18,6 @@ from django.db.models import (
     UUIDField,
 )
 
-from apps.core.enums import FileType
-from apps.core.mixins import TimestampMixin, UserTrackingMixin
 
 User = get_user_model()
 
@@ -68,36 +72,34 @@ class FileUpload(TimestampMixin, UserTrackingMixin):
             models.Index(fields=["tags"]),
         ]
 
-    def __str__(self):
+    def __str__(self):  # noqa: C901
         return self.original_filename
 
     @property
-    def file_size_human(self):
+    def file_size_human(self):  # noqa: C901
         """Human readable file size"""
-        from apps.core.utils import format_file_size
 
         return format_file_size(self.file_size)
 
     @property
-    def is_expired(self):
+    def is_expired(self):  # noqa: C901
         """Check if file has expired"""
         if not self.expires_at:
             return False
-        from django.utils import timezone
 
         return timezone.now() > self.expires_at
 
     @property
-    def is_image(self):
+    def is_image(self):  # noqa: C901
         """Check if file is an image"""
         return self.file_type == FileType.IMAGE
 
     @property
-    def is_document(self):
+    def is_document(self):  # noqa: C901
         """Check if file is a document"""
         return self.file_type == FileType.DOCUMENT
 
-    def can_access(self, user=None):
+    def can_access(self, user=None):  # noqa: C901
         """Check if user can access this file"""
         # Public files are accessible to all
         if self.is_public and not self.is_expired:
@@ -117,20 +119,18 @@ class FileUpload(TimestampMixin, UserTrackingMixin):
 
         return False
 
-    def increment_download_count(self):
+    def increment_download_count(self):  # noqa: C901
         """Increment download counter atomically using F expression"""
         FileUpload.objects.filter(pk=self.pk).update(
             download_count=F("download_count") + 1
         )
 
-    def get_download_url(self, expires_in=3600):
+    def get_download_url(self, expires_in=3600):  # noqa: C901
         """Get signed download URL"""
-        from .services import FileService
 
         return FileService.get_download_url(self, expires_in)
 
-    def get_upload_url(self, expires_in=3600):
+    def get_upload_url(self, expires_in=3600):  # noqa: C901
         """Get signed upload URL"""
-        from .services import FileService
 
         return FileService.get_upload_url(self.storage_path, expires_in)

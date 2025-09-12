@@ -1,3 +1,9 @@
+from django.core.management.base import BaseCommand, CommandError
+from django.db import models, transaction
+from apps.registry.registry import content_registry
+from apps.search.models import SearchIndex
+from apps.search.services import search_service
+        from django.db.models import Count
 """
 Django management command for search indexing.
 
@@ -7,12 +13,7 @@ Usage:
     python manage.py search_index --clear
 """
 
-from django.core.management.base import BaseCommand, CommandError
-from django.db import models, transaction
 
-from apps.registry.registry import content_registry
-from apps.search.models import SearchIndex
-from apps.search.services import search_service
 
 
 class Command(BaseCommand):
@@ -100,7 +101,6 @@ class Command(BaseCommand):
 
         # By content type
         self.stdout.write("By content type:")
-        from django.db.models import Count
 
         content_types = (
             SearchIndex.objects.values("content_type__app_label", "content_type__model")

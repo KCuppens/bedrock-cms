@@ -1,14 +1,14 @@
-"""
-CSRF token endpoint for frontend applications.
-"""
-
 from django.http import JsonResponse
 from django.middleware.csrf import get_token
 from django.views.decorators.http import require_GET
 
+"""
+CSRF token endpoint for frontend applications.
+"""
+
 
 @require_GET
-def get_csrf_token(request):
+def get_csrf_token(request):  # noqa: C901
     """
     Get CSRF token for frontend application.
 

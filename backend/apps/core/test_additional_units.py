@@ -1,9 +1,20 @@
+import unittest
+from unittest.mock import Mock
+            from apps.core import utils
+            from apps.core import validators
+            from apps.core import enums
+            from apps.core import mixins
+            from apps.core import permissions
+            from apps.core import middleware
+            from apps.core import cache
+            from apps.core import throttling
+            from apps.core import decorators
+            from apps.core import circuit_breaker
+            from apps.core import storage
 """
 Additional unit tests for core app to boost coverage.
 """
 
-import unittest
-from unittest.mock import Mock
 
 
 class TestCoreUtilityFunctions(unittest.TestCase):
@@ -12,7 +23,6 @@ class TestCoreUtilityFunctions(unittest.TestCase):
     def test_core_utils_import(self):
         """Test that core utils can be imported."""
         try:
-            from apps.core import utils
 
             self.assertTrue(hasattr(utils, "__name__"))
         except ImportError:
@@ -21,7 +31,6 @@ class TestCoreUtilityFunctions(unittest.TestCase):
     def test_core_validators_import(self):
         """Test that core validators can be imported."""
         try:
-            from apps.core import validators
 
             self.assertTrue(hasattr(validators, "__name__"))
 
@@ -39,7 +48,7 @@ class TestCoreUtilityFunctions(unittest.TestCase):
                             validator({"key": "value"})
                         else:
                             validator("test_value")
-                    except:
+                    except Exception:
                         pass  # Validation may fail, that's expected
         except ImportError:
             pass
@@ -47,7 +56,6 @@ class TestCoreUtilityFunctions(unittest.TestCase):
     def test_core_enums_access(self):
         """Test accessing core enums."""
         try:
-            from apps.core import enums
 
             # Access all enum classes
             for attr_name in dir(enums):
@@ -66,7 +74,6 @@ class TestCoreUtilityFunctions(unittest.TestCase):
     def test_core_mixins_classes(self):
         """Test core mixin classes."""
         try:
-            from apps.core import mixins
 
             for attr_name in dir(mixins):
                 if not attr_name.startswith("_"):
@@ -85,7 +92,7 @@ class TestCoreUtilityFunctions(unittest.TestCase):
                                     instance.get_serializer_class = Mock(
                                         return_value=Mock
                                     )
-                            except:
+                            except Exception:
                                 pass
         except ImportError:
             pass
@@ -93,7 +100,6 @@ class TestCoreUtilityFunctions(unittest.TestCase):
     def test_core_permissions_classes(self):
         """Test core permission classes."""
         try:
-            from apps.core import permissions
 
             for attr_name in dir(permissions):
                 if not attr_name.startswith("_"):
@@ -113,10 +119,10 @@ class TestCoreUtilityFunctions(unittest.TestCase):
                                         mock_request, mock_view
                                     )
                                     self.assertIsInstance(result, bool)
-                                except:
+                                except Exception:
                                     pass
 
-                        except:
+                        except Exception:
                             pass
         except ImportError:
             pass
@@ -128,7 +134,6 @@ class TestCoreMiddleware(unittest.TestCase):
     def test_middleware_import(self):
         """Test middleware import and basic functionality."""
         try:
-            from apps.core import middleware
 
             for attr_name in dir(middleware):
                 if not attr_name.startswith("_") and "Middleware" in attr_name:
@@ -147,10 +152,10 @@ class TestCoreMiddleware(unittest.TestCase):
                                 mock_request.META = {}
                                 try:
                                     middleware_instance(mock_request)
-                                except:
+                                except Exception:
                                     pass  # Middleware may require specific setup
 
-                        except:
+                        except Exception:
                             pass
         except ImportError:
             pass
@@ -162,7 +167,6 @@ class TestCoreCache(unittest.TestCase):
     def test_cache_import(self):
         """Test cache utilities import."""
         try:
-            from apps.core import cache
 
             # Test cache functions
             for attr_name in dir(cache):
@@ -179,7 +183,7 @@ class TestCoreCache(unittest.TestCase):
                                 attr("test_key")
                             elif "clear" in attr_name.lower():
                                 attr()
-                        except:
+                        except Exception:
                             pass  # Cache operations may fail without proper setup
         except ImportError:
             pass
@@ -191,7 +195,6 @@ class TestCoreThrottling(unittest.TestCase):
     def test_throttling_import(self):
         """Test throttling classes import."""
         try:
-            from apps.core import throttling
 
             for attr_name in dir(throttling):
                 if not attr_name.startswith("_") and "Throttle" in attr_name:
@@ -211,16 +214,16 @@ class TestCoreThrottling(unittest.TestCase):
                                         mock_request, mock_view
                                     )
                                     self.assertIsInstance(result, bool)
-                                except:
+                                except Exception:
                                     pass
 
                             if hasattr(throttle, "get_rate"):
                                 try:
                                     throttle.get_rate()
-                                except:
+                                except Exception:
                                     pass
 
-                        except:
+                        except Exception:
                             pass
         except ImportError:
             pass
@@ -232,7 +235,6 @@ class TestCoreDecorators(unittest.TestCase):
     def test_decorators_import(self):
         """Test decorators import and basic functionality."""
         try:
-            from apps.core import decorators
 
             for attr_name in dir(decorators):
                 if not attr_name.startswith("_"):
@@ -247,16 +249,16 @@ class TestCoreDecorators(unittest.TestCase):
                             # Try calling decorated function
                             try:
                                 test_function()
-                            except:
+                            except Exception:
                                 pass  # Decorator may require specific parameters
 
-                        except:
+                        except Exception:
                             try:
                                 # Try decorator with parameters
                                 decorated = attr(lambda: "test")
                                 if callable(decorated):
                                     decorated()
-                            except:
+                            except Exception:
                                 pass
         except ImportError:
             pass
@@ -268,7 +270,6 @@ class TestCoreCircuitBreaker(unittest.TestCase):
     def test_circuit_breaker_import(self):
         """Test circuit breaker import and basic functionality."""
         try:
-            from apps.core import circuit_breaker
 
             # Test circuit breaker classes and functions
             for attr_name in dir(circuit_breaker):
@@ -284,7 +285,7 @@ class TestCoreCircuitBreaker(unittest.TestCase):
                                 if hasattr(cb, "call"):
                                     try:
                                         cb.call(lambda: "success")
-                                    except:
+                                    except Exception:
                                         pass
 
                                 if hasattr(cb, "record_success"):
@@ -293,7 +294,7 @@ class TestCoreCircuitBreaker(unittest.TestCase):
                                 if hasattr(cb, "record_failure"):
                                     cb.record_failure()
 
-                        except:
+                        except Exception:
                             pass
         except ImportError:
             pass
@@ -305,7 +306,6 @@ class TestCoreStorage(unittest.TestCase):
     def test_storage_import(self):
         """Test storage utilities import."""
         try:
-            from apps.core import storage
 
             # Test storage functions
             for attr_name in dir(storage):
@@ -323,7 +323,7 @@ class TestCoreStorage(unittest.TestCase):
                             elif "exists" in attr_name.lower():
                                 result = attr("test/path")
                                 self.assertIsInstance(result, bool)
-                        except:
+                        except Exception:
                             pass  # Storage operations may fail without proper setup
         except ImportError:
             pass

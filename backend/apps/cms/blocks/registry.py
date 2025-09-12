@@ -1,9 +1,9 @@
+from apps.cms.models import BlockType
+
 """
 Block registry utilities for the CMS.
 Provides helper functions to work with block types and metadata.
 """
-
-from apps.cms.models import BlockType
 
 
 def get_block_metadata():

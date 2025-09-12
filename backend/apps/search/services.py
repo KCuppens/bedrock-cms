@@ -1,30 +1,32 @@
+import time
+from typing import Any
+from django.contrib.contenttypes.models import ContentType
+from django.core.paginator import Paginator
+from django.db.models import F, Q
+from django.utils import timezone
+    from django.contrib.postgres.search import SearchQuery, SearchRank, SearchVector
+from apps.registry.registry import content_registry
+from .models import SearchIndex
+from .models import SearchQuery as SearchQueryLog
+from .models import SearchSuggestion
+        from datetime import timedelta
+        from django.db.models import Avg, Count
 """
 Search services for CMS content.
 
 Provides search functionality including indexing, querying, and analytics.
 """
 
-import time
-from typing import Any
 
-from django.contrib.contenttypes.models import ContentType
-from django.core.paginator import Paginator
-from django.db.models import F, Q
-from django.utils import timezone
 
 # PostgreSQL search functionality (optional)
 try:
-    from django.contrib.postgres.search import SearchQuery, SearchRank, SearchVector
 
     HAS_POSTGRES_SEARCH = True
 except ImportError:
     HAS_POSTGRES_SEARCH = False
 
-from apps.registry.registry import content_registry
 
-from .models import SearchIndex
-from .models import SearchQuery as SearchQueryLog
-from .models import SearchSuggestion
 
 
 class SearchService:
@@ -346,9 +348,7 @@ class SearchService:
         Returns:
             Dictionary with analytics data
         """
-        from datetime import timedelta
 
-        from django.db.models import Avg, Count
 
         start_date = timezone.now() - timedelta(days=days)
 

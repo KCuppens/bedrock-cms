@@ -1,19 +1,16 @@
-"""
-Comprehensive CMS tests targeting 80%+ coverage with real database operations.
-"""
-
 from datetime import datetime, timedelta
 
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
 from django.test import TestCase, TransactionTestCase
 from django.urls import reverse
-
 from rest_framework import status
 from rest_framework.test import APIClient, APITestCase
 
 from apps.cms import tasks
-from apps.cms.models import ContentBlock, Group, Page
+from apps.cms.models import Group, Page
+
+# ContentBlock doesn't exist yet, so we'll mock it if needed
 from apps.cms.serializers.pages import PageDetailSerializer, PageSerializer
 from apps.cms.versioning import (
     create_page_version,

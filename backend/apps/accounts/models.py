@@ -86,10 +86,10 @@ class User(AbstractUser):
             models.Index(fields=["-created_at"]),
         ]
 
-    def __str__(self):
+    def __str__(self):  # noqa: C901
         return self.email
 
-    def get_full_name(self):
+    def get_full_name(self):  # noqa: C901
         """Return the full name for the user."""
         # Try first_name and last_name first (from AbstractUser)
         if self.first_name or self.last_name:
@@ -97,7 +97,7 @@ class User(AbstractUser):
         # Fall back to name field
         return self.name or self.email
 
-    def get_short_name(self):
+    def get_short_name(self):  # noqa: C901
         """Return the short name for the user."""
         # Try first_name first (from AbstractUser)
         if self.first_name:
@@ -105,28 +105,28 @@ class User(AbstractUser):
         # Fall back to name field
         return self.name.split(" ")[0] if self.name else self.email.split("@")[0]
 
-    def update_last_seen(self):
+    def update_last_seen(self):  # noqa: C901
         """Update the last_seen timestamp using F expression for atomic update"""
         User.objects.filter(pk=self.pk).update(last_seen=timezone.now())
 
     @cached_property
-    def user_groups(self):
+    def user_groups(self):  # noqa: C901
         """Cache user groups to prevent repeated database queries"""
         return set(self.groups.values_list("name", flat=True))
 
-    def has_group(self, group_name):
+    def has_group(self, group_name):  # noqa: C901
         """Check if user belongs to a specific group"""
         return group_name in self.user_groups
 
-    def is_admin(self):
+    def is_admin(self):  # noqa: C901
         """Check if user is an admin"""
         return "Admin" in self.user_groups or self.is_superuser
 
-    def is_manager(self):
+    def is_manager(self):  # noqa: C901
         """Check if user is a manager or admin"""
         return "Manager" in self.user_groups or self.is_admin()
 
-    def is_member(self):
+    def is_member(self):  # noqa: C901
         """Check if user is a member, manager, or admin"""
         return "Member" in self.user_groups or self.is_manager()
 
@@ -162,7 +162,7 @@ class UserProfile(models.Model):
         verbose_name = _("User Profile")
         verbose_name_plural = _("User Profiles")
 
-    def __str__(self):
+    def __str__(self):  # noqa: C901
         return f"{self.user.email} Profile"
 
 
