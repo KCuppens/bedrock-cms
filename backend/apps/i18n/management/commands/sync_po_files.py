@@ -5,9 +5,10 @@ Imports Django's .po files into the database and exports database translations b
 
 from pathlib import Path
 
-import polib
 from django.apps import apps
 from django.core.management.base import BaseCommand
+
+import polib
 
 from apps.i18n.models import Locale, UiMessage, UiMessageTranslation
 

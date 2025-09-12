@@ -22,8 +22,9 @@ except ImportError:
 
 from apps.registry.registry import content_registry
 
-from .models import SearchIndex, SearchSuggestion
+from .models import SearchIndex
 from .models import SearchQuery as SearchQueryLog
+from .models import SearchSuggestion
 
 
 class SearchService:

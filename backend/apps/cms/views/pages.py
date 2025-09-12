@@ -1,6 +1,7 @@
 from django.conf import settings
 from django.db import transaction
 from django.http import HttpResponse
+
 from drf_spectacular.utils import OpenApiParameter, extend_schema
 from rest_framework import permissions, status, viewsets
 from rest_framework.decorators import action
@@ -825,6 +826,7 @@ class PagesViewSet(VersioningMixin, viewsets.ModelViewSet):
 
 from django.shortcuts import redirect
 from django.views.decorators.cache import cache_page
+
 from django_ratelimit.decorators import ratelimit
 
 

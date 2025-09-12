@@ -97,7 +97,9 @@ def test_pages_view_comprehensive():
         # Test tree action (should cover lines 132-163)
         try:
             with patch("apps.cms.models.Page.objects") as mock_objects:
-                mock_objects.filter.return_value.select_related.return_value.order_by.return_value = []
+                mock_objects.filter.return_value.select_related.return_value.order_by.return_value = (
+                    []
+                )
                 viewset.tree(viewset.request)
         except:
             pass

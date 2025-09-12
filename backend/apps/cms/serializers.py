@@ -45,9 +45,7 @@ class PageReadSerializer(serializers.ModelSerializer):
             processed_block = dict(block)
 
             # Add component field if not present
-            # Add component field if not present
-            if "component" not in processed_block and "type" in processed_block
-                :
+            if "component" not in processed_block and "type" in processed_block:
                 processed_block["component"] = processed_block["type"]
 
             processed_blocks.append(processed_block)
@@ -146,8 +144,7 @@ class PageTreeItemSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Page
-        fields = ["id", "title", "slug", "path", "position", "status", "childre
-            n_count"]
+        fields = ["id", "title", "slug", "path", "position", "status", "children_count"]
 
     def get_children_count(self, obj):
         # Use cached count if available from prefetch_related annotation
@@ -207,8 +204,7 @@ class PageWriteSerializer(serializers.ModelSerializer):
         if scheduled_publish_at and scheduled_unpublish_at:
             if scheduled_unpublish_at <= scheduled_publish_at:
                 raise serializers.ValidationError(
-                    {"scheduled_unpublish_at": "Must be after scheduled publish
-                        time"}
+                    {"scheduled_unpublish_at": "Must be after scheduled publish time"}
                 )
 
         return attrs

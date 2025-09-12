@@ -1,4 +1,5 @@
 from django.urls import include, path
+
 from rest_framework.routers import DefaultRouter
 
 from apps.core.csrf_views import get_csrf_token

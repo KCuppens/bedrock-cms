@@ -7,6 +7,7 @@ from typing import Any
 
 from django.conf import settings
 from django.urls import get_resolver
+
 from rest_framework.viewsets import ModelViewSet, ViewSet
 
 logger = logging.getLogger(__name__)

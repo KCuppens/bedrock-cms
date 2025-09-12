@@ -8,6 +8,7 @@ from datetime import date, datetime, timedelta
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.gis.geoip2 import GeoIP2
 from django.utils import timezone
+
 from user_agents import parse
 
 

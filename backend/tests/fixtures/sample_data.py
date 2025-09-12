@@ -4,8 +4,9 @@ Comprehensive test data fixtures for consistent testing across modules.
 
 from unittest.mock import patch
 
-import pytest
 from django.contrib.auth import get_user_model
+
+import pytest
 from faker import Faker
 
 fake = Faker()

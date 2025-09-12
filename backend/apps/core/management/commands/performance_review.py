@@ -213,18 +213,14 @@ class Command(BaseCommand):
                     "status": (
                         "good"
                         if avg_time < 100
-                        else "warning"
-                        if avg_time < 500
-                        else "critical"
+                        else "warning" if avg_time < 500 else "critical"
                     ),
                 }
 
                 status_icon = (
                     "[OK]"
                     if avg_time < 100
-                    else "[WARN]"
-                    if avg_time < 500
-                    else "[CRITICAL]"
+                    else "[WARN]" if avg_time < 500 else "[CRITICAL]"
                 )
                 self.stdout.write(
                     f"    {status_icon} Avg: {avg_time:.1f}ms, Range: {min_time:.1f}-{max_time:.1f}ms"
@@ -345,18 +341,14 @@ class Command(BaseCommand):
                     "status": (
                         "good"
                         if avg_time < 200
-                        else "warning"
-                        if avg_time < 1000
-                        else "critical"
+                        else "warning" if avg_time < 1000 else "critical"
                     ),
                 }
 
                 status_icon = (
                     "[OK]"
                     if avg_time < 200
-                    else "[WARN]"
-                    if avg_time < 1000
-                    else "[CRITICAL]"
+                    else "[WARN]" if avg_time < 1000 else "[CRITICAL]"
                 )
                 self.stdout.write(
                     f"      {status_icon} {avg_time:.1f}ms total, {avg_time / count:.2f}ms per block"
@@ -567,9 +559,7 @@ class Command(BaseCommand):
             status_icon = (
                 "[OK]"
                 if data["status"] == "good"
-                else "[WARN]"
-                if data["status"] == "warning"
-                else "[CRITICAL]"
+                else "[WARN]" if data["status"] == "warning" else "[CRITICAL]"
             )
             self.stdout.write(
                 f"{status_icon} {name}: {data['avg_time_ms']}ms avg ({data['min_time_ms']}-{data['max_time_ms']}ms)"
@@ -595,9 +585,7 @@ class Command(BaseCommand):
             status_icon = (
                 "[OK]"
                 if data["status"] == "good"
-                else "[WARN]"
-                if data["status"] == "warning"
-                else "[CRITICAL]"
+                else "[WARN]" if data["status"] == "warning" else "[CRITICAL]"
             )
             self.stdout.write(
                 f"{status_icon} {count} blocks: {data['avg_time_ms']}ms total, {data['per_block_ms']}ms per block"
@@ -620,9 +608,7 @@ class Command(BaseCommand):
             severity_icon = (
                 "[HIGH]"
                 if rec["severity"] == "high"
-                else "[MED]"
-                if rec["severity"] == "medium"
-                else "[LOW]"
+                else "[MED]" if rec["severity"] == "medium" else "[LOW]"
             )
             self.stdout.write(
                 f"\n{i}. {severity_icon} [{rec['category']}] {rec['issue']}"

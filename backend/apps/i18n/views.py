@@ -9,6 +9,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.core.management import call_command
 from django.core.management.base import CommandError
 from django.db import models
+
 from django_filters.rest_framework import DjangoFilterBackend
 from drf_spectacular.utils import OpenApiParameter, extend_schema
 from rest_framework import filters, permissions, status, viewsets
@@ -18,6 +19,7 @@ from rest_framework.response import Response
 logger = logging.getLogger(__name__)
 
 from django.conf import settings
+
 from .models import (
     Locale,
     TranslationGlossary,
@@ -66,8 +68,7 @@ class LocaleViewSet(viewsets.ModelViewSet):
         """Optionally filter by active status."""
         queryset = super().get_queryset()
         active_only = (
-            self.request.query_params.get("active_only", "false").lower() == "t
-                rue"
+            self.request.query_params.get("active_only", "false").lower() == "true"
         )
         if active_only:
             queryset = queryset.filter(is_active=True)
@@ -79,8 +80,8 @@ class LocaleViewSet(viewsets.ModelViewSet):
             "locale. Requires authentication.",
     )
     @action(
-        detail=True, methods=["post"], permission_classes=[permissions.IsAuthen
-            ticated]
+        detail=True, methods=["post"],
+        permission_classes=[permissions.IsAuthenticated]
     )
     def toggle_active(self, request, pk=None):
         """Toggle the active status of a locale."""
@@ -100,8 +101,10 @@ class LocaleViewSet(viewsets.ModelViewSet):
         serializer = self.get_serializer(locale)
         return Response(
             {
-                "message": f"Locale {locale.code} {'activated' if "
-                    "locale.is_active else 'deactivated'} successfully",
+                "message": (
+                    f"Locale {locale.code} "
+                    f"{'activated' if locale.is_active else 'deactivated'} successfully"
+                ),
                 "locale": serializer.data,
             }
         )
@@ -112,8 +115,8 @@ class LocaleViewSet(viewsets.ModelViewSet):
             "locale. Requires authentication.",
     )
     @action(
-        detail=True, methods=["post"], permission_classes=[permissions.IsAuthen
-            ticated]
+        detail=True, methods=["post"],
+        permission_classes=[permissions.IsAuthenticated]
     )
     def set_default(self, request, pk=None):
         """Set the locale as default."""
@@ -122,8 +125,7 @@ class LocaleViewSet(viewsets.ModelViewSet):
         # If already default, no action needed
         if locale.is_default:
             return Response(
-                {"message": f"Locale {locale.code} is already the default local
-                    e"},
+                {"message": f"Locale {locale.code} is already the default locale"},
                 status=status.HTTP_200_OK,
             )
 
@@ -164,7 +166,7 @@ class LocaleViewSet(viewsets.ModelViewSet):
 
         # Check if there are dependent objects (optional)
         # You might want to add checks for pages,
-            translations, etc. that depend on this locale
+        # translations, etc. that depend on this locale
 
         # Perform the deletion
         locale.delete()
@@ -214,8 +216,7 @@ class TranslationUnitViewSet(viewsets.ModelViewSet):
             ),
             OpenApiParameter("object_id", int, description="Object ID"),
             OpenApiParameter(
-                "target_locale", str, description="Target locale code (optional
-                    )"
+                "target_locale", str, description="Target locale code (optional)"
             ),
         ],
     )
@@ -290,8 +291,7 @@ class TranslationUnitViewSet(viewsets.ModelViewSet):
             )
             model_class = content_type.model_class()
             model_class.objects.get(pk=object_id)
-        except (ValueError, ContentType.DoesNotExist, model_class.DoesNotExist)
-            :
+        except (ValueError, ContentType.DoesNotExist, model_class.DoesNotExist):
             return Response(
                 {"error": "Invalid model_label or object not found"},
                 status=status.HTTP_400_BAD_REQUEST,
@@ -349,8 +349,7 @@ class TranslationUnitViewSet(viewsets.ModelViewSet):
 
                 # Check permissions (optional)
                 # if not self.check_object_permissions(request, unit):
-                #     errors.append({'id': unit_data['id'], 'error': 'Permissio
-                    n denied'})
+                #     errors.append({'id': unit_data['id'], 'error': 'Permission denied'})
                 #     continue
 
                 # Update fields
@@ -367,8 +366,7 @@ class TranslationUnitViewSet(viewsets.ModelViewSet):
 
             except TranslationUnit.DoesNotExist:
                 errors.append(
-                    {"id": unit_data["id"], "error": "Translation unit not foun
-                        d"}
+                    {"id": unit_data["id"], "error": "Translation unit not found"}
                 )
             except Exception as e:
                 errors.append({"id": unit_data["id"], "error": str(e)})
@@ -549,8 +547,7 @@ class TranslationUnitViewSet(viewsets.ModelViewSet):
 
     @extend_schema(
         summary="Get machine translation suggestion",
-        description="Get machine translation suggestion for a translation unit.
-            ",
+        description="Get machine translation suggestion for a translation unit.",
         request=MachineTranslationSuggestionSerializer,
     )
     @action(detail=True, methods=["post"])
@@ -578,15 +575,13 @@ class TranslationUnitViewSet(viewsets.ModelViewSet):
                 suggestion = text
 
         except Exception as e:
-            # If DeepL service is not configured or fails,
-                return the original text
+            # If DeepL service is not configured or fails, return the original text
             logger.warning(f"Translation service error: {e}")
             suggestion = text
 
         # Update queue item with suggestion if exists
         if hasattr(translation_unit, "queue_item"):
-            translation_unit.queue_item.machine_translation_suggestion = sugges
-                tion
+            translation_unit.queue_item.machine_translation_suggestion = suggestion
             translation_unit.queue_item.mt_service = service
             translation_unit.queue_item.save()
 
@@ -633,8 +628,7 @@ class TranslationUnitViewSet(viewsets.ModelViewSet):
             previous_target_text=translation_unit.target_text,
             new_target_text=translation_unit.target_text,
             comment=(
-                f"{action.capitalize()}: {comment}" if comment else action.capi
-                    talize()
+                f"{action.capitalize()}: {comment}" if comment else action.capitalize()
             ),
             performed_by=request.user,
         )
@@ -673,8 +667,7 @@ class TranslationUnitViewSet(viewsets.ModelViewSet):
         assigned_to = serializer.validated_data.get("assigned_to")
         comment = serializer.validated_data.get("comment", "")
         # Get translation units
-        translation_units = TranslationUnit.objects.filter(id__in=translation_u
-            nit_ids)
+        translation_units = TranslationUnit.objects.filter(id__in=translation_unit_ids)
 
         assigned_units = []
         errors = []
@@ -702,8 +695,7 @@ class TranslationUnitViewSet(viewsets.ModelViewSet):
                     previous_target_text=translation_unit.target_text,
                     new_target_text=translation_unit.target_text,
                     comment=(
-                        f"Bulk {action}: {comment}" if comment else f"Bulk {act
-                            ion}"
+                        f"Bulk {action}: {comment}" if comment else f"Bulk {action}"
                     ),
                     performed_by=request.user,
                 )
@@ -716,14 +708,12 @@ class TranslationUnitViewSet(viewsets.ModelViewSet):
                     {
                         "id": translation_unit.id,
                         "assigned_to": assigned_to.id if assigned_to else None,
-                        "assigned_to_email": assigned_to.email if assigned_to e
-                            lse None,
+                        "assigned_to_email": assigned_to.email if assigned_to else None,
                         "previous_assignee": (
                             previous_assignee.id if previous_assignee else None
                         ),
                         "previous_assignee_email": (
-                            previous_assignee.email if previous_assignee else N
-                                one
+                            previous_assignee.email if previous_assignee else None
                         ),
                     }
                 )
@@ -749,8 +739,7 @@ class TranslationUnitViewSet(viewsets.ModelViewSet):
 
     @extend_schema(
         summary="Mark translation as complete",
-        description="Mark a translation as complete and move to approved status
-            .",
+        description="Mark a translation as complete and move to approved status.",
         request=TranslationApprovalSerializer,
     )
     @action(detail=True, methods=["post"])
@@ -832,8 +821,7 @@ class UiMessageViewSet(viewsets.ModelViewSet):
         description="Import from or export to .po files",
         parameters=[
             OpenApiParameter(
-                "direction", str, description="Direction: import, export, or sy
-                    nc"
+                "direction", str, description="Direction: import, export, or sync"
             ),
             OpenApiParameter(
                 "locale", str, description="Specific locale code (optional)"
@@ -844,8 +832,7 @@ class UiMessageViewSet(viewsets.ModelViewSet):
         ],
     )
     @action(
-        detail=False, methods=["post"], permission_classes=[permissions.IsAuthe
-            nticated]
+        detail=False, methods=["post"], permission_classes=[permissions.IsAuthenticated]
     )
     def sync_po_files(self, request):
         """Sync with .po files."""
@@ -904,8 +891,7 @@ class UiMessageViewSet(viewsets.ModelViewSet):
         ],
     )
     @action(
-        detail=False, methods=["post"], permission_classes=[permissions.IsAuthe
-            nticated]
+        detail=False, methods=["post"], permission_classes=[permissions.IsAuthenticated]
     )
     def import_django_strings(self, request):
         """Import Django built-in strings."""
@@ -916,8 +902,7 @@ class UiMessageViewSet(viewsets.ModelViewSet):
             out = io.StringIO()
 
             # Build command arguments
-            command_args = ["import_django_translations", f"--namespace={namesp
-                ace}"]
+            command_args = ["import_django_translations", f"--namespace={namespace}"]
             if locale_code:
                 command_args.append(f"--locale={locale_code}")
 
@@ -948,8 +933,7 @@ class UiMessageViewSet(viewsets.ModelViewSet):
 
     @extend_schema(
         summary="Get message bundle for locale",
-        description="Get all UI messages as a JSON bundle for a specific locale
-            ",
+        description="Get all UI messages as a JSON bundle for a specific locale",
     )
     @action(
         detail=False,
@@ -1005,8 +989,7 @@ class UiMessageViewSet(viewsets.ModelViewSet):
                     },
                     "source": {
                         "type": "string",
-                        "description": "Source of keys (build, runtime-discover
-                            y)",
+                        "description": "Source of keys (build, runtime-discovery)",
                     },
                 },
             }
@@ -1064,11 +1047,9 @@ class UiMessageViewSet(viewsets.ModelViewSet):
                 if was_created:
                     created.append(key)
 
-                    # Auto-create approved translation for default locale if re
-                        quested
+                    # Auto-create approved translation for default locale if requested
                     if auto_approve:
-                        default_locale = Locale.objects.filter(is_default=True)
-                            .first()
+                        default_locale = Locale.objects.filter(is_default=True).first()
                         if default_locale:
                             UiMessageTranslation.objects.create(
                                 message=ui_message,
@@ -1100,13 +1081,10 @@ class UiMessageViewSet(viewsets.ModelViewSet):
             from django.contrib.contenttypes.models import ContentType
 
             LogEntry.objects.log_action(
-                user_id=request.user.pk if request.user.is_authenticated else N
-                    one,
-                content_type_id=ContentType.objects.get_for_model(UiMessage).pk
-                    ,
+                user_id=request.user.pk if request.user.is_authenticated else None,
+                content_type_id=ContentType.objects.get_for_model(UiMessage).pk,
                 object_id=None,
-                object_repr=f"Synced {len(created)} new and "
-                    "{len(updated)} updated keys from {source}",
+                object_repr=f"Synced {len(created)} new and {len(updated)} updated keys from {source}",
                 action_flag=ADDITION,
                 change_message=f"Source: {source}",
             )
@@ -1163,8 +1141,7 @@ class UiMessageViewSet(viewsets.ModelViewSet):
                 "component": component,
                 "timestamp": datetime.now().isoformat(),
                 "user": (
-                    request.user.email if request.user.is_authenticated else "a
-                        nonymous"
+                    request.user.email if request.user.is_authenticated else "anonymous"
                 ),
             }
             existing.append(entry)
@@ -1188,6 +1165,7 @@ class UiMessageViewSet(viewsets.ModelViewSet):
     def discovery_stats(self, request):
         """Get statistics about discovered translation keys."""
         from datetime import datetime, timedelta
+
         from django.core.cache import cache
         from django.db.models import Count
 
@@ -1267,8 +1245,7 @@ class UiMessageViewSet(viewsets.ModelViewSet):
         },
     )
     @action(
-        detail=False, methods=["post"], permission_classes=[permissions.IsAuthe
-            nticated]
+        detail=False, methods=["post"], permission_classes=[permissions.IsAuthenticated]
     )
     def import_json(self, request):
         """Import translations from a JSON file."""

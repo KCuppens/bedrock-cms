@@ -2,9 +2,10 @@
 CMS-specific factories for pages, categories, and content.
 """
 
+from django.utils.text import slugify
+
 import factory
 import factory.django
-from django.utils.text import slugify
 from faker import Faker
 
 from apps.cms.model_parts.category import Category, Tag

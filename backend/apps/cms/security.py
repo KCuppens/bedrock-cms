@@ -4,8 +4,9 @@ Security utilities for CMS content.
 
 from typing import Any
 
-import bleach  # type: ignore
 from django.conf import settings
+
+import bleach  # type: ignore
 
 # Default allowed tags for rich text content
 DEFAULT_ALLOWED_TAGS = [

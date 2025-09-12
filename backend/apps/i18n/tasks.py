@@ -5,9 +5,10 @@ Background tasks for internationalization and localization.
 import logging
 from typing import Any
 
-from celery import shared_task
 from django.contrib.contenttypes.models import ContentType
 from django.db import transaction
+
+from celery import shared_task
 
 from apps.registry.registry import content_registry
 

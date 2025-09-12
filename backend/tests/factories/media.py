@@ -2,9 +2,10 @@
 Media and file factories for testing uploads and media management.
 """
 
+from django.core.files.base import ContentFile
+
 import factory
 import factory.django
-from django.core.files.base import ContentFile
 from faker import Faker
 
 from apps.media.models import MediaItem

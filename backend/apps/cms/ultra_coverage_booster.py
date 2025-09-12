@@ -192,7 +192,9 @@ def test_views_py_full_import():
             with patch("apps.cms.views.pages.Locale.objects") as mock_locale:
                 mock_locale.get.return_value = Mock()
                 with patch("apps.cms.views.pages.Page.objects") as mock_page:
-                    mock_page.filter.return_value.order_by.return_value.__getitem__.return_value.iterator.return_value = []
+                    mock_page.filter.return_value.order_by.return_value.__getitem__.return_value.iterator.return_value = (
+                        []
+                    )
                     sitemap_view(mock_request, "en")
         except:
             pass

@@ -6,6 +6,7 @@ import json
 
 from django.contrib.auth import get_user_model
 from django.test import TestCase, TransactionTestCase
+
 from rest_framework import status
 
 from apps.cms.models import Page

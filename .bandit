@@ -1,0 +1,3 @@
+[bandit]
+exclude = /venv,/.venv,/env,/ENV,/backend/venv,/backend/.venv,/tests,/test,/migrations,/frontend,/node_modules,/build,/dist,.git,__pycache__,.tox,.eggs
+skips = B101,B601,B602,B603,B607

@@ -2,9 +2,10 @@
 Analytics factories for testing metrics and events.
 """
 
+from django.utils import timezone
+
 import factory
 import factory.django
-from django.utils import timezone
 from faker import Faker
 
 from apps.analytics.models import Event, PageView, Session

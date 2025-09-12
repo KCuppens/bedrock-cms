@@ -7,10 +7,11 @@ import re
 from typing import Any
 from urllib.parse import urljoin
 
-import requests
-from celery import shared_task
 from django.db import transaction
 from django.utils import timezone
+
+import requests
+from celery import shared_task
 
 from .models import Page
 from .scheduling import ScheduledTask
@@ -404,7 +405,9 @@ def process_scheduled_publishing(self):
         # Using select_for_update with skip_locked for concurrent safety
         pending_tasks = ScheduledTask.objects.filter(
             status="pending", scheduled_for__lte=now
-        ).select_for_update(skip_locked=True)[:50]  # Process max 50 at a time
+        ).select_for_update(skip_locked=True)[
+            :50
+        ]  # Process max 50 at a time
 
         for task in pending_tasks:
             try:
