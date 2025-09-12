@@ -3,39 +3,47 @@ import uuid
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models import (
-from django.utils.translation import gettext_lazy as _
-from apps.accounts.rbac import RBACMixin
-from apps.core.validators import JSONSizeValidator, validate_json_structure
-from .versioning import AuditEntry
-        from django.utils import timezone
-        from .blocks.validation import validate_blocks
-        from .presentation import presentation_resolver
-            from apps.blog.models import BlogSettings
-            from apps.blog.models import Category
-            from apps.blog.models import BlogSettings, Category
-        from django.utils import timezone
-        from django.utils import timezone
-        from django.utils import timezone
-        from django.core.cache import cache
-        from django.core.cache import cache
-            from django.apps import apps
+    AuditEntry,
     AutoField,
+    BlogSettings,
     BooleanField,
+    Category,
     CharField,
     DateTimeField,
     ForeignKey,
+    JSONSizeValidator,
     PositiveIntegerField,
     PositiveSmallIntegerField,
+    RBACMixin,
     SlugField,
     TextField,
     UUIDField,
-)
+    .blocks.validation,
+    .presentation,
+    .versioning,
+    apps,
+    apps.accounts.rbac,
+    apps.blog.models,
+    apps.core.validators,
+    cache,
+    django.apps,
+    django.core.cache,
+    django.utils,
+    django.utils.translation,
 
+)
+from django.db.models import gettext_lazy as _
+from django.db.models import (
+
+    presentation_resolver,
+    timezone,
+    validate_blocks,
+    validate_json_structure,
+)
 
 # Import scheduling models
 # Import SEO models
 # Import versioning models
-
 
 class Page(models.Model, RBACMixin):
     STATUS_CHOICES = [
@@ -153,7 +161,6 @@ class Page(models.Model, RBACMixin):
     def clean(self):  # noqa: C901
         """Validate the page, including blocks validation."""
 
-
         errors = {}
 
         if self.blocks:
@@ -265,12 +272,11 @@ class Page(models.Model, RBACMixin):
                 cls.objects.filter(pk=page.pk).update(position=index)
 
     def _validate_presentation_page_blocks(self):  # noqa: C901
-        """
+
         Validate presentation page requirements.
 
         Checks if this page is used as a presentation page and validates
         that it has the correct content_detail block configuration.
-        """
 
         # Check if this page is used as a presentation page anywhere
         is_presentation_page = False
@@ -281,7 +287,6 @@ class Page(models.Model, RBACMixin):
             if BlogSettings.objects.filter(default_presentation_page=self).exists():
                 is_presentation_page = True
         except Exception:
-            pass
 
         # Check if it's a category-specific presentation page
         try:
@@ -289,7 +294,6 @@ class Page(models.Model, RBACMixin):
             if Category.objects.filter(presentation_page=self).exists():
                 is_presentation_page = True
         except Exception:
-            pass
 
         # If this is a presentation page, validate content_detail blocks
         if is_presentation_page:
@@ -313,7 +317,6 @@ class Page(models.Model, RBACMixin):
                 return True
 
         except Exception:
-            pass
 
         return False
 
@@ -398,7 +401,6 @@ class Page(models.Model, RBACMixin):
         """Check if page can be rejected."""
         return self.status == "pending_review"
 
-
 class Redirect(models.Model):
     STATUS_CHOICES = [
         (301, _("301 Permanent")),
@@ -453,12 +455,10 @@ class Redirect(models.Model):
         self.clean()
         super().save(*args, **kwargs)
 
-
 # Legacy import compatibility - RedirectImport was removed
 RedirectImport = None
 
 # Import models from model_parts
-
 
 class BlockTypeCategory(models.TextChoices):
     """Predefined categories for block types."""
@@ -470,12 +470,10 @@ class BlockTypeCategory(models.TextChoices):
     DYNAMIC = "dynamic", _("Dynamic")
     OTHER = "other", _("Other")
 
-
 class BlockType(models.Model):
-    """
+
     Database model for managing block types dynamically.
     This replaces the hardcoded BLOCK_MODELS registry.
-    """
 
     # Core identification
     type: CharField = models.CharField(
@@ -626,10 +624,9 @@ class BlockType(models.Model):
 
     @classmethod
     def get_registry_dict(cls):  # noqa: C901
-        """
+
         Get all active block types as a dictionary for the dynamic registry.
         Returns format compatible with existing BLOCK_MODELS structure.
-        """
 
         registry = cache.get("block_types_registry")
         if registry is None:

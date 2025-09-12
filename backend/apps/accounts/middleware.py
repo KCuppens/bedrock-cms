@@ -1,22 +1,20 @@
 import logging
 
 from django.conf import settings
+from django.contrib.auth import get_user_model
 from django.core.cache import cache
 from django.utils import timezone
 from django.utils.deprecation import MiddlewareMixin
-from django.contrib.auth import get_user_model
+
 from .tasks import update_user_last_seen
 
 logger = logging.getLogger(__name__)
 
-
 class LastSeenMiddleware(MiddlewareMixin):
-    """
+
     Middleware to update user's last_seen timestamp.
 
-    Uses Celery tasks in production, direct update in development.
-    """
-
+    """Uses Celery tasks in production, direct update in development."""
     def process_request(self, request):
         """Update last_seen for authenticated users"""
         if request.user.is_authenticated:

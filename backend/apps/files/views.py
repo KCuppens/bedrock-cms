@@ -14,17 +14,19 @@ from apps.core.permissions import IsOwnerOrAdmin
 
 from .models import FileUpload
 from .serializers import (
-from .services import FileService
-            from django.db.models import Q
-        import os
-        import uuid
+    FileService,
     FileUploadCreateSerializer,
     FileUploadSerializer,
+    Q,
     SignedUrlSerializer,
+    .services,
+    django.db.models,
+
+    os,
+    uuid,
 )
 
 logger = logging.getLogger(__name__)
-
 
 @extend_schema_view(
     list=extend_schema(
@@ -273,7 +275,6 @@ class FileUploadViewSet(viewsets.ModelViewSet):
 
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data)
-
 
 # Standalone view for direct file downloads (used in fallback URLs)
 def file_download_view(request, file_id):  # noqa: C901

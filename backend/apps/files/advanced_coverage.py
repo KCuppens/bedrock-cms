@@ -2,27 +2,40 @@ import io
 import os
 from datetime import datetime
 from unittest.mock import Mock, patch
+
 import django
-        from apps.files.models import File, FileCategory, FileTag, FileVersion  # noqa: F401
-        from apps.files.views import FileBulkOperationView, FileUploadView, FileViewSet  # noqa: F401
-        from apps.files import services  # noqa: F401
-        from apps.files.serializers import (  # noqa: F401
-        from apps.files import permissions  # noqa: F401
-        from apps.files import tasks  # noqa: F401
-"""
-Files app advanced coverage booster - deep testing of file operations.
-"""
 
+from apps.files import services  # noqa: F401
+from apps.files.models import File, FileCategory, FileTag, FileVersion  # noqa: F401
+from apps.files.serializers import (  # noqa: F401; Configure minimal Django
+    "DJANGO_SETTINGS_MODULE",
+    Files,
 
+    "apps.config.settings.base",
 
-# Configure minimal Django
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "apps.config.settings.base")
+    advanced,
+    app,
+    apps.files,
+    booster,
+    coverage,
+    deep,
+    file,
+
+    # operations
+    os.environ.setdefault,
+    permissions,
+    tasks,
+    testing,
+)
+from apps.files.views import (
+    FileBulkOperationView,
+    FileUploadView,
+    FileViewSet,
+)
 
 try:
     django.setup()
 except Exception:
-    pass
-
 
 def test_files_models_advanced():
     """Advanced testing of file models."""
@@ -54,7 +67,6 @@ def test_files_models_advanced():
                 mock_file.size = 1073741824  # 1 GB
                 File.get_size_display(mock_file)
             except Exception:
-                pass
 
         # Test file type detection
         if hasattr(File, "get_file_type"):
@@ -70,14 +82,12 @@ def test_files_models_advanced():
                 try:
                     File.get_file_type(mock_file)
                 except Exception:
-                    pass
 
         # Test file validation
         if hasattr(File, "clean"):
             try:
                 File.clean(mock_file)
             except Exception:
-                pass
 
         # Test FileVersion model
         mock_version = Mock(spec=FileVersion)
@@ -89,7 +99,6 @@ def test_files_models_advanced():
             try:
                 FileVersion.__str__(mock_version)
             except Exception:
-                pass
 
         # Test FileCategory model
         mock_category = Mock(spec=FileCategory)
@@ -102,11 +111,8 @@ def test_files_models_advanced():
                     mock_files.count.return_value = 10
                     FileCategory.get_file_count(mock_category)
             except Exception:
-                pass
 
     except ImportError:
-        pass
-
 
 def test_files_views_advanced():
     """Advanced testing of file views."""
@@ -141,7 +147,6 @@ def test_files_views_advanced():
                 if hasattr(viewset, "upload"):
                     viewset.upload(viewset.request)
             except Exception:
-                pass
 
         # Test file search and filtering
         if hasattr(viewset, "search"):
@@ -149,7 +154,6 @@ def test_files_views_advanced():
             try:
                 viewset.search(viewset.request)
             except Exception:
-                pass
 
         # Test file download
         if hasattr(viewset, "download"):
@@ -161,14 +165,12 @@ def test_files_views_advanced():
             try:
                 viewset.download(viewset.request, pk=1)
             except Exception:
-                pass
 
         # Test file preview
         if hasattr(viewset, "preview"):
             try:
                 viewset.preview(viewset.request, pk=1)
             except Exception:
-                pass
 
         # Test bulk operations
         if hasattr(viewset, "bulk_delete"):
@@ -176,18 +178,14 @@ def test_files_views_advanced():
             try:
                 viewset.bulk_delete(viewset.request)
             except Exception:
-                pass
 
         if hasattr(viewset, "bulk_move"):
             viewset.request.data = {"ids": [1, 2], "category_id": 5}
             try:
                 viewset.bulk_move(viewset.request)
             except Exception:
-                pass
 
     except ImportError:
-        pass
-
 
 def test_files_services_advanced():
     """Advanced testing of file services."""
@@ -205,21 +203,18 @@ def test_files_services_advanced():
                 try:
                     storage.save(mock_file, "test.txt")
                 except Exception:
-                    pass
 
             # Test delete file
             if hasattr(storage, "delete"):
                 try:
                     storage.delete("/media/files/test.txt")
                 except Exception:
-                    pass
 
             # Test file exists
             if hasattr(storage, "exists"):
                 try:
                     storage.exists("/media/files/test.txt")
                 except Exception:
-                    pass
 
         # Test FileProcessingService
         if hasattr(services, "FileProcessingService"):
@@ -231,21 +226,18 @@ def test_files_services_advanced():
                 try:
                     processor.process_image(mock_image, width=800, height=600)
                 except Exception:
-                    pass
 
             # Test thumbnail generation
             if hasattr(processor, "generate_thumbnail"):
                 try:
                     processor.generate_thumbnail(mock_image, size=(150, 150))
                 except Exception:
-                    pass
 
             # Test file compression
             if hasattr(processor, "compress"):
                 try:
                     processor.compress("/path/to/file.zip")
                 except Exception:
-                    pass
 
         # Test FileValidationService
         if hasattr(services, "FileValidationService"):
@@ -259,18 +251,14 @@ def test_files_services_advanced():
                 try:
                     validator.validate(mock_file)
                 except Exception:
-                    pass
 
             # Test virus scanning
             if hasattr(validator, "scan_for_virus"):
                 try:
                     validator.scan_for_virus(mock_file)
                 except Exception:
-                    pass
 
     except ImportError:
-        pass
-
 
 def test_files_serializers_advanced():
     """Advanced testing of file serializers."""
@@ -301,10 +289,8 @@ def test_files_serializers_advanced():
                 try:
                     serializer.validate_file(mock_file)
                 except Exception:
-                    pass
 
         except Exception:
-            pass
 
         # Test FileDetailSerializer with nested relations
         mock_file = Mock()
@@ -316,13 +302,10 @@ def test_files_serializers_advanced():
 
         serializer = FileDetailSerializer(mock_file)
         try:
-            pass
+
         except Exception:
-            pass
 
     except ImportError:
-        pass
-
 
 def test_files_permissions_advanced():
     """Advanced testing of file permissions."""
@@ -354,11 +337,8 @@ def test_files_permissions_advanced():
                 try:
                     perm.has_object_permission(mock_request, mock_view, mock_file)
                 except Exception:
-                    pass
 
     except ImportError:
-        pass
-
 
 def test_files_tasks_advanced():
     """Advanced testing of file tasks."""
@@ -373,25 +353,20 @@ def test_files_tasks_advanced():
                 try:
                     tasks.cleanup_orphaned_files()
                 except Exception:
-                    pass
 
         # Test file indexing task
         if hasattr(tasks, "index_file_content"):
             try:
                 tasks.index_file_content(file_id=1)
             except Exception:
-                pass
 
         # Test thumbnail generation task
         if hasattr(tasks, "generate_thumbnails"):
             try:
                 tasks.generate_thumbnails(file_id=1)
             except Exception:
-                pass
 
     except ImportError:
-        pass
-
 
 # Run all advanced coverage tests
 if __name__ == "__main__":

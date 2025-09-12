@@ -4,16 +4,12 @@ from django.contrib.auth import get_user_model
 from django.core.cache import cache
 from django.db import models
 from django.template import Context, Template
+from django.utils import timezone
 
 from apps.core.enums import EmailStatus
 from apps.core.mixins import TimestampMixin, UserTrackingMixin
-        from django.utils import timezone
-        from django.utils import timezone
-        from django.utils import timezone
-        from django.utils import timezone
 
 User = get_user_model()
-
 
 class EmailTemplate(TimestampMixin, UserTrackingMixin):
     """Email template model with database storage and caching"""
@@ -121,7 +117,6 @@ class EmailTemplate(TimestampMixin, UserTrackingMixin):
                 return None
 
         return template
-
 
 class EmailMessageLog(TimestampMixin):
     """Log of sent email messages"""

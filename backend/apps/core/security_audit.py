@@ -5,18 +5,13 @@ from django.conf import settings
 from django.urls import get_resolver
 from rest_framework.viewsets import ModelViewSet, ViewSet
 
-"""
 Security audit utilities for verifying permission enforcement.
-"""
-
 
 logger = logging.getLogger(__name__)
 
-
 class SecurityAuditReport:
-    """
+
     Generate security audit reports for API endpoints.
-    """
 
     def __init__(self):
         self.endpoints = []
@@ -24,12 +19,12 @@ class SecurityAuditReport:
         self.warnings = []
 
     def audit_all_endpoints(self) -> dict[str, Any]:
-        """
+
         Audit all API endpoints for security issues.
 
         Returns:
             Dict containing audit results
-        """
+
         # Get all URL patterns
         resolver = get_resolver()
         self._audit_url_patterns(resolver.url_patterns, "")
@@ -316,26 +311,22 @@ class SecurityAuditReport:
 
         return recommendations
 
-
 def run_security_audit():
-    """
+
     Run a comprehensive security audit.
 
     Returns:
         Dict with audit results
-    """
+
     auditor = SecurityAuditReport()
     return auditor.audit_all_endpoints()
 
-
 def print_security_audit_report(report=None):
-    """
+
     Print a formatted security audit report.
 
     Args:
         report: Audit report dict, if None will run new audit
-    """
+
     if report is None:
         report = run_security_audit()
-
-    pass

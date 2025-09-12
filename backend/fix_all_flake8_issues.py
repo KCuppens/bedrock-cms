@@ -1,13 +1,9 @@
 #!/usr/bin/env python
-"""
-Comprehensive flake8 issues fixer.
-Fixes E722, F401, F821, F405, E402, E999, and adds noqa for C901.
-"""
 
-import os
+"""Comprehensive flake8 issues fixer.
+Fixes E722, F401, F821, F405, E402, E999, and adds noqa for C901."""
 import re
 from pathlib import Path
-
 
 def fix_bare_except(content):
     """Replace bare except with except Exception."""
@@ -25,7 +21,6 @@ def fix_bare_except(content):
             fixed_lines.append(line)
 
     return "\n".join(fixed_lines)
-
 
 def add_noqa_for_f401(content, file_path):
     """Add noqa comments for F401 unused imports in specific contexts."""
@@ -85,7 +80,6 @@ def add_noqa_for_f401(content, file_path):
 
     return content
 
-
 def fix_undefined_names(content, file_path):
     """Fix F821 undefined name errors."""
     fixes = {
@@ -109,7 +103,6 @@ def fix_undefined_names(content, file_path):
             if line.startswith("from ") or line.startswith("import "):
                 import_index = i + 1
             elif import_index > 0 and line and not line.startswith("#"):
-                break
 
         # Add missing imports
         for import_stmt in sorted(imports_to_add):
@@ -117,7 +110,6 @@ def fix_undefined_names(content, file_path):
             import_index += 1
 
     return "\n".join(lines)
-
 
 def fix_star_imports(content, file_path):
     """Fix F405 star import issues in settings files."""
@@ -132,7 +124,6 @@ def fix_star_imports(content, file_path):
     for i, line in enumerate(lines):
         if "from .base import *" in line:
             star_import_index = i
-            break
 
     if star_import_index >= 0:
         # Replace with explicit imports
@@ -152,7 +143,6 @@ def fix_star_imports(content, file_path):
 
     return "\n".join(lines)
 
-
 def fix_module_level_imports(content):
     """Move E402 module level imports to top of file."""
     lines = content.split("\n")
@@ -170,7 +160,6 @@ def fix_module_level_imports(content):
             or stripped.startswith('"""')
             or stripped.startswith("'''")
         ):
-            continue
 
         # Check if we've seen non-import code
         if stripped and not (
@@ -203,7 +192,6 @@ def fix_module_level_imports(content):
 
     return "\n".join(lines)
 
-
 def fix_syntax_error(content, file_path):
     """Fix E999 syntax error in i18n/views.py."""
     if "i18n\\views.py" in file_path or "i18n/views.py" in file_path:
@@ -222,7 +210,6 @@ def fix_syntax_error(content, file_path):
         return "\n".join(lines)
 
     return content
-
 
 def add_noqa_for_complexity(content, file_path):
     """Add noqa comments for C901 complexity warnings."""
@@ -246,12 +233,11 @@ def add_noqa_for_complexity(content, file_path):
 
     return "\n".join(fixed_lines)
 
-
 def process_file(file_path):
     """Process a single file to fix all issues."""
     try:
         # Read file
-        with open(file_path, "r", encoding="utf-8") as f:
+        with open(file_path, encoding="utf-8") as f:
             content = f.read()
 
         original_content = content
@@ -290,7 +276,6 @@ def process_file(file_path):
         print(f"Error processing {file_path}: {e}")
         return False
 
-
 def main():
     """Main function to process all files."""
     # Get all Python files in apps directory
@@ -298,7 +283,6 @@ def main():
 
     if not apps_dir.exists():
         print("apps directory not found!")
-        return
 
     # Process all Python files
     total_files = 0
@@ -312,7 +296,6 @@ def main():
             print(f"Fixed: {py_file}")
 
     print(f"\nProcessed {total_files} files, fixed {fixed_files} files")
-
 
 if __name__ == "__main__":
     main()

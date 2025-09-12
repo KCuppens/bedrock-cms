@@ -12,18 +12,28 @@ from apps.core.permissions import IsOwnerOrAdmin
 
 from .models import Note
 from .serializers import (
-from .serializers_optimized import NoteDetailSerializer, NoteListSerializer
-            from django.db.models import Count
-            from django.db import connection
-            from django.core.cache import cache
-            from celery import current_app
-            import time
-            import psutil
     HealthCheckSerializer,
     NoteCreateUpdateSerializer,
+    NoteDetailSerializer,
+    NoteListSerializer,
     NoteSerializer,
 )
 
+# Additional imports for health check functionality
+import time
+from django.db.models import Count
+from django.db import connection
+from django.core.cache import cache
+
+try:
+    from celery import current_app
+except ImportError:
+    current_app = None
+
+try:
+    import psutil
+except ImportError:
+    psutil = None
 
 @extend_schema_view(
     list=extend_schema(
@@ -93,7 +103,6 @@ class NoteViewSet(viewsets.ModelViewSet):
             queryset = queryset.prefetch_related("tags")
         # For list views, annotate with count
         elif self.action == "list":
-
             queryset = queryset.annotate(tags_count=Count("tags"))
 
         # Users can see their own notes and public notes
@@ -187,7 +196,6 @@ class NoteViewSet(viewsets.ModelViewSet):
         serializer = self.get_serializer(note)
         return Response(serializer.data)
 
-
 @extend_schema_view(
     list=extend_schema(
         summary="Health check",
@@ -238,7 +246,6 @@ class HealthCheckViewSet(viewsets.ViewSet):
     def _check_database(self):  # noqa: C901
         """Check database connectivity"""
         try:
-
             with connection.cursor() as cursor:
                 cursor.execute("SELECT 1")
             return True
@@ -248,7 +255,6 @@ class HealthCheckViewSet(viewsets.ViewSet):
     def _check_cache(self):  # noqa: C901
         """Check cache connectivity"""
         try:
-
             test_key = "health_check_test"
             cache.set(test_key, "ok", 10)
             return cache.get(test_key) == "ok"
@@ -258,7 +264,6 @@ class HealthCheckViewSet(viewsets.ViewSet):
     def _check_celery(self):  # noqa: C901
         """Check Celery worker availability"""
         try:
-
             inspect = current_app.control.inspect()
             stats = inspect.stats()
             return stats is not None and len(stats) > 0
@@ -277,8 +282,6 @@ class HealthCheckViewSet(viewsets.ViewSet):
     def _get_system_metrics(self):  # noqa: C901
         """Get system metrics (for staff users only)"""
         try:
-
-
             # Get uptime (approximate)
             boot_time = psutil.boot_time()
             uptime_seconds = time.time() - boot_time

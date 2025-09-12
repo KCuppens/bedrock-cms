@@ -2,25 +2,28 @@ from django.contrib.auth import get_user_model
 from django.contrib.contenttypes.models import ContentType
 from django.test import TestCase
 from django.urls import reverse
+
 from rest_framework import status
 from rest_framework.test import APIClient
+
 from apps.i18n.models import (
-"""
-Test cases for i18n views and API endpoints.
-"""
-
-
-
+    API,
     Locale,
+    Test,
     TranslationGlossary,
     TranslationHistory,
     TranslationUnit,
     UiMessage,
     UiMessageTranslation,
+
+    cases,
+    # endpoints
+
+    i18n,
+    views,
 )
 
 User = get_user_model()
-
 
 class LocaleViewSetTest(TestCase):
     """Test cases for Locale ViewSet."""
@@ -138,7 +141,6 @@ class LocaleViewSetTest(TestCase):
         self.assertTrue(self.locale_es.is_default)
         self.assertFalse(self.locale_en.is_default)
 
-
 class UiMessageViewSetTest(TestCase):
     """Test cases for UiMessage ViewSet."""
 
@@ -239,7 +241,6 @@ class UiMessageViewSetTest(TestCase):
         self.assertEqual(
             response.data["buttons.cancel"], "Cancel"
         )  # Falls back to default
-
 
 class UiMessageTranslationViewSetTest(TestCase):
     """Test cases for UiMessageTranslation ViewSet."""
@@ -356,7 +357,6 @@ class UiMessageTranslationViewSetTest(TestCase):
         self.assertEqual(response.data[0]["namespace"], "common")
         self.assertEqual(response.data[0]["message_count"], 1)
 
-
 class TranslationUnitViewSetTest(TestCase):
     """Test cases for TranslationUnit ViewSet."""
 
@@ -452,7 +452,6 @@ class TranslationUnitViewSetTest(TestCase):
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data), 2)
-
 
 class TranslationGlossaryViewSetTest(TestCase):
     """Test cases for TranslationGlossary ViewSet."""

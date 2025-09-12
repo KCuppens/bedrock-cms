@@ -1,7 +1,6 @@
 from django.contrib.auth.models import Group, Permission
 from django.core.management.base import BaseCommand
 
-
 class Command(BaseCommand):
     """Management command to sync user groups and their permissions"""
 
@@ -129,7 +128,6 @@ class Command(BaseCommand):
                         f"Group {group_name} already exists (use --force to update permissions)"
                     )
                 )
-                continue
 
             if not dry_run:
                 # Clear existing permissions if updating

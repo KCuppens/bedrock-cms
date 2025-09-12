@@ -1,26 +1,34 @@
 import os
 from datetime import datetime
 from unittest.mock import Mock, patch
+
 import django
-        from apps.cms import tasks  # noqa: F401
-        from apps.cms.tasks import (  # noqa: F401
-        from apps.cms import tasks  # noqa: F401
-        from apps.cms.tasks import signals  # noqa: F401
-        from apps.cms.tasks import utils  # noqa: F401
-"""
-CMS tasks coverage booster - targeting background tasks and celery tasks.
-"""
 
+from apps.cms import tasks  # noqa: F401
+from apps.cms.tasks import (  # noqa: F401; Configure minimal Django
+    "DJANGO_SETTINGS_MODULE",
+    CMS,
 
+    "apps.config.settings.base",
 
-# Configure minimal Django
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "apps.config.settings.base")
+    apps.cms,
+    apps.cms.tasks,
+    background,
+    booster,
+    celery,
+    coverage,
+
+    os.environ.setdefault,
+    signals,
+    targeting,
+    tasks,
+    # tasks
+    utils,
+)
 
 try:
     django.setup()
 except Exception:
-    pass
-
 
 def test_cms_tasks():
     """Test CMS tasks.py."""
@@ -50,7 +58,6 @@ def test_cms_tasks():
                                         )
                                         attr()
                                 except Exception:
-                                    pass
 
                             elif "unpublish" in attr_name.lower():
                                 try:
@@ -62,7 +69,6 @@ def test_cms_tasks():
                                         )
                                         attr()
                                 except Exception:
-                                    pass
 
                             elif "cleanup" in attr_name.lower():
                                 try:
@@ -76,7 +82,6 @@ def test_cms_tasks():
                                         )
                                         attr()
                                 except Exception:
-                                    pass
 
                             elif "index" in attr_name.lower():
                                 try:
@@ -88,21 +93,18 @@ def test_cms_tasks():
                                         MockPage.objects.all.return_value = mock_pages
                                         attr()
                                 except Exception:
-                                    pass
 
                             elif "cache" in attr_name.lower():
                                 try:
                                     # Test clear_page_cache task
                                     attr(page_id=1)
                                 except Exception:
-                                    pass
 
                             elif "notify" in attr_name.lower():
                                 try:
                                     # Test notification tasks
                                     attr(page_id=1, user_id=1, action="published")
                                 except Exception:
-                                    pass
 
                             elif "generate" in attr_name.lower():
                                 try:
@@ -116,7 +118,6 @@ def test_cms_tasks():
                                         )
                                         attr()
                                 except Exception:
-                                    pass
 
                             else:
                                 # Generic task test
@@ -130,9 +131,8 @@ def test_cms_tasks():
                                         try:
                                             attr(page_id=1)
                                         except Exception:
-                                            pass
+
                                 except Exception:
-                                    pass
 
                         else:
                             # Non-Celery function
@@ -146,24 +146,20 @@ def test_cms_tasks():
                                     try:
                                         attr(1)
                                     except Exception:
-                                        pass
+
                             elif "validate" in attr_name.lower():
                                 try:
                                     attr({"key": "value"})
                                 except Exception:
-                                    pass
+
                             elif "process" in attr_name.lower():
                                 try:
                                     attr(Mock())
                                 except Exception:
-                                    pass
 
                 except Exception:
-                    pass
 
     except ImportError:
-        pass
-
 
 def test_cms_scheduled_tasks():
     """Test CMS scheduled/periodic tasks."""
@@ -185,7 +181,6 @@ def test_cms_scheduled_tasks():
                 publish_scheduled_pages()
 
         except Exception:
-            pass
 
         # Test unpublish_expired_pages
         try:
@@ -197,7 +192,6 @@ def test_cms_scheduled_tasks():
                 unpublish_expired_pages()
 
         except Exception:
-            pass
 
         # Test cleanup_old_versions
         try:
@@ -208,7 +202,6 @@ def test_cms_scheduled_tasks():
                 cleanup_old_versions()
 
         except Exception:
-            pass
 
         # Test generate_sitemap
         try:
@@ -222,11 +215,8 @@ def test_cms_scheduled_tasks():
                     generate_sitemap()
 
         except Exception:
-            pass
 
     except ImportError:
-        pass
-
 
 def test_cms_async_tasks():
     """Test CMS async task processing."""
@@ -245,7 +235,6 @@ def test_cms_async_tasks():
                     tasks.process_page_workflow(page_id=1)
 
         except Exception:
-            pass
 
         # Test task groups
         try:
@@ -257,7 +246,6 @@ def test_cms_async_tasks():
                     tasks.bulk_publish_pages([1, 2, 3])
 
         except Exception:
-            pass
 
         # Test task retries
         try:
@@ -267,14 +255,10 @@ def test_cms_async_tasks():
                     try:
                         tasks.retry_failed_publish(page_id=1)
                     except Exception:
-                        pass
 
         except Exception:
-            pass
 
     except ImportError:
-        pass
-
 
 def test_cms_task_signals():
     """Test CMS task signal handlers."""
@@ -288,7 +272,6 @@ def test_cms_task_signals():
             try:
                 signals.task_success_handler(sender=mock_sender, result=mock_result)
             except Exception:
-                pass
 
         # Test task failure handler
         if hasattr(signals, "task_failure_handler"):
@@ -299,7 +282,6 @@ def test_cms_task_signals():
                     sender=mock_sender, exception=mock_exception
                 )
             except Exception:
-                pass
 
         # Test task retry handler
         if hasattr(signals, "task_retry_handler"):
@@ -308,11 +290,8 @@ def test_cms_task_signals():
             try:
                 signals.task_retry_handler(sender=mock_sender, reason=mock_reason)
             except Exception:
-                pass
 
     except ImportError:
-        pass
-
 
 def test_cms_task_utilities():
     """Test CMS task utility functions."""
@@ -330,30 +309,24 @@ def test_cms_task_utilities():
                             try:
                                 # Test distributed lock
                                 with attr("test_lock_key", timeout=10):
-                                    pass
+
                             except Exception:
-                                pass
 
                         elif "queue" in attr_name.lower():
                             try:
                                 # Test queue management
                                 attr("default")
                             except Exception:
-                                pass
 
                         elif "monitor" in attr_name.lower():
                             try:
                                 # Test task monitoring
                                 attr("task_id_123")
                             except Exception:
-                                pass
 
                 except Exception:
-                    pass
 
     except ImportError:
-        pass
-
 
 # Run all task coverage tests
 if __name__ == "__main__":

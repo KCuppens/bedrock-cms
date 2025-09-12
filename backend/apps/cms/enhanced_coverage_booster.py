@@ -1,21 +1,19 @@
 import os
 import sys
 from unittest.mock import Mock, patch
+
 import django
-from django.utils import timezone
-        from apps.cms.views.pages import PagesViewSet  # noqa: F401
-        import apps.cms.views as views_module
-        from apps.cms.views.category import CategoryViewSet  # noqa: F401
-        from apps.cms.views.blocks import BlocksViewSet  # noqa: F401
-        from apps.cms.views.redirect import RedirectViewSet  # noqa: F401
-        from apps.cms.views.seo import SeoViewSet  # noqa: F401
-        from apps.cms.serializers import category, pages, redirect, seo  # noqa: F401
-        from apps.cms import models  # noqa: F401
-"""
+
+import apps.cms.views as views_module
+from apps.cms import models  # noqa: F401
+from apps.cms.serializers import category, pages, redirect, seo  # noqa: F401
+from apps.cms.views.blocks import BlocksViewSet  # noqa: F401
+from apps.cms.views.category import CategoryViewSet  # noqa: F401
+from apps.cms.views.pages import PagesViewSet  # noqa: F401
+from apps.cms.views.redirect import RedirectViewSet  # noqa: F401
+from apps.cms.views.seo import SeoViewSet  # noqa: F401
+
 Enhanced coverage booster - targets specific uncovered lines in high-impact files.
-"""
-
-
 
 # Configure minimal Django
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "apps.config.settings.base")
@@ -27,8 +25,6 @@ sys.modules["apps.media.models"] = Mock()
 try:
     django.setup()
 except Exception:
-    pass
-
 
 def test_pages_view_comprehensive():  # noqa: C901
     """Target specific lines in pages.py (375 lines, 303 missing)."""
@@ -47,13 +43,11 @@ def test_pages_view_comprehensive():  # noqa: C901
             try:
                 viewset.get_serializer_class()
             except Exception:
-                pass
 
             # Test get_permissions (lines 38-48)
             try:
                 viewset.get_permissions()
             except Exception:
-                pass
 
         # Test special actions
         special_actions = ["get_by_path", "children", "tree", "publish", "unpublish"]
@@ -62,7 +56,6 @@ def test_pages_view_comprehensive():  # noqa: C901
             try:
                 viewset.get_permissions()
             except Exception:
-                pass
 
         # Test get_queryset (lines 27-31)
         try:
@@ -74,7 +67,6 @@ def test_pages_view_comprehensive():  # noqa: C901
 
                 viewset.get_queryset()
         except Exception:
-            pass
 
         # Test action methods with mocked request
         viewset.request = Mock()
@@ -92,7 +84,6 @@ def test_pages_view_comprehensive():  # noqa: C901
                     viewset.request.query_params = {"path": "/test/", "locale": "en"}
                     viewset.get_by_path(viewset.request)
         except Exception:
-            pass
 
         # Test children action (should cover lines 102-120)
         try:
@@ -100,7 +91,6 @@ def test_pages_view_comprehensive():  # noqa: C901
                 viewset.get_object = Mock(return_value=Mock())
                 viewset.children(viewset.request)
         except Exception:
-            pass
 
         # Test tree action (should cover lines 132-163)
         try:
@@ -110,7 +100,6 @@ def test_pages_view_comprehensive():  # noqa: C901
                 )
                 viewset.tree(viewset.request)
         except Exception:
-            pass
 
         # Test publish action (should cover lines 176-190)
         try:
@@ -122,7 +111,6 @@ def test_pages_view_comprehensive():  # noqa: C901
             with patch("apps.cms.views.pages.timezone"):
                 viewset.publish(viewset.request)
         except Exception:
-            pass
 
         # Test unpublish action (should cover lines 194-206)
         try:
@@ -134,11 +122,8 @@ def test_pages_view_comprehensive():  # noqa: C901
 
             viewset.unpublish(viewset.request)
         except Exception:
-            pass
 
     except ImportError:
-        pass
-
 
 def test_views_py_comprehensive():  # noqa: C901
     """Target the main views.py file (388 lines, all missing)."""
@@ -163,13 +148,10 @@ def test_views_py_comprehensive():  # noqa: C901
                                 if hasattr(instance, "get_permissions"):
                                     instance.get_permissions()
                         except Exception:
-                            pass
+
                 except Exception:
-                    pass
 
     except ImportError:
-        pass
-
 
 def test_category_view_comprehensive():  # noqa: C901
     """Target category.py view (118 lines, 64 missing)."""
@@ -185,22 +167,17 @@ def test_category_view_comprehensive():  # noqa: C901
             try:
                 viewset.get_serializer_class()
             except Exception:
-                pass
 
             try:
                 viewset.get_permissions()
             except Exception:
-                pass
 
         # Test get_queryset
         try:
             viewset.get_queryset()
         except Exception:
-            pass
 
     except ImportError:
-        pass
-
 
 def test_blocks_view_comprehensive():  # noqa: C901
     """Target blocks.py view (26 lines, 13 missing)."""
@@ -214,7 +191,6 @@ def test_blocks_view_comprehensive():  # noqa: C901
             viewset.request = Mock()
             viewset.registry(viewset.request)
         except Exception:
-            pass
 
         # Test validate action
         try:
@@ -222,11 +198,8 @@ def test_blocks_view_comprehensive():  # noqa: C901
             viewset.request.data = {"blocks": []}
             viewset.validate(viewset.request)
         except Exception:
-            pass
 
     except ImportError:
-        pass
-
 
 def test_redirect_view_comprehensive():  # noqa: C901
     """Target redirect.py view (92 lines, 61 missing)."""
@@ -242,17 +215,13 @@ def test_redirect_view_comprehensive():  # noqa: C901
             try:
                 viewset.get_serializer_class()
             except Exception:
-                pass
 
         # Test get_queryset
         try:
             viewset.get_queryset()
         except Exception:
-            pass
 
     except ImportError:
-        pass
-
 
 def test_seo_view_comprehensive():  # noqa: C901
     """Target seo.py view (144 lines, 118 missing)."""
@@ -268,17 +237,13 @@ def test_seo_view_comprehensive():  # noqa: C901
             try:
                 viewset.get_serializer_class()
             except Exception:
-                pass
 
         # Test get_queryset
         try:
             viewset.get_queryset()
         except Exception:
-            pass
 
     except ImportError:
-        pass
-
 
 def test_serializers_comprehensive():  # noqa: C901
     """Target serializers to boost coverage."""
@@ -300,15 +265,12 @@ def test_serializers_comprehensive():  # noqa: C901
                 try:
                     # Try to access meta and fields
                     if hasattr(serializer_class, "_meta"):
-                        pass
+
                     if hasattr(serializer_class, "_declared_fields"):
-                        pass
+
                 except Exception:
-                    pass
 
     except ImportError:
-        pass
-
 
 def test_models_comprehensive():  # noqa: C901
     """Target models to boost coverage."""
@@ -331,15 +293,12 @@ def test_models_comprehensive():  # noqa: C901
                         instance = Mock(spec=model_class)
                         instance.title = "Test"
                         try:
-                            pass
+
                         except Exception:
-                            pass
+
                 except Exception:
-                    pass
 
     except ImportError:
-        pass
-
 
 # Run all comprehensive coverage tests
 if __name__ == "__main__":

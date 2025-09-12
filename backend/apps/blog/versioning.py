@@ -1,25 +1,10 @@
 import uuid
 from datetime import datetime, timedelta
 from typing import TYPE_CHECKING, Optional
+
 from django.contrib.auth import get_user_model
 from django.db import models, transaction
 from django.db.models import (
-from django.utils import timezone
-    from .models import BlogPost
-    from django.contrib.auth.models import AbstractUser as User
-        from .models import Tag
-from django.db.models.signals import post_save
-from django.dispatch import receiver
-"""
-Versioning and revision tracking for blog posts.
-
-This module provides revision snapshots, autosave, and audit trail functionality
-for blog posts, similar to the CMS page versioning system.
-"""
-
-# mypy: ignore-errors
-
-
     BooleanField,
     DateTimeField,
     ForeignKey,
@@ -28,8 +13,14 @@ for blog posts, similar to the CMS page versioning system.
     TextField,
     UUIDField,
 )
+from django.contrib.auth.models import AbstractUser as User
+from django.db.models import signals
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+from django.utils import timezone
 
 if TYPE_CHECKING:
+    from apps.blog.models import BlogPost
 else:
     BlogPost = "BlogPost"
 
@@ -38,11 +29,9 @@ if TYPE_CHECKING:
 else:
     User = get_user_model()
 
-
 class BlogPostRevision(models.Model):
-    """
+
     Store snapshots of blog post content for versioning and autosave.
-    """
 
     id: UUIDField = models.UUIDField(
         primary_key=True, default=uuid.uuid4, editable=False
@@ -103,7 +92,7 @@ class BlogPostRevision(models.Model):
         is_autosave: bool = False,
         comment: str = "",
     ) -> "BlogPostRevision":  # type: ignore
-        """
+
         Create a new revision snapshot of a blog post.
 
         Args:
@@ -115,7 +104,7 @@ class BlogPostRevision(models.Model):
 
         Returns:
             Created BlogPostRevision instance
-        """
+
         # Create complete snapshot of blog post data
         snapshot_data = {
             "title": blog_post.title,
@@ -162,13 +151,13 @@ class BlogPostRevision(models.Model):
 
     @classmethod
     def cleanup_old_autosave_revisions(cls, blog_post: "BlogPost", keep_count: int = 5):
-        """
+
         Clean up old autosave revisions for a blog post.
 
         Args:
             blog_post: BlogPost to clean up revisions for
             keep_count: Number of recent autosave revisions to keep
-        """
+
         # Get autosave revisions older than the keep_count
         old_autosaves = cls.objects.filter(
             blog_post=blog_post, is_autosave=True
@@ -180,13 +169,13 @@ class BlogPostRevision(models.Model):
 
     @classmethod
     def cleanup_old_revisions(cls, blog_post: "BlogPost", days_to_keep: int = 90):
-        """
+
         Clean up very old revisions for a blog post.
 
         Args:
             blog_post: BlogPost to clean up revisions for
             days_to_keep: Number of days of revisions to keep
-        """
+
         cutoff_date = timezone.now() - timedelta(days=days_to_keep)
 
         # Keep all published snapshots and recent revisions
@@ -200,7 +189,7 @@ class BlogPostRevision(models.Model):
     def restore_to_blog_post(
         self, user: Optional["User"] = None, create_backup: bool = True
     ) -> "BlogPost":  # type: ignore
-        """
+
         Restore this revision's content to the blog post.
 
         Args:
@@ -209,7 +198,6 @@ class BlogPostRevision(models.Model):
 
         Returns:
             Updated BlogPost instance
-        """
 
         blog_post = self.blog_post
         snapshot = self.snapshot
@@ -260,11 +248,9 @@ class BlogPostRevision(models.Model):
 
         return blog_post
 
-
 class BlogPostViewTracker(models.Model):
-    """
+
     Track view counts for blog posts.
-    """
 
     blog_post: OneToOneField = models.OneToOneField(
         "blog.BlogPost",
@@ -292,12 +278,12 @@ class BlogPostViewTracker(models.Model):
         return f"{self.blog_post.title} - {self.view_count} views"
 
     def increment_view(self, is_unique: bool = False):
-        """
+
         Increment view count for this blog post.
 
         Args:
             is_unique: Whether this is a unique view (new visitor)
-        """
+
         self.view_count = models.F("view_count") + 1
         if is_unique:
             self.unique_view_count = models.F("unique_view_count") + 1
@@ -307,15 +293,13 @@ class BlogPostViewTracker(models.Model):
         # Refresh from database to get updated values
         self.refresh_from_db()
 
-
 # Signal handlers for automatic revision creation
-
 
 @receiver(post_save, sender="blog.BlogPost")
 def create_blog_post_revision_on_publish(sender, instance, created, **kwargs):
-    """
+
     Automatically create a revision when a blog post is published.
-    """
+
     if not created and instance.status == "published" and instance.published_at:
         # Check if we already have a published snapshot for this exact state
         existing_published = BlogPostRevision.objects.filter(
@@ -330,11 +314,10 @@ def create_blog_post_revision_on_publish(sender, instance, created, **kwargs):
                 comment="Automatic snapshot on publish",
             )
 
-
 @receiver(post_save, sender="blog.BlogPost")
 def ensure_view_tracker_exists(sender, instance, created, **kwargs):
-    """
+
     Ensure a view tracker exists for every blog post.
-    """
+
     if created:
         BlogPostViewTracker.objects.get_or_create(blog_post=instance)

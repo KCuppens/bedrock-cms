@@ -7,7 +7,6 @@ from apps.emails.models import EmailTemplate
 
 User = get_user_model()
 
-
 class Command(BaseCommand):
     """Management command to seed demo data"""
 
@@ -41,7 +40,7 @@ class Command(BaseCommand):
             help="Skip creating demo notes",
         )
 
-    def handle(self, *args, **options):
+    def handle(self, *args, **options):  # noqa: C901
         reset = options["reset"]
         password = options["password"]
         skip_users = options["skip_users"]
@@ -94,7 +93,7 @@ class Command(BaseCommand):
         if deleted_notes > 0:
             self.stdout.write(f"Deleted {deleted_notes} demo notes")
 
-    def _create_demo_users(self, password):
+    def _create_demo_users(self, password):  # noqa: C901
         """Create demo users with different roles"""
         demo_users = [
             {
@@ -164,7 +163,7 @@ class Command(BaseCommand):
             self.stdout.write(self.style.SUCCESS(f"Created {created_count} demo users"))
             self.stdout.write(f"Demo user password: {password}")
 
-    def _create_email_templates(self):
+    def _create_email_templates(self):  # noqa: C901
         """Create demo email templates"""
         templates = [
             {
@@ -184,7 +183,7 @@ class Command(BaseCommand):
 </ul>
 <p>If you have any questions, feel free to contact us at {{ support_email }}.</p>
 <p>Best regards,<br>The {{ site_name }} Team</p>
-                """,
+
                 "text_content": """
 Welcome {{ user_name }}!
 
@@ -199,7 +198,7 @@ If you have any questions, feel free to contact us at {{ support_email }}.
 
 Best regards,
 The {{ site_name }} Team
-                """,
+
                 "template_variables": {
                     "user_name": "User full name",
                     "site_name": "Site name",
@@ -220,7 +219,7 @@ The {{ site_name }} Team
 <p><a href="{{ reset_link }}" style="background-color: #007bff; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;">Reset Your Password</a></p>
 <p>This link will expire in 24 hours. If you didn't request this reset, please ignore this email.</p>
 <p>Best regards,<br>The {{ site_name }} Team</p>
-                """,
+
                 "text_content": """
 Password Reset Request
 
@@ -234,7 +233,7 @@ This link will expire in 24 hours. If you didn't request this reset, please igno
 
 Best regards,
 The {{ site_name }} Team
-                """,
+
                 "template_variables": {
                     "user_name": "User full name",
                     "site_name": "Site name",
@@ -255,7 +254,7 @@ The {{ site_name }} Team
 <p><a href="{{ action_url }}" style="background-color: #28a745; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;">Take Action</a></p>
 {% endif %}
 <p>Best regards,<br>The {{ site_name }} Team</p>
-                """,
+
                 "text_content": """
 {{ title }}
 
@@ -269,7 +268,7 @@ Take action: {{ action_url }}
 
 Best regards,
 The {{ site_name }} Team
-                """,
+
                 "template_variables": {
                     "title": "Notification title",
                     "user_name": "User full name",
@@ -302,7 +301,7 @@ The {{ site_name }} Team
                 self.style.SUCCESS(f"Created {created_count} email templates")
             )
 
-    def _create_demo_notes(self):
+    def _create_demo_notes(self):  # noqa: C901
         """Create demo notes"""
         try:
             demo_user = User.objects.get(email="member@example.com")
@@ -310,7 +309,6 @@ The {{ site_name }} Team
             self.stdout.write(
                 self.style.WARNING("Demo user not found, skipping notes creation")
             )
-            return
 
         demo_notes = [
             {
@@ -356,7 +354,7 @@ The {{ site_name }} Team
         if created_count > 0:
             self.stdout.write(self.style.SUCCESS(f"Created {created_count} demo notes"))
 
-    def _show_summary(self):
+    def _show_summary(self):  # noqa: C901
         """Show summary of created data"""
         self.stdout.write("\n" + "=" * 50)
         self.stdout.write("DEMO DATA SUMMARY")

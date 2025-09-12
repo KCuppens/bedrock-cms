@@ -2,8 +2,6 @@
 """Fix all E501 line too long issues comprehensively."""
 
 import os
-import re
-
 
 def split_long_line(line, max_length=79):
     """Split a line that's too long."""
@@ -182,10 +180,9 @@ def split_long_line(line, max_length=79):
                         for offset in range(min(20, mid)):
                             if string_content[mid + offset] in " ,;:":
                                 mid = mid + offset + 1
-                                break
+
                             if string_content[mid - offset] in " ,;:":
                                 mid = mid - offset + 1
-                                break
 
                         part1 = string_content[:mid]
                         part2 = string_content[mid:]
@@ -216,11 +213,10 @@ def split_long_line(line, max_length=79):
     # If no good split point found, just break at 79 chars
     return [line[:79], indent_str + "    " + line[79:].strip()]
 
-
 def fix_file_line_lengths(filepath):
     """Fix all E501 line length issues in a file."""
     try:
-        with open(filepath, "r", encoding="utf-8") as f:
+        with open(filepath, encoding="utf-8") as f:
             lines = f.readlines()
 
         fixed_lines = []
@@ -248,7 +244,6 @@ def fix_file_line_lengths(filepath):
     except Exception as e:
         print(f"Error processing {filepath}: {e}")
         return False
-
 
 def main():
     """Main function to fix all line length issues."""
@@ -278,7 +273,6 @@ def main():
             print(f"File not found: {filepath}")
 
     print(f"\nFixed {fixed_count} files")
-
 
 if __name__ == "__main__":
     main()

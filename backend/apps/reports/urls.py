@@ -2,10 +2,7 @@ from django.urls import path
 
 from . import views
 
-"""
 Reports URL configuration.
-"""
-
 
 app_name = "reports"
 

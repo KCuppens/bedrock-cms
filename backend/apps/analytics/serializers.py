@@ -13,7 +13,6 @@ from .models import (
 
 User = get_user_model()
 
-
 class PageViewSerializer(serializers.ModelSerializer):
     """Serializer for PageView model"""
 
@@ -44,7 +43,6 @@ class PageViewSerializer(serializers.ModelSerializer):
             "viewed_at",
         ]
         read_only_fields = ["id", "viewed_at", "page_title", "user_email"]
-
 
 class PageViewCreateSerializer(serializers.ModelSerializer):
     """Serializer for creating PageView records (minimal data)"""
@@ -81,7 +79,6 @@ class PageViewCreateSerializer(serializers.ModelSerializer):
         else:
             ip = request.META.get("REMOTE_ADDR")
         return ip or "127.0.0.1"
-
 
 class UserActivitySerializer(serializers.ModelSerializer):
     """Serializer for UserActivity model"""
@@ -122,7 +119,6 @@ class UserActivitySerializer(serializers.ModelSerializer):
             return str(obj.content_object)
         return None
 
-
 class UserActivityCreateSerializer(serializers.ModelSerializer):
     """Serializer for creating UserActivity records"""
 
@@ -146,7 +142,6 @@ class UserActivityCreateSerializer(serializers.ModelSerializer):
         else:
             ip = request.META.get("REMOTE_ADDR")
         return ip or "127.0.0.1"
-
 
 class ContentMetricsSerializer(serializers.ModelSerializer):
     """Serializer for ContentMetrics model"""
@@ -183,7 +178,6 @@ class ContentMetricsSerializer(serializers.ModelSerializer):
         if obj.content_object:
             return str(obj.content_object)
         return None
-
 
 class AssessmentSerializer(serializers.ModelSerializer):
     """Serializer for Assessment model"""
@@ -240,7 +234,6 @@ class AssessmentSerializer(serializers.ModelSerializer):
             "severity_display",
         ]
 
-
 class AssessmentCreateSerializer(serializers.ModelSerializer):
     """Serializer for creating Assessment records"""
 
@@ -261,7 +254,6 @@ class AssessmentCreateSerializer(serializers.ModelSerializer):
         if request and request.user:
             validated_data["created_by"] = request.user
         return super().create(validated_data)
-
 
 class RiskSerializer(serializers.ModelSerializer):
     """Serializer for Risk model"""
@@ -319,7 +311,6 @@ class RiskSerializer(serializers.ModelSerializer):
             "status_display",
             "severity_display",
         ]
-
 
 class ThreatSerializer(serializers.ModelSerializer):
     """Serializer for Threat model"""
@@ -379,7 +370,6 @@ class ThreatSerializer(serializers.ModelSerializer):
             "severity_display",
         ]
 
-
 class ThreatCreateSerializer(serializers.ModelSerializer):
     """Serializer for creating Threat records"""
 
@@ -406,7 +396,6 @@ class ThreatCreateSerializer(serializers.ModelSerializer):
         if request and request.user:
             validated_data["reported_by"] = request.user
         return super().create(validated_data)
-
 
 class AnalyticsSummarySerializer(serializers.ModelSerializer):
     """Serializer for AnalyticsSummary model"""
@@ -442,9 +431,7 @@ class AnalyticsSummarySerializer(serializers.ModelSerializer):
         ]
         read_only_fields = ["created_at", "updated_at", "period_type_display"]
 
-
 # Specialized serializers for analytics endpoints
-
 
 class TrafficStatsSerializer(serializers.Serializer):
     """Serializer for traffic statistics"""
@@ -455,7 +442,6 @@ class TrafficStatsSerializer(serializers.Serializer):
     bounce_rate = serializers.DecimalField(max_digits=5, decimal_places=2)
     avg_session_duration = serializers.IntegerField()
 
-
 class TopContentSerializer(serializers.Serializer):
     """Serializer for top performing content"""
 
@@ -464,7 +450,6 @@ class TopContentSerializer(serializers.Serializer):
     views = serializers.IntegerField()
     unique_views = serializers.IntegerField()
     avg_time_on_page = serializers.IntegerField()
-
 
 class DashboardStatsSerializer(serializers.Serializer):
     """Serializer for dashboard summary statistics"""
@@ -482,7 +467,6 @@ class DashboardStatsSerializer(serializers.Serializer):
     visitors_trend = serializers.ListField(child=serializers.IntegerField())
     threat_trend = serializers.ListField(child=serializers.IntegerField())
 
-
 class RiskTimelineSerializer(serializers.Serializer):
     """Serializer for risk timeline data"""
 
@@ -490,7 +474,6 @@ class RiskTimelineSerializer(serializers.Serializer):
     risks_identified = serializers.IntegerField()
     risks_mitigated = serializers.IntegerField()
     risk_score_avg = serializers.DecimalField(max_digits=5, decimal_places=2)
-
 
 class ThreatStatsSerializer(serializers.Serializer):
     """Serializer for threat statistics"""

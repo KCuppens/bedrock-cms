@@ -1,10 +1,9 @@
-"""
+
 Model Permissions Configuration
 
 This module defines custom permissions for all models in the Bedrock CMS.
 Django automatically creates add, change, delete, and view permissions for each model,
 but we can add custom permissions for more fine-grained control.
-"""
 
 # Define custom permissions for each app's models
 # These should be added to the model's Meta class
@@ -160,9 +159,8 @@ API_PERMISSIONS = [
     ("manage_rate_limits", "Can manage API rate limits"),
 ]
 
-
 def get_model_permissions(app_label, model_name):
-    """
+
     Get the custom permissions for a specific model.
 
     Args:
@@ -171,7 +169,7 @@ def get_model_permissions(app_label, model_name):
 
     Returns:
         List of permission tuples
-    """
+
     permissions_map = {
         "cms": {
             "page": CMS_PAGE_PERMISSIONS,
@@ -220,7 +218,6 @@ def get_model_permissions(app_label, model_name):
     }
 
     return permissions_map.get(app_label, {}).get(model_name.lower(), [])
-
 
 # Permission groups for easier management
 PERMISSION_GROUPS = {
@@ -279,9 +276,8 @@ PERMISSION_GROUPS = {
     ],
 }
 
-
 def get_permission_group(group_name):
-    """
+
     Get the permissions for a specific permission group.
 
     Args:
@@ -289,17 +285,16 @@ def get_permission_group(group_name):
 
     Returns:
         List of permission strings
-    """
+
     return PERMISSION_GROUPS.get(group_name, [])
 
-
 def get_all_custom_permissions():
-    """
+
     Get all custom permissions defined in this module.
 
     Returns:
         Dictionary mapping app.model to list of permissions
-    """
+
     return {
         "cms.page": CMS_PAGE_PERMISSIONS,
         "cms.redirect": CMS_REDIRECT_PERMISSIONS,

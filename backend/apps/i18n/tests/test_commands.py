@@ -1,18 +1,15 @@
+import shutil
 import tempfile
 from io import StringIO
 from pathlib import Path
 from unittest.mock import MagicMock, patch
+
 from django.core.management import call_command
 from django.test import TestCase
+
 from apps.i18n.models import Locale, UiMessage, UiMessageTranslation
-        import shutil
-"""
+
 Test cases for i18n management commands.
-"""
-
-
-
-
 
 class InitLocalesCommandTest(TestCase):
     """Test cases for init_locales command."""
@@ -59,7 +56,6 @@ class InitLocalesCommandTest(TestCase):
         self.assertTrue(Locale.objects.filter(code="en").exists())
         self.assertTrue(Locale.objects.filter(code="es").exists())
         self.assertTrue(Locale.objects.filter(code="de").exists())
-
 
 class ImportDjangoTranslationsCommandTest(TestCase):
     """Test cases for import_django_translations command."""
@@ -125,7 +121,6 @@ class ImportDjangoTranslationsCommandTest(TestCase):
 
         # The message should still exist with potentially updated value
         self.assertTrue(UiMessage.objects.filter(key="admin.save").exists())
-
 
 class SyncPoFilesCommandTest(TestCase):
     """Test cases for sync_po_files command."""

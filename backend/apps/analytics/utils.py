@@ -1,22 +1,18 @@
 import re
 from datetime import date, datetime, timedelta
+from urllib.parse import parse_qs, urlencode, urlparse, urlunparse
+
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.gis.geoip2 import GeoIP2
 from django.utils import timezone
 from user_agents import parse
-        from urllib.parse import parse_qs, urlencode, urlparse, urlunparse
-    from .models import PageView
-        from urllib.parse import urlparse
-"""
+
+from .models import PageView
+
 Utility functions for analytics functionality.
-"""
-
-
-
-
 
 def parse_user_agent(user_agent_string: str) -> dict[str, str]:
-    """
+
     Parse user agent string to extract browser and OS information.
 
     Args:
@@ -24,7 +20,7 @@ def parse_user_agent(user_agent_string: str) -> dict[str, str]:
 
     Returns:
         Dict containing browser, os, and device_type information
-    """
+
     user_agent = parse(user_agent_string)
 
     device_type = "other"
@@ -41,9 +37,8 @@ def parse_user_agent(user_agent_string: str) -> dict[str, str]:
         "device_type": device_type,
     }
 
-
 def get_client_ip(request) -> str:
-    """
+
     Extract client IP address from request, handling proxies.
 
     Args:
@@ -51,7 +46,7 @@ def get_client_ip(request) -> str:
 
     Returns:
         Client IP address as string
-    """
+
     x_forwarded_for = request.META.get("HTTP_X_FORWARDED_FOR")
     if x_forwarded_for:
         # Take the first IP in the chain
@@ -61,9 +56,8 @@ def get_client_ip(request) -> str:
 
     return ip
 
-
 def get_geo_data(ip_address: str) -> dict[str, str | None]:
-    """
+
     Get geographic data from IP address.
 
     Args:
@@ -71,7 +65,7 @@ def get_geo_data(ip_address: str) -> dict[str, str | None]:
 
     Returns:
         Dict containing country and city information
-    """
+
     try:
         # Skip local/private IPs
         if ip_address in ["127.0.0.1", "localhost"] or ip_address.startswith(
@@ -88,9 +82,8 @@ def get_geo_data(ip_address: str) -> dict[str, str | None]:
         # Fail silently if GeoIP is not configured or IP lookup fails
         return {"country": None, "city": None}
 
-
 def sanitize_url(url: str, max_length: int = 1024) -> str:
-    """
+
     Sanitize and truncate URL for storage.
 
     Args:
@@ -99,7 +92,7 @@ def sanitize_url(url: str, max_length: int = 1024) -> str:
 
     Returns:
         Sanitized URL string
-    """
+
     if not url:
         return ""
 
@@ -140,9 +133,8 @@ def sanitize_url(url: str, max_length: int = 1024) -> str:
         # If parsing fails, just truncate the original URL
         return url[:max_length]
 
-
 def calculate_session_duration(session_id: str, end_time: datetime = None) -> int:
-    """
+
     Calculate session duration in seconds.
 
     Args:
@@ -151,7 +143,6 @@ def calculate_session_duration(session_id: str, end_time: datetime = None) -> in
 
     Returns:
         Session duration in seconds
-    """
 
     if end_time is None:
         end_time = timezone.now()
@@ -172,9 +163,8 @@ def calculate_session_duration(session_id: str, end_time: datetime = None) -> in
     except Exception:
         return 0
 
-
 def get_content_type_and_id(obj) -> tuple[int, int]:
-    """
+
     Get ContentType ID and object ID for any Django model instance.
 
     Args:
@@ -182,13 +172,12 @@ def get_content_type_and_id(obj) -> tuple[int, int]:
 
     Returns:
         Tuple of (content_type_id, object_id)
-    """
+
     content_type = ContentType.objects.get_for_model(obj)
     return content_type.id, obj.id
 
-
 def format_duration(seconds: int) -> str:
-    """
+
     Format duration in seconds to human-readable string.
 
     Args:
@@ -196,7 +185,7 @@ def format_duration(seconds: int) -> str:
 
     Returns:
         Formatted duration string
-    """
+
     if seconds < 60:
         return f"{seconds}s"
     elif seconds < 3600:
@@ -208,9 +197,8 @@ def format_duration(seconds: int) -> str:
         remaining_minutes = (seconds % 3600) // 60
         return f"{hours}h {remaining_minutes}m"
 
-
 def get_date_range(period: str, date_param: str = None) -> tuple[date, date]:
-    """
+
     Get date range for analytics queries.
 
     Args:
@@ -219,7 +207,7 @@ def get_date_range(period: str, date_param: str = None) -> tuple[date, date]:
 
     Returns:
         Tuple of (start_date, end_date)
-    """
+
     if date_param:
         try:
             target_date = datetime.strptime(date_param, "%Y-%m-%d").date()
@@ -270,9 +258,8 @@ def get_date_range(period: str, date_param: str = None) -> tuple[date, date]:
         start_date = target_date - timedelta(days=30)
         return start_date, end_date
 
-
 def is_bot_user_agent(user_agent_string: str) -> bool:
-    """
+
     Check if user agent string indicates a bot or crawler.
 
     Args:
@@ -280,7 +267,7 @@ def is_bot_user_agent(user_agent_string: str) -> bool:
 
     Returns:
         True if appears to be a bot
-    """
+
     bot_patterns = [
         r"bot",
         r"crawl",
@@ -313,9 +300,8 @@ def is_bot_user_agent(user_agent_string: str) -> bool:
 
     return False
 
-
 def clean_referrer(referrer: str) -> str:
-    """
+
     Clean and normalize referrer URL.
 
     Args:
@@ -323,7 +309,7 @@ def clean_referrer(referrer: str) -> str:
 
     Returns:
         Cleaned referrer URL
-    """
+
     if not referrer:
         return ""
 
@@ -343,9 +329,8 @@ def clean_referrer(referrer: str) -> str:
     except Exception:
         return referrer
 
-
 def get_analytics_context(request) -> dict:
-    """
+
     Extract analytics context from Django request.
 
     Args:
@@ -353,7 +338,7 @@ def get_analytics_context(request) -> dict:
 
     Returns:
         Dict containing analytics context data
-    """
+
     user_agent_string = request.META.get("HTTP_USER_AGENT", "")
     user_agent_data = parse_user_agent(user_agent_string)
     ip_address = get_client_ip(request)

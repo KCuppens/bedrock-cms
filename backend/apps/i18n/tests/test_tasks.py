@@ -1,24 +1,26 @@
 from unittest.mock import MagicMock, patch
+
 from django.contrib.auth import get_user_model
 from django.contrib.contenttypes.models import ContentType
 from django.test import TestCase
+
 from apps.i18n.models import Locale, TranslationQueue, TranslationUnit
 from apps.i18n.tasks import (
-"""
-Test cases for i18n background tasks.
-"""
-
-
+    Test,
 
     auto_translate_content,
+    background,
+    cases,
     cleanup_old_translations,
+
     generate_translation_report,
+    i18n,
     process_translation_queue,
     sync_locale_fallbacks,
+    # tasks
 )
 
 User = get_user_model()
-
 
 class I18nTasksTest(TestCase):
     """Test i18n background tasks."""
@@ -176,7 +178,6 @@ class I18nTasksTest(TestCase):
                 cleanup_old_translations()
             except Exception:
                 # If tasks don't handle errors, that's still coverage
-                pass
 
     @patch("apps.i18n.tasks.logger")
     def test_task_with_invalid_parameters(self, mock_logger):  # noqa: C901

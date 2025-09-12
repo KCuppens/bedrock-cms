@@ -1,23 +1,18 @@
+import re
+
 from django.contrib.auth import get_user_model
 from django.utils import timezone
 from rest_framework import serializers
+
 from apps.files.models import FileUpload
 from apps.i18n.models import Locale
+
 from .models import BlogPost, BlogSettings, Category, Tag
-from django.core.exceptions import ValidationError
-        import re
-            from .versioning import BlogPostRevision
-        from apps.i18n.models import Locale
-"""
+from .versioning import BlogPostRevision
+
 Blog serializers for API endpoints.
-"""
-
-
-
-
 
 User = get_user_model()
-
 
 class TagSerializer(serializers.ModelSerializer):
     """Serializer for Tag model."""
@@ -37,7 +32,6 @@ class TagSerializer(serializers.ModelSerializer):
             "updated_at",
         ]
         read_only_fields = ["id", "slug", "post_count", "created_at", "updated_at"]
-
 
 class CategorySerializer(serializers.ModelSerializer):
     """Serializer for Category model."""
@@ -72,7 +66,6 @@ class CategorySerializer(serializers.ModelSerializer):
                 "Color must be a valid hex color (e.g., #6366f1)"
             )
         return value
-
 
 class BlogPostListSerializer(serializers.ModelSerializer):
     """Lightweight serializer for blog post listings."""
@@ -124,7 +117,6 @@ class BlogPostListSerializer(serializers.ModelSerializer):
     def get_reading_time(self, obj):  # noqa: C901
         """Get estimated reading time."""
         return obj.get_reading_time()
-
 
 class BlogPostSerializer(serializers.ModelSerializer):
     """Full serializer for blog posts."""
@@ -227,7 +219,7 @@ class BlogPostSerializer(serializers.ModelSerializer):
         """Validate status transitions."""
         if self.instance and self.instance.status == "published" and value == "draft":
             # Allow unpublishing but warn about SEO impact
-            pass
+
         return value
 
     def validate_scheduled_publish_at(self, value):  # noqa: C901
@@ -297,7 +289,6 @@ class BlogPostSerializer(serializers.ModelSerializer):
 
         return super().update(instance, validated_data)
 
-
 class BlogPostWriteSerializer(serializers.ModelSerializer):
     """Write-only serializer for creating/updating blog posts."""
 
@@ -350,7 +341,6 @@ class BlogPostWriteSerializer(serializers.ModelSerializer):
             )
         return value
 
-
 class BlogPostRevisionSerializer(serializers.Serializer):
     """Serializer for blog post revisions."""
 
@@ -364,7 +354,6 @@ class BlogPostRevisionSerializer(serializers.Serializer):
     is_autosave = serializers.BooleanField(read_only=True)
     comment = serializers.CharField(read_only=True)
 
-
 class BlogPostAutosaveSerializer(serializers.Serializer):
     """Serializer for autosave functionality."""
 
@@ -372,7 +361,6 @@ class BlogPostAutosaveSerializer(serializers.Serializer):
     content = serializers.CharField(required=False, allow_blank=True)
     blocks = serializers.JSONField(required=False)
     excerpt = serializers.CharField(required=False, allow_blank=True)
-
 
 class BlogPostDuplicateSerializer(serializers.Serializer):
     """Serializer for duplicating blog posts."""
@@ -391,7 +379,6 @@ class BlogPostDuplicateSerializer(serializers.Serializer):
         # Set the queryset for locale field
 
         self.fields["locale"].queryset = Locale.objects.filter(is_active=True)
-
 
 class BlogSettingsSerializer(serializers.ModelSerializer):
     """Serializer for BlogSettings model."""

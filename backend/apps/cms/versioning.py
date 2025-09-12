@@ -1,32 +1,28 @@
 import uuid
 from datetime import timedelta
 from typing import TYPE_CHECKING, Any
+
 from django.contrib.auth import get_user_model
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
 from django.db import models
 from django.utils import timezone
-    from .models import Page
-"""
+
+from .models import Page
+
 Versioning and audit models for the CMS.
 
 This module provides content versioning, autosave, and audit trail functionality.
-"""
 
 # mypy: ignore-errors
 
-
-
 if TYPE_CHECKING:
-
 
 User = get_user_model()
 
-
 class PageRevision(models.Model):
-    """
+
     Store snapshots of page content for versioning and autosave.
-    """
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     page = models.ForeignKey(
@@ -85,7 +81,7 @@ class PageRevision(models.Model):
         is_autosave: bool = False,
         comment: str = "",
     ) -> "PageRevision":
-        """
+
         Create a new revision snapshot of a page.
 
         Args:
@@ -97,7 +93,7 @@ class PageRevision(models.Model):
 
         Returns:
             Created PageRevision instance
-        """
+
         # Create complete snapshot of page data
         snapshot_data = {
             "title": page.title,
@@ -137,7 +133,7 @@ class PageRevision(models.Model):
 
     @classmethod
     def should_create_autosave(cls, page: "Page", user: User) -> bool:
-        """
+
         Check if an autosave revision should be created.
 
         Throttles autosave creation to max one per minute per page per user.
@@ -148,7 +144,7 @@ class PageRevision(models.Model):
 
         Returns:
             True if autosave should be created
-        """
+
         if not user:
             return False
 
@@ -161,12 +157,12 @@ class PageRevision(models.Model):
         return not recent_autosave
 
     def restore_to_page(self) -> "Page":
-        """
+
         Restore this revision's content to the page (as draft).
 
         Returns:
             Updated Page instance
-        """
+
         snapshot = self.snapshot
         page = self.page
 
@@ -188,11 +184,9 @@ class PageRevision(models.Model):
         """Get the number of blocks in this revision."""
         return len(self.snapshot.get("blocks", []))
 
-
 class AuditEntry(models.Model):
-    """
+
     Audit log entry for tracking user actions.
-    """
 
     ACTION_CHOICES = [
         ("create", "Create"),
@@ -261,7 +255,7 @@ class AuditEntry(models.Model):
         meta: dict[str, Any] = None,
         request=None,
     ) -> "AuditEntry":
-        """
+
         Create an audit log entry.
 
         Args:
@@ -273,7 +267,7 @@ class AuditEntry(models.Model):
 
         Returns:
             Created AuditEntry instance
-        """
+
         if meta is None:
             meta = {}
 
@@ -308,17 +302,15 @@ class AuditEntry(models.Model):
             ip = request.META.get("REMOTE_ADDR")
         return ip
 
-
 class RevisionDiffer:
-    """
+
     Utility class for computing diffs between page revisions.
-    """
 
     @staticmethod
     def diff_revisions(
         old_revision: PageRevision, new_revision: PageRevision
     ) -> dict[str, Any]:
-        """
+
         Compare two revisions and return a diff.
 
         Args:
@@ -327,7 +319,7 @@ class RevisionDiffer:
 
         Returns:
             Dict containing diff information
-        """
+
         old_data = old_revision.snapshot
         new_data = new_revision.snapshot
 
@@ -365,7 +357,7 @@ class RevisionDiffer:
 
     @staticmethod
     def _diff_blocks(old_blocks: list[dict], new_blocks: list[dict]) -> dict[str, Any]:
-        """
+
         Compare block arrays and return detailed diff.
 
         Args:
@@ -374,7 +366,7 @@ class RevisionDiffer:
 
         Returns:
             Dict containing block-level changes
-        """
+
         diff = {
             "has_changes": False,
             "added": [],
@@ -415,7 +407,7 @@ class RevisionDiffer:
 
     @staticmethod
     def diff_current_page(page: "Page", revision: PageRevision) -> dict[str, Any]:
-        """
+
         Compare current page state with a revision.
 
         Args:
@@ -424,7 +416,7 @@ class RevisionDiffer:
 
         Returns:
             Dict containing diff information
-        """
+
         # Create a temporary revision-like snapshot of current page
         current_data = {
             "title": page.title,

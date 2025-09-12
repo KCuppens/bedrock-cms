@@ -5,10 +5,7 @@ from django.core.management.base import BaseCommand
 from apps.i18n.models import Locale, UiMessage, UiMessageTranslation
 from apps.i18n.services import DeepLTranslationService
 
-"""
 Translate ALL UI messages to a target locale using DeepL.
-"""
-
 
 class Command(BaseCommand):
     help = "Translate ALL UI messages to a target locale using DeepL"
@@ -38,7 +35,7 @@ class Command(BaseCommand):
             help="Delay between translations in seconds (default: 0.1)",
         )
 
-    def handle(self, *args, **options):
+    def handle(self, *args, **options):  # noqa: C901
         target_locale_code = options["locale"]
         source_locale_code = options["source"]
         force = options["force"]
@@ -51,7 +48,6 @@ class Command(BaseCommand):
             source_locale = Locale.objects.get(code=source_locale_code)
         except Locale.DoesNotExist as e:
             self.stdout.write(self.style.ERROR(f"Locale error: {e}"))
-            return
 
         self.stdout.write(
             f"Translating ALL UI messages from {source_locale.name} to {target_locale.name}"
@@ -76,7 +72,6 @@ class Command(BaseCommand):
 
         if total_messages == 0:
             self.stdout.write(self.style.SUCCESS("No messages need translation!"))
-            return
 
         # Initialize DeepL service
         deepl_service = DeepLTranslationService()
@@ -102,7 +97,6 @@ class Command(BaseCommand):
                             f"  [SKIP] {message.key}: empty default value"
                         )
                         skipped_count += 1
-                        continue
 
                     # Check if translation exists (for force mode)
                     existing_translation = None
@@ -112,7 +106,6 @@ class Command(BaseCommand):
                                 message=message, locale=target_locale
                             )
                         except UiMessageTranslation.DoesNotExist:
-                            pass
 
                     # Translate using DeepL
                     self.stdout.write(

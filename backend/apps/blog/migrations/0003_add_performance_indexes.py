@@ -2,7 +2,6 @@
 
 from django.db import migrations, models
 
-
 class Migration(migrations.Migration):
     dependencies = [
         ("blog", "0002_add_presentation_features"),
@@ -63,7 +62,7 @@ class Migration(migrations.Migration):
             CREATE INDEX IF NOT EXISTS blog_blogpost_blocks_gin
             ON blog_blogpost USING gin (blocks jsonb_path_ops)
             WHERE blocks IS NOT NULL;
-            """,
+
             reverse_sql="DROP INDEX IF EXISTS blog_blogpost_blocks_gin;",
             state_operations=[],
         ),
@@ -78,7 +77,7 @@ class Migration(migrations.Migration):
                     coalesce(content, '')
                 )
             );
-            """,
+
             reverse_sql="DROP INDEX IF EXISTS blog_blogpost_search_idx;",
             state_operations=[],
         ),

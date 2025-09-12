@@ -4,7 +4,6 @@ from django.conf import settings
 from django.http import HttpResponseForbidden
 from django.utils.deprecation import MiddlewareMixin
 
-
 class SecurityHeadersMiddleware(MiddlewareMixin):
     """Middleware to add security headers"""
 
@@ -106,7 +105,6 @@ class SecurityHeadersMiddleware(MiddlewareMixin):
 
         return response
 
-
 class AdminIPAllowlistMiddleware(MiddlewareMixin):
     """Middleware to restrict admin access by IP address"""
 
@@ -160,14 +158,12 @@ class AdminIPAllowlistMiddleware(MiddlewareMixin):
                             return True
                 except ValueError:
                     # Skip invalid IP/network entries
-                    continue
 
             return False
 
         except ValueError:
             # Invalid client IP
             return False
-
 
 class DemoModeMiddleware(MiddlewareMixin):
     """Middleware to add demo mode banner"""
@@ -212,7 +208,6 @@ class DemoModeMiddleware(MiddlewareMixin):
             <style>
                 body { margin-top: 40px !important; }
             </style>
-            """
 
             try:
                 content = response.content.decode("utf-8", errors="ignore")
@@ -230,6 +225,5 @@ class DemoModeMiddleware(MiddlewareMixin):
                         response["Content-Length"] = len(response.content)
             except Exception:
                 # Fail silently if content can't be modified
-                pass
 
         return response

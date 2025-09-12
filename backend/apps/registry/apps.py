@@ -2,10 +2,10 @@ import logging
 
 from django.apps import AppConfig
 from django.core.exceptions import ValidationError
-        from .registry import content_registry, register_core_models
+
+from .registry import content_registry, register_core_models
 
 logger = logging.getLogger(__name__)
-
 
 class RegistryConfig(AppConfig):
     default_auto_field = "django.db.models.BigAutoField"
@@ -33,4 +33,3 @@ class RegistryConfig(AppConfig):
             logger.error("Content registry validation failed: %s", e)
             # Don't raise in production, just log the error
             if not getattr(self, "testing", False):
-                raise

@@ -4,7 +4,6 @@ from django.db import models
 
 User = get_user_model()
 
-
 class TimestampMixin(models.Model):
     """Abstract model that provides timestamp fields"""
 
@@ -13,7 +12,6 @@ class TimestampMixin(models.Model):
 
     class Meta:
         abstract = True
-
 
 class UserTrackingMixin(models.Model):
     """Abstract model that tracks which user created/updated the record"""
@@ -38,13 +36,11 @@ class UserTrackingMixin(models.Model):
     class Meta:
         abstract = True
 
-
 class FullTrackingMixin(TimestampMixin, UserTrackingMixin):
     """Abstract model that combines timestamp and user tracking"""
 
     class Meta:
         abstract = True
-
 
 class SoftDeleteMixin(models.Model):
     """Abstract model that provides soft delete functionality"""
@@ -84,13 +80,11 @@ class SoftDeleteMixin(models.Model):
         self.deleted_by = None
         self.save()
 
-
 class ActiveManager(models.Manager):
     """Manager that excludes soft-deleted records"""
 
     def get_queryset(self):
         return super().get_queryset().filter(is_deleted=False)
-
 
 class AllObjectsManager(models.Manager):
     """Manager that includes all records (including soft-deleted)"""

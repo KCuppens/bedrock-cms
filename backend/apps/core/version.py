@@ -1,16 +1,15 @@
 import json
 import os
+import re
+import sys
 from datetime import datetime
 from functools import lru_cache
 from pathlib import Path
 from typing import Any
-    from git import Repo
-        import sys
-                        import re
-"""
-Version tracking service using GitPython
-"""
 
+from git import Repo
+
+Version tracking service using GitPython
 
 try:
 
@@ -18,17 +17,16 @@ try:
 except ImportError:
     GIT_AVAILABLE = False
 
-
 class VersionService:
     """Service for tracking application version and build information"""
 
     @staticmethod
     @lru_cache(maxsize=1)
     def get_version_info() -> dict[str, Any]:
-        """
+
         Get comprehensive version information from git and environment.
         Cached to avoid repeated git operations.
-        """
+
         info = {
             "version": "unknown",
             "commit": "unknown",
@@ -80,7 +78,7 @@ class VersionService:
             # Go up until we find .git directory
             while repo_path.parent != repo_path:
                 if (repo_path / ".git").exists():
-                    break
+
                 repo_path = repo_path.parent
 
             if not (repo_path / ".git").exists():
@@ -88,7 +86,7 @@ class VersionService:
                 repo_path = Path.cwd()
                 while repo_path.parent != repo_path:
                     if (repo_path / ".git").exists():
-                        break
+
                     repo_path = repo_path.parent
 
             repo = Repo(repo_path)
@@ -203,7 +201,6 @@ class VersionService:
     def clear_cache():
         """Clear the version cache (useful for development)"""
         VersionService.get_version_info.cache_clear()
-
 
 # Convenience function
 def get_version() -> str:

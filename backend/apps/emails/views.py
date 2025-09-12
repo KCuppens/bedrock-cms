@@ -1,3 +1,5 @@
+import hashlib
+import hmac
 import json
 
 from django.conf import settings
@@ -10,9 +12,6 @@ from django.views.generic import DetailView, TemplateView
 
 from .models import EmailMessageLog, EmailTemplate
 from .services import EmailService
-    import hashlib
-    import hmac
-
 
 @method_decorator(staff_member_required, name="dispatch")
 class EmailTemplateListView(TemplateView):
@@ -26,7 +25,6 @@ class EmailTemplateListView(TemplateView):
             "category", "name"
         )
         return context
-
 
 @method_decorator(staff_member_required, name="dispatch")
 class EmailTemplatePreviewView(DetailView):
@@ -73,7 +71,6 @@ class EmailTemplatePreviewView(DetailView):
 
         return context
 
-
 def email_preview_html(request, template_key):  # noqa: C901
     """Return HTML preview of email template"""
     if not settings.DEBUG and not request.user.is_staff:
@@ -104,7 +101,6 @@ def email_preview_html(request, template_key):  # noqa: C901
     except Exception as e:
         return HttpResponse(f"Error rendering template: {str(e)}", status=500)
 
-
 def email_preview_text(request, template_key):  # noqa: C901
     """Return text preview of email template"""
     if not settings.DEBUG and not request.user.is_staff:
@@ -128,7 +124,6 @@ def email_preview_text(request, template_key):  # noqa: C901
         return HttpResponse(text_content, content_type="text/plain")
     except Exception as e:
         return HttpResponse(f"Error rendering template: {str(e)}", status=500)
-
 
 @csrf_exempt
 def send_test_email(request, template_key):  # noqa: C901
@@ -168,7 +163,6 @@ def send_test_email(request, template_key):  # noqa: C901
     except Exception as e:
         return JsonResponse({"success": False, "error": str(e)}, status=500)
 
-
 @method_decorator(staff_member_required, name="dispatch")
 class EmailLogListView(TemplateView):
     """List recent email logs for monitoring"""
@@ -181,7 +175,6 @@ class EmailLogListView(TemplateView):
             "template"
         ).order_by("-created_at")[:100]
         return context
-
 
 # Webhook endpoints for email tracking (if using external email service)
 def verify_webhook_signature(request):  # noqa: C901
@@ -201,7 +194,6 @@ def verify_webhook_signature(request):  # noqa: C901
 
     # Constant-time comparison to prevent timing attacks
     return hmac.compare_digest(signature, expected)
-
 
 @csrf_exempt
 def email_webhook(request):  # noqa: C901

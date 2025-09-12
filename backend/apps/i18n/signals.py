@@ -1,22 +1,18 @@
 import logging
+
 from django.contrib.contenttypes.models import ContentType
 from django.db.models.signals import post_delete, post_save, pre_save
 from django.dispatch import receiver
+
 from apps.cms.models import Page
+
 from .models import Locale
+from .settings_sync import DjangoSettingsSync
 from .translation import TranslationManager
-        from .settings_sync import DjangoSettingsSync
-        from .settings_sync import DjangoSettingsSync
-"""
+
 Signal handlers for automatic translation unit creation and locale synchronization.
-"""
-
-
-
-
 
 logger = logging.getLogger(__name__)
-
 
 @receiver(post_save, sender=Page)
 def create_page_translation_units(sender, instance, created, **kwargs):
@@ -24,7 +20,6 @@ def create_page_translation_units(sender, instance, created, **kwargs):
     try:
         # Skip if this is being restored from a revision
         if getattr(instance, "_skip_translation_units", False):
-            return
 
         # Get the page's locale (source locale)
         source_locale = instance.locale
@@ -38,8 +33,6 @@ def create_page_translation_units(sender, instance, created, **kwargs):
     except Exception:
         # Don't let translation unit creation break page saving
         # This would be logged in production
-        pass
-
 
 @receiver(pre_save, sender=Page)
 def store_old_page_data(sender, instance, **kwargs):
@@ -53,14 +46,13 @@ def store_old_page_data(sender, instance, **kwargs):
             instance._old_title = None
             instance._old_blocks = None
 
-
 # Generic signal handler for any model that gets registered for translation
 def create_translation_units_handler(sender, instance, created, **kwargs):
-    """
+
     Generic signal handler for creating translation units.
 
     This can be connected to any model that supports translation.
-    """
+
     try:
         # Get the source locale - this would need to be customized per model
         # For now, assume models have a 'locale' field
@@ -79,17 +71,15 @@ def create_translation_units_handler(sender, instance, created, **kwargs):
 
     except Exception:
         # Don't let translation unit creation break saving
-        pass
-
 
 def register_model_for_translation(model_class, fields=None):
-    """
+
     Register a model to automatically create translation units.
 
     Args:
         model_class: Model class to register
         fields: List of translatable field names (optional)
-    """
+
     if fields:
         content_type = ContentType.objects.get_for_model(model_class)
         model_label = f"{content_type.app_label}.{content_type.model}"
@@ -98,18 +88,16 @@ def register_model_for_translation(model_class, fields=None):
     # Connect the signal
     post_save.connect(create_translation_units_handler, sender=model_class, weak=False)
 
-
 # Locale synchronization signals
-
 
 @receiver(post_save, sender=Locale)
 def sync_django_settings_on_locale_save(sender, instance, created, **kwargs):
-    """
+
     Sync Django settings when a locale is saved.
 
     This clears the settings cache to ensure fresh data is loaded
     when Django settings are next accessed.
-    """
+
     try:
 
         # Clear the cache to force refresh of dynamic settings
@@ -129,15 +117,14 @@ def sync_django_settings_on_locale_save(sender, instance, created, **kwargs):
     except Exception as e:
         logger.error(f"Failed to sync Django settings after locale save: {e}")
 
-
 @receiver(post_delete, sender=Locale)
 def sync_django_settings_on_locale_delete(sender, instance, **kwargs):
-    """
+
     Sync Django settings when a locale is deleted.
 
     This clears the settings cache and ensures another locale
     becomes the default if the default locale was deleted.
-    """
+
     try:
 
         # Clear the cache to force refresh of dynamic settings
@@ -164,15 +151,14 @@ def sync_django_settings_on_locale_delete(sender, instance, **kwargs):
     except Exception as e:
         logger.error(f"Failed to sync Django settings after locale deletion: {e}")
 
-
 @receiver(pre_save, sender=Locale)
 def validate_locale_changes(sender, instance, **kwargs):
-    """
+
     Validate locale changes before saving.
 
     Ensures there's always at least one default locale and handles
     default locale transitions properly.
-    """
+
     try:
         # If this is a new locale being set as default, unset other defaults
         if instance.is_default:

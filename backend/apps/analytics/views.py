@@ -12,7 +12,6 @@ from rest_framework.response import Response
 from rest_framework.throttling import UserRateThrottle
 
 from .models import (
-from .serializers import (
     AnalyticsSummary,
     Assessment,
     ContentMetrics,
@@ -21,6 +20,8 @@ from .serializers import (
     Threat,
     UserActivity,
 )
+from .serializers import (
+
     AnalyticsSummarySerializer,
     AssessmentCreateSerializer,
     AssessmentSerializer,
@@ -41,7 +42,6 @@ from .serializers import (
 
 User = get_user_model()
 
-
 class AnalyticsPermission(permissions.BasePermission):
     """Custom permission for analytics endpoints"""
 
@@ -55,7 +55,6 @@ class AnalyticsPermission(permissions.BasePermission):
 
         # Allow write access only to admins
         return request.user.is_admin()
-
 
 @extend_schema_view(
     list=extend_schema(
@@ -109,7 +108,6 @@ class PageViewViewSet(viewsets.ModelViewSet):
             queryset = queryset.filter(user_id=user_id)
 
         return queryset
-
 
 @extend_schema_view(
     list=extend_schema(
@@ -167,7 +165,6 @@ class UserActivityViewSet(viewsets.ModelViewSet):
 
         return queryset
 
-
 @extend_schema_view(
     list=extend_schema(
         summary="List content metrics",
@@ -211,7 +208,6 @@ class ContentMetricsViewSet(viewsets.ReadOnlyModelViewSet):
             queryset = queryset.filter(content_category=category)
 
         return queryset
-
 
 @extend_schema_view(
     list=extend_schema(
@@ -264,7 +260,6 @@ class AssessmentViewSet(viewsets.ModelViewSet):
 
         return queryset
 
-
 @extend_schema_view(
     list=extend_schema(
         summary="List risks",
@@ -307,7 +302,6 @@ class RiskViewSet(viewsets.ModelViewSet):
             queryset = queryset.filter(severity=severity)
 
         return queryset
-
 
 @extend_schema_view(
     list=extend_schema(
@@ -359,7 +353,6 @@ class ThreatViewSet(viewsets.ModelViewSet):
 
         return queryset
 
-
 @extend_schema_view(
     list=extend_schema(
         summary="List analytics summaries",
@@ -374,9 +367,7 @@ class AnalyticsSummaryViewSet(viewsets.ReadOnlyModelViewSet):
     permission_classes = [AnalyticsPermission]
     throttle_classes = [UserRateThrottle]
 
-
 # Custom analytics API views
-
 
 class AnalyticsAPIViewSet(viewsets.GenericViewSet):
     """Custom analytics endpoints for dashboard and reporting"""

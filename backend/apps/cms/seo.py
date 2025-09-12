@@ -2,7 +2,6 @@ from django.db import models
 
 from apps.i18n.models import Locale
 
-
 class SeoSettings(models.Model):
     """Global SEO settings per locale."""
 
@@ -126,7 +125,6 @@ class SeoSettings(models.Model):
 
     def __str__(self):
         return f"SEO Settings for {self.locale.name}"
-
 
 # Removed SeoDefaults model - section-based SEO defaults removed for simplicity
 # All SEO configuration is now handled at the global (per-locale) level

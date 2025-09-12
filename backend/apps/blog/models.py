@@ -1,25 +1,9 @@
 import uuid
+
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models import (
-from django.utils.text import slugify
-from django.utils.translation import gettext_lazy as _
-from apps.accounts.rbac import RBACMixin
-from apps.core.validators import JSONSizeValidator, validate_json_structure
-            from django.utils import timezone
-        from django.utils import timezone
-        import re
-        from django.utils.html import strip_tags
-        from django.utils import timezone
-from .versioning import BlogPostRevision, BlogPostViewTracker  # noqa: F401
-"""
-Blog models for the CMS.
-
-This module provides blog functionality including posts, categories, and tags.
-"""
-
-
     AutoField,
     BooleanField,
     CharField,
@@ -31,10 +15,17 @@ This module provides blog functionality including posts, categories, and tags.
     TextField,
     UUIDField,
 )
+from django.utils.translation import gettext_lazy as _
+from django.utils import timezone
+from django.utils.text import slugify
+from django.utils.html import strip_tags
 
+from apps.accounts.rbac import RBACMixin
+from apps.core.validators import JSONSizeValidator
+from apps.cms import versioning
+import re
 
 User = get_user_model()
-
 
 class Category(models.Model, RBACMixin):
     """Blog category model."""
@@ -74,7 +65,6 @@ class Category(models.Model, RBACMixin):
     def get_absolute_url(self):  # noqa: C901
         return f"/blog/category/{self.slug}/"
 
-
 class Tag(models.Model, RBACMixin):
     """Blog tag model."""
 
@@ -101,7 +91,6 @@ class Tag(models.Model, RBACMixin):
 
     def get_absolute_url(self):  # noqa: C901
         return f"/blog/tag/{self.slug}/"
-
 
 class BlogPost(models.Model, RBACMixin):
     """Blog post model."""
@@ -278,7 +267,6 @@ class BlogPost(models.Model, RBACMixin):
     def get_reading_time(self):  # noqa: C901
         """Calculate estimated reading time in minutes."""
 
-
         # Combine content and blocks for word count using list for efficiency
         text_parts = [strip_tags(self.content)]
 
@@ -302,7 +290,7 @@ class BlogPost(models.Model, RBACMixin):
                     if text_to_add:
                         current_length += len(text_to_add)
                         if current_length > max_text_length:
-                            break
+
                         text_parts.append(text_to_add)
 
         # Join all parts efficiently
@@ -345,9 +333,7 @@ class BlogPost(models.Model, RBACMixin):
         if self.status != "scheduled" or not self.scheduled_publish_at:
             return False
 
-
         return self.scheduled_publish_at > timezone.now()
-
 
 class BlogSettings(models.Model):
     """Global blog settings and presentation configuration."""
@@ -428,10 +414,10 @@ class BlogSettings(models.Model):
         return f"Blog Settings ({self.locale.code})"
 
     def get_display_options(self, category=None, post=None):  # noqa: C901
-        """
+
         Get effective display options with precedence:
         post override -> category override -> global settings
-        """
+
         options = {
             "show_toc": self.show_toc,
             "show_author": self.show_author,
@@ -451,10 +437,10 @@ class BlogSettings(models.Model):
         return options
 
     def get_presentation_page(self, category=None, post=None):  # noqa: C901
-        """
+
         Get the effective presentation page with precedence:
         post override -> category override -> global default
-        """
+
         # Post override (could be extended later)
         if post and hasattr(post, "presentation_page") and post.presentation_page:
             return post.presentation_page
@@ -465,6 +451,5 @@ class BlogSettings(models.Model):
 
         # Global default
         return self.default_presentation_page
-
 
 # Import versioning models to ensure they are registered

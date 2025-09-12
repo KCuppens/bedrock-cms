@@ -1,22 +1,23 @@
 from django.contrib.auth import get_user_model
+from django.contrib.auth.models import Permission
+from django.core.management import call_command
 from django.test import TestCase
 from django.urls import reverse
-
 from rest_framework import status
 from rest_framework.test import APITestCase
 
 from apps.cms.blocks.validation import validate_blocks
 from apps.cms.models import Page, Redirect
 from apps.cms.seo import SeoSettings
-from apps.cms.seo_utils import deep_merge_dicts, resolve_seo
+from apps.cms.seo_utils import (
+    deep_merge_dicts,
+    generate_canonical_url,
+    generate_hreflang_alternates,
+    resolve_seo,
+)
 from apps.i18n.models import Locale
-        from django.contrib.auth.models import Permission
-        from django.core.management import call_command
-        from apps.cms.seo_utils import generate_canonical_url
-        from apps.cms.seo_utils import generate_hreflang_alternates
 
 User = get_user_model()
-
 
 class LocaleModelTest(TestCase):
     """Test cases for Locale model."""
@@ -39,7 +40,6 @@ class LocaleModelTest(TestCase):
         locale1 = Locale.objects.get(code="en")
         self.assertFalse(locale1.is_default)
         self.assertTrue(locale2.is_default)
-
 
 class PageModelTest(TestCase):
     """Test cases for Page model."""
@@ -166,7 +166,6 @@ class PageModelTest(TestCase):
 
         self.assertEqual(Page.objects.filter(slug="child").count(), 2)
 
-
 class RedirectModelTest(TestCase):
     """Test cases for Redirect model."""
 
@@ -200,7 +199,6 @@ class RedirectModelTest(TestCase):
 
         with self.assertRaises(Exception):
             redirect.clean()
-
 
 class BlockValidationTest(TestCase):
     """Test cases for block validation."""
@@ -240,7 +238,6 @@ class BlockValidationTest(TestCase):
 
         with self.assertRaises(Exception):
             validate_blocks(invalid_blocks)
-
 
 class PagesAPITest(APITestCase):
     """Test cases for Pages API endpoints."""
@@ -415,7 +412,6 @@ class PagesAPITest(APITestCase):
         )
         self.assertEqual(products_data["children_count"], 1)
 
-
 class SitemapTest(TestCase):
     """Test cases for sitemap generation."""
 
@@ -450,7 +446,6 @@ class SitemapTest(TestCase):
         """Test sitemap with invalid locale returns 404."""
         response = self.client.get("/api/v1/cms/sitemap-invalid.xml")
         self.assertEqual(response.status_code, 404)
-
 
 class ManagementCommandTest(TestCase):
     """Test cases for management commands."""
@@ -498,7 +493,6 @@ class ManagementCommandTest(TestCase):
         self.assertEqual(self.parent.path, "/parent")
         self.assertEqual(self.child.path, "/parent/child")
 
-
 class SeoModelsTest(TestCase):
     """Test cases for SEO models."""
 
@@ -524,7 +518,6 @@ class SeoModelsTest(TestCase):
         # Note: SeoDefaults model was removed. All SEO configuration
         # is now handled at the global (per-locale) level via SeoSettings.
         self.assertTrue(True)  # This test passes to document the change
-
 
 class SeoUtilsTest(TestCase):
     """Test cases for SEO utilities."""
@@ -645,7 +638,6 @@ class SeoUtilsTest(TestCase):
         fr_alternate = next(alt for alt in alternates if alt["hreflang"] == "fr")
         self.assertEqual(fr_alternate["href"], "https://example.com/test-fr")
 
-
 class SeoAPITest(APITestCase):
     """Test cases for SEO API functionality."""
 
@@ -712,7 +704,6 @@ class SeoAPITest(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertIsNotNone(response.data["resolved_seo"])
         self.assertIsNotNone(response.data["seo_links"])
-
 
 class SitemapEnhancedTest(TestCase):
     """Test cases for enhanced sitemap functionality."""

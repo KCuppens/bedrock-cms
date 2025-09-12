@@ -3,13 +3,9 @@ from rest_framework import serializers
 
 from .versioning import AuditEntry, PageRevision
 
-"""
 Serializers for versioning and audit functionality.
-"""
-
 
 User = get_user_model()
-
 
 class PageRevisionSerializer(serializers.ModelSerializer):
     """Serializer for PageRevision model."""
@@ -49,13 +45,11 @@ class PageRevisionSerializer(serializers.ModelSerializer):
         else:
             return "manual"
 
-
 class PageRevisionDetailSerializer(PageRevisionSerializer):
     """Detailed serializer including snapshot data."""
 
     class Meta(PageRevisionSerializer.Meta):
         fields = PageRevisionSerializer.Meta.fields + ["snapshot"]
-
 
 class RevisionDiffSerializer(serializers.Serializer):
     """Serializer for revision diff data."""
@@ -66,7 +60,6 @@ class RevisionDiffSerializer(serializers.Serializer):
     has_changes = serializers.BooleanField(read_only=True)
     changes = serializers.JSONField(read_only=True)
 
-
 class RevertRevisionSerializer(serializers.Serializer):
     """Serializer for revision revert operation."""
 
@@ -75,7 +68,6 @@ class RevertRevisionSerializer(serializers.Serializer):
         allow_blank=True,
         help_text="Optional comment about the revert operation",
     )
-
 
 class AuditEntrySerializer(serializers.ModelSerializer):
     """Serializer for AuditEntry model."""
@@ -108,9 +100,8 @@ class AuditEntrySerializer(serializers.ModelSerializer):
             elif obj.content_object:
                 return str(obj.content_object)
         except Exception:
-            pass
-        return f"{obj.model_label}#{obj.object_id}"
 
+        return f"{obj.model_label}#{obj.object_id}"
 
 class AutosaveSerializer(serializers.Serializer):
     """Serializer for manual autosave creation."""
@@ -131,7 +122,6 @@ class AutosaveSerializer(serializers.Serializer):
 
         return attrs
 
-
 class PublishPageSerializer(serializers.Serializer):
     """Serializer for page publishing."""
 
@@ -143,7 +133,6 @@ class PublishPageSerializer(serializers.Serializer):
         allow_blank=True,
         help_text="Optional comment about the publication",
     )
-
 
 class UnpublishPageSerializer(serializers.Serializer):
     """Serializer for page unpublishing."""

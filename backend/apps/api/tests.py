@@ -7,7 +7,6 @@ from apps.api.models import Note
 
 User = get_user_model()
 
-
 class NoteModelTest(APITestCase):
     """Test Note model functionality"""
 
@@ -38,7 +37,6 @@ class NoteModelTest(APITestCase):
         """Test tag_list property"""
         note = Note(tags="tag1, tag2, tag3")
         self.assertEqual(note.tag_list, ["tag1", "tag2", "tag3"])
-
 
 class NoteAPITest(APITestCase):
     """Test Note API endpoints"""
@@ -87,7 +85,6 @@ class NoteAPITest(APITestCase):
 
         # DRF returns 403 when IsOwnerOrAdmin is used with unauthenticated users
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
-
 
 class HealthCheckAPITest(APITestCase):
     """Test Health Check API endpoints"""

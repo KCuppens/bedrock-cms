@@ -5,7 +5,6 @@ from apps.core.mixins import TimestampMixin, UserTrackingMixin
 
 User = get_user_model()
 
-
 class Note(TimestampMixin, UserTrackingMixin):
     """Example model for API demonstration"""
 

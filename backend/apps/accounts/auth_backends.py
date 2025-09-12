@@ -1,7 +1,5 @@
-"""
-Custom authentication backends for RBAC scope enforcement.
-"""
 
+"""Custom authentication backends for RBAC scope enforcement."""
 from django.contrib.auth.backends import BaseBackend
 from django.contrib.auth.models import Permission
 
@@ -9,19 +7,15 @@ from apps.i18n.models import Locale
 
 from .rbac import ScopedLocale, ScopedSection
 
-
 class ScopedPermissionBackend(BaseBackend):
-    """
-    Custom authentication backend that enforces locale and section scopes.
 
-    This backend checks if a user has the required permission AND
+    """Custom authentication backend that enforces locale and section scopes."""
+# This backend checks if a user has the required permission AND
     if they have scope access (locale + section) to the object.
-    """
 
     def has_perm(self, user_obj, perm, obj=None):
-        """
-        Check if user has permission, considering scopes.
 
+        """Check if user has permission, considering scopes."""
         Args:
             user_obj: User instance
             perm: Permission string (e.g., 'cms.change_page')
@@ -29,7 +23,7 @@ class ScopedPermissionBackend(BaseBackend):
 
         Returns:
             bool: True if user has permission and scope access
-        """
+
         if not user_obj.is_active:
             return False
 
@@ -70,16 +64,15 @@ class ScopedPermissionBackend(BaseBackend):
         return user_obj.groups.filter(permissions=permission).exists()
 
     def _check_object_scopes(self, user_obj, obj):
-        """
-        Manually check locale and section scopes for an object.
 
+        """Manually check locale and section scopes for an object."""
         Args:
             user_obj: User instance
             obj: Model instance
 
         Returns:
             bool: True if user has scope access
-        """
+
         # Check locale scope if object has a locale
         if hasattr(obj, "locale"):
             locale_access = ScopedLocale.objects.filter(
@@ -114,7 +107,6 @@ class ScopedPermissionBackend(BaseBackend):
         locale_ids = ScopedLocale.objects.filter(group__in=user_groups).values_list(
             "locale_id", flat=True
         )
-
 
         return Locale.objects.filter(id__in=locale_ids, is_active=True)
 

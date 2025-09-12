@@ -7,15 +7,11 @@ from typing import Any
 
 from django.core.cache import cache
 
-"""
 Circuit breaker implementation for external service calls.
 
 Prevents cascading failures by failing fast when services are unavailable.
-"""
-
 
 logger = logging.getLogger(__name__)
-
 
 class CircuitState(Enum):
     """Circuit breaker states"""
@@ -24,16 +20,14 @@ class CircuitState(Enum):
     OPEN = "open"  # Failing fast
     HALF_OPEN = "half_open"  # Testing recovery
 
-
 class CircuitBreaker:
-    """
+
     Circuit breaker for external service calls.
 
     States:
     - CLOSED: Normal operation, calls pass through
     - OPEN: Service is down, calls fail immediately
     - HALF_OPEN: Testing if service recovered
-    """
 
     def __init__(
         self,
@@ -43,7 +37,7 @@ class CircuitBreaker:
         expected_exception: type[Exception] | tuple[type[Exception], ...] = Exception,
         success_threshold: int = 2,
     ):
-        """
+
         Initialize circuit breaker.
 
         Args:
@@ -52,7 +46,7 @@ class CircuitBreaker:
             recovery_timeout: Seconds to wait before attempting recovery
             expected_exception: Exception type to catch
             success_threshold: Successful calls needed to close circuit
-        """
+
         self.name = name
         self.failure_threshold = failure_threshold
         self.recovery_timeout = recovery_timeout
@@ -98,7 +92,7 @@ class CircuitBreaker:
         cache.set(self._success_count_key, value, timeout=3600)
 
     def call(self, func: Callable, *args, **kwargs) -> Any:
-        """
+
         Execute function with circuit breaker protection.
 
         Args:
@@ -112,7 +106,7 @@ class CircuitBreaker:
         Raises:
             CircuitOpenException: If circuit is open
             Original exception: If circuit is closed and function fails
-        """
+
         state = self.state
 
         if state == CircuitState.OPEN:
@@ -195,12 +189,8 @@ class CircuitBreaker:
             },
         }
 
-
 class CircuitOpenException(Exception):
     """Exception raised when circuit is open"""
-
-    pass
-
 
 def circuit_breaker(
     name: str | None = None,
@@ -210,7 +200,7 @@ def circuit_breaker(
     success_threshold: int = 2,
     fallback: Callable | None = None,
 ):
-    """
+
     Decorator to add circuit breaker to functions.
 
     Args:
@@ -225,7 +215,6 @@ def circuit_breaker(
         @circuit_breaker(name="external_api", failure_threshold=3)
         def call_external_api():
             return requests.get("https://api.example.com/data")
-    """
 
     def decorator(func):
         circuit_name = name or f"{func.__module__}.{func.__name__}"
@@ -245,7 +234,6 @@ def circuit_breaker(
                 if fallback:
                     logger.info("Using fallback for %s", circuit_name)
                     return fallback(*args, **kwargs)
-                raise
 
         # Add methods to check status
         wrapper.circuit_breaker = breaker
@@ -255,7 +243,6 @@ def circuit_breaker(
         return wrapper
 
     return decorator
-
 
 # Pre-configured circuit breakers for common services
 
@@ -290,7 +277,6 @@ external_api_circuit_breaker = functools.partial(
     recovery_timeout=60,
     expected_exception=(ConnectionError, TimeoutError),
 )
-
 
 class CircuitBreakerManager:
     """Manager for all circuit breakers in the system"""

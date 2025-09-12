@@ -1,24 +1,21 @@
+import copy
+from unittest.mock import Mock
+
 from django.contrib.auth import get_user_model
+from django.contrib.auth.models import Permission
+from django.contrib.contenttypes.models import ContentType
 from django.test import TestCase
 from django.utils import timezone
 from rest_framework import status
 from rest_framework.test import APITestCase
+
 from apps.cms.models import Page
 from apps.cms.versioning import AuditEntry, PageRevision, RevisionDiffer
 from apps.i18n.models import Locale
-        from unittest.mock import Mock
-        import copy
-        from django.contrib.auth.models import Permission
-        from django.contrib.contenttypes.models import ContentType
-"""
+
 Tests for versioning and audit functionality.
-"""
-
-
-
 
 User = get_user_model()
-
 
 class PageRevisionModelTests(TestCase):
     """Test PageRevision model functionality."""
@@ -130,7 +127,6 @@ class PageRevisionModelTests(TestCase):
         revision2 = PageRevision.create_snapshot(page=page_with_blocks, user=self.user)
         self.assertEqual(revision2.get_block_count(), 3)
 
-
 class AuditEntryModelTests(TestCase):
     """Test AuditEntry model functionality."""
 
@@ -181,7 +177,6 @@ class AuditEntryModelTests(TestCase):
 
         expected = f"{self.user.email} performed update on cms.page#{self.page.id}"
         self.assertEqual(str(entry), expected)
-
 
 class RevisionDifferTests(TestCase):
     """Test revision diffing functionality."""
@@ -276,7 +271,6 @@ class RevisionDifferTests(TestCase):
 
         self.assertFalse(diff["has_changes"])
         self.assertEqual(diff["changes"], {})
-
 
 class VersioningAPITests(APITestCase):
     """Test versioning API endpoints."""
@@ -456,7 +450,6 @@ class VersioningAPITests(APITestCase):
         self.page.refresh_from_db()
         self.assertEqual(self.page.status, "draft")
         self.assertIsNone(self.page.published_at)
-
 
 class VersioningSignalsTests(TestCase):
     """Test versioning signal handlers."""

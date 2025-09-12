@@ -3,10 +3,7 @@ from typing import Any
 import bleach  # type: ignore
 from django.conf import settings
 
-"""
 Security utilities for CMS content.
-"""
-
 
 # Default allowed tags for rich text content
 DEFAULT_ALLOWED_TAGS = [
@@ -61,14 +58,13 @@ DEFAULT_ALLOWED_ATTRIBUTES = {
 # Default allowed protocols for URLs
 DEFAULT_ALLOWED_PROTOCOLS = ["http", "https", "mailto", "tel"]
 
-
 def get_sanitization_config():
-    """
+
     Get HTML sanitization configuration from settings or defaults.
 
     Returns:
         Dict with 'allowed_tags', 'allowed_attributes', and 'allowed_protocols'
-    """
+
     return {
         "allowed_tags": getattr(
             settings, "HTML_SANITIZER_ALLOWED_TAGS", DEFAULT_ALLOWED_TAGS
@@ -81,14 +77,13 @@ def get_sanitization_config():
         ),
     }
 
-
 def sanitize_html(
     html_content: str,
     allowed_tags: list[str] | None = None,
     allowed_attributes: dict[str, list[str]] | None = None,
     allowed_protocols: list[str] | None = None,
 ) -> str:
-    """
+
     Sanitize HTML content to remove potentially dangerous elements and attributes.
 
     Args:
@@ -99,7 +94,7 @@ def sanitize_html(
 
     Returns:
         Sanitized HTML string safe for rendering
-    """
+
     if not html_content or not isinstance(html_content, str):
         return ""
 
@@ -114,9 +109,8 @@ def sanitize_html(
         strip_comments=True,  # Remove HTML comments
     )
 
-
 def sanitize_rich_text_block(block_data: dict[str, Any]) -> dict[str, Any]:
-    """
+
     Sanitize HTML content in a rich_text block.
 
     Args:
@@ -124,7 +118,7 @@ def sanitize_rich_text_block(block_data: dict[str, Any]) -> dict[str, Any]:
 
     Returns:
         Block data with sanitized HTML content
-    """
+
     if not isinstance(block_data, dict):
         return block_data
 
@@ -143,9 +137,8 @@ def sanitize_rich_text_block(block_data: dict[str, Any]) -> dict[str, Any]:
 
     return sanitized_block
 
-
 def sanitize_block_content(block_data: dict[str, Any]) -> dict[str, Any]:
-    """
+
     Recursively sanitize HTML content in block data.
 
     This function handles different block types and sanitizes any HTML content
@@ -156,7 +149,7 @@ def sanitize_block_content(block_data: dict[str, Any]) -> dict[str, Any]:
 
     Returns:
         Block data with sanitized HTML content
-    """
+
     if not isinstance(block_data, dict):
         return block_data
 
@@ -246,9 +239,8 @@ def sanitize_block_content(block_data: dict[str, Any]) -> dict[str, Any]:
     # For unknown block types, return as-is (could be enhanced to sanitize all string props)
     return block_data
 
-
 def sanitize_blocks(blocks: list[dict[str, Any]]) -> list[dict[str, Any]]:
-    """
+
     Sanitize HTML content in a list of blocks.
 
     Args:
@@ -256,12 +248,11 @@ def sanitize_blocks(blocks: list[dict[str, Any]]) -> list[dict[str, Any]]:
 
     Returns:
         List of blocks with sanitized HTML content
-    """
+
     if not isinstance(blocks, list):
         return blocks
 
     return [sanitize_block_content(block) for block in blocks]
-
 
 # Settings documentation for reference
 SETTINGS_HELP = """
@@ -293,4 +284,3 @@ HTML_SANITIZER_ALLOWED_ATTRIBUTES = {
 
 # Allowed URL protocols
 HTML_SANITIZER_ALLOWED_PROTOCOLS = ['http', 'https', 'mailto', 'tel']
-"""

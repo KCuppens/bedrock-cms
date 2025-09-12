@@ -1,6 +1,5 @@
-"""
+
 CMS-specific factories for pages, categories, and content.
-"""
 
 from django.utils.text import slugify
 
@@ -15,7 +14,6 @@ from apps.i18n.models import Locale
 from .base import BaseFactory
 
 fake = Faker()
-
 
 class LocaleFactory(BaseFactory):
     """Factory for creating locales."""
@@ -48,7 +46,6 @@ class LocaleFactory(BaseFactory):
     is_active = True
     is_default = factory.LazyAttribute(lambda obj: obj.code == "en")
 
-
 class CategoryFactory(BaseFactory):
     """Factory for creating categories."""
 
@@ -60,7 +57,6 @@ class CategoryFactory(BaseFactory):
     description = factory.Faker("sentence", nb_words=10)
     is_active = True
 
-
 class TagFactory(BaseFactory):
     """Factory for creating tags."""
 
@@ -69,7 +65,6 @@ class TagFactory(BaseFactory):
 
     name = factory.Faker("word")
     slug = factory.LazyAttribute(lambda obj: slugify(obj.name))
-
 
 class PageFactory(BaseFactory):
     """Factory for creating CMS pages."""
@@ -108,7 +103,6 @@ class PageFactory(BaseFactory):
     @factory.post_generation
     def categories(self, create, extracted, **kwargs):
         if not create:
-            return
 
         if extracted:
             for category in extracted:
@@ -122,7 +116,6 @@ class PageFactory(BaseFactory):
     @factory.post_generation
     def tags(self, create, extracted, **kwargs):
         if not create:
-            return
 
         if extracted:
             for tag in extracted:
@@ -133,13 +126,11 @@ class PageFactory(BaseFactory):
             for tag in tags:
                 self.tags.add(tag)
 
-
 class PublishedPageFactory(PageFactory):
     """Factory for published pages."""
 
     status = "published"
     published_at = factory.LazyFunction(lambda: fake.date_time_this_year())
-
 
 class DraftPageFactory(PageFactory):
     """Factory for draft pages."""

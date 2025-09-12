@@ -1,11 +1,10 @@
-"""
+
 Comprehensive integration tests for CMS Views.
 
 Tests all endpoints, permissions, edge cases, and business logic
 to achieve maximum coverage of apps/cms/views.py (388 lines).
 
 Target: +310 lines of coverage
-"""
 
 import uuid
 
@@ -20,7 +19,6 @@ from tests.factories import *
 from tests.fixtures.sample_data import *
 
 User = get_user_model()
-
 
 class PagesViewSetTestCase(APITestCase):
     """Test PagesViewSet core functionality."""
@@ -99,7 +97,6 @@ class PagesViewSetTestCase(APITestCase):
 
         viewset.action = "update"
         self.assertEqual(viewset.get_serializer_class().__name__, "PageWriteSerializer")
-
 
 class PageRetrievalTestCase(APITestCase):
     """Test page retrieval endpoints."""
@@ -221,7 +218,6 @@ class PageRetrievalTestCase(APITestCase):
         data = response.json()
         self.assertEqual(data["title"], "Draft Page")
 
-
 class PageHierarchyTestCase(APITestCase):
     """Test page hierarchy and tree operations."""
 
@@ -299,7 +295,6 @@ class PageHierarchyTestCase(APITestCase):
         )
         self.assertEqual(len(child1_node["children"]), 1)
         self.assertEqual(child1_node["children"][0]["title"], "Grandchild")
-
 
 class PageCRUDTestCase(APITestCase):
     """Test Create, Read, Update, Delete operations."""
@@ -398,6 +393,5 @@ class PageCRUDTestCase(APITestCase):
 
         # Verify page was deleted
         self.assertFalse(Page.objects.filter(id=self.test_page.id).exists())
-
 
 # Continue with remaining test cases...

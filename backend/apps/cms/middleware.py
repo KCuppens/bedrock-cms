@@ -1,13 +1,12 @@
 from django.core.cache import cache
+from django.db import transaction
 from django.http import HttpResponsePermanentRedirect, HttpResponseRedirect
 from django.utils.deprecation import MiddlewareMixin
 
 from .models import Redirect
-            from django.db import transaction
-
 
 class RedirectMiddleware(MiddlewareMixin):
-    """
+
     Middleware to handle SEO redirects defined in the Redirect model.
 
     This middleware:
@@ -16,7 +15,6 @@ class RedirectMiddleware(MiddlewareMixin):
     3. Returns appropriate HTTP redirect responses
     4. Tracks hit counts for redirect analytics
     5. Uses caching for performance
-    """
 
     def process_request(self, request):
         """Process incoming requests and check for redirects."""
@@ -118,7 +116,6 @@ class RedirectMiddleware(MiddlewareMixin):
 
         except Redirect.DoesNotExist:
             # Redirect was deleted between finding it and tracking the hit
-            pass
+
         except Exception:
             # Don't fail the request if hit tracking fails
-            pass

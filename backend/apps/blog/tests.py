@@ -1,20 +1,17 @@
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
 from django.test import TestCase
+
 from apps.i18n.models import Locale
+from apps.registry.registry import content_registry
+from apps.registry.serializers import get_serializer_for_model
+from apps.registry.viewsets import get_viewset_for_model
+
 from .models import BlogPost, Category, Tag
-        from apps.registry.registry import content_registry
-        from apps.registry.serializers import get_serializer_for_model
-        from apps.registry.viewsets import get_viewset_for_model
-"""
+
 Tests for blog functionality.
-"""
-
-
-
 
 User = get_user_model()
-
 
 class BlogModelTests(TestCase):
     """Test blog models."""
@@ -228,7 +225,6 @@ class BlogModelTests(TestCase):
         # Should only count published posts
         published_count = self.category.posts.filter(status="published").count()
         self.assertEqual(published_count, 1)
-
 
 class BlogIntegrationTests(TestCase):
     """Integration tests for blog functionality."""

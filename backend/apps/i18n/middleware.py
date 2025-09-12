@@ -1,31 +1,28 @@
 import logging
+import time
+
 from django.conf import settings
 from django.core.cache import cache
+from django.utils import translation
 from django.utils.deprecation import MiddlewareMixin
-            import time
-            from apps.i18n.settings_sync import DjangoSettingsSync
-                    from django.utils import translation
-"""
+
+from apps.i18n.settings_sync import DjangoSettingsSync
+
 Dynamic language middleware for i18n.
 
 This middleware ensures that the available languages are always
 up-to-date with the database configuration.
-"""
-
-
 
 logger = logging.getLogger(__name__)
 
-
 class DynamicLanguageMiddleware(MiddlewareMixin):
-    """
+
     Middleware to ensure Django's language settings are synchronized
     with the database on each request.
 
     This middleware runs after Django is fully initialized, avoiding
     the circular dependency issue of trying to access the database
     during settings import.
-    """
 
     # Cache key for tracking when we last updated settings
     LAST_UPDATE_KEY = "i18n_settings_last_update"

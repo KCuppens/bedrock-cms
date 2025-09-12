@@ -1,18 +1,15 @@
 from django.utils import timezone
+
 from django_filters.rest_framework import DjangoFilterBackend
 from drf_spectacular.utils import OpenApiParameter, extend_schema
 from rest_framework import filters, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
+
 from .versioning import AuditEntry, PageRevision, RevisionDiffer
 from .versioning_serializers import (
-"""
-API views for versioning and audit functionality.
-"""
-
-
-
+    API,
     AuditEntrySerializer,
     AutosaveSerializer,
     PageRevisionDetailSerializer,
@@ -21,15 +18,19 @@ API views for versioning and audit functionality.
     RevertRevisionSerializer,
     RevisionDiffSerializer,
     UnpublishPageSerializer,
+
+    audit,
+
+    # functionality
+    versioning,
+    views,
 )
 
-
 class PageRevisionViewSet(viewsets.ReadOnlyModelViewSet):
-    """
+
     ViewSet for managing page revisions.
 
     Provides read-only access to page revisions with diff and revert functionality.
-    """
 
     queryset = PageRevision.objects.select_related("created_by", "page")
     serializer_class = PageRevisionSerializer
@@ -53,7 +54,6 @@ class PageRevisionViewSet(viewsets.ReadOnlyModelViewSet):
         if not self.request.user.is_superuser:
             # This would integrate with RBAC to filter based on user's locale/section access
             # For now, just ensure user is authenticated
-            pass
 
         return queryset
 
@@ -160,13 +160,11 @@ class PageRevisionViewSet(viewsets.ReadOnlyModelViewSet):
             {"message": f"Page reverted to revision from {revision.created_at}"}
         )
 
-
 class AuditEntryViewSet(viewsets.ReadOnlyModelViewSet):
-    """
+
     ViewSet for audit entries.
 
     Provides read-only access to audit log entries with filtering.
-    """
 
     queryset = AuditEntry.objects.select_related("actor").prefetch_related(
         "content_object"
@@ -197,12 +195,10 @@ class AuditEntryViewSet(viewsets.ReadOnlyModelViewSet):
 
         return queryset
 
-
 # Mixin to add versioning endpoints to PageViewSet
 class VersioningMixin:
-    """
+
     Mixin to add versioning functionality to the PageViewSet.
-    """
 
     @extend_schema(
         summary="Get page revisions",

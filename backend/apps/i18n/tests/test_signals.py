@@ -1,25 +1,29 @@
 from unittest.mock import MagicMock, patch
+
 from django.contrib.auth import get_user_model
 from django.contrib.contenttypes.models import ContentType
 from django.test import TestCase
+
 from apps.cms.models import Page
 from apps.i18n.models import Locale, TranslationUnit
 from apps.i18n.signals import (
-from apps.i18n.translation import TranslationManager
-"""
-Test cases for i18n signal handlers.
-"""
+    Test,
+    TranslationManager,
 
-
-
+    apps.i18n.translation,
+    cases,
     create_page_translation_units,
     create_translation_units_handler,
+
+    # handlers
+    i18n,
+
     register_model_for_translation,
+    signal,
     store_old_page_data,
 )
 
 User = get_user_model()
-
 
 class PageSignalsTest(TestCase):
     """Test cases for Page model signal handlers."""
@@ -124,7 +128,6 @@ class PageSignalsTest(TestCase):
             page._old_blocks, [{"type": "text", "value": "Original content"}]
         )
 
-
 class GenericSignalsTest(TestCase):
     """Test cases for generic signal handlers."""
 
@@ -205,7 +208,6 @@ class GenericSignalsTest(TestCase):
 
         # Create a mock model class
         class MockModel:
-            pass
 
         fields = ["title", "content"]
 
@@ -237,7 +239,6 @@ class GenericSignalsTest(TestCase):
         """Test registering a model without specifying fields."""
 
         class MockModel:
-            pass
 
         with (
             patch(
@@ -255,7 +256,6 @@ class GenericSignalsTest(TestCase):
             mock_connect.assert_called_once_with(
                 create_translation_units_handler, sender=MockModel, weak=False
             )
-
 
 class SignalIntegrationTest(TestCase):
     """Integration tests for signal handlers working together."""

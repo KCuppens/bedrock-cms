@@ -1,6 +1,5 @@
-"""
+
 Internationalization factories for translation testing.
-"""
 
 import factory
 import factory.django
@@ -13,7 +12,6 @@ from .base import BaseFactory, UserFactory
 from .cms import LocaleFactory, PageFactory
 
 fake = Faker()
-
 
 class TranslationUnitFactory(BaseFactory):
     """Factory for creating translation units."""
@@ -41,7 +39,6 @@ class TranslationUnitFactory(BaseFactory):
         page = PageFactory()
         return page.id
 
-
 class UiMessageFactory(BaseFactory):
     """Factory for UI messages."""
 
@@ -53,7 +50,6 @@ class UiMessageFactory(BaseFactory):
     namespace = factory.Iterator(["general", "forms", "navigation", "errors"])
     description = factory.Faker("sentence", nb_words=6)
     default_value = factory.Faker("sentence", nb_words=4)
-
 
 class UiMessageTranslationFactory(BaseFactory):
     """Factory for UI message translations."""

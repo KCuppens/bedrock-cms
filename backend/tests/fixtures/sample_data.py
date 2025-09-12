@@ -1,6 +1,5 @@
-"""
+
 Comprehensive test data fixtures for consistent testing across modules.
-"""
 
 from unittest.mock import patch
 
@@ -8,8 +7,6 @@ from django.contrib.auth import get_user_model
 
 import pytest
 from faker import Faker
-
-fake = Faker()
 
 from ..factories import (
     AdminUserFactory,
@@ -29,7 +26,7 @@ from ..factories import (
 )
 
 User = get_user_model()
-
+fake = Faker()
 
 @pytest.fixture
 def sample_users():
@@ -42,7 +39,6 @@ def sample_users():
         "staff": UserFactory(is_staff=True),
     }
 
-
 @pytest.fixture
 def sample_locales():
     """Create standard locales for testing."""
@@ -52,7 +48,6 @@ def sample_locales():
         "fr": LocaleFactory(code="fr", is_active=True),
         "de": LocaleFactory(code="de", is_active=False),  # Inactive for testing
     }
-
 
 @pytest.fixture
 def sample_cms_data(sample_locales, sample_users):
@@ -84,7 +79,6 @@ def sample_cms_data(sample_locales, sample_users):
         "all_pages": published_pages + draft_pages + spanish_pages,
     }
 
-
 @pytest.fixture
 def sample_media_data():
     """Create media items for testing."""
@@ -93,7 +87,6 @@ def sample_media_data():
         "documents": MediaItemFactory.create_batch(3, file_type="document"),
         "videos": MediaItemFactory.create_batch(2, file_type="video"),
     }
-
 
 @pytest.fixture
 def sample_translation_data(sample_cms_data, sample_locales, sample_users):
@@ -113,7 +106,6 @@ def sample_translation_data(sample_cms_data, sample_locales, sample_users):
 
     return translation_units
 
-
 @pytest.fixture
 def sample_analytics_data():
     """Create analytics data for testing."""
@@ -128,7 +120,6 @@ def sample_analytics_data():
         events.extend(session_events)
 
     return {"sessions": sessions, "events": events}
-
 
 @pytest.fixture
 def mock_external_services():
@@ -152,7 +143,6 @@ def mock_external_services():
 
                 yield mocks
 
-
 @pytest.fixture
 def api_client():
     """Enhanced API client for testing."""
@@ -160,20 +150,17 @@ def api_client():
 
     return APIClient()
 
-
 @pytest.fixture
 def authenticated_client(api_client, sample_users):
     """API client authenticated as regular user."""
     api_client.force_authenticate(user=sample_users["regular"])
     return api_client
 
-
 @pytest.fixture
 def admin_client(api_client, sample_users):
     """API client authenticated as admin user."""
     api_client.force_authenticate(user=sample_users["admin"])
     return api_client
-
 
 @pytest.fixture
 def editor_client(api_client, sample_users):

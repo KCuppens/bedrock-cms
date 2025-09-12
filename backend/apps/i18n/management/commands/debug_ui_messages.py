@@ -2,10 +2,7 @@ from django.core.management.base import BaseCommand
 
 from apps.i18n.models import Locale, UiMessage, UiMessageTranslation
 
-"""
 Debug command to check UI messages that need translation.
-"""
-
 
 class Command(BaseCommand):
     help = "Debug UI messages that need translation"
@@ -31,7 +28,6 @@ class Command(BaseCommand):
             self.stdout.write(
                 self.style.ERROR(f"Locale {locale_code} not found or not active")
             )
-            return
 
         # Get messages that need translation
         messages_query = UiMessage.objects.exclude(

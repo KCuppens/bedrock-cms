@@ -1,25 +1,21 @@
 import json
 import logging
 import time
+
+import brotli
 from django.conf import settings
 from django.core.cache import cache
 from django.db import connection
 from django.http import JsonResponse
 from django.utils.deprecation import MiddlewareMixin
-                import brotli
-"""
+
 Performance monitoring and optimization middleware.
-"""
-
-
 
 logger = logging.getLogger("performance")
 
-
 class PerformanceMonitoringMiddleware(MiddlewareMixin):
-    """
+
     Middleware to monitor and log performance metrics.
-    """
 
     def process_request(self, request):
         """Start timing the request."""
@@ -71,11 +67,9 @@ class PerformanceMonitoringMiddleware(MiddlewareMixin):
 
         return response
 
-
 class QueryCountLimitMiddleware(MiddlewareMixin):
-    """
+
     Middleware to prevent N+1 queries by limiting query count.
-    """
 
     MAX_QUERIES = 50  # Maximum queries per request
 
@@ -112,11 +106,9 @@ class QueryCountLimitMiddleware(MiddlewareMixin):
 
         return response
 
-
 class CacheHitRateMiddleware(MiddlewareMixin):
-    """
+
     Middleware to track cache hit rates.
-    """
 
     def process_response(self, request, response):
         """Track cache hit/miss."""
@@ -149,11 +141,9 @@ class CacheHitRateMiddleware(MiddlewareMixin):
 
         return response
 
-
 class DatabaseConnectionPoolMiddleware(MiddlewareMixin):
-    """
+
     Middleware to manage database connection pooling.
-    """
 
     def process_request(self, request):
         """Ensure connection is alive."""
@@ -176,11 +166,9 @@ class DatabaseConnectionPoolMiddleware(MiddlewareMixin):
 
         return response
 
-
 class RequestThrottlingMiddleware(MiddlewareMixin):
-    """
+
     Per-IP request throttling middleware.
-    """
 
     def get_client_ip(self, request):
         """Get client IP address."""
@@ -225,11 +213,9 @@ class RequestThrottlingMiddleware(MiddlewareMixin):
 
         return None
 
-
 class CompressionMiddleware(MiddlewareMixin):
-    """
+
     Enhanced compression middleware with Brotli support.
-    """
 
     MIN_SIZE = 1024  # Minimum size to compress (1KB)
 
@@ -265,7 +251,6 @@ class CompressionMiddleware(MiddlewareMixin):
                     response["Vary"] = "Accept-Encoding"
                     del response["Content-Length"]
             except ImportError:
-                pass
 
         # Fall back to gzip (handled by GZipMiddleware)
 

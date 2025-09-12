@@ -2,8 +2,6 @@
 """Final comprehensive flake8 fixes."""
 
 import os
-import re
-
 
 def fix_line_length(content):
     """Fix lines that are too long."""
@@ -73,7 +71,6 @@ def fix_line_length(content):
 
     return "\n".join(fixed_lines)
 
-
 def fix_undefined_names(content, filepath):
     """Fix undefined names based on file context."""
 
@@ -101,10 +98,10 @@ def fix_undefined_names(content, filepath):
             lines = content.split("\n")
             for i, line in enumerate(lines):
                 if line.startswith("from apps.") or line.startswith("import "):
-                    continue
+
                 elif line.strip() == "":
                     lines.insert(i, import_line)
-                    break
+
             content = "\n".join(lines)
 
     elif "blog/tests/test_comprehensive.py" in filepath:
@@ -120,11 +117,10 @@ def fix_undefined_names(content, filepath):
                     lines.insert(
                         i + 1, "from apps.accounts.serializers import UserSerializer"
                     )
-                    break
+
             content = "\n".join(lines)
 
     return content
-
 
 def fix_specific_long_lines(content, filepath):
     """Fix specific long lines that are hard to handle generically."""
@@ -142,7 +138,7 @@ def fix_specific_long_lines(content, filepath):
                     '            if ("component" not in processed_block and'
                 )
                 fixed_lines.append('                    "type" in processed_block):')
-                continue
+
             elif line_num == 49:
                 continue  # Skip the old line 49
             elif line_num == 50:
@@ -152,17 +148,17 @@ def fix_specific_long_lines(content, filepath):
                     '        """Return SEO links (canonical + alternates)'
                 )
                 fixed_lines.append('        if with_seo=1 parameter is provided."""')
-                continue
+
             elif line_num == 91 and 'print(f"DEBUG:' in line:
                 fixed_lines.append(
                     '        # print(f"DEBUG: get_recent_revisions called for'
                 )
                 fixed_lines.append('        #        page {obj.id} in serializers.py")')
-                continue
+
             elif line_num == 93 and "Return mock revision" in line:
                 fixed_lines.append("        # Return mock revision data since database")
                 fixed_lines.append("        # versioning isn't configured yet")
-                continue
+
             elif line_num == 135 and "print(" in line:
                 fixed_lines.append(
                     '        # print(f"DEBUG: Returning {len(mock_revisions)}'
@@ -170,7 +166,7 @@ def fix_specific_long_lines(content, filepath):
                 fixed_lines.append(
                     '        #       mock revisions from serializers.py")'
                 )
-                continue
+
             elif line_num == 145 and '"id", "title"' in line:
                 fixed_lines.append("        fields = [")
                 fixed_lines.append(
@@ -178,13 +174,12 @@ def fix_specific_long_lines(content, filepath):
                 )
                 fixed_lines.append('            "status", "children_count"')
                 fixed_lines.append("        ]")
-                continue
+
             elif line_num == 205 and "scheduled_unpublish_at" in line:
                 fixed_lines.append('                    {"scheduled_unpublish_at":')
                 fixed_lines.append(
                     '                     "Must be after scheduled publish time"}'
                 )
-                continue
 
         elif "cms/serializers/pages.py" in filepath:
             if line_num == 32 and "children_pages" in line:
@@ -193,13 +188,13 @@ def fix_specific_long_lines(content, filepath):
                 )
                 fixed_lines.append("                parent=obj")
                 fixed_lines.append("            )")
-                continue
+
             elif line_num == 243 and "create revision" in line:
                 fixed_lines.append(
                     "                    # Would create revision here if versioning"
                 )
                 fixed_lines.append("                    # was implemented")
-                continue
+
             elif line_num == 317 and "placeholder" in line:
                 fixed_lines.append(
                     "                # Using placeholder tokens for now -"
@@ -210,23 +205,21 @@ def fix_specific_long_lines(content, filepath):
                 fixed_lines.append(
                     "                # when authentication is integrated"
                 )
-                continue
+
             elif line_num == 323 and "Return formatted" in line:
                 fixed_lines.append(
                     '        """Return formatted response for revision restore'
                 )
                 fixed_lines.append('        success."""')
-                continue
 
         fixed_lines.append(line)
 
     return "\n".join(fixed_lines)
 
-
 def process_file(filepath):
     """Process a single file to fix flake8 issues."""
     try:
-        with open(filepath, "r", encoding="utf-8") as f:
+        with open(filepath, encoding="utf-8") as f:
             content = f.read()
 
         original_content = content
@@ -252,7 +245,6 @@ def process_file(filepath):
         print(f"Error processing {filepath}: {e}")
         return False
 
-
 def main():
     """Main function to fix all flake8 issues."""
     files_to_fix = [
@@ -273,7 +265,6 @@ def main():
             print(f"File not found: {filepath}")
 
     print(f"\nFixed {fixed_count} files")
-
 
 if __name__ == "__main__":
     main()

@@ -17,13 +17,11 @@ from .serializers import (
 
 User = get_user_model()
 
-
 class AuthThrottle(AnonRateThrottle):
     """Custom throttle for authentication endpoints"""
 
     scope = "auth"
     rate = "5/min"
-
 
 @extend_schema_view(
     retrieve=extend_schema(

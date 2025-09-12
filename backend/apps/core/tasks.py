@@ -1,42 +1,38 @@
+import io
 import logging
-from django.core.cache import cache
-from django.utils import timezone
+
 from celery import shared_task
-            from apps.blog.models import BlogPost
-            from apps.blog.versioning import BlogPostViewTracker
-            from apps.analytics.models import PageView
-            from apps.cms.models import Page
-        from apps.search.services import search_service
-        from django.core.mail import send_mail
-        from django.template.loader import render_to_string
-        import io
-        from PIL import Image
-        from apps.files.models import File
-        from django.db.models import Count
-        from apps.blog.versioning import BlogPostRevision
-        from apps.cms.versioning import PageRevision
-        from apps.core.cache import cache_manager
-        from django.db import connection
-"""
+from django.core.cache import cache
+from django.core.mail import send_mail
+from django.db import connection
+from django.db.models import Count
+from django.template.loader import render_to_string
+from django.utils import timezone
+from PIL import Image
+
+from apps.analytics.models import PageView
+from apps.blog.models import BlogPost
+from apps.blog.versioning import BlogPostRevision, BlogPostViewTracker
+from apps.cms.models import Page
+from apps.cms.versioning import PageRevision
+from apps.core.cache import cache_manager
+from apps.files.models import File
+from apps.search.services import search_service
+
 Async tasks for heavy operations using Celery.
-"""
-
-
-
 
 logger = logging.getLogger(__name__)
 
-
 @shared_task(bind=True, max_retries=3)
 def track_view_async(self, content_type, object_id, user_id=None):  # noqa: C901
-    """
+
     Asynchronously track view counts for any content.
 
     Args:
         content_type: String identifier for content type
         object_id: ID of the object being viewed
         user_id: Optional user ID for tracking unique views
-    """
+
     try:
         if content_type == "blog_post":
 
@@ -63,12 +59,11 @@ def track_view_async(self, content_type, object_id, user_id=None):  # noqa: C901
         logger.error(f"Error tracking view: {e}")
         raise self.retry(exc=e, countdown=60)
 
-
 @shared_task(bind=True, max_retries=3)
 def warm_cache_async(
     self, cache_key, callable_path, args=None, kwargs=None, timeout=600
 ):
-    """
+
     Warm cache asynchronously by executing a callable and storing result.
 
     Args:
@@ -77,7 +72,7 @@ def warm_cache_async(
         args: Arguments for the callable
         kwargs: Keyword arguments for the callable
         timeout: Cache timeout in seconds
-    """
+
     try:
         # Import the callable
         module_path, func_name = callable_path.rsplit(".", 1)
@@ -94,15 +89,14 @@ def warm_cache_async(
         logger.error(f"Error warming cache: {e}")
         raise self.retry(exc=e, countdown=60)
 
-
 @shared_task
 def bulk_warm_cache(cache_configs):  # noqa: C901
-    """
+
     Warm multiple cache entries in parallel.
 
     Args:
         cache_configs: List of dicts with cache configuration
-    """
+
     results = []
     for config in cache_configs:
         warm_cache_async.delay(
@@ -116,17 +110,16 @@ def bulk_warm_cache(cache_configs):  # noqa: C901
 
     return {"warmed_keys": results}
 
-
 @shared_task(bind=True, max_retries=3)
 def process_search_index_async(self, model_label, object_id, action="update"):  # noqa: C901
-    """
+
     Asynchronously update search index.
 
     Args:
         model_label: Label of the model (e.g., 'cms.page')
         object_id: ID of the object
         action: 'update' or 'delete'
-    """
+
     try:
 
         if action == "update":
@@ -145,10 +138,9 @@ def process_search_index_async(self, model_label, object_id, action="update"):  
         logger.error(f"Error updating search index: {e}")
         raise self.retry(exc=e, countdown=60)
 
-
 @shared_task
 def send_email_async(to_email, subject, template_name, context):  # noqa: C901
-    """
+
     Send email asynchronously.
 
     Args:
@@ -156,7 +148,7 @@ def send_email_async(to_email, subject, template_name, context):  # noqa: C901
         subject: Email subject
         template_name: Email template name
         context: Template context dictionary
-    """
+
     try:
 
         html_message = render_to_string(f"emails/{template_name}.html", context)
@@ -177,18 +169,15 @@ def send_email_async(to_email, subject, template_name, context):  # noqa: C901
         logger.error(f"Error sending email: {e}")
         return {"status": "error", "error": str(e)}
 
-
 @shared_task
 def generate_thumbnails_async(image_id):  # noqa: C901
-    """
+
     Generate image thumbnails asynchronously.
 
     Args:
         image_id: ID of the image to process
-    """
+
     try:
-
-
 
         file_obj = File.objects.get(id=image_id)
 
@@ -219,15 +208,13 @@ def generate_thumbnails_async(image_id):  # noqa: C901
         logger.error(f"Error generating thumbnails: {e}")
         return {"status": "error", "error": str(e)}
 
-
 @shared_task
 def cleanup_old_revisions():  # noqa: C901
-    """
+
     Clean up old revisions to prevent database bloat.
     Keeps only the last 50 revisions per content item.
-    """
-    try:
 
+    try:
 
         # Clean up page revisions
         pages_with_many_revisions = (
@@ -266,15 +253,14 @@ def cleanup_old_revisions():  # noqa: C901
         logger.error(f"Error cleaning up revisions: {e}")
         return {"status": "error", "error": str(e)}
 
-
 @shared_task
 def invalidate_cache_pattern_async(pattern):  # noqa: C901
-    """
+
     Asynchronously invalidate cache by pattern.
 
     Args:
         pattern: Cache key pattern to invalidate
-    """
+
     try:
 
         cache_manager.delete_pattern(pattern)
@@ -283,13 +269,12 @@ def invalidate_cache_pattern_async(pattern):  # noqa: C901
         logger.error(f"Error invalidating cache: {e}")
         return {"status": "error", "error": str(e)}
 
-
 @shared_task
 def optimize_database_async():  # noqa: C901
-    """
+
     Run database optimization tasks.
     Should be scheduled to run during low-traffic periods.
-    """
+
     try:
 
         with connection.cursor() as cursor:
@@ -299,11 +284,11 @@ def optimize_database_async():  # noqa: C901
 
                 # Update table statistics
                 cursor.execute(
-                    """
+
                     SELECT schemaname, tablename
                     FROM pg_tables
                     WHERE schemaname = 'public'
-                """
+
                 )
                 tables = cursor.fetchall()
 

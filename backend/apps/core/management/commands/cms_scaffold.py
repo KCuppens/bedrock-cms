@@ -1,35 +1,52 @@
 from pathlib import Path
+
 from django.apps import apps
 from django.core.management.base import BaseCommand, CommandError
 from django.template import Context, Template
-import inflection
-from apps.registry.registry import content_registry
 from django.utils import timezone
-from rest_framework import serializers
-from {{ app_label }}.models import {{ model_class }}
-from rest_framework import viewsets, status, filters
-from rest_framework.decorators import action
-from rest_framework.response import Response
-from rest_framework.permissions import IsAuthenticated
+
+import inflection
 from django_filters.rest_framework import DjangoFilterBackend
-from drf_spectacular.utils import extend_schema, OpenApiParameter
-from {{ app_label }}.models import {{ model_class }}
-from .{{ snake_name }}_serializers import (
-from rest_framework.routers import DefaultRouter
-from .{{ snake_name }}_views import {{ model_class }}ViewSet
-from django.contrib import admin
-from {{ app_label }}.models import {{ model_class }}
-"""
-Management command to scaffold CRUD API endpoints for registered models.
-"""
+from drf_spectacular.utils import OpenApiParameter, extend_schema
+from rest_framework import filters, serializers, status, viewsets
+from rest_framework.decorators import action
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
+from {{app_label}}.models import {{ model_class }}
 
+from apps.registry.registry import content_registry
 
+from .{{snake_name}}_serializers import (
+    API,
+    CRUD,
+    BaseCommand,
+    Command,
+    DefaultRouter,
+    Management,
 
+    "Generate,
+    .{{ snake_name }}_views,
+    :,
+    =,
 
+    admin,
 
+    command,
+    django.contrib,
+    endpoints,
 
-class Command(BaseCommand):
-    help = "Generate CRUD API endpoints for a registered model"
+    help,
+
+    model",
+    # models
+    registered,
+    rest_framework.routers,
+    scaffold,
+
+    {{ app_label }}.models,
+    {{ model_class }},
+    {{ model_class }}ViewSet,
+)
 
     def add_arguments(self, parser):
         parser.add_argument(
@@ -86,7 +103,6 @@ class Command(BaseCommand):
 
         if dry_run:
             self._show_dry_run(context, output_dir)
-            return
 
         try:
             # Create serializers file
@@ -204,9 +220,6 @@ class Command(BaseCommand):
         template = Template(
             '''"""
 Serializers for {{ model_class }} model.
-"""
-
-
 
 class {{ model_class }}ListSerializer(serializers.ModelSerializer):
     """Serializer for {{ model_class }} list view."""
@@ -219,7 +232,6 @@ class {{ model_class }}ListSerializer(serializers.ModelSerializer):
         ]
         read_only_fields = ['created_at', 'updated_at']
 
-
 class {{ model_class }}DetailSerializer(serializers.ModelSerializer):
     """Serializer for {{ model_class }} detail view."""
 
@@ -227,7 +239,6 @@ class {{ model_class }}DetailSerializer(serializers.ModelSerializer):
         model = {{ model_class }}
         fields = '__all__'
         read_only_fields = ['created_at', 'updated_at']
-
 
 class {{ model_class }}WriteSerializer(serializers.ModelSerializer):
     """Serializer for creating/updating {{ model_class }}."""
@@ -243,7 +254,6 @@ class {{ model_class }}WriteSerializer(serializers.ModelSerializer):
         """Custom validation for {{ model_class }}."""
         # Add your custom validation logic here
         return attrs
-
 
 {% if config.can_publish %}class {{ model_class }}PublishSerializer(serializers.Serializer):
     """Serializer for publish/unpublish actions."""
@@ -266,8 +276,6 @@ class {{ model_class }}WriteSerializer(serializers.ModelSerializer):
         template = Template(
             '''"""
 API views for {{ model_class }} model.
-"""
-
 
     {{ model_class }}ListSerializer,
     {{ model_class }}DetailSerializer,
@@ -275,13 +283,11 @@ API views for {{ model_class }} model.
     {{ model_class }}PublishSerializer,{% endif %}
 )
 
-
 class {{ model_class }}ViewSet(viewsets.ModelViewSet):
-    """
+
     ViewSet for {{ model_class }} model.
 
     Provides standard CRUD operations{% if config.can_publish %} plus publish/unpublish{% endif %}.
-    """
 
     queryset = {{ model_class }}.objects.all()
     permission_classes = [IsAuthenticated]
@@ -386,8 +392,6 @@ class {{ model_class }}ViewSet(viewsets.ModelViewSet):
         template = Template(
             '''"""
 URL configuration for {{ model_class }} API.
-"""
-
 
 # Create router and register viewset
 router = DefaultRouter()
@@ -406,9 +410,6 @@ urlpatterns = router.urls
         template = Template(
             '''"""
 Admin configuration for {{ model_class }} model.
-"""
-
-
 
 @admin.register({{ model_class }})
 class {{ model_class }}Admin(admin.ModelAdmin):
@@ -580,7 +581,7 @@ curl "/api/content/{{ model_label }}/?search=example{% if config.locale_field %}
 - [Content Registry](../registry.md)
 - [API Authentication](../authentication.md)
 - [Permissions](../permissions.md)
-"""
+
         )
 
         file_path = docs_dir / f"{context['kebab_name']}.md"

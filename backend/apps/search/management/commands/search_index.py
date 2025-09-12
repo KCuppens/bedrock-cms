@@ -1,25 +1,21 @@
 from django.core.management.base import BaseCommand, CommandError
 from django.db import models, transaction
+from django.db.models import Count
+
 from apps.registry.registry import content_registry
 from apps.search.models import SearchIndex
 from apps.search.services import search_service
-        from django.db.models import Count
-"""
+
 Django management command for search indexing.
 
 Usage:
     python manage.py search_index --reindex-all
     python manage.py search_index --model blog.blogpost
     python manage.py search_index --clear
-"""
-
-
-
 
 class Command(BaseCommand):
-    """
+
     Management command for search indexing operations.
-    """
 
     help = "Manage search index operations"
 
@@ -147,7 +143,6 @@ class Command(BaseCommand):
 
         if not self.confirm_action("This will delete all search index data. Continue?"):
             self.stdout.write(self.style.ERROR("Operation cancelled."))
-            return
 
         with transaction.atomic():
             count = SearchIndex.objects.count()
@@ -166,7 +161,6 @@ class Command(BaseCommand):
         configs = content_registry.get_all_configs()
         if not configs:
             self.stdout.write(self.style.WARNING("No content types registered."))
-            return
 
         self.stdout.write(f"Found {len(configs)} registered content types:")
         for config in configs:
@@ -174,7 +168,6 @@ class Command(BaseCommand):
 
         if not self.confirm_action("Continue with reindexing?"):
             self.stdout.write(self.style.ERROR("Operation cancelled."))
-            return
 
         total_indexed = 0
 

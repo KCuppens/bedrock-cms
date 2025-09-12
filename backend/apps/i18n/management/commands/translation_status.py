@@ -2,10 +2,7 @@ from django.core.management.base import BaseCommand
 
 from apps.i18n.models import Locale, UiMessage, UiMessageTranslation
 
-"""
 Show translation status for a locale.
-"""
-
 
 class Command(BaseCommand):
     help = "Show translation status for a locale"
@@ -25,7 +22,6 @@ class Command(BaseCommand):
             locale = Locale.objects.get(code=locale_code)
         except Locale.DoesNotExist:
             self.stdout.write(self.style.ERROR(f"Locale {locale_code} not found"))
-            return
 
         self.stdout.write(f"Translation status for: {locale.name} ({locale.code})")
         self.stdout.write(f"Active: {locale.is_active}")

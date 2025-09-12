@@ -1,37 +1,28 @@
 """Global pytest configuration and fixtures"""
 
-import os
-
-import django
-from django.conf import settings
-
-# Configure Django settings before importing models
-if not settings.configured:
-    os.environ.setdefault("DJANGO_SETTINGS_MODULE", "apps.config.settings.test")
-    django.setup()
-
-from django.contrib.auth import get_user_model
-from django.contrib.auth.models import Group
-
 import pytest
-from rest_framework.test import APIClient
 
-User = get_user_model()
-
+# Let pytest-django handle Django setup
+pytest_plugins = ["django.test"]
 
 @pytest.fixture
-def user():
+def user(db):
     """Create a test user"""
+    from django.contrib.auth import get_user_model
+    User = get_user_model()
     return User.objects.create_user(
         email="test@example.com",
         password="testpass123",  # nosec B106
         name="Test User",
     )
 
-
 @pytest.fixture
-def admin_user():
+def admin_user(db):
     """Create an admin user"""
+    from django.contrib.auth import get_user_model
+    from django.contrib.auth.models import Group
+    
+    User = get_user_model()
     user = User.objects.create_user(
         email="admin@example.com",
         password="adminpass123",  # nosec B106
@@ -46,10 +37,13 @@ def admin_user():
 
     return user
 
-
 @pytest.fixture
-def manager_user():
+def manager_user(db):
     """Create a manager user"""
+    from django.contrib.auth import get_user_model
+    from django.contrib.auth.models import Group
+    
+    User = get_user_model()
     user = User.objects.create_user(
         email="manager@example.com",
         password="managerpass123",  # nosec B106
@@ -62,10 +56,13 @@ def manager_user():
 
     return user
 
-
 @pytest.fixture
-def member_user():
+def member_user(db):
     """Create a member user"""
+    from django.contrib.auth import get_user_model
+    from django.contrib.auth.models import Group
+    
+    User = get_user_model()
     user = User.objects.create_user(
         email="member@example.com",
         password="memberpass123",  # nosec B106
@@ -78,28 +75,27 @@ def member_user():
 
     return user
 
-
 @pytest.fixture
 def api_client():
     """Create an API client"""
+    from rest_framework.test import APIClient
     return APIClient()
-
 
 @pytest.fixture
 def auth_client(user):
     """Create an authenticated API client"""
+    from rest_framework.test import APIClient
     client = APIClient()
     client.force_authenticate(user=user)
     return client
 
-
 @pytest.fixture
 def admin_client(admin_user):
     """Create an admin API client"""
+    from rest_framework.test import APIClient
     client = APIClient()
     client.force_authenticate(user=admin_user)
     return client
-
 
 @pytest.fixture(autouse=True)
 def celery_eager(settings):
@@ -107,16 +103,16 @@ def celery_eager(settings):
     settings.CELERY_TASK_ALWAYS_EAGER = True
     settings.CELERY_TASK_EAGER_PROPAGATES = True
 
-
 @pytest.fixture
 def mailpit(settings):
     """Configure mailpit for email testing"""
     settings.EMAIL_BACKEND = "django.core.mail.backends.locmem.EmailBackend"
 
-
 @pytest.fixture
-def groups():
+def groups(db):
     """Create default user groups"""
+    from django.contrib.auth.models import Group
+    
     admin_group, _ = Group.objects.get_or_create(name="Admin")
     manager_group, _ = Group.objects.get_or_create(name="Manager")
     member_group, _ = Group.objects.get_or_create(name="Member")
@@ -129,7 +125,6 @@ def groups():
         "readonly": readonly_group,
     }
 
-
 @pytest.fixture
 def sample_file():
     """Create a sample file for testing"""
@@ -139,14 +134,12 @@ def sample_file():
         "test.txt", b"This is a test file content", content_type="text/plain"
     )
 
-
 @pytest.fixture
 def sample_image():
     """Create a sample image for testing"""
     import io
 
     from django.core.files.uploadedfile import SimpleUploadedFile
-
     from PIL import Image
 
     # Create a simple image

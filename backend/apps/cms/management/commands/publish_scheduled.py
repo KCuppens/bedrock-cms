@@ -3,7 +3,6 @@ from django.utils import timezone
 
 from apps.cms.tasks import publish_scheduled_content
 
-
 class Command(BaseCommand):
     help = "Publish scheduled content that is ready to be published"
 
@@ -47,4 +46,3 @@ class Command(BaseCommand):
 
         except Exception as e:
             self.stdout.write(self.style.ERROR(f"Command failed: {str(e)}"))
-            raise

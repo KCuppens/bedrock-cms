@@ -2,23 +2,20 @@ import logging
 import re
 from typing import Any
 from urllib.parse import urljoin
-from django.db import transaction
-from django.utils import timezone
+
 import requests
 from celery import shared_task
+from django.db import transaction
+from django.utils import timezone
+
+from apps.blog.models import BlogPost
+
 from .models import Page
 from .scheduling import ScheduledTask
-    from apps.blog.models import BlogPost
-"""
+
 Background tasks for CMS operations.
-"""
-
-
-
-
 
 logger = logging.getLogger(__name__)
-
 
 class LinkExtractor:
     """Extract and validate internal links from content blocks."""
@@ -181,10 +178,9 @@ class LinkExtractor:
 
         return result
 
-
 @shared_task(bind=True)
 def check_internal_links(self, page_ids: list[int] | None = None) -> dict[str, Any]:  # noqa: C901
-    """
+
     Check internal links in pages and report broken ones.
 
     Args:
@@ -192,7 +188,7 @@ def check_internal_links(self, page_ids: list[int] | None = None) -> dict[str, A
 
     Returns:
         Dict with broken links report
-    """
+
     try:
         # Initialize link extractor
         extractor = LinkExtractor()
@@ -288,31 +284,26 @@ def check_internal_links(self, page_ids: list[int] | None = None) -> dict[str, A
         error_msg = f"Failed to check internal links: {str(e)}"
         logger.error(error_msg)
         self.update_state(state="FAILURE", meta={"error": error_msg})
-        raise
-
 
 @shared_task
 def nightly_link_check():  # noqa: C901
-    """
+
     Nightly task to check all internal links.
-    """
+
     logger.info("Starting nightly internal link check")
     result = check_internal_links.delay()
     return result.id
-
 
 @shared_task(bind=True)
 def check_single_page_links(self, page_id: int) -> dict[str, Any]:  # noqa: C901
     """Check links for a single page."""
     return check_internal_links(self, page_ids=[page_id])
 
-
 @shared_task
 def publish_scheduled_content():  # noqa: C901
-    """
+
     Publish scheduled content that's ready to be published.
     This task should run every minute to check for content ready to publish.
-    """
 
     now = timezone.now()
     published_count = 0
@@ -379,8 +370,6 @@ def publish_scheduled_content():  # noqa: C901
     except Exception as e:
         error_msg = f"Critical error in scheduled publishing: {str(e)}"
         logger.error(error_msg)
-        raise
-
 
 @shared_task(
     bind=True,
@@ -389,10 +378,10 @@ def publish_scheduled_content():  # noqa: C901
     autoretry_for=(Exception,),
 )
 def process_scheduled_publishing(self):  # noqa: C901
-    """
+
     Process all pending scheduled publishing tasks.
     This task should be run periodically (e.g., every minute) via Celery Beat.
-    """
+
     now = timezone.now()
     processed_count = 0
     failed_count = 0
@@ -433,7 +422,6 @@ def process_scheduled_publishing(self):  # noqa: C901
 
                 # Re-raise if this is a retry-able error and we haven't exceeded max retries
                 if task.attempts < 3:
-                    raise
 
         logger.info(
             f"Scheduled publishing completed: {processed_count} processed, {failed_count} failed"

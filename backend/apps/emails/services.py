@@ -13,7 +13,6 @@ from .tasks import send_email_task
 logger = logging.getLogger(__name__)
 User = get_user_model()
 
-
 class EmailService:
     """Service for sending emails using templates"""
 
@@ -30,7 +29,7 @@ class EmailService:
         async_send: bool = True,
         **kwargs,
     ) -> EmailMessageLog:
-        """
+
         Send email using template
 
         Args:
@@ -47,7 +46,7 @@ class EmailService:
 
         Returns:
             EmailMessageLog: Created email log entry
-        """
+
         # Normalize to_email to string for database storage
         if isinstance(to_email, list):
             primary_recipient = to_email[0]
@@ -191,7 +190,6 @@ class EmailService:
 
         return template.render_all(context or {})
 
-
 # Convenience functions for common email types
 def send_welcome_email(
     user: User, context: dict[str, Any] | None = None
@@ -210,7 +208,6 @@ def send_welcome_email(
         template_key="welcome", to_email=user.email, context=email_context, user=user
     )
 
-
 def send_password_reset_email(
     user: User, reset_link: str, context: dict[str, Any] | None = None
 ) -> EmailMessageLog:
@@ -228,7 +225,6 @@ def send_password_reset_email(
         context=email_context,
         user=user,
     )
-
 
 def send_notification_email(
     user: User,

@@ -1,13 +1,14 @@
 import time
+
 from django.core.cache import cache
 from django.core.management.base import BaseCommand
-from apps.core.cache import cache_manager
+
+from apps.blog.models import BlogPost
+from apps.cms.models import Page
+from apps.core.cache import CACHE_PREFIXES, cache_manager
 from apps.core.signals import invalidate_all_cache, invalidate_content_type_cache
-        from apps.core.cache import CACHE_PREFIXES
-            from apps.cms.models import Page
-            from apps.blog.models import BlogPost
-            from apps.i18n.models import Locale
-"""
+from apps.i18n.models import Locale
+
 Django management command for cache management.
 
 Usage:
@@ -15,16 +16,10 @@ Usage:
     python manage.py cache_manage --stats
     python manage.py cache_manage --invalidate-pages
     python manage.py cache_manage --warm-cache
-"""
-
-
-
-
 
 class Command(BaseCommand):
-    """
+
     Management command for cache operations.
-    """
 
     help = "Manage CMS cache operations"
 
@@ -156,7 +151,6 @@ class Command(BaseCommand):
                 stats = cache.get_stats()
                 info.update(stats)
         except Exception:
-            pass
 
         # Test cache connectivity
         test_key = "cache_test_key"
@@ -255,7 +249,6 @@ class Command(BaseCommand):
                 warmed += 1
 
         except ImportError:
-            pass
 
         return warmed
 
@@ -284,7 +277,6 @@ class Command(BaseCommand):
                 warmed += 1
 
         except ImportError:
-            pass
 
         return warmed
 
@@ -308,7 +300,6 @@ class Command(BaseCommand):
                 warmed += 1
 
         except ImportError:
-            pass
 
         return warmed
 

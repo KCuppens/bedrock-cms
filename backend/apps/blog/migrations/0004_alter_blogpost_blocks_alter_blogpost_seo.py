@@ -4,7 +4,6 @@ from django.db import migrations, models
 
 import apps.core.validators
 
-
 class Migration(migrations.Migration):
     dependencies = [
         ("blog", "0003_add_performance_indexes"),

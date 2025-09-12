@@ -7,18 +7,16 @@ from typing import Any
 from django.conf import settings
 from django.core.files.base import ContentFile
 from django.core.files.storage import default_storage
+from django.db import transaction
+from django.urls import reverse
+from django.utils import timezone
 
 from apps.core.circuit_breaker import storage_circuit_breaker
 from apps.core.enums import FileType
 
 from .models import FileUpload
-        from django.urls import reverse
-        from django.urls import reverse
-        from django.db import transaction
-        from django.utils import timezone
 
 logger = logging.getLogger(__name__)
-
 
 class FileService:
     """Service for handling file operations"""
@@ -72,7 +70,7 @@ class FileService:
         while True:
             chunk = file.read(chunk_size)
             if not chunk:
-                break
+
             hasher.update(chunk)
 
         checksum = hasher.hexdigest()
@@ -270,7 +268,6 @@ class FileService:
     @classmethod
     def cleanup_expired_files(cls) -> dict[str, int]:
         """Clean up expired files with batch processing"""
-
 
         expired_files = FileUpload.objects.filter(expires_at__lt=timezone.now())
 

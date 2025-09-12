@@ -1,22 +1,18 @@
 import logging
 
-import requests
 from django.conf import settings
 
-"""
-Translation services for auto-suggestions and machine translation.
-"""
+import requests
 
+Translation services for auto-suggestions and machine translation.
 
 logger = logging.getLogger(__name__)
 
-
 class DeepLTranslationService:
-    """
+
     DeepL API integration for machine translation suggestions.
 
     Provides simple, high-quality translation suggestions using DeepL API.
-    """
 
     def __init__(self):
         self.api_key = getattr(settings, "DEEPL_API_KEY", None)
@@ -33,7 +29,7 @@ class DeepLTranslationService:
         logger.info("Using DeepL Free API")
 
     def translate(self, text, source_lang, target_lang):
-        """
+
         Translate text from source language to target language.
 
         Args:
@@ -43,7 +39,7 @@ class DeepLTranslationService:
 
         Returns:
             str: Translated text or None if translation failed
-        """
+
         if not text or not text.strip():
             return None
 
@@ -132,12 +128,12 @@ class DeepLTranslationService:
         return None
 
     def get_supported_languages(self):
-        """
+
         Get list of supported languages from DeepL API.
 
         Returns:
             dict: Dictionary with 'source' and 'target' language lists
-        """
+
         try:
             response = requests.get(
                 f"{self.base_url}/languages",
@@ -168,10 +164,10 @@ class DeepLTranslationService:
             return {"source": [], "target": []}
 
     def _fallback_translate(self, text, source_lang, target_lang):
-        """
+
         Simple fallback translation when DeepL is not available.
         Provides basic translations for common UI terms.
-        """
+
         # Basic translation dictionary for common UI terms
         translations = {
             "en": {
@@ -253,12 +249,12 @@ class DeepLTranslationService:
         return None
 
     def check_usage(self):
-        """
+
         Check current API usage and limits.
 
         Returns:
             dict: Usage information or None if failed
-        """
+
         try:
             response = requests.get(
                 f"{self.base_url}/usage",

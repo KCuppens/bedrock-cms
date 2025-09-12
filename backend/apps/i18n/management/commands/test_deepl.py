@@ -2,10 +2,7 @@ from django.core.management.base import BaseCommand
 
 from apps.i18n.services import DeepLTranslationService
 
-"""
 Test DeepL translation service.
-"""
-
 
 class Command(BaseCommand):
     help = "Test DeepL translation service"

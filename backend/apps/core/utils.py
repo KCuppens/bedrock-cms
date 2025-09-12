@@ -8,27 +8,22 @@ from django.core.mail import send_mail
 from django.utils import timezone
 from django.utils.text import slugify
 
-
 def generate_uuid():
     """Generate a UUID4 string"""
     return str(uuid.uuid4())
-
 
 def generate_short_uuid(length=8):
     """Generate a short UUID-like string"""
     return str(uuid.uuid4()).replace("-", "")[:length]
 
-
 def generate_secure_token(length=32):
     """Generate a cryptographically secure random token"""
     return secrets.token_urlsafe(length)
-
 
 def generate_hash(data: str, algorithm="sha256"):
     """Generate hash of data using specified algorithm"""
     hash_func = getattr(hashlib, algorithm)
     return hash_func(data.encode()).hexdigest()
-
 
 def create_slug(text: str, max_length: int = 50) -> str:
     """Create a URL-friendly slug from text"""
@@ -36,7 +31,6 @@ def create_slug(text: str, max_length: int = 50) -> str:
     if len(slug) > max_length:
         slug = slug[:max_length].rstrip("-")
     return slug
-
 
 def safe_get_dict_value(
     dictionary: dict[str, Any], key: str, default: Any = None
@@ -47,13 +41,11 @@ def safe_get_dict_value(
     except (KeyError, AttributeError):
         return default
 
-
 def truncate_string(text: str, max_length: int = 100, suffix: str = "...") -> str:
     """Truncate string to specified length with suffix"""
     if len(text) <= max_length:
         return text
     return text[: max_length - len(suffix)] + suffix
-
 
 def format_file_size(size_bytes: int) -> str:
     """Format file size in bytes to human readable format"""
@@ -69,7 +61,6 @@ def format_file_size(size_bytes: int) -> str:
 
     return f"{size_float:.1f} {size_names[i]}"
 
-
 def get_client_ip(request) -> str:
     """Get client IP address from request"""
     x_forwarded_for = request.META.get("HTTP_X_FORWARDED_FOR")
@@ -79,11 +70,9 @@ def get_client_ip(request) -> str:
         ip = request.META.get("REMOTE_ADDR")
     return ip
 
-
 def get_user_agent(request) -> str:
     """Get user agent from request"""
     return request.META.get("HTTP_USER_AGENT", "")
-
 
 def time_since_creation(created_at) -> str:
     """Get human-readable time since creation"""
@@ -100,7 +89,6 @@ def time_since_creation(created_at) -> str:
         return f"{minutes} minutes ago"
     else:
         return "Just now"
-
 
 def send_notification_email(
     subject: str,
@@ -124,7 +112,6 @@ def send_notification_email(
             raise e
         return False
 
-
 def mask_email(email: str) -> str:
     """Mask email address for privacy"""
     if "@" not in email:
@@ -137,7 +124,6 @@ def mask_email(email: str) -> str:
         masked_local = local[0] + "*" * (len(local) - 2) + local[-1]
 
     return f"{masked_local}@{domain}"
-
 
 def validate_json_structure(
     data: dict[str, Any], required_fields: list

@@ -2,7 +2,6 @@
 
 from django.db import migrations, models
 
-
 class Migration(migrations.Migration):
     dependencies = [
         ("cms", "0019_add_model_relationships_to_blocktype"),
@@ -15,7 +14,7 @@ class Migration(migrations.Migration):
             CREATE INDEX IF NOT EXISTS cms_page_blocks_gin
             ON cms_page USING gin (blocks jsonb_path_ops)
             WHERE blocks IS NOT NULL;
-            """,
+
             reverse_sql="DROP INDEX IF EXISTS cms_page_blocks_gin;",
             state_operations=[],
         ),
@@ -24,7 +23,7 @@ class Migration(migrations.Migration):
             CREATE INDEX IF NOT EXISTS cms_page_seo_gin
             ON cms_page USING gin (seo jsonb_path_ops)
             WHERE seo IS NOT NULL;
-            """,
+
             reverse_sql="DROP INDEX IF EXISTS cms_page_seo_gin;",
             state_operations=[],
         ),

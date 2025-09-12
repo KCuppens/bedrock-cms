@@ -4,7 +4,6 @@ from django.db import migrations, models
 
 import apps.core.validators
 
-
 class Migration(migrations.Migration):
     dependencies = [
         ("cms", "0004_pagerevision_auditentry"),

@@ -1,9 +1,8 @@
-"""
+
 Advanced CMS Views tests for publishing, moderation, and complex operations.
 
 Tests publishing workflows, moderation system, scheduled content,
 block operations, and all remaining CMS view functionality.
-"""
 
 from datetime import timedelta
 
@@ -18,7 +17,6 @@ from tests.factories import *
 from tests.fixtures.sample_data import *
 
 User = get_user_model()
-
 
 class PagePublishingTestCase(APITestCase):
     """Test page publishing and workflow operations."""
@@ -188,7 +186,6 @@ class PagePublishingTestCase(APITestCase):
         self.assertEqual(data["results"][0]["title"], "Scheduled Page 1")
         self.assertEqual(data["results"][1]["title"], "Scheduled Page 2")
 
-
 class PageModerationTestCase(APITestCase):
     """Test page moderation workflow."""
 
@@ -315,7 +312,6 @@ class PageModerationTestCase(APITestCase):
         self.assertIn("total_drafts", data)
         self.assertEqual(data["pending_review"], 3)
 
-
 class PageBlockOperationsTestCase(APITestCase):
     """Test block-level operations on pages."""
 
@@ -441,7 +437,6 @@ class PageBlockOperationsTestCase(APITestCase):
         self.assertEqual(len(self.test_page.blocks), 1)
         self.assertEqual(self.test_page.blocks[0]["type"], "heading")
 
-
 class PageMoveOperationsTestCase(APITestCase):
     """Test page movement and hierarchy operations."""
 
@@ -528,7 +523,6 @@ class PageMoveOperationsTestCase(APITestCase):
             list(children.values_list("id", flat=True)),
             [self.sibling2.id, self.sibling1.id, self.child.id],
         )
-
 
 class SitemapViewTestCase(APITestCase):
     """Test sitemap generation."""

@@ -9,10 +9,7 @@ from apps.accounts.rbac import ScopedLocale, ScopedSection
 from apps.cms.models import Page
 from apps.i18n.models import Locale
 
-"""
 Comprehensive tests for RBAC (Role-Based Access Control) functionality.
-"""
-
 
 def create_test_page(**kwargs):
     """Helper to create test pages without triggering revision creation."""
@@ -20,7 +17,6 @@ def create_test_page(**kwargs):
     page._skip_revision_creation = True
     page.save()
     return page
-
 
 class LocaleModelTests(TestCase):
     """Test enhanced Locale model functionality."""
@@ -104,7 +100,6 @@ class LocaleModelTests(TestCase):
         )
 
         self.assertTrue(ar_locale.rtl)
-
 
 class ScopedPermissionModelsTests(TestCase):
     """Test RBAC scoped permission models."""
@@ -200,7 +195,6 @@ class ScopedPermissionModelsTests(TestCase):
         self.assertTrue(root_section.matches_path("/blog/post-1"))
         self.assertTrue(root_section.matches_path("/news/article-1"))
         self.assertTrue(root_section.matches_path("/about"))
-
 
 class ScopedPermissionBackendTests(TestCase):
     """Test the custom authentication backend."""
@@ -379,7 +373,6 @@ class ScopedPermissionBackendTests(TestCase):
         superuser_sections = self.backend.get_user_scoped_sections(self.superuser)
         self.assertEqual(superuser_sections, ["/"])
 
-
 class RBACMixinTests(TestCase):
     """Test the RBACMixin functionality."""
 
@@ -433,7 +426,6 @@ class RBACMixinTests(TestCase):
         self.assertFalse(self.page.user_has_locale_access(no_access_user))
         self.assertFalse(self.page.user_has_section_access(no_access_user))
         self.assertFalse(self.page.user_has_scope_access(no_access_user))
-
 
 @override_settings(
     AUTHENTICATION_BACKENDS=[

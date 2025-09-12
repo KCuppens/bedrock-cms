@@ -2,21 +2,28 @@ from django.contrib.admin.sites import AdminSite
 from django.contrib.auth import get_user_model
 from django.contrib.contenttypes.models import ContentType
 from django.test import TestCase
+
 from apps.i18n.admin import (
-from apps.i18n.models import Locale, TranslationUnit, UiMessage, UiMessageTranslation
-"""
-Test cases for i18n admin interface.
-"""
-
-
+    Locale,
     LocaleAdmin,
+    Test,
+    TranslationUnit,
     TranslationUnitAdmin,
+    UiMessage,
     UiMessageAdmin,
+    UiMessageTranslation,
     UiMessageTranslationAdmin,
+
+    admin,
+    apps.i18n.models,
+    cases,
+
+    i18n,
+
+    # interface
 )
 
 User = get_user_model()
-
 
 class I18nAdminTest(TestCase):
     """Test i18n admin interfaces."""
@@ -133,7 +140,6 @@ class I18nAdminTest(TestCase):
                 admin.get_queryset(None)
             except Exception:
                 # If it fails, that's fine for coverage
-                pass
 
     def test_translation_unit_admin_readonly_fields(self):  # noqa: C901
         """Test TranslationUnit admin readonly fields."""

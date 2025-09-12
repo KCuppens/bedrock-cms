@@ -2,17 +2,15 @@ from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ValidationError
 from django.db import transaction
 from django.utils import timezone
+
+from apps.blog.models import BlogPost
+
+from ..models import Page
 from ..scheduling import ScheduledTask
-                    from ..models import Page
-                    from apps.blog.models import BlogPost
-"""
+
 Scheduling service for CMS content.
 
 This module provides services for scheduling content publishing and unpublishing.
-"""
-
-
-
 
 class SchedulingService:
     """Service for managing content scheduling."""
@@ -21,7 +19,7 @@ class SchedulingService:
     def schedule_publish(
         content_object, publish_at, unpublish_at=None, user=None
     ) -> tuple[ScheduledTask, ScheduledTask | None]:
-        """
+
         Schedule content for publishing.
 
         Args:
@@ -35,7 +33,7 @@ class SchedulingService:
 
         Raises:
             ValidationError: If scheduling parameters are invalid
-        """
+
         # Validate
         if publish_at <= timezone.now():
             raise ValidationError("Publish time must be in the future")
@@ -80,7 +78,7 @@ class SchedulingService:
 
     @staticmethod
     def schedule_unpublish(content_object, unpublish_at, user=None) -> ScheduledTask:
-        """
+
         Schedule content for unpublishing (content must be already published).
 
         Args:
@@ -93,7 +91,7 @@ class SchedulingService:
 
         Raises:
             ValidationError: If content is not published or time is invalid
-        """
+
         if content_object.status != "published":
             raise ValidationError(
                 "Can only schedule unpublishing for published content"
@@ -129,13 +127,13 @@ class SchedulingService:
 
     @staticmethod
     def cancel_scheduling(content_object, skip_status_update=False):
-        """
+
         Cancel all scheduled tasks for content.
 
         Args:
             content_object: The Page or BlogPost
             skip_status_update: If True, don't update content status
-        """
+
         content_type = ContentType.objects.get_for_model(content_object)
 
         with transaction.atomic():
@@ -158,7 +156,7 @@ class SchedulingService:
     def get_scheduled_tasks(
         content_type=None, status="pending", from_date=None, to_date=None
     ):
-        """
+
         Get scheduled tasks with filters.
 
         Args:
@@ -169,7 +167,7 @@ class SchedulingService:
 
         Returns:
             QuerySet of ScheduledTask objects
-        """
+
         queryset = ScheduledTask.objects.all()
 
         if content_type:
@@ -196,7 +194,7 @@ class SchedulingService:
 
     @staticmethod
     def reschedule_task(task, new_scheduled_for, user=None):
-        """
+
         Reschedule an existing task to a new time.
 
         Args:
@@ -206,7 +204,7 @@ class SchedulingService:
 
         Raises:
             ValidationError: If task cannot be rescheduled or time is invalid
-        """
+
         if task.status != "pending":
             raise ValidationError("Can only reschedule pending tasks")
 

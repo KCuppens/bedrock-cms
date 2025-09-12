@@ -5,19 +5,15 @@ from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ValidationError
 from django.db import models
 
-"""
 Content configuration and registry for CMS content types.
-"""
-
 
 @dataclass
 class ContentConfig:
-    """
+
     Configuration for registering a Django model as CMS content.
 
     This defines how a model should be exposed through the CMS API,
     including routing, SEO, search, and translation settings.
-    """
 
     # Required fields
     model: "type[models.Model]"
@@ -156,11 +152,11 @@ class ContentConfig:
             )
 
     def get_effective_form_fields(self) -> "list[str]":
-        """
+
         Get the effective form fields to use for serialization.
 
         Returns form_fields if specified, otherwise all model fields.
-        """
+
         if self.form_fields:
             return self.form_fields
 

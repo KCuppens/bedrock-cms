@@ -1,19 +1,15 @@
-"""
+
 Production settings with CDN and performance optimizations.
-"""
 
 import sentry_sdk
 from sentry_sdk.integrations.celery import CeleryIntegration
 from sentry_sdk.integrations.django import DjangoIntegration
 from sentry_sdk.integrations.redis import RedisIntegration
 
-from .base import (  # noqa: F403
-    BASE_DIR,  # noqa: F405
-    INSTALLED_APPS,  # noqa: F405
+from .base import (
     DATABASES,  # noqa: F405
-    REST_FRAMEWORK,  # noqa: F405
     LOGGING,  # noqa: F405
-    env,  # noqa: F405
+    env,  # noqa: F403; noqa: F405
 )
 
 # Security

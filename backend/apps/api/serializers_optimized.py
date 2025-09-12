@@ -2,13 +2,10 @@ from rest_framework import serializers
 
 from .models import Note
 
-"""
 Optimized serializers for list views to prevent over-fetching.
 
 These serializers provide lightweight representations for list views,
 reducing the amount of data transferred and processed.
-"""
-
 
 class NoteListSerializer(serializers.ModelSerializer):
     """Lightweight serializer for note list views"""
@@ -44,7 +41,6 @@ class NoteListSerializer(serializers.ModelSerializer):
             return obj.tags_count
         # Fallback to count query (should be avoided)
         return obj.tags.count()
-
 
 class NoteDetailSerializer(serializers.ModelSerializer):
     """Full serializer for note detail views"""

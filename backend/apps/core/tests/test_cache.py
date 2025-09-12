@@ -1,28 +1,30 @@
 from unittest.mock import MagicMock, patch
+
 from django.contrib.auth import get_user_model
 from django.core.cache import cache
 from django.test import TestCase, override_settings
+
 from apps.core.cache import CacheKeyBuilder, CacheManager, cache_manager
 from apps.core.signals import (
-from apps.i18n.models import Locale
-        from apps.core.cache import CACHE_TIMEOUTS
-        from apps.core.cache import CACHE_PREFIXES
-        import time
-        import time
-"""
-Tests for caching functionality.
-"""
+    CACHE_PREFIXES,
+    CACHE_TIMEOUTS,
+    Locale,
+    Tests,
 
+    apps.core.cache,
+    apps.i18n.models,
+    caching,
 
+    # functionality
 
     invalidate_all_cache,
     invalidate_blog_cache,
     invalidate_content_cache,
     invalidate_page_cache,
+    time,
 )
 
 User = get_user_model()
-
 
 class CacheKeyBuilderTests(TestCase):
     """Test cache key generation."""
@@ -118,7 +120,6 @@ class CacheKeyBuilderTests(TestCase):
         key = self.key_builder.seo_key("cms.page", 123, "en")
         self.assertEqual(key, "test:seo:cms.page:123:en")
 
-
 class CacheManagerTests(TestCase):
     """Test cache manager functionality."""
 
@@ -184,7 +185,6 @@ class CacheManagerTests(TestCase):
 
         # Should not raise an exception
         self.cache_manager.delete_pattern("test:*")
-
 
 class CacheInvalidationTests(TestCase):
     """Test cache invalidation functionality."""
@@ -260,7 +260,6 @@ class CacheInvalidationTests(TestCase):
         # Should be gone
         self.assertIsNone(cache_manager.get(sitemap_key))
 
-
 class CacheIntegrationTests(TestCase):
     """Integration tests for caching with models."""
 
@@ -315,7 +314,6 @@ class CacheIntegrationTests(TestCase):
 
         self.assertEqual(retrieved, value)
 
-
 class CacheSignalTests(TestCase):
     """Test cache invalidation signals."""
 
@@ -364,7 +362,6 @@ class CacheSignalTests(TestCase):
 
         # Should not raise an exception
         invalidate_content_cache(mock_content, "test.model")
-
 
 @override_settings(
     CACHES={

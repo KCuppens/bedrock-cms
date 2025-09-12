@@ -1,6 +1,5 @@
-"""
+
 Media and file factories for testing uploads and media management.
-"""
 
 from django.core.files.base import ContentFile
 
@@ -13,7 +12,6 @@ from apps.media.models import MediaItem
 from .base import BaseFactory, UserFactory
 
 fake = Faker()
-
 
 class MediaItemFactory(BaseFactory):
     """Factory for creating media items."""
@@ -69,19 +67,16 @@ class MediaItemFactory(BaseFactory):
         }.get(obj.file_type, {})
     )
 
-
 class ImageFactory(MediaItemFactory):
     """Factory specifically for images."""
 
     file_type = "image"
     mime_type = "image/jpeg"
 
-
 class DocumentFactory(MediaItemFactory):
     """Factory specifically for documents."""
 
     file_type = "document"
     mime_type = "application/pdf"
-
 
 __all__ = ["MediaItemFactory", "ImageFactory", "DocumentFactory"]

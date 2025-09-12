@@ -10,17 +10,12 @@ from django.db.utils import OperationalError, ProgrammingError
 
 from .models import Locale
 
-"""
 Django settings synchronization utilities for i18n locales.
 
 This module provides utilities to keep Django's LANGUAGE_CODE and LANGUAGES
 settings in sync with the database Locale model.
-"""
-
-
 
 logger = logging.getLogger(__name__)
-
 
 class DjangoSettingsSync:
     """Utility class for synchronizing database locales with Django settings."""
@@ -30,12 +25,12 @@ class DjangoSettingsSync:
 
     @classmethod
     def get_active_languages(cls) -> list[tuple[str, str]]:
-        """
+
         Generate LANGUAGES tuple from active database locales.
 
         Returns:
             List of tuples (code, name) for active locales, ordered by sort_order.
-        """
+
         try:
             # Check cache first
             cached_languages = cache.get(f"{cls.CACHE_KEY}_languages")
@@ -45,7 +40,6 @@ class DjangoSettingsSync:
             # Check if database is available and tables exist
             if not cls._database_ready():
                 return [("en", "English")]
-
 
             languages = [
                 (locale.code, locale.name)
@@ -69,12 +63,12 @@ class DjangoSettingsSync:
 
     @classmethod
     def get_default_language(cls) -> str:
-        """
+
         Get LANGUAGE_CODE from default database locale.
 
         Returns:
             Language code of the default locale, or 'en' as fallback.
-        """
+
         try:
             # Check cache first
             cached_default = cache.get(f"{cls.CACHE_KEY}_default")
@@ -84,7 +78,6 @@ class DjangoSettingsSync:
             # Check if database is available and tables exist
             if not cls._database_ready():
                 return "en"
-
 
             default_locale = Locale.objects.filter(
                 is_default=True, is_active=True
@@ -102,12 +95,12 @@ class DjangoSettingsSync:
 
     @classmethod
     def get_locale_settings(cls) -> dict[str, Any]:
-        """
+
         Get all locale-related settings from database.
 
         Returns:
             Dictionary with LANGUAGE_CODE, LANGUAGES, and additional locale info.
-        """
+
         try:
             # Check cache first
             cached_settings = cache.get(f"{cls.CACHE_KEY}_all")
@@ -121,7 +114,6 @@ class DjangoSettingsSync:
                     "RTL_LANGUAGES": [],
                     "LOCALE_CODES": ["en"],
                 }
-
 
             active_locales = Locale.objects.filter(is_active=True).order_by(
                 "sort_order"
@@ -176,7 +168,7 @@ class DjangoSettingsSync:
 
     @classmethod
     def update_settings_file(cls, settings_path: str | None = None) -> bool:
-        """
+
         Update the Django settings file with current database locale settings.
 
         This is an advanced feature that dynamically writes to the settings file.
@@ -187,7 +179,7 @@ class DjangoSettingsSync:
 
         Returns:
             True if successful, False otherwise.
-        """
+
         try:
             if not settings_path:
                 # Try to determine the settings file path
@@ -214,7 +206,6 @@ class DjangoSettingsSync:
                 for path in possible_paths:
                     if path.exists():
                         settings_path = str(path)
-                        break
 
                 if not settings_path:
                     logger.error(f"Could not find settings file: {settings_file}")
@@ -270,12 +261,12 @@ class DjangoSettingsSync:
 
     @classmethod
     def validate_consistency(cls) -> dict[str, Any]:
-        """
+
         Validate consistency between database locales and Django settings.
 
         Returns:
             Dictionary with validation results and recommendations.
-        """
+
         validation_result = {
             "is_consistent": True,
             "issues": [],
@@ -340,12 +331,12 @@ class DjangoSettingsSync:
 
     @classmethod
     def _database_ready(cls) -> bool:
-        """
+
         Check if database is available and i18n tables exist.
 
         Returns:
             True if database and tables are ready, False otherwise.
-        """
+
         try:
             with connection.cursor() as cursor:
                 cursor.execute(
@@ -363,17 +354,14 @@ class DjangoSettingsSync:
         except Exception:
             return False
 
-
 # Convenience functions for use in settings files
 def get_dynamic_language_code() -> str:
     """Get dynamic LANGUAGE_CODE from database."""
     return DjangoSettingsSync.get_default_language()
 
-
 def get_dynamic_languages() -> list[tuple[str, str]]:
     """Get dynamic LANGUAGES from database."""
     return DjangoSettingsSync.get_active_languages()
-
 
 def get_rtl_languages() -> list[str]:
     """Get list of RTL language codes from database."""

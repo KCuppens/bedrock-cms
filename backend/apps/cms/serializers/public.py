@@ -1,20 +1,17 @@
+import re
+
 from rest_framework import serializers
+
 from apps.cms.models import Page
 from apps.cms.seo_utils import generate_seo_links, resolve_seo
-                        import re
-"""
+
 Public-facing serializers optimized for frontend consumption.
 Includes resolved SEO data and minimal field exposure.
-"""
-
-
-
 
 class PublicPageSerializer(serializers.ModelSerializer):
-    """
+
     Optimized serializer for public page consumption.
     Includes resolved SEO and minimal necessary fields for performance.
-    """
 
     resolved_seo = serializers.SerializerMethodField()
     seo_links = serializers.SerializerMethodField()
@@ -89,12 +86,10 @@ class PublicPageSerializer(serializers.ModelSerializer):
         except Exception:
             return {}
 
-
 class PublicPageListSerializer(serializers.ModelSerializer):
-    """
+
     Lightweight serializer for page listings (navigation, search results).
     Excludes heavy fields like blocks and resolved SEO.
-    """
 
     locale_code = serializers.CharField(source="locale.code", read_only=True)
     url = serializers.CharField(source="path", read_only=True)
@@ -142,11 +137,9 @@ class PublicPageListSerializer(serializers.ModelSerializer):
 
         return ""
 
-
 class BlockMetadataSerializer(serializers.Serializer):
-    """
+
     Serializer for block type metadata needed by the frontend.
-    """
 
     type = serializers.CharField()
     component = serializers.CharField()

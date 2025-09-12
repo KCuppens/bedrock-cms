@@ -4,15 +4,14 @@ from functools import wraps
 
 from django.core.cache import cache
 from django.http import HttpRequest
-
 from rest_framework.response import Response
-                from apps.core.cache import cache_manager
 
+from apps.core.cache import cache_manager
 
 def cache_response(
     timeout=300, key_prefix="", vary_on_headers=None, cache_errors=False
 ):
-    """
+
     Enhanced cache decorator for function/method responses.
 
     Args:
@@ -20,7 +19,6 @@ def cache_response(
         key_prefix: Custom prefix for cache keys
         vary_on_headers: List of headers to include in cache key
         cache_errors: Whether to cache error responses
-    """
 
     def decorator(func):
         @wraps(func)
@@ -51,16 +49,14 @@ def cache_response(
 
     return decorator
 
-
 def cache_method_response(timeout=300, vary_on_user=True, vary_on_headers=None):
-    """
+
     Enhanced cache decorator specifically for viewset methods.
 
     Args:
         timeout: Cache timeout in seconds
         vary_on_user: Include user in cache key
         vary_on_headers: List of headers to include in cache key
-    """
 
     def decorator(method):
         @wraps(method)
@@ -118,15 +114,13 @@ def cache_method_response(timeout=300, vary_on_user=True, vary_on_headers=None):
 
     return decorator
 
-
 def cache_page_response(timeout=600, cache_anonymous_only=True):
-    """
+
     Cache decorator for entire page responses.
 
     Args:
         timeout: Cache timeout in seconds
         cache_anonymous_only: Only cache for anonymous users
-    """
 
     def decorator(view_func):
         @wraps(view_func)
@@ -158,15 +152,13 @@ def cache_page_response(timeout=600, cache_anonymous_only=True):
 
     return decorator
 
-
 def invalidate_cache(pattern=None, exact_key=None):
-    """
+
     Decorator to invalidate cache after method execution.
 
     Args:
         pattern: Cache key pattern to invalidate
         exact_key: Exact cache key to invalidate
-    """
 
     def decorator(func):
         @wraps(func)
@@ -187,15 +179,13 @@ def invalidate_cache(pattern=None, exact_key=None):
 
     return decorator
 
-
 def conditional_cache(condition_func, timeout=300):
-    """
+
     Conditionally cache based on a function.
 
     Args:
         condition_func: Function that returns True if should cache
         timeout: Cache timeout in seconds
-    """
 
     def decorator(func):
         @wraps(func)
@@ -229,11 +219,9 @@ def conditional_cache(condition_func, timeout=300):
 
     return decorator
 
-
 def search_cached(timeout=3600):
     """Specific cache decorator for search operations."""
     return cache_response(timeout=timeout, key_prefix="search")
-
 
 def _generate_cache_key(prefix, args=None, kwargs=None, headers=None):
     """Generate a consistent cache key."""
@@ -261,7 +249,6 @@ def _generate_cache_key(prefix, args=None, kwargs=None, headers=None):
             key_parts.append(f"{header}:{kwargs.get(header, '')}")
 
     return ":".join(key_parts)
-
 
 def _is_error_response(response):
     """Check if response is an error."""

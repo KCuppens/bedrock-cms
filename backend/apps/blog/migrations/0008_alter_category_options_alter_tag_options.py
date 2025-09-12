@@ -2,7 +2,6 @@
 
 from django.db import migrations
 
-
 class Migration(migrations.Migration):
     dependencies = [
         ("blog", "0007_add_custom_permissions"),

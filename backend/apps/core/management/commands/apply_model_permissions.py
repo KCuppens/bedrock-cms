@@ -5,14 +5,11 @@ from django.db import transaction
 
 from apps.core.model_permissions import get_all_custom_permissions
 
-"""
 Management command to apply custom permissions to all models.
 
 Usage:
     python manage.py apply_model_permissions
     python manage.py apply_model_permissions --dry-run
-"""
-
 
 class Command(BaseCommand):
     help = "Apply custom permissions to all models"

@@ -12,7 +12,6 @@ from .models import (
     UserActivity,
 )
 
-
 @admin.register(PageView)
 class PageViewAdmin(admin.ModelAdmin):
     """Admin interface for PageView model"""
@@ -88,7 +87,6 @@ class PageViewAdmin(admin.ModelAdmin):
     def get_queryset(self, request):  # noqa: C901
         return super().get_queryset(request).select_related("page", "user")
 
-
 @admin.register(UserActivity)
 class UserActivityAdmin(admin.ModelAdmin):
     """Admin interface for UserActivity model"""
@@ -146,7 +144,6 @@ class UserActivityAdmin(admin.ModelAdmin):
             .prefetch_related("content_object")
         )
 
-
 @admin.register(ContentMetrics)
 class ContentMetricsAdmin(admin.ModelAdmin):
     """Admin interface for ContentMetrics model"""
@@ -201,7 +198,6 @@ class ContentMetricsAdmin(admin.ModelAdmin):
 
     def get_queryset(self, request):  # noqa: C901
         return super().get_queryset(request).select_related("content_type")
-
 
 @admin.register(Assessment)
 class AssessmentAdmin(admin.ModelAdmin):
@@ -265,7 +261,6 @@ class AssessmentAdmin(admin.ModelAdmin):
 
     def get_queryset(self, request):  # noqa: C901
         return super().get_queryset(request).select_related("assigned_to", "created_by")
-
 
 @admin.register(Risk)
 class RiskAdmin(admin.ModelAdmin):
@@ -332,7 +327,6 @@ class RiskAdmin(admin.ModelAdmin):
             .get_queryset(request)
             .select_related("owner", "assigned_to", "assessment")
         )
-
 
 @admin.register(Threat)
 class ThreatAdmin(admin.ModelAdmin):
@@ -411,7 +405,6 @@ class ThreatAdmin(admin.ModelAdmin):
             super().get_queryset(request).select_related("assigned_to", "reported_by")
         )
 
-
 @admin.register(AnalyticsSummary)
 class AnalyticsSummaryAdmin(admin.ModelAdmin):
     """Admin interface for AnalyticsSummary model"""
@@ -464,7 +457,6 @@ class AnalyticsSummaryAdmin(admin.ModelAdmin):
         ("Performance Metrics", {"fields": ("avg_load_time", "uptime_percentage")}),
         ("Metadata", {"fields": ("created_at", "updated_at")}),
     )
-
 
 # Custom admin site configuration
 admin.site.site_header = "Bedrock CMS Analytics"

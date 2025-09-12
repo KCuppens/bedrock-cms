@@ -6,7 +6,6 @@ from apps.cms.seo import SeoSettings
 from apps.files.models import FileUpload
 from apps.i18n.models import Locale
 
-
 class SeoSettingsSerializer(serializers.ModelSerializer):
     """Serializer for SEO settings."""
 

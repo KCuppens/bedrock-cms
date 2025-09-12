@@ -2,7 +2,6 @@ from django.contrib import admin
 
 from .models import Redirect
 
-
 @admin.register(Redirect)
 class RedirectAdmin(admin.ModelAdmin):
     list_display = ["from_path", "to_path", "status", "locale", "created_at"]

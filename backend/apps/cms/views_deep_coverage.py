@@ -1,19 +1,22 @@
 import os
 from datetime import datetime
 from unittest.mock import Mock, patch
+
 import django
-        from apps.cms.views import blocks, pages, registry  # noqa: F401
-            from apps.cms.views.blocks import BlockViewSet  # noqa: F401
-            from apps.cms.views.registry import RegistryViewSet  # noqa: F401
-        from apps.cms.views import permissions  # noqa: F401
-        from apps.cms.views import mixins  # noqa: F401
-        from apps.cms.views import filters  # noqa: F401
-        from apps.cms.views import pagination  # noqa: F401
-"""
+
+from apps.cms.views import (  # noqa: F401
+    blocks,
+    filters,  # noqa: F401
+    mixins,  # noqa: F401
+    pages,
+    pagination,  # noqa: F401
+    permissions,  # noqa: F401
+    registry,
+)
+from apps.cms.views.blocks import BlockViewSet  # noqa: F401
+from apps.cms.views.registry import RegistryViewSet  # noqa: F401
+
 CMS views deep coverage booster - targeting untested view methods.
-"""
-
-
 
 # Configure minimal Django
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "apps.config.settings.base")
@@ -21,8 +24,6 @@ os.environ.setdefault("DJANGO_SETTINGS_MODULE", "apps.config.settings.base")
 try:
     django.setup()
 except Exception:
-    pass
-
 
 def test_cms_views_deep():
     """Deep test of CMS views focusing on uncovered areas."""
@@ -57,7 +58,6 @@ def test_cms_views_deep():
                 try:
                     viewset.get_serializer_class()
                 except Exception:
-                    pass
 
                 # Test permissions
                 try:
@@ -65,7 +65,6 @@ def test_cms_views_deep():
                     for perm in perms:
                         perm.has_permission(viewset.request, viewset)
                 except Exception:
-                    pass
 
             # Test queryset filtering
             with patch("apps.cms.models.Page") as MockPage:
@@ -88,14 +87,12 @@ def test_cms_views_deep():
                 try:
                     viewset.get_queryset()
                 except Exception:
-                    pass
 
                 # Test with draft status
                 viewset.request.query_params = {"status": "draft"}
                 try:
                     viewset.get_queryset()
                 except Exception:
-                    pass
 
             # Test custom actions
             if hasattr(viewset, "publish"):
@@ -105,7 +102,6 @@ def test_cms_views_deep():
                 try:
                     viewset.publish(viewset.request, pk=1)
                 except Exception:
-                    pass
 
             if hasattr(viewset, "unpublish"):
                 mock_page = Mock()
@@ -114,7 +110,6 @@ def test_cms_views_deep():
                 try:
                     viewset.unpublish(viewset.request, pk=1)
                 except Exception:
-                    pass
 
             if hasattr(viewset, "schedule"):
                 viewset.request.data = {
@@ -127,7 +122,6 @@ def test_cms_views_deep():
                 try:
                     viewset.schedule(viewset.request, pk=1)
                 except Exception:
-                    pass
 
             if hasattr(viewset, "duplicate"):
                 mock_page = Mock()
@@ -136,7 +130,6 @@ def test_cms_views_deep():
                 try:
                     viewset.duplicate(viewset.request, pk=1)
                 except Exception:
-                    pass
 
             if hasattr(viewset, "preview"):
                 mock_page = Mock()
@@ -145,7 +138,6 @@ def test_cms_views_deep():
                 try:
                     viewset.preview(viewset.request, pk=1)
                 except Exception:
-                    pass
 
             if hasattr(viewset, "versions"):
                 mock_page = Mock()
@@ -157,7 +149,6 @@ def test_cms_views_deep():
                 try:
                     viewset.versions(viewset.request, pk=1)
                 except Exception:
-                    pass
 
             if hasattr(viewset, "revert"):
                 viewset.request.data = {"version_id": 1}
@@ -167,10 +158,8 @@ def test_cms_views_deep():
                 try:
                     viewset.revert(viewset.request, pk=1)
                 except Exception:
-                    pass
 
         except Exception:
-            pass
 
         # Test BlockViewSet deeply
         try:
@@ -188,7 +177,6 @@ def test_cms_views_deep():
                 try:
                     viewset.get_serializer_class()
                 except Exception:
-                    pass
 
             # Test queryset
             with patch("apps.cms.models.Block") as MockBlock:
@@ -197,7 +185,6 @@ def test_cms_views_deep():
                 try:
                     viewset.get_queryset()
                 except Exception:
-                    pass
 
             # Test custom actions
             if hasattr(viewset, "reorder"):
@@ -207,10 +194,8 @@ def test_cms_views_deep():
                 try:
                     viewset.reorder(viewset.request)
                 except Exception:
-                    pass
 
         except Exception:
-            pass
 
         # Test RegistryViewSet deeply
         try:
@@ -223,20 +208,15 @@ def test_cms_views_deep():
             try:
                 viewset.list(viewset.request)
             except Exception:
-                pass
 
             # Test retrieve action
             try:
                 viewset.retrieve(viewset.request, pk="text-block")
             except Exception:
-                pass
 
         except Exception:
-            pass
 
     except ImportError:
-        pass
-
 
 def test_cms_view_permissions():
     """Test CMS view permission classes."""
@@ -260,7 +240,6 @@ def test_cms_view_permissions():
                     try:
                         perm.has_permission(mock_request, mock_view)
                     except Exception:
-                        pass
 
                     # Test has_object_permission
                     mock_obj = Mock()
@@ -268,14 +247,10 @@ def test_cms_view_permissions():
                     try:
                         perm.has_object_permission(mock_request, mock_view, mock_obj)
                     except Exception:
-                        pass
 
                 except Exception:
-                    pass
 
     except ImportError:
-        pass
-
 
 def test_cms_view_mixins():
     """Test CMS view mixins."""
@@ -298,27 +273,21 @@ def test_cms_view_mixins():
                         try:
                             MixinClass.get_queryset(instance)
                         except Exception:
-                            pass
 
                     if hasattr(MixinClass, "get_serializer_context"):
                         try:
                             MixinClass.get_serializer_context(instance)
                         except Exception:
-                            pass
 
                     if hasattr(MixinClass, "perform_create"):
                         mock_serializer = Mock()
                         try:
                             MixinClass.perform_create(instance, mock_serializer)
                         except Exception:
-                            pass
 
                 except Exception:
-                    pass
 
     except ImportError:
-        pass
-
 
 def test_cms_view_filters():
     """Test CMS view filters and filterset."""
@@ -344,14 +313,10 @@ def test_cms_view_filters():
                                 mock_request, mock_queryset, None
                             )
                         except Exception:
-                            pass
 
                 except Exception:
-                    pass
 
     except ImportError:
-        pass
-
 
 def test_cms_view_pagination():
     """Test CMS view pagination."""
@@ -376,21 +341,16 @@ def test_cms_view_pagination():
                             mock_queryset, mock_request, mock_view
                         )
                     except Exception:
-                        pass
 
                     # Test get_paginated_response
                     mock_data = [{"id": i} for i in range(20)]
                     try:
                         paginator.get_paginated_response(mock_data)
                     except:  # nosec B110 - Coverage booster intentionally ignores errors
-                        pass
 
                 except:  # nosec B110 - Coverage booster intentionally ignores errors
-                    pass
 
     except ImportError:
-        pass
-
 
 # Run all deep coverage tests
 if __name__ == "__main__":

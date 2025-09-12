@@ -1,3 +1,4 @@
+
 """
 Accounts app tests with high coverage and real database operations.
 """
@@ -16,7 +17,6 @@ from apps.accounts.models import UserProfile
 from apps.accounts.serializers import UserProfileSerializer, UserSerializer
 
 User = get_user_model()
-
 
 class AccountsModelTests(TestCase):
     """Comprehensive tests for Accounts models."""
@@ -156,7 +156,6 @@ class AccountsModelTests(TestCase):
             with self.assertRaises(ValidationError):
                 user.clean()
 
-
 class AccountsAuthTests(TestCase):
     """Test authentication functionality."""
 
@@ -232,7 +231,6 @@ class AccountsAuthTests(TestCase):
             inactive_user.is_active = True
             inactive_user.save()
             self.assertTrue(inactive_user.is_active)
-
 
 class AccountsAPITests(APITestCase):
     """Comprehensive API tests for Accounts endpoints."""
@@ -313,7 +311,6 @@ class AccountsAPITests(APITestCase):
             response = self.client.patch(url, profile_data, format="json")
             if response.status_code in [200, 202]:
                 # Profile should be updated
-                pass
 
         except Exception:
             pass  # URL may not exist
@@ -347,7 +344,6 @@ class AccountsAPITests(APITestCase):
                 )
                 if assign_response.status_code in [201, 200]:
                     # Role should be assigned
-                    pass
 
         except Exception:
             pass  # URLs may not exist
@@ -368,7 +364,6 @@ class AccountsAPITests(APITestCase):
                 self.assertTrue(self.user.check_password("newtestpass123"))
         except Exception:
             pass  # URL may not exist
-
 
 class AccountsRBACTests(TestCase):
     """Test Role-Based Access Control functionality."""
@@ -443,7 +438,6 @@ class AccountsRBACTests(TestCase):
         except Exception:
             pass  # Models or functions may not exist
 
-
 class AccountsSerializerTests(TestCase):
     """Test Accounts app serializers."""
 
@@ -485,7 +479,6 @@ class AccountsSerializerTests(TestCase):
                 is_valid = serializer.is_valid()
                 if not is_valid:
                     # May need password or other required fields
-                    pass
 
             # Test invalid data
             # Empty username
@@ -513,7 +506,6 @@ class AccountsSerializerTests(TestCase):
             self.assertEqual(data["phone_number"], "+1234567890")
         except Exception:
             pass  # Profile model or serializer may not exist
-
 
 class AccountsIntegrationTests(TransactionTestCase):
     """Integration tests for Accounts app workflows."""

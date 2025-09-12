@@ -1,37 +1,23 @@
 import logging
+
 from django.core.cache import cache
+from django.core.management.base import BaseCommand
 from django.db.models.signals import post_delete, post_save
 from django.dispatch import receiver
+
+from apps.blog.models import BlogPost
+from apps.cms.models import Page
+from apps.core.cache import cache_manager
 from apps.core.tasks import bulk_warm_cache, warm_cache_async
-        from apps.cms.models import Page
-        from apps.core.cache import cache_manager
-        from apps.i18n.models import Locale
-        from apps.blog.models import BlogPost
-        from apps.core.cache import cache_manager
-        from apps.core.cache import cache_manager
-        from apps.core.cache import cache_manager
-        from apps.i18n.models import Locale
-    from apps.core.cache import cache_manager
-    from apps.core.cache import cache_manager
-    from apps.core.cache import cache_manager
-    from apps.core.cache import cache_manager
-from django.core.management.base import BaseCommand
-        from apps.core.cache import cache_manager
-        from django.core.cache import cache
-"""
+from apps.i18n.models import Locale
+
 Cache warming and invalidation strategies.
-"""
-
-
-
 
 logger = logging.getLogger(__name__)
 
-
 class CacheWarmer:
-    """
+
     Manages cache warming strategies for optimal performance.
-    """
 
     @staticmethod
     def warm_homepage_cache():
@@ -190,7 +176,6 @@ class CacheWarmer:
             bulk_warm_cache.delay(configs)
             logger.info(f"Warming {len(configs)} sitemap caches")
 
-
 # Signal handlers for cache invalidation
 @receiver(post_save, sender="cms.Page")
 def invalidate_page_cache(sender, instance, created, **kwargs):
@@ -218,7 +203,6 @@ def invalidate_page_cache(sender, instance, created, **kwargs):
                 timeout=1800,
             )
 
-
 @receiver(post_delete, sender="cms.Page")
 def invalidate_page_cache_on_delete(sender, instance, **kwargs):
     """Invalidate page cache on delete."""
@@ -226,7 +210,6 @@ def invalidate_page_cache_on_delete(sender, instance, **kwargs):
     if instance.locale and instance.path:
         cache_manager.invalidate_page(locale=instance.locale.code, path=instance.path)
         cache_manager.invalidate_sitemap(instance.locale.code)
-
 
 @receiver(post_save, sender="blog.BlogPost")
 def invalidate_blog_cache(sender, instance, created, **kwargs):
@@ -254,7 +237,6 @@ def invalidate_blog_cache(sender, instance, created, **kwargs):
                 timeout=1800,
             )
 
-
 @receiver(post_delete, sender="blog.BlogPost")
 def invalidate_blog_cache_on_delete(sender, instance, **kwargs):
     """Invalidate blog post cache on delete."""
@@ -264,9 +246,7 @@ def invalidate_blog_cache_on_delete(sender, instance, **kwargs):
             locale=instance.locale.code, slug=instance.slug
         )
 
-
 # Management command for cache warming
-
 
 class Command(BaseCommand):
     """Management command for cache operations."""
@@ -335,7 +315,6 @@ class Command(BaseCommand):
         self.stdout.write(f"  Hit Rate: {stats.get('hit_rate', 0):.2%}")
 
         # Show slow endpoints
-
 
         self.stdout.write("\nSlow Endpoints:")
         # This is a simplified example - in production you'd query Redis directly

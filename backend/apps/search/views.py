@@ -3,28 +3,33 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAdminUser
 from rest_framework.response import Response
 from rest_framework.throttling import AnonRateThrottle, UserRateThrottle
+
 from apps.core.decorators import cache_response
+
 from .models import SearchIndex, SearchQuery, SearchSuggestion
 from .serializers import (
-from .services import search_service
-"""
-Search API views.
-
-Provides REST API endpoints for search functionality.
-"""
-
-
-
+    API,
+    REST,
     AutocompleteSerializer,
     BulkIndexSerializer,
+    Provides,
+    Search,
     SearchAnalyticsSerializer,
     SearchIndexSerializer,
     SearchQueryLogSerializer,
     SearchRequestSerializer,
     SearchResponseSerializer,
     SearchSuggestionSerializer,
-)
 
+    .services,
+    endpoints,
+
+    # functionality
+
+    search,
+    search_service,
+    # views
+)
 
 class SearchThrottle(UserRateThrottle):
     """Custom throttle for search requests."""
@@ -32,13 +37,11 @@ class SearchThrottle(UserRateThrottle):
     scope = "search"
     rate = "100/hour"
 
-
 class SearchAPIView(generics.GenericAPIView):
-    """
+
     Main search endpoint.
 
     Performs full-text search across all registered content types.
-    """
 
     serializer_class = SearchRequestSerializer
     permission_classes = []  # Public endpoint
@@ -75,14 +78,13 @@ class SearchAPIView(generics.GenericAPIView):
 
         return Response(response_serializer.data)
 
-
 @api_view(["GET"])
 @permission_classes([])
 @cache_response(timeout=3600)  # Cache for 1 hour
 def autocomplete_view(request):  # noqa: C901
-    """
+
     Get search suggestions for autocomplete.
-    """
+
     serializer = AutocompleteSerializer(data=request.GET)
     serializer.is_valid(raise_exception=True)
 
@@ -93,11 +95,9 @@ def autocomplete_view(request):  # noqa: C901
 
     return Response({"query": query, "suggestions": suggestions})
 
-
 class SearchSuggestionListCreateView(generics.ListCreateAPIView):
-    """
+
     List and create search suggestions (admin only).
-    """
 
     queryset = SearchSuggestion.objects.select_related("created_by").all()
     serializer_class = SearchSuggestionSerializer
@@ -105,24 +105,21 @@ class SearchSuggestionListCreateView(generics.ListCreateAPIView):
     filterset_fields = ["is_active", "is_promoted"]
     ordering = ["-search_count", "suggestion_text"]
 
-
 class SearchSuggestionDetailView(generics.RetrieveUpdateDestroyAPIView):
-    """
+
     Retrieve, update, or delete a search suggestion (admin only).
-    """
 
     queryset = SearchSuggestion.objects.select_related("created_by").all()
     serializer_class = SearchSuggestionSerializer
     permission_classes = [IsAdminUser]
 
-
 @api_view(["GET"])
 @permission_classes([IsAdminUser])
 @cache_response(timeout=1800)  # Cache for 30 minutes
 def search_analytics_view(request):  # noqa: C901
-    """
+
     Get search analytics (admin only).
-    """
+
     days = int(request.GET.get("days", 30))
     analytics = search_service.get_search_analytics(days)
 
@@ -131,11 +128,9 @@ def search_analytics_view(request):  # noqa: C901
 
     return Response(serializer.data)
 
-
 class SearchIndexListView(generics.ListAPIView):
-    """
+
     List search index entries (admin only).
-    """
 
     queryset = SearchIndex.objects.select_related("content_type").all()
     serializer_class = SearchIndexSerializer
@@ -148,11 +143,9 @@ class SearchIndexListView(generics.ListAPIView):
     ]
     ordering = ["-indexed_at"]
 
-
 class SearchQueryLogListView(generics.ListAPIView):
-    """
+
     List search query logs (admin only).
-    """
 
     queryset = SearchQuery.objects.select_related("user").all()
     serializer_class = SearchQueryLogSerializer
@@ -160,13 +153,12 @@ class SearchQueryLogListView(generics.ListAPIView):
     filterset_fields = ["user", "result_count"]
     ordering = ["-created_at"]
 
-
 @api_view(["POST"])
 @permission_classes([IsAdminUser])
 def bulk_index_view(request):  # noqa: C901
-    """
+
     Trigger bulk indexing of content (admin only).
-    """
+
     serializer = BulkIndexSerializer(data=request.data)
     serializer.is_valid(raise_exception=True)
 
@@ -189,13 +181,12 @@ def bulk_index_view(request):  # noqa: C901
             {"success": False, "error": str(e)}, status=status.HTTP_400_BAD_REQUEST
         )
 
-
 @api_view(["GET"])
 @permission_classes([])
 def search_categories_view(request):  # noqa: C901
-    """
+
     Get available search categories.
-    """
+
     categories = (
         SearchIndex.objects.values_list("search_category", flat=True)
         .distinct()

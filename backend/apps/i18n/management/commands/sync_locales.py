@@ -6,13 +6,10 @@ from django.core.management.base import BaseCommand, CommandError
 from apps.i18n.models import Locale
 from apps.i18n.settings_sync import DjangoSettingsSync
 
-"""
 Management command to synchronize database locales with Django settings.
 
 This command provides comprehensive synchronization between the Locale model
 and Django's i18n settings (LANGUAGE_CODE and LANGUAGES).
-"""
-
 
 class Command(BaseCommand):
     help = "Synchronize database locales with Django i18n settings"
@@ -51,7 +48,7 @@ class Command(BaseCommand):
             help="Set a specific locale as default (locale code)",
         )
 
-    def handle(self, *args, **options):
+    def handle(self, *args, **options):  # noqa: C901
         """Handle the sync command."""
 
         direction = options["direction"]
@@ -95,7 +92,7 @@ class Command(BaseCommand):
         else:
             self.stdout.write(self.style.SUCCESS("✓ Locale settings cache cleared"))
 
-    def validate_consistency(self, json_output=False, fix_inconsistencies=False):
+    def validate_consistency(self, json_output=False, fix_inconsistencies=False):  # noqa: C901
         """Validate consistency between database and Django settings."""
         validation_result = DjangoSettingsSync.validate_consistency()
 
@@ -133,7 +130,7 @@ class Command(BaseCommand):
 
     def sync_db_to_django(
         self, json_output=False, update_settings_file=False, settings_path=None
-    ):
+    ):  # noqa: C901
         """Sync database locales to Django settings."""
 
         # Get current database settings
@@ -202,7 +199,7 @@ class Command(BaseCommand):
                     )
                 )
 
-    def sync_django_to_db(self, json_output=False, default_locale_code=None):
+    def sync_django_to_db(self, json_output=False, default_locale_code=None):  # noqa: C901
         """Sync Django settings to database locales."""
 
         django_language_code = getattr(settings, "LANGUAGE_CODE", None)

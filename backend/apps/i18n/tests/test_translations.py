@@ -1,29 +1,29 @@
 import json
+
 from django.contrib.auth import get_user_model
 from django.test import TestCase, TransactionTestCase
+
 from rest_framework import status
+
 from apps.cms.models import Page
 from apps.i18n.models import Locale, TranslationUnit, UiMessage, UiMessageTranslation
 from apps.i18n.translation import (
-        from django.contrib.auth import get_user_model
-        from django.contrib.auth import get_user_model
-        from django.contrib.auth import get_user_model
-        from rest_framework.test import APIClient
-        from django.contrib.auth import get_user_model
-"""
-Tests for translation functionality.
-"""
-
-
-
-
+    APIClient,
+    Tests,
     TranslationManager,
     TranslationResolver,
     UiMessageResolver,
+
+    django.contrib.auth,
+
+    # functionality
+    get_user_model,
+
+    rest_framework.test,
+    translation,
 )
 
 User = get_user_model()
-
 
 class LocaleModelTests(TestCase):
     """Test Locale model functionality."""
@@ -83,7 +83,6 @@ class LocaleModelTests(TestCase):
         self.locale_en.refresh_from_db()
         self.assertFalse(self.locale_en.is_default)
         self.assertTrue(locale_de.is_default)
-
 
 class TranslationUnitModelTests(TestCase):
     """Test TranslationUnit model functionality."""
@@ -199,7 +198,6 @@ class TranslationUnitModelTests(TestCase):
         unit.save()
         self.assertTrue(unit.is_complete)
 
-
 class TranslationManagerTests(TestCase):
     """Test TranslationManager functionality."""
 
@@ -271,7 +269,6 @@ class TranslationManagerTests(TestCase):
         self.assertEqual(
             resolver.target_locale, self.locale_en
         )  # Falls back to default
-
 
 class TranslationResolverTests(TestCase):
     """Test TranslationResolver functionality."""
@@ -352,7 +349,6 @@ class TranslationResolverTests(TestCase):
         self.assertTrue(field_status["has_translation"])
         self.assertEqual(field_status["status"], "missing")
         self.assertEqual(field_status["target_locale"], "es")
-
 
 class UiMessageTests(TestCase):
     """Test UI message functionality."""
@@ -454,7 +450,6 @@ class UiMessageTests(TestCase):
         self.assertIn("auth.login.button", bundle)
         self.assertEqual(bundle["auth.login.title"], "Iniciar Sesión")
         self.assertEqual(bundle["auth.login.button"], "Entrar")
-
 
 class TranslationAPITests(TransactionTestCase):
     """Test translation API endpoints."""
@@ -631,7 +626,6 @@ class TranslationAPITests(TransactionTestCase):
         self.unit.refresh_from_db()
         self.assertEqual(self.unit.target_text, "Página de Prueba")
         self.assertEqual(self.unit.status, "draft")
-
 
 class TranslationSignalTests(TestCase):
     """Test translation signal handlers."""

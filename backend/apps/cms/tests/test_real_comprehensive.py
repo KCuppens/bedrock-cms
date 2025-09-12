@@ -8,15 +8,11 @@ from rest_framework.test import APIClient, APITestCase
 from apps.cms.models import Page, Redirect
 from apps.i18n.models import Locale
 
-"""
 Real comprehensive CMS tests using actual models and targeting high coverage.
-"""
-
 
 # Import actual models
 
 User = get_user_model()
-
 
 class CMSRealModelTests(TestCase):
     """Comprehensive tests for actual CMS models."""
@@ -175,7 +171,6 @@ class CMSRealModelTests(TestCase):
         # UUID should be a valid UUID4
         self.assertEqual(len(str(page.group_id)), 36)
 
-
 class CMSRealModelMethodTests(TestCase):
     """Test CMS model methods and properties."""
 
@@ -249,7 +244,6 @@ class CMSRealModelMethodTests(TestCase):
             entries = page.audit_entries.all()
             self.assertIsInstance(entries.count(), int)
 
-
 class CMSRealAPITests(APITestCase):
     """Test CMS API endpoints with real models."""
 
@@ -307,7 +301,6 @@ class CMSRealAPITests(APITestCase):
         redirect.save()
         redirect.refresh_from_db()
         self.assertEqual(redirect.status_code, 302)
-
 
 class CMSRealIntegrationTests(TransactionTestCase):
     """Integration tests with real CMS models."""

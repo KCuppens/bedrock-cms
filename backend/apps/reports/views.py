@@ -1,7 +1,8 @@
-from celery import current_app
-from celery.result import AsyncResult
 from django.db.models import Count, Q
 from django.utils import timezone
+
+from celery import current_app
+from celery.result import AsyncResult
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAdminUser, IsAuthenticated
@@ -12,20 +13,17 @@ from apps.cms.tasks import check_internal_links, check_single_page_links
 from apps.i18n.models import Locale, TranslationUnit
 from apps.i18n.tasks import seed_locale_translation_units
 
-"""
 Reports API views for CMS background jobs and analytics.
-"""
-
 
 @api_view(["GET", "POST"])
 @permission_classes([IsAuthenticated, IsAdminUser])
 def broken_links_report(request):  # noqa: C901
-    """
+
     Get broken links report or trigger a new link check.
 
     GET /api/v1/reports/broken-links/ - Get cached results
     POST /api/v1/reports/broken-links/ - Trigger new check
-    """
+
     if request.method == "GET":
         # Get query parameters
         page_id = request.query_params.get("page_id")
@@ -82,15 +80,14 @@ def broken_links_report(request):  # noqa: C901
             }
         )
 
-
 @api_view(["GET"])
 @permission_classes([IsAuthenticated, IsAdminUser])
 def translation_digest(request):  # noqa: C901
-    """
+
     Get missing translations digest per locale.
 
     GET /api/v1/reports/translation-digest/
-    """
+
     # Get all active locales
     locales = Locale.objects.filter(is_active=True).order_by("code")
 
@@ -159,15 +156,14 @@ def translation_digest(request):  # noqa: C901
 
     return Response(digest)
 
-
 @api_view(["GET"])
 @permission_classes([IsAuthenticated, IsAdminUser])
 def task_status(request, task_id):  # noqa: C901
-    """
+
     Get status of a Celery task.
 
     GET /api/v1/reports/task-status/{task_id}/
-    """
+
     try:
         result = AsyncResult(task_id, app=current_app)
 
@@ -197,16 +193,15 @@ def task_status(request, task_id):  # noqa: C901
             status=status.HTTP_400_BAD_REQUEST,
         )
 
-
 @api_view(["POST"])
 @permission_classes([IsAuthenticated, IsAdminUser])
 def seed_locale(request):  # noqa: C901
-    """
+
     Trigger locale seeding task.
 
     POST /api/v1/reports/seed-locale/
     Body: {"locale_code": "es", "force_reseed": false}
-    """
+
     locale_code = request.data.get("locale_code")
     force_reseed = request.data.get("force_reseed", False)
 
@@ -243,15 +238,14 @@ def seed_locale(request):  # noqa: C901
         }
     )
 
-
 @api_view(["GET"])
 @permission_classes([IsAuthenticated, IsAdminUser])
 def reports_overview(request):  # noqa: C901
-    """
+
     Get overview of available reports and recent activity.
 
     GET /api/v1/reports/
-    """
+
     # Get some basic statistics
     total_pages = Page.objects.filter(status="published").count()
     total_locales = Locale.objects.filter(is_active=True).count()

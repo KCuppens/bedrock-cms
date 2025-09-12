@@ -1,30 +1,37 @@
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
 from django.test import TestCase
+
 from rest_framework import status
 from rest_framework.test import APITestCase
+
 from apps.cms.models import Page
 from apps.i18n.models import Locale
 from apps.registry.config import ContentConfig
 from apps.registry.registry import (
-from apps.registry.serializers import ContentSerializerFactory, get_serializer_for_model
-from apps.registry.viewsets import ContentViewSetFactory, get_viewset_for_model
-        from apps.registry.registry import register_core_models
-        from django.contrib.auth import get_user_model
-        from apps.registry.registry import register_core_models
-"""
-Tests for content registry functionality.
-"""
-
-
-
     ContentRegistry,
     ContentRegistryError,
+    ContentSerializerFactory,
+    ContentViewSetFactory,
+    Tests,
+
+    apps.registry.registry,
+    apps.registry.serializers,
+    apps.registry.viewsets,
+    content,
     content_registry,
+    django.contrib.auth,
+
+    # functionality
+    get_serializer_for_model,
+    get_user_model,
+    get_viewset_for_model,
+
+    register_core_models,
+    registry,
 )
 
 User = get_user_model()
-
 
 class ContentConfigTests(TestCase):
     """Test ContentConfig functionality."""
@@ -121,7 +128,6 @@ class ContentConfigTests(TestCase):
         self.assertIn("supports_localization", data)
         self.assertEqual(data["model_label"], "cms.page")
         self.assertEqual(data["kind"], "collection")
-
 
 class ContentRegistryTests(TestCase):
     """Test ContentRegistry functionality."""
@@ -240,7 +246,6 @@ class ContentRegistryTests(TestCase):
         self.assertIn("cms.page", export_data)
         self.assertIn("registry_version", export_data)
 
-
 class ContentSerializerFactoryTests(TestCase):
     """Test ContentSerializerFactory functionality."""
 
@@ -291,7 +296,6 @@ class ContentSerializerFactoryTests(TestCase):
 
         # Should have URL field for collections with slug
         self.assertIn("url", serializer.fields)
-
 
 class ContentViewSetFactoryTests(TestCase):
     """Test ContentViewSetFactory functionality."""
@@ -345,7 +349,6 @@ class ContentViewSetFactoryTests(TestCase):
         # Should have by_slug method
         self.assertTrue(hasattr(viewset_class, "by_slug"))
 
-
 class RegistryAPITests(APITestCase):
     """Test registry API endpoints."""
 
@@ -368,7 +371,6 @@ class RegistryAPITests(APITestCase):
             register_core_models()
         except Exception:
             # If it fails because already registered, that's fine
-            pass
 
     def tearDown(self):
         """Clean up after test."""
@@ -416,7 +418,6 @@ class RegistryAPITests(APITestCase):
         # Response should be JSON string
         self.assertEqual(response["Content-Type"], "application/json")
 
-
 class RegistryIntegrationTests(TestCase):
     """Integration tests for the entire registry system."""
 
@@ -436,7 +437,6 @@ class RegistryIntegrationTests(TestCase):
             register_core_models()
         except Exception:
             # If it fails because already registered, that's fine
-            pass
 
     def test_end_to_end_registration(self):
         """Test complete registration workflow."""

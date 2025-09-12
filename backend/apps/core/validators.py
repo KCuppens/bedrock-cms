@@ -3,21 +3,17 @@ import json
 from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
 
-"""
 Custom validators for the core app.
-"""
-
 
 def validate_json_size(value, max_size_mb=1):
-    """
+
     Validate that JSON field size doesn't exceed the limit.
 
     Args:
         value: The JSON value to validate
         max_size_mb: Maximum size in megabytes (default 1MB)
-    """
+
     if value is None:
-        return
 
     # Convert to JSON string to measure size
     try:
@@ -40,15 +36,13 @@ def validate_json_size(value, max_size_mb=1):
             code="invalid_json",
         )
 
-
 def validate_json_structure(value, max_depth=10):
-    """
+
     Validate JSON structure to prevent deeply nested objects.
 
     Args:
         value: The JSON value to validate
         max_depth: Maximum nesting depth allowed
-    """
 
     def check_depth(obj, current_depth=0):
         if current_depth > max_depth:
@@ -68,11 +62,9 @@ def validate_json_structure(value, max_depth=10):
     if value is not None:
         check_depth(value)
 
-
 class JSONSizeValidator:
-    """
+
     Validator class for JSON field size limits.
-    """
 
     def __init__(self, max_size_mb=1):
         self.max_size_mb = max_size_mb

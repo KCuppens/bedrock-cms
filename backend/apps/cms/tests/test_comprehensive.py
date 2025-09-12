@@ -20,7 +20,6 @@ from apps.i18n.models import Locale
 
 User = get_user_model()
 
-
 class CMSModelTests(TestCase):
     """Comprehensive tests for CMS models."""
 
@@ -152,7 +151,6 @@ class CMSModelTests(TestCase):
             count = self.category.get_page_count()
             self.assertEqual(count, 2)
 
-
 class CMSVersioningTests(TestCase):
     """Test CMS versioning functionality."""
 
@@ -190,7 +188,7 @@ class CMSVersioningTests(TestCase):
         """Test version manager functionality."""
         try:
             # VersionManager doesn't exist, skip this test
-            pass
+
         except Exception:
             pass  # Version manager may not exist
 
@@ -215,7 +213,6 @@ class CMSVersioningTests(TestCase):
             self.assertEqual(self.page.content, "Original content")
         except Exception:
             pass  # Revert function may not exist
-
 
 class CMSAPITests(APITestCase):
     """Comprehensive API tests for CMS endpoints."""
@@ -319,7 +316,6 @@ class CMSAPITests(APITestCase):
         except Exception:
             pass  # URL may not exist
 
-
 class CMSSerializerTests(TestCase):
     """Test CMS serializers."""
 
@@ -366,7 +362,6 @@ class CMSSerializerTests(TestCase):
 
         self.assertEqual(data["title"], "Test Page")
         self.assertIn("author", data)
-
 
 class CMSTaskTests(TestCase):
     """Test CMS background tasks."""
@@ -424,7 +419,6 @@ class CMSTaskTests(TestCase):
         except AttributeError:
             pass  # Task may not exist
 
-
 class CMSSecurityTests(TestCase):
     """Test CMS security features."""
 
@@ -445,7 +439,6 @@ class CMSSecurityTests(TestCase):
 
         try:
             # PageSecurityManager doesn't exist, skip this test
-            pass
 
             # Test user permissions
             can_edit = security_manager.can_edit(self.user, page)
@@ -461,7 +454,6 @@ class CMSSecurityTests(TestCase):
 
         except (AttributeError, NameError):
             pass  # Security manager may not exist
-
 
 class CMSSEOTests(TestCase):
     """Test CMS SEO functionality."""
@@ -483,7 +475,6 @@ class CMSSEOTests(TestCase):
 
         try:
             # SEOManager doesn't exist, skip this test
-            pass
 
             # Test meta description generation
             meta_description = seo_manager.generate_meta_description(page)
@@ -510,7 +501,6 @@ class CMSSEOTests(TestCase):
         if hasattr(page, "meta_keywords"):
             self.assertEqual(page.meta_keywords, "test, seo, keywords")
 
-
 class CMSIntegrationTests(TransactionTestCase):
     """Integration tests for CMS workflows."""
 
@@ -536,7 +526,6 @@ class CMSIntegrationTests(TransactionTestCase):
             version = create_page_version(page, self.user)
             self.assertIsNotNone(version)
         except Exception:
-            pass
 
         # Publish page
         if hasattr(page, "publish"):
@@ -604,7 +593,6 @@ class CMSIntegrationTests(TransactionTestCase):
         # Test locale relationships
         if hasattr(en_page, "translations"):
             # Add translation relationship if it exists
-            pass
 
         self.assertNotEqual(en_page.locale, es_page.locale)
         self.assertEqual(en_page.locale.code, "en")

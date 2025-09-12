@@ -5,10 +5,7 @@ from django.utils.html import format_html
 
 from .models import BlogPost, BlogSettings, Category, Tag
 
-"""
 Blog admin interface.
-"""
-
 
 @admin.register(Category)
 class CategoryAdmin(admin.ModelAdmin):
@@ -51,7 +48,6 @@ class CategoryAdmin(admin.ModelAdmin):
 
     post_count.short_description = "Published Posts"
 
-
 @admin.register(Tag)
 class TagAdmin(admin.ModelAdmin):
     """Admin for blog tags."""
@@ -76,13 +72,11 @@ class TagAdmin(admin.ModelAdmin):
 
     post_count.short_description = "Published Posts"
 
-
 class TagInline(admin.TabularInline):
     """Inline admin for post tags."""
 
     model = BlogPost.tags.through
     extra = 1
-
 
 @admin.register(BlogPost)
 class BlogPostAdmin(admin.ModelAdmin):
@@ -231,7 +225,6 @@ class BlogPostAdmin(admin.ModelAdmin):
         self.message_user(request, f"{updated} posts had featured status removed.")
 
     remove_featured.short_description = "Remove featured status from selected posts"
-
 
 @admin.register(BlogSettings)
 class BlogSettingsAdmin(admin.ModelAdmin):

@@ -1,23 +1,21 @@
+import logging
+
 from django.urls import include, path
+
 from rest_framework.routers import DefaultRouter
+
 from .registry import content_registry
 from .viewsets import RegistryViewSet, get_viewset_for_config
-            import logging
-"""
+
 Dynamic URL routing for registered content models.
-"""
-
-
-
-
 
 def create_dynamic_router():
-    """
+
     Create a dynamic router with routes for all registered content models.
 
     Returns:
         DefaultRouter with all registered content model routes
-    """
+
     router = DefaultRouter()
 
     # Add registry management endpoints
@@ -41,7 +39,6 @@ def create_dynamic_router():
             logger.error("Failed to register routes for %s: {e}", config.model_label)
 
     return router
-
 
 # Create the dynamic router
 dynamic_router = create_dynamic_router()

@@ -1,32 +1,26 @@
 import json
 from typing import Any
+
 from django.core.exceptions import ValidationError
 from django.db import models
+
+from apps.blog.models import BlogPost, Category, Tag
+from apps.cms.models import Page
+
 from .config import ContentConfig
-        from apps.cms.models import Page
-        from apps.blog.models import BlogPost, Category, Tag
-"""
+
 Global content registry for CMS content types.
-"""
 
 # mypy: ignore-errors
-
-
-
-
 
 class ContentRegistryError(Exception):
     """Exception raised for content registry errors."""
 
-    pass
-
-
 class ContentRegistry:
-    """
+
     Global registry for CMS content types.
 
     Manages registration, validation, and access to content configurations.
-    """
 
     def __init__(self):
         self._configs: dict[str, ContentConfig] = {}
@@ -34,7 +28,7 @@ class ContentRegistry:
         self._validated = False
 
     def register(self, config: ContentConfig):
-        """
+
         Register a content configuration.
 
         Args:
@@ -42,7 +36,7 @@ class ContentRegistry:
 
         Raises:
             ContentRegistryError: If config is invalid or already registered
-        """
+
         model_label = config.model_label
 
         if model_label in self._configs:
@@ -56,12 +50,12 @@ class ContentRegistry:
         self._validated = False
 
     def unregister(self, model_label: str):
-        """
+
         Unregister a content configuration.
 
         Args:
             model_label: Model label to unregister
-        """
+
         if model_label in self._configs:
             config = self._configs[model_label]
             del self._configs[model_label]
@@ -69,7 +63,7 @@ class ContentRegistry:
             self._validated = False
 
     def get_config(self, model_label: str) -> ContentConfig | None:
-        """
+
         Get a content configuration by model label.
 
         Args:
@@ -77,11 +71,11 @@ class ContentRegistry:
 
         Returns:
             ContentConfig instance or None if not found
-        """
+
         return self._configs.get(model_label)
 
     def get_config_by_model(self, model: type[models.Model]) -> ContentConfig | None:
-        """
+
         Get a content configuration by model class.
 
         Args:
@@ -89,7 +83,7 @@ class ContentRegistry:
 
         Returns:
             ContentConfig instance or None if not found
-        """
+
         return self._by_model.get(model)
 
     def get_all_configs(self) -> list[ContentConfig]:
@@ -97,7 +91,7 @@ class ContentRegistry:
         return list(self._configs.values())
 
     def get_configs_by_kind(self, kind: str) -> list[ContentConfig]:
-        """
+
         Get all configurations of a specific kind.
 
         Args:
@@ -105,7 +99,7 @@ class ContentRegistry:
 
         Returns:
             List of ContentConfig instances
-        """
+
         return [config for config in self._configs.values() if config.kind == kind]
 
     def get_model_labels(self) -> list[str]:
@@ -121,14 +115,13 @@ class ContentRegistry:
         return model in self._by_model
 
     def validate_all(self):
-        """
+
         Validate all registered configurations.
 
         Raises:
             ContentRegistryError: If any configuration is invalid
-        """
+
         if self._validated:
-            return
 
         errors = []
 
@@ -146,12 +139,12 @@ class ContentRegistry:
         self._validated = True
 
     def get_registry_summary(self) -> dict[str, Any]:
-        """
+
         Get a summary of all registered content types.
 
         Returns:
             Dictionary with registry statistics and configurations
-        """
+
         configs_by_kind = {}
         for kind in ["collection", "singleton", "snippet"]:
             configs_by_kind[kind] = [
@@ -167,12 +160,12 @@ class ContentRegistry:
         }
 
     def export_configs(self) -> str:
-        """
+
         Export all configurations as JSON.
 
         Returns:
             JSON string of all configurations
-        """
+
         export_data = {
             "registry_version": "1.0",
             "configs": {
@@ -188,25 +181,22 @@ class ContentRegistry:
         self._by_model.clear()
         self._validated = False
 
-
 # Global registry instance
 content_registry = ContentRegistry()
 
-
 def register(config: ContentConfig):
-    """
+
     Register a content configuration with the global registry.
 
     Args:
         config: ContentConfig instance to register
-    """
-    content_registry.register(config)
 
+    content_registry.register(config)
 
 def register_model(
     model: type[models.Model], kind: str, name: str = None, **kwargs
 ) -> ContentConfig:
-    """
+
     Convenience function to register a model with the content registry.
 
     Args:
@@ -217,7 +207,7 @@ def register_model(
 
     Returns:
         The created ContentConfig instance
-    """
+
     if name is None:
         name = model._meta.verbose_name
 
@@ -226,31 +216,25 @@ def register_model(
     register(config)
     return config
 
-
 def get_config(model_label: str) -> ContentConfig | None:
     """Get a content configuration by model label."""
     return content_registry.get_config(model_label)
-
 
 def get_config_by_model(model: type[models.Model]) -> ContentConfig | None:
     """Get a content configuration by model class."""
     return content_registry.get_config_by_model(model)
 
-
 def get_all_configs() -> list[ContentConfig]:
     """Get all registered configurations."""
     return content_registry.get_all_configs()
-
 
 def is_registered(model_label: str) -> bool:
     """Check if a model label is registered."""
     return content_registry.is_registered(model_label)
 
-
 def validate_registry():
     """Validate all registered configurations."""
     content_registry.validate_all()
-
 
 # Auto-register some core CMS models
 def register_core_models():
@@ -274,7 +258,6 @@ def register_core_models():
 
     except ImportError:
         # CMS models not available yet
-        pass
 
     # Register blog models
     try:
@@ -327,4 +310,3 @@ def register_core_models():
 
     except ImportError:
         # Blog models not available yet
-        pass

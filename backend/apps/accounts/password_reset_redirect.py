@@ -1,19 +1,15 @@
 from django.conf import settings
+from django.contrib.auth import get_user_model
 from django.shortcuts import redirect
 from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode
 from django.views.decorators.http import require_GET
-from django.contrib.auth import get_user_model
 
-"""
 Handle password reset URL redirects from Allauth to frontend.
-"""
-
-
 
 @require_GET
 def password_reset_redirect(request, uidb36, key):
-    """
+
     Redirect Allauth password reset URLs to frontend.
 
     Allauth sends URLs like:
@@ -21,7 +17,6 @@ def password_reset_redirect(request, uidb36, key):
 
     We need to redirect to:
     /password-reset/{uid}/{token}
-    """
 
     User = get_user_model()
 
@@ -46,17 +41,16 @@ def password_reset_redirect(request, uidb36, key):
     # Redirect to frontend with the UID and token
     return redirect(f"{frontend_url}/password-reset/{uid}/{key}")
 
-
 @require_GET
 def email_verification_redirect(request, key):
-    """
+
     Redirect email verification URLs to frontend.
 
     Allauth sends URLs like:
     /accounts/confirm-email/{key}/
 
     We can handle this by redirecting to a frontend page.
-    """
+
     frontend_url = getattr(settings, "FRONTEND_URL", "http://localhost:8082")
 
     # For now, just redirect to sign-in with a message

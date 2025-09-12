@@ -21,7 +21,6 @@ from django.utils import timezone
 if TYPE_CHECKING:
     from django.contrib.auth.models import AbstractUser as User
 
-
 class Locale(models.Model):
     """Locale model for multi-language support."""
 
@@ -127,20 +126,17 @@ class Locale(models.Model):
 
         super().save(*args, **kwargs)
 
-
 # Define User type properly for mypy
 if TYPE_CHECKING:
     pass  # User is imported in the TYPE_CHECKING block above
 else:
     User = get_user_model()
 
-
 class TranslationUnit(models.Model):
-    """
+
     Track translatable content for any model field.
 
     Supports content translation workflow with status tracking and fallback resolution.
-    """
 
     STATUS_CHOICES = [
         ("missing", "Missing"),
@@ -237,7 +233,7 @@ class TranslationUnit(models.Model):
         source_text: str,
         user: User | None = None,
     ) -> "TranslationUnit":
-        """
+
         Create or update a translation unit.
 
         Args:
@@ -250,7 +246,7 @@ class TranslationUnit(models.Model):
 
         Returns:
             TranslationUnit instance
-        """
+
         content_type = ContentType.objects.get_for_model(obj)
 
         unit, created = cls.objects.get_or_create(
@@ -290,11 +286,9 @@ class TranslationUnit(models.Model):
 
         return qs
 
-
 class UiMessage(models.Model):
-    """
+
     UI messages that need to be translated for the frontend.
-    """
 
     key: CharField = models.CharField(
         max_length=200,
@@ -325,11 +319,9 @@ class UiMessage(models.Model):
     def __str__(self):  # noqa: C901
         return f"{self.namespace}.{self.key}"
 
-
 class UiMessageTranslation(models.Model):
-    """
+
     Translations for UI messages.
-    """
 
     STATUS_CHOICES = [
         ("missing", "Missing"),
@@ -371,11 +363,9 @@ class UiMessageTranslation(models.Model):
     def __str__(self):  # noqa: C901
         return f"{self.message.key} ({self.locale.code}): {self.value}"
 
-
 class TranslationGlossary(models.Model):
-    """
+
     Translation glossary for consistent terminology across translations.
-    """
 
     term: CharField = models.CharField(
         max_length=200, help_text="Original term or phrase"
@@ -438,11 +428,9 @@ class TranslationGlossary(models.Model):
     def __str__(self):  # noqa: C901
         return f"{self.term} ({self.source_locale.code} → {self.target_locale.code})"
 
-
 class TranslationQueue(models.Model):
-    """
+
     Queue system for managing translation workflow and assignments.
-    """
 
     STATUS_CHOICES = [
         ("pending", "Pending"),
@@ -554,11 +542,9 @@ class TranslationQueue(models.Model):
             self.calculate_word_count()
         super().save(*args, **kwargs)
 
-
 class TranslationHistory(models.Model):
-    """
+
     History tracking for translation changes and status updates.
-    """
 
     ACTION_CHOICES = [
         ("created", "Created"),

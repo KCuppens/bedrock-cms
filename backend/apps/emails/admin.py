@@ -4,7 +4,6 @@ from django.utils.translation import gettext_lazy as _
 
 from .models import EmailMessageLog, EmailTemplate
 
-
 @admin.register(EmailTemplate)
 class EmailTemplateAdmin(admin.ModelAdmin):
     """Admin interface for EmailTemplate"""
@@ -24,7 +23,7 @@ class EmailTemplateAdmin(admin.ModelAdmin):
 
     fieldsets = (
         (
-            None,
+
             {
                 "fields": (
                     "key",
@@ -57,7 +56,6 @@ class EmailTemplateAdmin(admin.ModelAdmin):
             obj.created_by = request.user
         obj.updated_by = request.user
         super().save_model(request, obj, form, change)
-
 
 @admin.register(EmailMessageLog)
 class EmailMessageLogAdmin(admin.ModelAdmin):

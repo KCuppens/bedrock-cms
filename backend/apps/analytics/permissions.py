@@ -1,17 +1,11 @@
 from rest_framework.permissions import BasePermission
 
-"""
-Custom permissions for analytics functionality.
-"""
-
-
+"""Custom permissions for analytics functionality."""
 class AnalyticsViewPermission(BasePermission):
-    """
-    Permission to view analytics data.
 
-    Requires user to be authenticated and have manager or admin role.
-    """
+    """Permission to view analytics data.
 
+    Requires user to be authenticated and have manager or admin role."""
     def has_permission(self, request, view):
         if not request.user.is_authenticated:
             return False
@@ -19,14 +13,11 @@ class AnalyticsViewPermission(BasePermission):
         # Allow managers and admins to view analytics
         return request.user.is_manager() or request.user.is_admin()
 
-
 class AnalyticsEditPermission(BasePermission):
-    """
+
     Permission to edit analytics data (create/update/delete).
 
-    Requires user to be authenticated and have admin role.
-    """
-
+    """Requires user to be authenticated and have admin role."""
     def has_permission(self, request, view):
         if not request.user.is_authenticated:
             return False
@@ -34,14 +25,11 @@ class AnalyticsEditPermission(BasePermission):
         # Only admins can edit analytics data
         return request.user.is_admin()
 
-
 class SecurityAnalyticsPermission(BasePermission):
-    """
-    Permission to view security analytics (threats, risks, assessments).
 
-    Requires user to be authenticated and have appropriate security clearance.
-    """
+    """Permission to view security analytics (threats, risks, assessments).
 
+    Requires user to be authenticated and have appropriate security clearance."""
     def has_permission(self, request, view):
         if not request.user.is_authenticated:
             return False
@@ -60,14 +48,11 @@ class SecurityAnalyticsPermission(BasePermission):
 
         return True
 
-
 class DashboardPermission(BasePermission):
-    """
-    Permission to access analytics dashboard.
 
-    Allows different levels of access based on user role.
-    """
+    """Permission to access analytics dashboard.
 
+    Allows different levels of access based on user role."""
     def has_permission(self, request, view):
         if not request.user.is_authenticated:
             return False
@@ -82,12 +67,11 @@ class DashboardPermission(BasePermission):
         )
 
     def get_dashboard_scope(self, user):
-        """
-        Get dashboard data scope based on user role.
 
+        """Get dashboard data scope based on user role."""
         Returns:
             str: Dashboard scope level ('basic', 'detailed', 'full')
-        """
+
         if user.is_admin():
             return "full"
         elif user.is_manager():
@@ -97,12 +81,9 @@ class DashboardPermission(BasePermission):
         else:
             return None
 
-
 class ContentMetricsPermission(BasePermission):
-    """
-    Permission to view content performance metrics.
-    """
 
+    """Permission to view content performance metrics."""
     def has_permission(self, request, view):
         if not request.user.is_authenticated:
             return False
@@ -129,12 +110,9 @@ class ContentMetricsPermission(BasePermission):
         # For now, allow access to all authenticated users
         return True
 
-
 class ExportPermission(BasePermission):
-    """
-    Permission to export analytics data.
-    """
 
+    """Permission to export analytics data."""
     def has_permission(self, request, view):
         if not request.user.is_authenticated:
             return False

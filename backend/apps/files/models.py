@@ -3,12 +3,6 @@ import uuid
 from django.contrib.auth import get_user_model
 from django.db import models
 from django.db.models import (
-from apps.core.enums import FileType
-from apps.core.mixins import TimestampMixin, UserTrackingMixin
-        from apps.core.utils import format_file_size
-        from django.utils import timezone
-        from .services import FileService
-        from .services import FileService
     BooleanField,
     CharField,
     DateTimeField,
@@ -17,10 +11,14 @@ from apps.core.mixins import TimestampMixin, UserTrackingMixin
     TextField,
     UUIDField,
 )
+from django.utils import timezone
 
+from apps.core.enums import FileType
+from apps.core.mixins import TimestampMixin, UserTrackingMixin
+from apps.core.utils import format_file_size
+from apps.files.services import FileService
 
 User = get_user_model()
-
 
 class FileUpload(TimestampMixin, UserTrackingMixin):
     """File upload model with S3/MinIO storage"""

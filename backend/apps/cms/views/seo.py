@@ -8,11 +8,9 @@ from apps.cms.seo import SeoSettings
 from apps.cms.serializers.seo import SeoSettingsSerializer
 from apps.i18n.models import Locale
 
-
 class SeoSettingsViewSet(viewsets.ModelViewSet):
-    """
+
     ViewSet for managing SEO settings per locale.
-    """
 
     queryset = SeoSettings.objects.select_related("locale", "default_og_asset").all()
     serializer_class = SeoSettingsSerializer
@@ -85,7 +83,6 @@ class SeoSettingsViewSet(viewsets.ModelViewSet):
             serializer = self.get_serializer(instance)
             return Response(serializer.data)
         except Exception:
-            pass
 
         # Try to get by locale code
         locale_code = pk
@@ -252,7 +249,6 @@ class SeoSettingsViewSet(viewsets.ModelViewSet):
             locale_id = update.get("locale") or update.get("locale_id")
             if not locale_id:
                 errors.append({"error": "locale is required for each update"})
-                continue
 
             try:
                 instance, created = SeoSettings.objects.get_or_create(

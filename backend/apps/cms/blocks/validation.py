@@ -1,21 +1,19 @@
 # mypy: ignore-errors
 from typing import Any, Literal
 
+from django.core.exceptions import ValidationError
+from django.db import connection
 from pydantic import BaseModel, Field, ValidationError
 from rest_framework.exceptions import ValidationError as DRFValidationError
 
+from ..models import BlockType
 from ..security import sanitize_blocks
-from django.core.exceptions import ValidationError
-    from django.db import connection
-    from ..models import BlockType
-
 
 class BaseBlockModel(BaseModel):
     """Base model for all block types."""
 
     type: str
     schema_version: int = Field(default=1)
-
 
 class HeroBlockModel(BaseBlockModel):
     """Hero section block."""
@@ -26,13 +24,11 @@ class HeroBlockModel(BaseBlockModel):
     class Config:
         extra = "allow"
 
-
 class RichTextBlockModel(BaseBlockModel):
     """Rich text content block."""
 
     type: Literal["richtext", "rich_text"]  # Accept both
     props: dict[str, Any] = Field(default_factory=lambda: {"content": ""})
-
 
 class ImageBlockModel(BaseBlockModel):
     """Single image block."""
@@ -42,13 +38,11 @@ class ImageBlockModel(BaseBlockModel):
         default_factory=lambda: {"src": "", "alt": "", "caption": ""}
     )
 
-
 class GalleryBlockModel(BaseBlockModel):
     """Image gallery block."""
 
     type: Literal["gallery"]
     props: dict[str, Any] = Field(default_factory=lambda: {"images": []})
-
 
 class ColumnsBlockModel(BaseBlockModel):
     """Multi-column layout block with nested blocks."""
@@ -56,7 +50,6 @@ class ColumnsBlockModel(BaseBlockModel):
     type: Literal["columns"]
     props: dict[str, Any] = Field(default_factory=lambda: {"columns": [], "gap": "md"})
     blocks: list[dict[str, Any]] = Field(default_factory=list)
-
 
 class CTABandBlockModel(BaseBlockModel):
     """Call-to-action band block."""
@@ -72,19 +65,16 @@ class CTABandBlockModel(BaseBlockModel):
         }
     )
 
-
 class FAQBlockModel(BaseBlockModel):
     """Frequently Asked Questions block."""
 
     type: Literal["faq"]
     props: dict[str, Any] = Field(default_factory=lambda: {"items": []})
 
-
 class ContentDetailSource(BaseModel):
     """Source configuration for content_detail block."""
 
     id: int | None = None
-
 
 class ContentDetailOptions(BaseModel):
     """Display options for content_detail block."""
@@ -94,7 +84,6 @@ class ContentDetailOptions(BaseModel):
     show_dates: bool = True
     show_share: bool = True
     show_reading_time: bool = True
-
 
 class ContentDetailBlockModel(BaseBlockModel):
     """Content detail block for rendering registered model details."""
@@ -114,7 +103,6 @@ class ContentDetailBlockModel(BaseBlockModel):
         }
     )
 
-
 class CollectionListBlockModel(BaseBlockModel):
     """Collection list block for displaying lists of content."""
 
@@ -129,7 +117,6 @@ class CollectionListBlockModel(BaseBlockModel):
             "emptyStateText": "",
         }
     )
-
 
 # Registry of all block models
 BLOCK_MODELS: dict[str, type[BaseBlockModel]] = {
@@ -146,19 +133,17 @@ BLOCK_MODELS: dict[str, type[BaseBlockModel]] = {
     "collection_list": CollectionListBlockModel,  # Use proper model
 }
 
-
 def validate_blocks(blocks: list[dict[str, Any]]) -> list[dict[str, Any]]:
-    """
+
     Validate a list of blocks using database-driven block types and Pydantic models.
     Returns validated and sanitized blocks or raises DRF ValidationError.
-    """
+
     if not isinstance(blocks, list):
         raise DRFValidationError(
             {"errors": [{"path": "blocks", "msg": "Must be a list"}]}
         )
 
     # Import here to avoid circular imports
-
 
     # Check if database is available and BlockType table exists
     db_block_types = {}
@@ -173,7 +158,6 @@ def validate_blocks(blocks: list[dict[str, Any]]) -> list[dict[str, Any]]:
             }
     except Exception:
         # Database not ready or table doesn't exist, continue with static validation
-        pass
 
     # First pass: Sanitize HTML content in blocks
     sanitized_blocks = sanitize_blocks(blocks)
@@ -186,14 +170,12 @@ def validate_blocks(blocks: list[dict[str, Any]]) -> list[dict[str, Any]]:
             errors.append(
                 {"path": f"blocks[{index}]", "msg": "Block must be an object"}
             )
-            continue
 
         block_type = block_data.get("type")
         if not block_type:
             errors.append(
                 {"path": f"blocks[{index}].type", "msg": "Block type is required"}
             )
-            continue
 
         # Check if block type exists in database (primary validation)
         if block_type not in db_block_types:
@@ -205,7 +187,6 @@ def validate_blocks(blocks: list[dict[str, Any]]) -> list[dict[str, Any]]:
                         "msg": f"Unknown block type: {block_type}",
                     }
                 )
-                continue
 
         # Validate block using appropriate Pydantic model (if available)
         validated_block_dict = block_data.copy()
@@ -230,7 +211,6 @@ def validate_blocks(blocks: list[dict[str, Any]]) -> list[dict[str, Any]]:
                                     "msg": error["msg"],
                                 }
                             )
-                        continue
 
             except ValidationError as e:
                 # Convert Pydantic errors to DRF format
@@ -239,7 +219,6 @@ def validate_blocks(blocks: list[dict[str, Any]]) -> list[dict[str, Any]]:
                     errors.append(
                         {"path": f"blocks[{index}].{field_path}", "msg": error["msg"]}
                     )
-                continue
 
         # Basic validation for database-only block types
         elif block_type in db_block_types:
@@ -252,7 +231,6 @@ def validate_blocks(blocks: list[dict[str, Any]]) -> list[dict[str, Any]]:
             if db_block_type.schema:
                 # TODO: Add JSON schema validation here if needed
                 # For now, we trust the frontend to send valid data
-                pass
 
         validated_blocks.append(validated_block_dict)
 

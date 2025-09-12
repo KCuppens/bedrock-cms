@@ -1,23 +1,22 @@
 import time
+from datetime import timedelta
 from typing import Any
+
 from django.contrib.contenttypes.models import ContentType
+from django.contrib.postgres.search import SearchQuery, SearchRank, SearchVector
 from django.core.paginator import Paginator
-from django.db.models import F, Q
+from django.db.models import Avg, Count, F, Q
 from django.utils import timezone
-    from django.contrib.postgres.search import SearchQuery, SearchRank, SearchVector
+
 from apps.registry.registry import content_registry
+
 from .models import SearchIndex
 from .models import SearchQuery as SearchQueryLog
 from .models import SearchSuggestion
-        from datetime import timedelta
-        from django.db.models import Avg, Count
-"""
+
 Search services for CMS content.
 
 Provides search functionality including indexing, querying, and analytics.
-"""
-
-
 
 # PostgreSQL search functionality (optional)
 try:
@@ -26,15 +25,11 @@ try:
 except ImportError:
     HAS_POSTGRES_SEARCH = False
 
-
-
-
 class SearchService:
-    """
+
     Core search service for CMS content.
 
     Handles search indexing, querying, ranking, and analytics.
-    """
 
     def __init__(self):
         self.index_model = SearchIndex
@@ -50,7 +45,7 @@ class SearchService:
         user=None,
         request=None,
     ) -> dict[str, Any]:
-        """
+
         Perform a search across all indexed content.
 
         Args:
@@ -63,7 +58,7 @@ class SearchService:
 
         Returns:
             Dictionary with search results, pagination info, and metadata
-        """
+
         start_time = time.time()
         filters = filters or {}
 
@@ -112,9 +107,9 @@ class SearchService:
         }
 
     def _build_search_queryset(self, query: str, filters: dict[str, Any]):
-        """
+
         Build search queryset with query and filters.
-        """
+
         queryset = self.index_model.objects.filter(is_published=True)
 
         # Apply text search
@@ -169,9 +164,9 @@ class SearchService:
         return queryset
 
     def _serialize_search_result(self, result: SearchIndex) -> dict[str, Any]:
-        """
+
         Serialize a search result for API response.
-        """
+
         # Get content type info safely
         object_type = ""
         if result.content_type:
@@ -201,9 +196,9 @@ class SearchService:
         user=None,
         request=None,
     ):
-        """
+
         Log search query for analytics.
-        """
+
         log_data = {
             "query_text": query,
             "filters": filters,
@@ -226,11 +221,10 @@ class SearchService:
         self.query_log_model.objects.create(**log_data)
 
     def _update_suggestions(self, query: str, result_count: int):
-        """
+
         Update search suggestions based on query.
-        """
+
         if not query or len(query) < 2:
-            return
 
         # Clean and normalize query
         normalized_query = query.lower().strip()
@@ -245,7 +239,7 @@ class SearchService:
         suggestion.increment_search_count(result_count)
 
     def get_suggestions(self, query: str, limit: int = 10) -> list[str]:
-        """
+
         Get search suggestions for autocomplete.
 
         Args:
@@ -254,7 +248,7 @@ class SearchService:
 
         Returns:
             List of suggestion strings
-        """
+
         if not query or len(query) < 2:
             return []
 
@@ -267,12 +261,12 @@ class SearchService:
         return [s.suggestion_text for s in suggestions]
 
     def index_object(self, obj):
-        """
+
         Index or re-index a single object.
 
         Args:
             obj: Django model instance to index
-        """
+
         # Get content type
         content_type = ContentType.objects.get_for_model(obj)
 
@@ -288,12 +282,12 @@ class SearchService:
         return search_index
 
     def remove_from_index(self, obj):
-        """
+
         Remove an object from the search index.
 
         Args:
             obj: Django model instance to remove
-        """
+
         content_type = ContentType.objects.get_for_model(obj)
 
         self.index_model.objects.filter(
@@ -301,12 +295,12 @@ class SearchService:
         ).delete()
 
     def reindex_all(self, model_label: str | None = None):
-        """
+
         Re-index all registered content types or a specific model.
 
         Args:
             model_label: Optional model label to index (e.g., 'blog.blogpost')
-        """
+
         configs = content_registry.get_all_configs()
 
         if model_label:
@@ -334,12 +328,11 @@ class SearchService:
                     self.index_object(obj)
                     indexed_count += 1
                 except Exception:
-                    pass
 
         return indexed_count
 
     def get_search_analytics(self, days: int = 30) -> dict[str, Any]:
-        """
+
         Get search analytics for the last N days.
 
         Args:
@@ -347,8 +340,6 @@ class SearchService:
 
         Returns:
             Dictionary with analytics data
-        """
-
 
         start_date = timezone.now() - timedelta(days=days)
 
@@ -387,7 +378,6 @@ class SearchService:
             "top_queries": list(top_queries),
             "zero_result_queries": list(zero_result_queries),
         }
-
 
 # Global search service instance
 search_service = SearchService()

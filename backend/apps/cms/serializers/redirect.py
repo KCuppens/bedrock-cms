@@ -5,7 +5,6 @@ from apps.cms.models import Redirect
 
 User = get_user_model()
 
-
 class RedirectSerializer(serializers.ModelSerializer):
     """Serializer for Redirect model"""
 

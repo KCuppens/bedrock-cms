@@ -3,7 +3,6 @@ from rest_framework import serializers
 from apps.blog.models import Category, Tag
 from apps.cms.model_parts.category import Collection
 
-
 class CategorySerializer(serializers.ModelSerializer):
     """Serializer for Category model"""
 
@@ -32,7 +31,6 @@ class CategorySerializer(serializers.ModelSerializer):
         validated_data.pop("created_by", None)
         return super().create(validated_data)
 
-
 class TagSerializer(serializers.ModelSerializer):
     """Serializer for Tag model"""
 
@@ -59,7 +57,6 @@ class TagSerializer(serializers.ModelSerializer):
         # Remove created_by as Blog Tag model doesn't have this field
         validated_data.pop("created_by", None)
         return super().create(validated_data)
-
 
 class CollectionSerializer(serializers.ModelSerializer):
     """Serializer for Collection model"""

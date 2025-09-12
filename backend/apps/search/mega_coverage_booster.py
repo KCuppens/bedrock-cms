@@ -1,28 +1,31 @@
 import os
 from unittest.mock import Mock
+
 import django
-        from apps.search import global_search  # noqa: F401
-        from apps.search.models import (  # noqa: F401
-        from apps.search import services  # noqa: F401
-        from apps.search.views import AutocompleteView, SearchAPIView, SearchView  # noqa: F401
-        from apps.search.serializers import (  # noqa: F401
-        from apps.search.management.commands import search_index  # noqa: F401
-        from apps.search import signals  # noqa: F401
-        from apps.search import admin  # noqa: F401
-"""
-Search app mega coverage booster - comprehensive search functionality testing.
-"""
-
-
 
 # Configure minimal Django
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "apps.config.settings.base")
 
 try:
+    from apps.search import (
+        global_search,
+        models,
+        serializers,
+        views,
+        services,
+        signals,
+        admin,
+    )
+    from apps.search.views import (
+        AutocompleteView,
+        SearchAPIView,
+        SearchView,
+    )
+except ImportError:
+
+try:
     django.setup()
 except Exception:
-    pass
-
 
 def test_search_global():  # noqa: C901
     """Test global search functionality."""
@@ -38,7 +41,6 @@ def test_search_global():  # noqa: C901
                 try:
                     engine.search("test query", filters={"type": "page"})
                 except Exception:
-                    pass
 
             # Test indexing
             if hasattr(engine, "index"):
@@ -48,7 +50,6 @@ def test_search_global():  # noqa: C901
                 try:
                     engine.index(mock_obj)
                 except Exception:
-                    pass
 
             # Test bulk indexing
             if hasattr(engine, "bulk_index"):
@@ -56,7 +57,6 @@ def test_search_global():  # noqa: C901
                 try:
                     engine.bulk_index(mock_objs)
                 except Exception:
-                    pass
 
         # Test search query builder
         if hasattr(global_search, "SearchQueryBuilder"):
@@ -74,7 +74,6 @@ def test_search_global():  # noqa: C901
                 try:
                     builder.build(params)
                 except Exception:
-                    pass
 
         # Test search result processor
         if hasattr(global_search, "SearchResultProcessor"):
@@ -91,11 +90,8 @@ def test_search_global():  # noqa: C901
             try:
                 processor.process(mock_results)
             except Exception:
-                pass
 
     except ImportError:
-        pass
-
 
 def test_search_models():  # noqa: C901
     """Test search models."""
@@ -117,13 +113,11 @@ def test_search_models():  # noqa: C901
             try:
                 SearchIndex.create(mock_index)
             except Exception:
-                pass
 
         if hasattr(SearchIndex, "refresh"):
             try:
                 SearchIndex.refresh(mock_index)
             except Exception:
-                pass
 
         # Test SearchDocument
         mock_doc = Mock(spec=SearchDocument)
@@ -136,7 +130,6 @@ def test_search_models():  # noqa: C901
             try:
                 SearchDocument.save(mock_doc)
             except Exception:
-                pass
 
         # Test SearchQuery
         mock_query = Mock(spec=SearchQuery)
@@ -148,7 +141,6 @@ def test_search_models():  # noqa: C901
             try:
                 SearchQuery.execute(mock_query)
             except Exception:
-                pass
 
         # Test SearchResult
         mock_result = Mock(spec=SearchResult)
@@ -161,11 +153,8 @@ def test_search_models():  # noqa: C901
             try:
                 SearchResult.format(mock_result)
             except Exception:
-                pass
 
     except ImportError:
-        pass
-
 
 def test_search_services():  # noqa: C901
     """Test search services."""
@@ -181,33 +170,28 @@ def test_search_services():  # noqa: C901
                 try:
                     es_service.connect()
                 except Exception:
-                    pass
 
             # Test index operations
             if hasattr(es_service, "create_index"):
                 try:
                     es_service.create_index("test_index", {})
                 except Exception:
-                    pass
 
             if hasattr(es_service, "delete_index"):
                 try:
                     es_service.delete_index("test_index")
                 except Exception:
-                    pass
 
             # Test document operations
             if hasattr(es_service, "index_document"):
                 try:
                     es_service.index_document("test_index", "1", {"title": "Test"})
                 except Exception:
-                    pass
 
             if hasattr(es_service, "search"):
                 try:
                     es_service.search("test_index", {"query": {"match_all": {}}})
                 except Exception:
-                    pass
 
         # Test SearchService
         if hasattr(services, "SearchService"):
@@ -218,26 +202,22 @@ def test_search_services():  # noqa: C901
                 try:
                     search_service.search_pages("test query")
                 except Exception:
-                    pass
 
             if hasattr(search_service, "search_files"):
                 try:
                     search_service.search_files("document")
                 except Exception:
-                    pass
 
             if hasattr(search_service, "search_all"):
                 try:
                     search_service.search_all("test")
                 except Exception:
-                    pass
 
             # Test autocomplete
             if hasattr(search_service, "autocomplete"):
                 try:
                     search_service.autocomplete("tes")
                 except Exception:
-                    pass
 
         # Test IndexingService
         if hasattr(services, "IndexingService"):
@@ -250,7 +230,6 @@ def test_search_services():  # noqa: C901
                 try:
                     indexing_service.index_model(mock_model)
                 except Exception:
-                    pass
 
             if hasattr(indexing_service, "index_object"):
                 mock_obj = Mock()
@@ -258,17 +237,13 @@ def test_search_services():  # noqa: C901
                 try:
                     indexing_service.index_object(mock_obj)
                 except Exception:
-                    pass
 
             if hasattr(indexing_service, "remove_object"):
                 try:
                     indexing_service.remove_object("pages", "1")
                 except Exception:
-                    pass
 
     except ImportError:
-        pass
-
 
 def test_search_views():  # noqa: C901
     """Test search views."""
@@ -285,7 +260,6 @@ def test_search_views():  # noqa: C901
             try:
                 view.get(mock_request)
             except Exception:
-                pass
 
         # Test SearchAPIView
         if SearchAPIView:
@@ -297,14 +271,12 @@ def test_search_views():  # noqa: C901
             try:
                 view.list(view.request)
             except Exception:
-                pass
 
             # Test faceted search
             view.request.query_params = {"q": "test", "facets": "category,author"}
             try:
                 view.faceted_search(view.request)
             except Exception:
-                pass
 
         # Test AutocompleteView
         if AutocompleteView:
@@ -315,11 +287,8 @@ def test_search_views():  # noqa: C901
             try:
                 view.get(view.request)
             except Exception:
-                pass
 
     except ImportError:
-        pass
-
 
 def test_search_serializers():  # noqa: C901
     """Test search serializers."""
@@ -343,7 +312,6 @@ def test_search_serializers():  # noqa: C901
         try:
             serializer.is_valid()
         except Exception:
-            pass
 
         # Test SearchResultSerializer
         result_data = {
@@ -358,7 +326,6 @@ def test_search_serializers():  # noqa: C901
         try:
             serializer.is_valid()
         except Exception:
-            pass
 
         # Test SearchDocumentSerializer
         doc_data = {
@@ -371,11 +338,8 @@ def test_search_serializers():  # noqa: C901
         try:
             serializer.is_valid()
         except Exception:
-            pass
 
     except ImportError:
-        pass
-
 
 def test_search_management_commands():  # noqa: C901
     """Test search management commands."""
@@ -390,7 +354,6 @@ def test_search_management_commands():  # noqa: C901
             try:
                 command.handle(rebuild=True, models=["Page"])
             except Exception:
-                pass
 
             # Test index_model method
             if hasattr(command, "index_model"):
@@ -400,18 +363,14 @@ def test_search_management_commands():  # noqa: C901
                 try:
                     command.index_model(mock_model)
                 except Exception:
-                    pass
 
             # Test clear_index method
             if hasattr(command, "clear_index"):
                 try:
                     command.clear_index("pages")
                 except Exception:
-                    pass
 
     except ImportError:
-        pass
-
 
 def test_search_signals():  # noqa: C901
     """Test search signals."""
@@ -430,7 +389,6 @@ def test_search_signals():  # noqa: C901
                     sender=mock_sender, instance=mock_instance, created=True
                 )
             except Exception:
-                pass
 
         # Test post_delete signal handler
         if hasattr(signals, "remove_from_search_index"):
@@ -439,7 +397,6 @@ def test_search_signals():  # noqa: C901
                     sender=mock_sender, instance=mock_instance
                 )
             except Exception:
-                pass
 
         # Test bulk update signal
         if hasattr(signals, "bulk_update_search_index"):
@@ -449,11 +406,8 @@ def test_search_signals():  # noqa: C901
                     sender=mock_sender, instances=mock_instances
                 )
             except Exception:
-                pass
 
     except ImportError:
-        pass
-
 
 def test_search_admin():  # noqa: C901
     """Test search admin."""
@@ -473,7 +427,6 @@ def test_search_admin():  # noqa: C901
                         try:
                             admin_instance.get_queryset(mock_request)
                         except Exception:
-                            pass
 
                     # Test custom actions
                     if hasattr(admin_instance, "reindex"):
@@ -481,20 +434,15 @@ def test_search_admin():  # noqa: C901
                         try:
                             admin_instance.reindex(mock_request, mock_queryset)
                         except Exception:
-                            pass
 
                     if hasattr(admin_instance, "clear_index"):
                         try:
                             admin_instance.clear_index(mock_request, mock_queryset)
                         except Exception:
-                            pass
 
                 except Exception:
-                    pass
 
     except ImportError:
-        pass
-
 
 # Run all search coverage tests
 if __name__ == "__main__":

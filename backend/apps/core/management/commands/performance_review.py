@@ -14,10 +14,7 @@ from apps.cms.blocks.validation import validate_blocks
 from apps.cms.models import Page
 from apps.media.models import Asset
 
-"""
 Management command for comprehensive performance review of Bedrock CMS.
-"""
-
 
 class Command(BaseCommand):
     help = "Run comprehensive performance review of the CMS system"
@@ -35,7 +32,7 @@ class Command(BaseCommand):
             help="Run quick performance review (fewer iterations)",
         )
 
-    def handle(self, *args, **options):
+    def handle(self, *args, **options):  # noqa: C901
         self.client = Client()
         self.results = {
             "database": {},
@@ -69,7 +66,7 @@ class Command(BaseCommand):
                 json.dump(self.results, f, indent=2, default=str)
             self.stdout.write(f"\nDetailed results saved to: {options['output']}")
 
-    def analyze_database_queries(self, quick_mode=False):
+    def analyze_database_queries(self, quick_mode=False):  # noqa: C901
         """Analyze database query performance and N+1 issues."""
         self.stdout.write("\nAnalyzing Database Performance...")
 
@@ -171,7 +168,7 @@ class Command(BaseCommand):
         # Restore debug setting
         settings.DEBUG = original_debug
 
-    def analyze_api_performance(self, quick_mode=False):
+    def analyze_api_performance(self, quick_mode=False):  # noqa: C901
         """Test API endpoint response times."""
         self.stdout.write("\nTesting API Response Times...")
 
@@ -279,7 +276,7 @@ class Command(BaseCommand):
             f"    * Set: {set_time:.2f}ms, Get: {get_time:.2f}ms, Delete: {delete_time:.2f}ms"
         )
 
-    def analyze_block_performance(self, quick_mode=False):
+    def analyze_block_performance(self, quick_mode=False):  # noqa: C901
         """Test block validation performance with varying sizes."""
         self.stdout.write("\nTesting Block Validation Performance...")
 
@@ -404,7 +401,7 @@ class Command(BaseCommand):
             f"    * Asset queries: {query_time:.1f}ms -> {optimized_query_time:.1f}ms"
         )
 
-    def generate_recommendations(self):
+    def generate_recommendations(self):  # noqa: C901
         """Generate performance optimization recommendations."""
         self.stdout.write("\nGenerating Recommendations...")
 

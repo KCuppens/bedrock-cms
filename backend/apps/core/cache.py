@@ -1,17 +1,16 @@
 import hashlib
+
 from django.core.cache import cache
-                from apps.cms.models import Page
-                from apps.registry.registry import content_registry
-                from apps.blog.models import BlogPost
-"""
+
+from apps.blog.models import BlogPost
+from apps.cms.models import Page
+from apps.registry.registry import content_registry
+
 Cache utilities and key management for CMS.
 
 Provides consistent cache key generation and invalidation strategies.
-"""
 
 # mypy: ignore-errors
-
-
 
 # Cache TTL settings
 CACHE_TIMEOUTS = {
@@ -34,19 +33,17 @@ CACHE_PREFIXES = {
     "seo": "seo",
 }
 
-
 class CacheKeyBuilder:
-    """
+
     Builds consistent cache keys across the CMS.
 
     Key format: {prefix}:{namespace}:{key_parts}
-    """
 
     def __init__(self, prefix: str = "cms"):
         self.prefix = prefix
 
     def build_key(self, namespace: str, *parts) -> str:
-        """
+
         Build a cache key from namespace and parts.
 
         Args:
@@ -55,7 +52,7 @@ class CacheKeyBuilder:
 
         Returns:
             Formatted cache key
-        """
+
         # Convert all parts to strings and filter out None values
         clean_parts = [str(part) for part in parts if part is not None]
         key_suffix = ":".join(clean_parts)
@@ -68,11 +65,11 @@ class CacheKeyBuilder:
     def page_key(
         self, locale: str, path: str, revision_id: str | int | None = None
     ) -> str:
-        """
+
         Build cache key for a page.
 
         Format: cms:p:{locale}:{path}:{revision_id}
-        """
+
         # Normalize path (remove leading/trailing slashes for consistency)
         clean_path = path.strip("/")
         if not clean_path:
@@ -91,11 +88,11 @@ class CacheKeyBuilder:
         slug: str,
         revision_id: str | int | None = None,
     ) -> str:
-        """
+
         Build cache key for registry content.
 
         Format: cms:c:{model_label}:{locale}:{slug}:{revision_id}
-        """
+
         parts = [model_label, locale, slug]
         if revision_id:
             parts.append(revision_id)
@@ -109,11 +106,11 @@ class CacheKeyBuilder:
         post_rev: str | int | None = None,
         page_rev: str | int | None = None,
     ) -> str:
-        """
+
         Build cache key for blog post presentation.
 
         Format: cms:b:{locale}:{slug}:{post_rev}:{page_rev}
-        """
+
         parts = [locale, slug]
         if post_rev:
             parts.append(post_rev)
@@ -123,11 +120,11 @@ class CacheKeyBuilder:
         return self.build_key("blog", *parts)
 
     def api_key(self, endpoint: str, **params) -> str:
-        """
+
         Build cache key for API responses.
 
         Format: cms:a:{endpoint}:{param_hash}
-        """
+
         # Create a hash of the parameters for consistent key generation
         if params:
             param_str = "&".join(f"{k}={v}" for k, v in sorted(params.items()))
@@ -139,11 +136,11 @@ class CacheKeyBuilder:
             return self.build_key("api", endpoint)
 
     def search_key(self, query: str, filters: dict | None = None) -> str:
-        """
+
         Build cache key for search results.
 
         Format: cms:s:{query_hash}:{filter_hash}
-        """
+
         # Hash the query for consistent keys
         query_hash = hashlib.md5(query.encode(), usedforsecurity=False).hexdigest()[:8]
 
@@ -159,26 +156,24 @@ class CacheKeyBuilder:
             return self.build_key("search", query_hash)
 
     def sitemap_key(self, locale: str) -> str:
-        """
+
         Build cache key for sitemap.
 
         Format: cms:sm:{locale}
-        """
+
         return self.build_key("sitemap", locale)
 
     def seo_key(self, model_label: str, object_id: str | int, locale: str) -> str:
-        """
+
         Build cache key for SEO data.
 
         Format: cms:seo:{model_label}:{object_id}:{locale}
-        """
+
         return self.build_key("seo", model_label, object_id, locale)
 
-
 class CacheManager:
-    """
+
     High-level cache management with invalidation support.
-    """
 
     def __init__(self, key_builder: CacheKeyBuilder | None = None):
         self.key_builder = key_builder or CacheKeyBuilder()
@@ -194,7 +189,7 @@ class CacheManager:
             for cache_type, default_timeout in CACHE_TIMEOUTS.items():
                 if f":{CACHE_PREFIXES.get(cache_type, cache_type)}:" in key:
                     timeout = default_timeout
-                    break
+
             else:
                 timeout = CACHE_TIMEOUTS["api"]  # Default fallback
 
@@ -205,12 +200,12 @@ class CacheManager:
         return cache.delete(key, version=version)
 
     def delete_pattern(self, pattern: str):
-        """
+
         Delete all keys matching a pattern.
 
         Note: This requires a cache backend that supports pattern deletion,
         like Redis. For other backends, this is a no-op.
-        """
+
         try:
             # Try Redis-style pattern deletion
             if hasattr(cache, "_cache") and hasattr(cache._cache, "delete_pattern"):
@@ -220,11 +215,10 @@ class CacheManager:
             else:
                 # Fallback: iterate through known keys (not efficient)
                 # This is mainly for development/testing with local cache
-                pass
+
         except Exception:
             # If pattern deletion fails, ignore silently
             # Individual key invalidation will still work
-            pass
 
     def get_or_set(
         self, key: str, callable_func, timeout: int | None = None, version=None
@@ -239,14 +233,14 @@ class CacheManager:
     def invalidate_page(
         self, locale: str = None, path: str = None, page_id: int = None
     ):
-        """
+
         Invalidate page cache entries.
 
         Args:
             locale: Page locale
             path: Page path
             page_id: Page ID (will look up path/locale if not provided)
-        """
+
         keys_to_invalidate = []
 
         if locale and path:
@@ -278,9 +272,9 @@ class CacheManager:
         slug: str = None,
         object_id: int = None,
     ):
-        """
+
         Invalidate content cache entries.
-        """
+
         keys_to_invalidate = []
 
         if locale and slug:
@@ -320,9 +314,9 @@ class CacheManager:
     def invalidate_blog_post(
         self, locale: str = None, slug: str = None, post_id: int = None
     ):
-        """
+
         Invalidate blog post cache entries.
-        """
+
         if locale and slug:
             # Invalidate all blog cache variations for this post
             pattern = self.key_builder.build_key("blog", locale, slug, "*")
@@ -335,12 +329,11 @@ class CacheManager:
                 post = BlogPost.objects.get(id=post_id)
                 self.invalidate_blog_post(locale=post.locale.code, slug=post.slug)
             except Exception:
-                pass
 
     def invalidate_search(self, query: str = None):
-        """
+
         Invalidate search cache entries.
-        """
+
         if query:
             # Invalidate specific query
             pattern = self.key_builder.search_key(query, {}) + "*"
@@ -351,9 +344,9 @@ class CacheManager:
             self.delete_pattern(pattern)
 
     def invalidate_sitemap(self, locale: str = None):
-        """
+
         Invalidate sitemap cache.
-        """
+
         if locale:
             key = self.key_builder.sitemap_key(locale)
             self.delete(key)
@@ -365,9 +358,9 @@ class CacheManager:
     def invalidate_seo(
         self, model_label: str = None, object_id: int = None, locale: str = None
     ):
-        """
+
         Invalidate SEO cache entries.
-        """
+
         if model_label and object_id and locale:
             key = self.key_builder.seo_key(model_label, object_id, locale)
             self.delete(key)
@@ -377,12 +370,11 @@ class CacheManager:
             self.delete_pattern(pattern)
 
     def clear_all(self):
-        """
+
         Clear all CMS cache entries.
-        """
+
         pattern = f"{self.key_builder.prefix}:*"
         self.delete_pattern(pattern)
-
 
 # Global cache manager instance
 cache_manager = CacheManager()

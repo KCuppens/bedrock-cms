@@ -1,28 +1,23 @@
 import logging
+from datetime import timedelta
 
 from django.conf import settings
+from django.db import transaction
+from django.db.models import F, Q
+from django.utils import timezone
 
 from celery import shared_task
 
-from .models import EmailMessageLog
-        from .services import EmailService
-        from datetime import timedelta
-        from django.utils import timezone
-        from django.db import transaction
-        from .models import EmailMessageLog, EmailTemplate
-        from .services import EmailService
-        from datetime import timedelta
-        from django.db import transaction
-        from django.db.models import F, Q
-        from django.utils import timezone
-        from apps.core.enums import EmailStatus
+from apps.core.enums import EmailStatus
+
+from .models import EmailMessageLog, EmailTemplate
+from .services import EmailService
 
 logger = logging.getLogger(__name__)
 
-
 @shared_task(name="apps.emails.tasks.send_email_task", bind=True)
 def send_email_task(self, email_log_id: int):  # noqa: C901
-    """
+
     Celery task to send email asynchronously
 
     Args:
@@ -30,7 +25,7 @@ def send_email_task(self, email_log_id: int):  # noqa: C901
 
     Returns:
         dict: Task result with success status and details
-    """
+
     try:
 
         # Get email log
@@ -70,15 +65,13 @@ def send_email_task(self, email_log_id: int):  # noqa: C901
             email_log = EmailMessageLog.objects.get(id=email_log_id)
             email_log.mark_as_failed(error_msg)
         except EmailMessageLog.DoesNotExist:
-            pass
 
         # Retry the task up to 3 times with exponential backoff
         raise self.retry(exc=e, countdown=60 * (2**self.request.retries), max_retries=3)
 
-
 @shared_task(name="apps.emails.tasks.cleanup_old_email_logs")
 def cleanup_old_email_logs(days_to_keep: int = 30):  # noqa: C901
-    """
+
     Celery task to clean up old email logs
 
     Args:
@@ -86,9 +79,8 @@ def cleanup_old_email_logs(days_to_keep: int = 30):  # noqa: C901
 
     Returns:
         dict: Task result with cleanup details
-    """
-    try:
 
+    try:
 
         cutoff_date = timezone.now() - timedelta(days=days_to_keep)
 
@@ -111,12 +103,11 @@ def cleanup_old_email_logs(days_to_keep: int = 30):  # noqa: C901
         logger.error(error_msg)
         return {"success": False, "error": error_msg}
 
-
 @shared_task(name="apps.emails.tasks.send_bulk_email_task")
 def send_bulk_email_task(
     template_key: str, recipient_emails: list[str], context: dict | None = None
 ):
-    """
+
     Celery task to send bulk emails with batch processing
 
     Args:
@@ -126,9 +117,8 @@ def send_bulk_email_task(
 
     Returns:
         dict: Task result with bulk send details
-    """
-    try:
 
+    try:
 
         # Get template once and cache it
         template = EmailTemplate.get_template(template_key, "en")
@@ -209,10 +199,9 @@ def send_bulk_email_task(
             "total_recipients": len(recipient_emails) if recipient_emails else 0,
         }
 
-
 @shared_task(name="apps.emails.tasks.retry_failed_emails")
 def retry_failed_emails(max_retries: int = 3):  # noqa: C901
-    """
+
     Celery task to retry failed emails with exponential backoff
 
     Args:
@@ -220,10 +209,8 @@ def retry_failed_emails(max_retries: int = 3):  # noqa: C901
 
     Returns:
         dict: Task result with retry details
-    """
+
     try:
-
-
 
         # Get failed emails from the last 24 hours that haven't exceeded retry limit
         cutoff_time = timezone.now() - timedelta(hours=24)

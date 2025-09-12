@@ -7,7 +7,6 @@ from apps.i18n.models import Locale
 from .models import Page
 from .seo import SeoSettings
 
-
 def deep_merge_dicts(
     base: dict[str, Any], *overrides: dict[str, Any]
 ) -> dict[str, Any]:
@@ -16,7 +15,6 @@ def deep_merge_dicts(
 
     for override in overrides:
         if not override:
-            continue
 
         for key, value in override.items():
             if (
@@ -30,19 +28,17 @@ def deep_merge_dicts(
 
     return result
 
-
 def get_best_matching_seo_default(path: str, locale: Locale) -> dict | None:
     """Find the best matching SEO default for a path. Now returns None since section-based defaults were removed."""
     # Section-based SEO defaults were removed for simplicity
     # All SEO configuration is now handled at the global (per-locale) level
     return None
 
-
 def resolve_seo(page: Page) -> dict[str, Any]:
-    """
+
     Resolve final SEO for a page by merging: Global → Section → Page
     Drafts get forced noindex.
-    """
+
     locale = page.locale
 
     # 1. Start with global SEO settings
@@ -92,14 +88,12 @@ def resolve_seo(page: Page) -> dict[str, Any]:
 
     return resolved_seo
 
-
 def generate_canonical_url(page: Page, base_url: str | None = None) -> str:
     """Generate canonical URL for a page."""
     if not base_url:
         base_url = getattr(settings, "CMS_SITEMAP_BASE_URL", "http://localhost:8000")
 
     return f"{base_url.rstrip('/')}{page.path}"
-
 
 def generate_hreflang_alternates(
     page: Page, base_url: str | None = None
@@ -127,7 +121,6 @@ def generate_hreflang_alternates(
             )
 
     return alternates
-
 
 def generate_seo_links(page: Page, base_url: str | None = None) -> dict[str, Any]:
     """Generate canonical and hreflang data for a page."""

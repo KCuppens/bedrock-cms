@@ -1,9 +1,7 @@
 from .base import UserFactory
 from .i18n import LocaleFactory
 
-"""
 Account-specific factories for users, roles, and permissions.
-"""
 
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Group
@@ -20,7 +18,6 @@ fake = Faker()
 
 User = get_user_model()
 
-
 class GroupFactory(BaseFactory):
     """Factory for creating groups."""
 
@@ -32,12 +29,10 @@ class GroupFactory(BaseFactory):
     @factory.post_generation
     def permissions(self, create, extracted, **kwargs):
         if not create:
-            return
 
         if extracted:
             for permission in extracted:
                 self.permissions.add(permission)
-
 
 class UserProfileFactory(BaseFactory):
     """Factory for user profiles."""
@@ -60,7 +55,6 @@ class UserProfileFactory(BaseFactory):
     )
     language_preference = factory.Iterator(["en", "es", "fr", "de"])
 
-
 class ScopedSectionFactory(BaseFactory):
     """Factory for scoped sections."""
 
@@ -70,7 +64,6 @@ class ScopedSectionFactory(BaseFactory):
     user = factory.SubFactory(lambda: None)
     section = factory.Iterator(["cms", "blog", "media", "analytics"])
     permission_level = factory.Iterator(["view", "edit", "admin"])
-
 
 class ScopedLocaleFactory(BaseFactory):
     """Factory for scoped locales."""
@@ -82,7 +75,6 @@ class ScopedLocaleFactory(BaseFactory):
     locale = factory.SubFactory(lambda: None)
     permission_level = factory.Iterator(["view", "edit", "admin"])
 
-
 # Specialized user factories with specific roles
 class EditorUserFactory(UserFactory):
     """Factory for editor users with CMS permissions."""
@@ -90,7 +82,6 @@ class EditorUserFactory(UserFactory):
     @factory.post_generation
     def setup_editor_permissions(self, create, extracted, **kwargs):
         if not create:
-            return
 
         # Add to editors group
         editor_group, _ = Group.objects.get_or_create(name="Editors")
@@ -102,14 +93,12 @@ class EditorUserFactory(UserFactory):
         # Add CMS section access
         ScopedSectionFactory(user=self, section="cms", permission_level="edit")
 
-
 class TranslatorUserFactory(UserFactory):
     """Factory for translator users with i18n permissions."""
 
     @factory.post_generation
     def setup_translator_permissions(self, create, extracted, **kwargs):
         if not create:
-            return
 
         # Add to translators group
         translator_group, _ = Group.objects.get_or_create(name="Translators")

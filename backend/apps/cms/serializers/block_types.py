@@ -2,7 +2,6 @@ from rest_framework import serializers
 
 from apps.cms.models import BlockType, BlockTypeCategory
 
-
 class BlockTypeSerializer(serializers.ModelSerializer):
     """Serializer for BlockType model with full CRUD support."""
 
@@ -100,7 +99,6 @@ class BlockTypeSerializer(serializers.ModelSerializer):
             )
         return value
 
-
 class BlockTypeListSerializer(serializers.ModelSerializer):
     """Lightweight serializer for list views."""
 
@@ -123,7 +121,6 @@ class BlockTypeListSerializer(serializers.ModelSerializer):
             "preload",
             "updated_at",
         ]
-
 
 class BlockTypeCreateSerializer(serializers.ModelSerializer):
     """Serializer for creating new block types."""
@@ -151,7 +148,6 @@ class BlockTypeCreateSerializer(serializers.ModelSerializer):
         validated_data["updated_by"] = user
         return super().create(validated_data)
 
-
 class BlockTypeUpdateSerializer(serializers.ModelSerializer):
     """Serializer for updating block types."""
 
@@ -176,7 +172,6 @@ class BlockTypeUpdateSerializer(serializers.ModelSerializer):
         user = self.context["request"].user
         validated_data["updated_by"] = user
         return super().update(instance, validated_data)
-
 
 class BlockTypeCategorySerializer(serializers.Serializer):
     """Serializer for block type categories."""

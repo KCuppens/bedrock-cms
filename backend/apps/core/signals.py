@@ -1,8 +1,7 @@
-"""
+
 Cache invalidation signals for CMS.
 
 Automatically invalidates relevant cache entries when content changes.
-"""
 
 import logging
 
@@ -19,14 +18,13 @@ from .cache import cache_manager
 
 logger = logging.getLogger(__name__)
 
-
 @receiver(post_save)
 def invalidate_cache_on_save(sender, instance, created, **kwargs):
-    """
+
     Invalidate cache when models are saved.
 
     Handles Page, BlogPost, and any registered content types.
-    """
+
     try:
         model_label = f"{sender._meta.app_label}.{sender._meta.model_name}"
 
@@ -54,12 +52,11 @@ def invalidate_cache_on_save(sender, instance, created, **kwargs):
     except Exception:
         logger.warning("Error invalidating cache for %s: {e}", instance)
 
-
 @receiver(post_delete)
 def invalidate_cache_on_delete(sender, instance, **kwargs):
-    """
+
     Invalidate cache when models are deleted.
-    """
+
     try:
         model_label = f"{sender._meta.app_label}.{sender._meta.model_name}"
 
@@ -84,14 +81,13 @@ def invalidate_cache_on_delete(sender, instance, **kwargs):
     except Exception:
         logger.warning("Error invalidating cache for deleted %s: {e}", instance)
 
-
 def invalidate_page_cache(page):
-    """
+
     Invalidate cache for a specific page and related entries.
 
     Args:
         page: Page instance
-    """
+
     try:
         # Invalidate the specific page
         if hasattr(page, "locale") and hasattr(page, "path"):
@@ -113,14 +109,13 @@ def invalidate_page_cache(page):
     except Exception:
         logger.warning("Error invalidating page cache for %s: {e}", page)
 
-
 def invalidate_blog_cache(blog_post):
-    """
+
     Invalidate cache for a specific blog post.
 
     Args:
         blog_post: BlogPost instance
-    """
+
     try:
         # Invalidate blog post presentation cache
         if hasattr(blog_post, "locale") and hasattr(blog_post, "slug"):
@@ -151,20 +146,18 @@ def invalidate_blog_cache(blog_post):
     except Exception:
         logger.warning("Error invalidating blog cache for %s: {e}", blog_post)
 
-
 def invalidate_content_cache(instance, model_label):
-    """
+
     Invalidate cache for registered content types.
 
     Args:
         instance: Model instance
         model_label: Model label (app.model)
-    """
+
     try:
 
         config = content_registry.get_config(model_label)
         if not config:
-            return
 
         # Get slug and locale from the instance
         slug_value = None
@@ -192,13 +185,12 @@ def invalidate_content_cache(instance, model_label):
     except Exception:
         logger.warning("Error invalidating content cache for %s: {e}", instance)
 
-
 # Handle many-to-many changes (like blog post tags)
 @receiver(m2m_changed)
 def invalidate_cache_on_m2m_change(sender, instance, action, pk_set, **kwargs):
-    """
+
     Invalidate cache when many-to-many relationships change.
-    """
+
     if action in ["post_add", "post_remove", "post_clear"]:
         try:
             # Determine the model that changed
@@ -224,18 +216,16 @@ def invalidate_cache_on_m2m_change(sender, instance, action, pk_set, **kwargs):
                 "Error invalidating cache for M2M change on %s: {e}", instance
             )
 
-
 # Handle asset changes (media replacements)
 @receiver(post_save)
 def invalidate_cache_on_asset_change(sender, instance, created, **kwargs):
-    """
+
     Invalidate cache when assets are updated.
 
     This is important for media replacements that should update all
     pages/content using those assets.
-    """
+
     if sender._meta.model_name != "asset":
-        return
 
     try:
         # When an asset is replaced, we need to invalidate all content using it
@@ -251,30 +241,26 @@ def invalidate_cache_on_asset_change(sender, instance, created, **kwargs):
 
             # This is a placeholder - in a real implementation,
             # you'd scan the AssetUsage table to find affected content
-            pass
 
     except Exception:
         logger.warning("Error invalidating cache for asset change %s: {e}", instance)
 
-
 # CDN Webhook Support (optional)
 def send_cdn_purge_webhook(keys: list, tags: list = None):
-    """
+
     Send cache purge webhook to CDN.
 
     Args:
         keys: List of cache keys to purge
         tags: List of cache tags to purge (if CDN supports tag-based purging)
-    """
-    try:
 
+    try:
 
         # Check if CDN webhook is configured
         webhook_url = getattr(settings, "CDN_PURGE_WEBHOOK_URL", None)
         webhook_token = getattr(settings, "CDN_PURGE_WEBHOOK_TOKEN", None)
 
         if not webhook_url:
-            return
 
         # Prepare webhook payload
         payload = {
@@ -302,23 +288,20 @@ def send_cdn_purge_webhook(keys: list, tags: list = None):
     except Exception as e:
         logger.error("Error sending CDN purge webhook: %s", e)
 
-
 # Utility functions for manual cache invalidation
-
 
 def invalidate_all_cache():
     """Manually invalidate all CMS cache entries."""
     cache_manager.clear_all()
     logger.info("All CMS cache entries invalidated")
 
-
 def invalidate_content_type_cache(model_label: str):
-    """
+
     Invalidate all cache entries for a specific content type.
 
     Args:
         model_label: Model label (e.g., 'blog.blogpost')
-    """
+
     try:
 
         config = content_registry.get_config(model_label)
@@ -326,7 +309,6 @@ def invalidate_content_type_cache(model_label: str):
             logger.warning(
                 "Unknown model label for cache invalidation: %s", model_label
             )
-            return
 
         # Get all objects of this type and invalidate their cache
         for obj in config.model.objects.all():
@@ -337,9 +319,8 @@ def invalidate_content_type_cache(model_label: str):
     except Exception:
         logger.error("Error invalidating cache for %s: {e}", model_label)
 
-
 def invalidate_blog_settings_cache(blog_settings):
-    """
+
     Invalidate cache when blog settings change.
 
     This affects all blog posts in that locale since presentation
@@ -347,7 +328,7 @@ def invalidate_blog_settings_cache(blog_settings):
 
     Args:
         blog_settings: BlogSettings instance
-    """
+
     try:
 
         # Get all published blog posts for this locale

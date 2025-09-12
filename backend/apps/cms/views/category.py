@@ -9,16 +9,15 @@ from rest_framework.response import Response
 from apps.blog.models import Category, Tag
 from apps.cms.model_parts.category import Collection
 from apps.cms.serializers.category import (
-            from datetime import timedelta
-            from django.utils import timezone
-        from datetime import timedelta
-        from django.utils import timezone
-            from django.utils import timezone
     CategorySerializer,
     CollectionSerializer,
     TagSerializer,
-)
+    datetime,
+    django.utils,
 
+    timedelta,
+    timezone,
+)
 
 @extend_schema_view(
     list=extend_schema(summary="List categories", tags=["Categories"]),
@@ -70,7 +69,6 @@ class CategoryViewSet(viewsets.ModelViewSet):
         serializer = self.get_serializer(root_categories, many=True)
         return Response(serializer.data)
 
-
 @extend_schema_view(
     list=extend_schema(summary="List tags", tags=["Tags"]),
     create=extend_schema(summary="Create tag", tags=["Tags"]),
@@ -99,7 +97,6 @@ class TagViewSet(viewsets.ModelViewSet):
         # Filter by trending (has posts in last 30 days)
         trending = self.request.query_params.get("trending")
         if trending and trending.lower() == "true":
-
 
             thirty_days_ago = timezone.now() - timedelta(days=30)
             queryset = queryset.filter(
@@ -134,7 +131,6 @@ class TagViewSet(viewsets.ModelViewSet):
     def trending(self, request):
         """Get trending tags (with recent posts)"""
 
-
         thirty_days_ago = timezone.now() - timedelta(days=30)
 
         limit = int(request.query_params.get("limit", 10))
@@ -165,7 +161,6 @@ class TagViewSet(viewsets.ModelViewSet):
 
         serializer = self.get_serializer(unused_tags, many=True)
         return Response(serializer.data)
-
 
 @extend_schema_view(
     list=extend_schema(summary="List collections", tags=["Collections"]),

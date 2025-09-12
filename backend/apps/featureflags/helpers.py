@@ -1,16 +1,14 @@
 from typing import TYPE_CHECKING
 
 from django.contrib.auth import get_user_model
+from django.contrib.auth.models import AbstractUser as User
+from django.http import Http404
 
 from waffle import flag_is_active, sample_is_active, switch_is_active
-    from django.contrib.auth.models import AbstractUser as User
-                    from django.http import Http404
-                    from django.http import Http404
 
 if TYPE_CHECKING:
 else:
     User = get_user_model()
-
 
 class FeatureFlags:
     """Helper class for feature flag operations"""
@@ -49,7 +47,7 @@ class FeatureFlags:
 
     @classmethod
     def is_enabled(cls, flag_name: str, request=None, user: User | None = None) -> bool:
-        """
+
         Check if a feature flag is enabled
 
         Args:
@@ -59,7 +57,7 @@ class FeatureFlags:
 
         Returns:
             bool: True if flag is active, False otherwise
-        """
+
         try:
             return (
                 flag_is_active(request, flag_name)
@@ -72,7 +70,7 @@ class FeatureFlags:
 
     @classmethod
     def is_switch_active(cls, switch_name: str) -> bool:
-        """
+
         Check if a feature switch is active
 
         Args:
@@ -80,7 +78,7 @@ class FeatureFlags:
 
         Returns:
             bool: True if switch is active, False otherwise
-        """
+
         try:
             return switch_is_active(switch_name)
         except Exception:
@@ -88,7 +86,7 @@ class FeatureFlags:
 
     @classmethod
     def is_sample_active(cls, sample_name: str) -> bool:
-        """
+
         Check if a feature sample is active
 
         Args:
@@ -96,7 +94,7 @@ class FeatureFlags:
 
         Returns:
             bool: True if sample is active, False otherwise
-        """
+
         try:
             return sample_is_active(sample_name)
         except Exception:
@@ -104,7 +102,7 @@ class FeatureFlags:
 
     @classmethod
     def get_enabled_flags(cls, request=None, user: User | None = None) -> dict:
-        """
+
         Get all enabled flags
 
         Args:
@@ -113,7 +111,7 @@ class FeatureFlags:
 
         Returns:
             dict: Dictionary of flag names and their status
-        """
+
         enabled_flags = {}
         for flag_name in cls.DEFAULT_FLAGS.keys():
             enabled_flags[flag_name] = cls.is_enabled(flag_name, request, user)
@@ -123,7 +121,7 @@ class FeatureFlags:
     def get_flag_status(
         cls, flag_name: str, request=None, user: User | None = None
     ) -> dict:
-        """
+
         Get detailed status of a feature flag
 
         Args:
@@ -133,7 +131,7 @@ class FeatureFlags:
 
         Returns:
             dict: Dictionary with flag status and metadata
-        """
+
         flag_config = cls.DEFAULT_FLAGS.get(flag_name, {})
 
         return {
@@ -143,12 +141,10 @@ class FeatureFlags:
             "default": flag_config.get("default", False),
         }
 
-
 # Convenience functions
 def is_feature_enabled(flag_name: str, request=None, user: User | None = None) -> bool:
     """Convenience function to check if a feature flag is enabled"""
     return FeatureFlags.is_enabled(flag_name, request, user)
-
 
 def require_feature_flag(flag_name: str):
     """Decorator to require a feature flag to be enabled"""
@@ -174,7 +170,6 @@ def require_feature_flag(flag_name: str):
                 for arg in args:
                     if hasattr(arg, "user") and hasattr(arg, "META"):
                         request = arg
-                        break
 
                 if not is_feature_enabled(flag_name, request):
 
@@ -185,7 +180,6 @@ def require_feature_flag(flag_name: str):
             return wrapper
 
     return decorator
-
 
 def get_feature_context(request=None, user: User | None = None) -> dict:
     """Get feature flags context for templates"""

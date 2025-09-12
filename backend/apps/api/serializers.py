@@ -2,7 +2,6 @@ from rest_framework import serializers
 
 from .models import Note
 
-
 class NoteSerializer(serializers.ModelSerializer):
     """Serializer for Note model"""
 
@@ -60,13 +59,11 @@ class NoteSerializer(serializers.ModelSerializer):
             data["tag_list"] = []
         return data
 
-
 class NoteCreateUpdateSerializer(NoteSerializer):
     """Serializer for creating/updating notes"""
 
     class Meta(NoteSerializer.Meta):
         fields = ["title", "content", "is_public", "tag_list"]
-
 
 class HealthCheckSerializer(serializers.Serializer):
     """Serializer for health check response"""

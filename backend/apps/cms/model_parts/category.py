@@ -4,7 +4,6 @@ from django.utils.text import slugify
 
 User = get_user_model()
 
-
 class Category(models.Model):
     """Category model for organizing content"""
 
@@ -45,7 +44,6 @@ class Category(models.Model):
     def __str__(self):
         return self.name
 
-
 class Tag(models.Model):
     """Tag model for content tagging"""
 
@@ -75,7 +73,6 @@ class Tag(models.Model):
 
     def __str__(self):
         return self.name
-
 
 class Collection(models.Model):
     """Collection model for grouping content"""

@@ -1,23 +1,16 @@
 import json
 from typing import Any, Optional
+
 from django.contrib.contenttypes.models import ContentType
 from django.db.models import QuerySet
-from .models import Locale, TranslationUnit
-        from .models import UiMessage, UiMessageTranslation
-        from .models import UiMessage
-        from .models import UiMessage
-"""
+
+from .models import Locale, TranslationUnit, UiMessage, UiMessageTranslation
+
 Translation utilities for content fallback and resolution.
-"""
-
-
-
-
 
 class TranslationResolver:
-    """
+
     Utility for resolving translated content with fallback support.
-    """
 
     def __init__(self, target_locale: Locale):
         """Initialize resolver with target locale."""
@@ -25,7 +18,7 @@ class TranslationResolver:
         self.fallback_chain = target_locale.get_fallback_chain()
 
     def resolve_field(self, obj, field: str, default_value: str = "") -> str:
-        """
+
         Resolve a translated field with fallback.
 
         Args:
@@ -35,7 +28,7 @@ class TranslationResolver:
 
         Returns:
             Translated text or fallback
-        """
+
         content_type = ContentType.objects.get_for_model(obj)
 
         # Try each locale in the fallback chain
@@ -51,7 +44,6 @@ class TranslationResolver:
                 if unit.target_text:
                     return unit.target_text
             except TranslationUnit.DoesNotExist:
-                continue
 
         # If no approved translation found, try source text from any unit
         try:
@@ -62,7 +54,6 @@ class TranslationResolver:
             if unit is not None and unit.source_text:
                 return unit.source_text
         except TranslationUnit.DoesNotExist:
-            pass
 
         # Fall back to current field value or default
         try:
@@ -75,7 +66,7 @@ class TranslationResolver:
             return default_value
 
     def resolve_object(self, obj, fields: list[str]) -> dict[str, str]:
-        """
+
         Resolve multiple fields for an object.
 
         Args:
@@ -84,7 +75,7 @@ class TranslationResolver:
 
         Returns:
             Dict mapping field names to translated values
-        """
+
         result = {}
         for field in fields:
             result[field] = self.resolve_field(obj, field)
@@ -93,7 +84,7 @@ class TranslationResolver:
     def get_translation_status(
         self, obj, fields: list[str]
     ) -> dict[str, dict[str, Any]]:
-        """
+
         Get translation status for multiple fields.
 
         Args:
@@ -102,7 +93,7 @@ class TranslationResolver:
 
         Returns:
             Dict with translation status info for each field
-        """
+
         content_type = ContentType.objects.get_for_model(obj)
         result = {}
 
@@ -140,19 +131,16 @@ class TranslationResolver:
                         )
                         if fallback_unit.target_text:
                             field_info["fallback_locale"] = locale.code
-                            break
+
                     except TranslationUnit.DoesNotExist:
-                        continue
 
             result[field] = field_info
 
         return result
 
-
 class TranslationManager:
-    """
+
     Manager for handling content translation operations.
-    """
 
     # Configuration for translatable fields per model
     TRANSLATABLE_FIELDS = {
@@ -161,7 +149,6 @@ class TranslationManager:
 
     def __init__(self):
         """Initialize translation manager."""
-        pass
 
     @classmethod
     def register_translatable_fields(cls, model_label: str, fields: list[str]):
@@ -177,17 +164,16 @@ class TranslationManager:
 
     @classmethod
     def create_translation_units(cls, obj, source_locale: Locale, user=None):
-        """
+
         Create translation units for an object's translatable fields.
 
         Args:
             obj: Object to create units for
             source_locale: Source locale of the content
             user: User creating the units
-        """
+
         translatable_fields = cls.get_translatable_fields(obj)
         if not translatable_fields:
-            return
 
         # Get all active target locales except source
         target_locales = Locale.objects.filter(is_active=True).exclude(
@@ -198,7 +184,6 @@ class TranslationManager:
             # Extract source text
             source_text = cls._extract_field_text(obj, field)
             if not source_text:
-                continue
 
             # Create units for each target locale
             for target_locale in target_locales:
@@ -213,7 +198,7 @@ class TranslationManager:
 
     @classmethod
     def _extract_field_text(cls, obj, field: str) -> str:
-        """
+
         Extract text content from a field for translation.
 
         Args:
@@ -222,7 +207,7 @@ class TranslationManager:
 
         Returns:
             Text content as string
-        """
+
         try:
             value = getattr(obj, field)
             if isinstance(value, str):
@@ -249,7 +234,7 @@ class TranslationManager:
         status: str = "draft",
         user=None,
     ) -> TranslationUnit:
-        """
+
         Create a new translation unit.
 
         Args:
@@ -264,7 +249,7 @@ class TranslationManager:
 
         Returns:
             Created TranslationUnit
-        """
+
         content_type = ContentType.objects.get_for_model(obj)
 
         unit, created = TranslationUnit.objects.update_or_create(
@@ -289,7 +274,7 @@ class TranslationManager:
         status: str | None = None,
         user=None,
     ) -> TranslationUnit:
-        """
+
         Update an existing translation unit.
 
         Args:
@@ -300,7 +285,7 @@ class TranslationManager:
 
         Returns:
             Updated TranslationUnit
-        """
+
         if target_text is not None:
             unit.target_text = target_text
         if status is not None:
@@ -313,7 +298,7 @@ class TranslationManager:
     def get_translations_for_object(
         self, obj, target_locale: Optional["Locale"] = None
     ) -> "QuerySet[TranslationUnit]":
-        """
+
         Get all translations for an object.
 
         Args:
@@ -322,7 +307,7 @@ class TranslationManager:
 
         Returns:
             QuerySet of TranslationUnit objects
-        """
+
         content_type = ContentType.objects.get_for_model(obj)
 
         units = TranslationUnit.objects.filter(
@@ -341,7 +326,7 @@ class TranslationManager:
         target_locale: Locale,
         user=None,
     ) -> list[TranslationUnit]:
-        """
+
         Bulk create multiple translations.
 
         Args:
@@ -355,7 +340,7 @@ class TranslationManager:
 
         Returns:
             List of created TranslationUnit objects
-        """
+
         units = []
         for data in translations_data:
             unit = self.create_translation(
@@ -374,7 +359,7 @@ class TranslationManager:
     def get_translation_progress(
         self, obj, target_locale: Locale, fields: list[str]
     ) -> dict[str, Any]:
-        """
+
         Get translation progress for an object.
 
         Args:
@@ -384,7 +369,7 @@ class TranslationManager:
 
         Returns:
             Dict with progress statistics
-        """
+
         content_type = ContentType.objects.get_for_model(obj)
 
         total_fields = len(fields)
@@ -425,7 +410,7 @@ class TranslationManager:
 
     @classmethod
     def get_resolver(cls, locale_code: str) -> TranslationResolver:
-        """
+
         Get a translation resolver for a locale.
 
         Args:
@@ -433,7 +418,7 @@ class TranslationManager:
 
         Returns:
             TranslationResolver instance
-        """
+
         try:
             locale = Locale.objects.get(code=locale_code, is_active=True)
             return TranslationResolver(locale)
@@ -442,11 +427,9 @@ class TranslationManager:
             default_locale = Locale.objects.get(is_default=True, is_active=True)
             return TranslationResolver(default_locale)
 
-
 class UiMessageResolver:
-    """
+
     Resolver for UI message translations.
-    """
 
     def __init__(self, locale: Locale):
         """Initialize with target locale."""
@@ -454,7 +437,7 @@ class UiMessageResolver:
         self.fallback_chain = locale.get_fallback_chain()
 
     def resolve_message(self, key: str, default: str = "") -> str:
-        """
+
         Resolve a UI message with fallback.
 
         Args:
@@ -463,7 +446,6 @@ class UiMessageResolver:
 
         Returns:
             Translated message text
-        """
 
         try:
             message = UiMessage.objects.get(key=key)
@@ -476,7 +458,6 @@ class UiMessageResolver:
                     )
                     return translation.value
                 except UiMessageTranslation.DoesNotExist:
-                    continue
 
             # Fall back to default value
             return message.default_value if message.default_value else default
@@ -490,7 +471,7 @@ class UiMessageResolver:
         default: str | None = None,
         parameters: dict[str, Any] | None = None,
     ) -> str:
-        """
+
         Resolve a UI message with fallback and parameter substitution.
         Alias for resolve_message with parameter support.
 
@@ -501,7 +482,7 @@ class UiMessageResolver:
 
         Returns:
             Translated message text with parameters substituted
-        """
+
         if default is None:
             default = key
 
@@ -513,12 +494,11 @@ class UiMessageResolver:
                 message = message.format(**parameters)
             except (KeyError, ValueError):
                 # If formatting fails, return message as-is
-                pass
 
         return message
 
     def get_message_bundle(self, namespace: str | None = None) -> dict[str, str]:
-        """
+
         Get all messages for a namespace as a dict.
 
         Args:
@@ -526,7 +506,6 @@ class UiMessageResolver:
 
         Returns:
             Dict mapping message keys to translated values
-        """
 
         messages = UiMessage.objects.all()
         if namespace:
@@ -539,12 +518,11 @@ class UiMessageResolver:
         return result
 
     def get_namespaced_bundle(self) -> dict[str, dict[str, str]]:
-        """
+
         Get all messages organized by namespace.
 
         Returns:
             Dict mapping namespaces to message dicts
-        """
 
         # Get all namespaces
         namespaces = UiMessage.objects.values_list("namespace", flat=True).distinct()
@@ -556,17 +534,17 @@ class UiMessageResolver:
         return result
 
     def get_all_messages(self) -> dict[str, str]:
-        """
+
         Get all messages as a flat dictionary.
         Alias for get_message_bundle with no namespace filter.
 
         Returns:
             Dict mapping message keys to translated values
-        """
+
         return self.get_message_bundle()
 
     def get_namespace_messages(self, namespace: str) -> dict[str, str]:
-        """
+
         Get all messages for a specific namespace.
         Alias for get_message_bundle with namespace filter.
 
@@ -575,5 +553,5 @@ class UiMessageResolver:
 
         Returns:
             Dict mapping message keys to translated values
-        """
+
         return self.get_message_bundle(namespace)

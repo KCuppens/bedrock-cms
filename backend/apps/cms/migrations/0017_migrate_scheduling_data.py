@@ -3,7 +3,6 @@
 from django.contrib.contenttypes.models import ContentType
 from django.db import migrations
 
-
 def migrate_page_scheduling_data(apps, schema_editor):
     """Migrate existing scheduled pages and create ScheduledTask entries."""
     Page = apps.get_model("cms", "Page")
@@ -28,7 +27,6 @@ def migrate_page_scheduling_data(apps, schema_editor):
             status="pending",
         )
 
-
 def reverse_migration(apps, schema_editor):
     """Reverse the migration if needed."""
     Page = apps.get_model("cms", "Page")
@@ -47,7 +45,6 @@ def reverse_migration(apps, schema_editor):
         page.published_at = page.scheduled_publish_at
         page.scheduled_publish_at = None
         page.save(update_fields=["published_at", "scheduled_publish_at"])
-
 
 class Migration(migrations.Migration):
     dependencies = [

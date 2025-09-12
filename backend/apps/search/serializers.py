@@ -2,15 +2,11 @@ from rest_framework import serializers
 
 from .models import SearchIndex, SearchQuery, SearchSuggestion
 
-"""
 Serializers for search functionality.
-"""
-
 
 class SearchResultSerializer(serializers.Serializer):
-    """
+
     Serializer for search results.
-    """
 
     id = serializers.CharField()
     title = serializers.CharField()
@@ -25,11 +21,9 @@ class SearchResultSerializer(serializers.Serializer):
     object_type = serializers.CharField()
     object_id = serializers.IntegerField()
 
-
 class SearchRequestSerializer(serializers.Serializer):
-    """
+
     Serializer for search requests.
-    """
 
     query = serializers.CharField(required=True, max_length=500)
     category = serializers.CharField(required=False, allow_blank=True, max_length=50)
@@ -42,11 +36,9 @@ class SearchRequestSerializer(serializers.Serializer):
     page = serializers.IntegerField(default=1, min_value=1)
     page_size = serializers.IntegerField(default=20, min_value=1, max_value=100)
 
-
 class SearchResponseSerializer(serializers.Serializer):
-    """
+
     Serializer for search responses.
-    """
 
     results = SearchResultSerializer(many=True)
     pagination = serializers.DictField()
@@ -55,11 +47,9 @@ class SearchResponseSerializer(serializers.Serializer):
     execution_time_ms = serializers.IntegerField()
     suggestions = serializers.ListField(child=serializers.CharField())
 
-
 class SearchSuggestionSerializer(serializers.ModelSerializer):
-    """
+
     Serializer for search suggestions.
-    """
 
     class Meta:
         model = SearchSuggestion
@@ -75,20 +65,16 @@ class SearchSuggestionSerializer(serializers.ModelSerializer):
         ]
         read_only_fields = ["id", "search_count", "result_count", "click_through_rate"]
 
-
 class AutocompleteSerializer(serializers.Serializer):
-    """
+
     Serializer for autocomplete requests.
-    """
 
     query = serializers.CharField(required=True, min_length=2, max_length=200)
     limit = serializers.IntegerField(default=10, min_value=1, max_value=50)
 
-
 class SearchAnalyticsSerializer(serializers.Serializer):
-    """
+
     Serializer for search analytics.
-    """
 
     period_days = serializers.IntegerField()
     total_queries = serializers.IntegerField()
@@ -97,11 +83,9 @@ class SearchAnalyticsSerializer(serializers.Serializer):
     top_queries = serializers.ListField()
     zero_result_queries = serializers.ListField()
 
-
 class SearchIndexSerializer(serializers.ModelSerializer):
-    """
+
     Serializer for search index entries (admin use).
-    """
 
     content_type_label = serializers.CharField(
         source="content_type.model", read_only=True
@@ -130,11 +114,9 @@ class SearchIndexSerializer(serializers.ModelSerializer):
         ]
         read_only_fields = ["id", "indexed_at", "created_at"]
 
-
 class SearchQueryLogSerializer(serializers.ModelSerializer):
-    """
+
     Serializer for search query logs (admin use).
-    """
 
     user_email = serializers.CharField(
         source="user.email", read_only=True, allow_null=True
@@ -158,11 +140,9 @@ class SearchQueryLogSerializer(serializers.ModelSerializer):
         ]
         read_only_fields = ["id", "created_at"]
 
-
 class BulkIndexSerializer(serializers.Serializer):
-    """
+
     Serializer for bulk indexing operations.
-    """
 
     model_label = serializers.CharField(
         required=False,

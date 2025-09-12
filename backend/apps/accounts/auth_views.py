@@ -1,8 +1,11 @@
+from allauth.account.forms import ResetPasswordForm, default_token_generator
 from django.contrib.auth import authenticate, get_user_model, login, logout
+from django.contrib.auth.password_validation import validate_password
+from django.contrib.auth.tokens import default_token_generator as django_token_generator
 from django.core.exceptions import ValidationError
 from django.core.validators import validate_email
-
-from allauth.account.forms import ResetPasswordForm
+from django.utils.encoding import force_str
+from django.utils.http import urlsafe_base64_decode
 from drf_spectacular.utils import extend_schema
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes, throttle_classes
@@ -12,14 +15,8 @@ from rest_framework.throttling import AnonRateThrottle
 from rest_framework.views import APIView
 
 from .serializers import UserSerializer
-from django.utils.encoding import force_str
-from django.utils.http import urlsafe_base64_decode
-from allauth.account.forms import default_token_generator
-from django.contrib.auth.tokens import default_token_generator as django_token_generator
-from django.contrib.auth.password_validation import validate_password
 
 User = get_user_model()
-
 
 class LoginThrottle(AnonRateThrottle):
     """Rate limiting for login attempts"""
@@ -27,13 +24,11 @@ class LoginThrottle(AnonRateThrottle):
     scope = "login"
     rate = "5/min"
 
-
 class PasswordResetThrottle(AnonRateThrottle):
     """Rate limiting for password reset requests"""
 
     scope = "password_reset"
     rate = "3/hour"
-
 
 @extend_schema(
     summary="User login",
@@ -96,7 +91,6 @@ def login_view(request):  # noqa: C901
         status=status.HTTP_200_OK,
     )
 
-
 @extend_schema(
     summary="User logout",
     description="Logout current user and destroy session",
@@ -114,7 +108,6 @@ def logout_view(request):  # noqa: C901
         status=status.HTTP_200_OK,
     )
 
-
 @extend_schema(
     summary="Get current user",
     description="Get current authenticated user information",
@@ -129,7 +122,6 @@ def current_user_view(request):  # noqa: C901
     """REST API endpoint to get current user"""
     serializer = UserSerializer(request.user, context={"request": request})
     return Response(serializer.data, status=status.HTTP_200_OK)
-
 
 @extend_schema(
     summary="Request password reset",
@@ -191,10 +183,8 @@ def password_reset_view(request):  # noqa: C901
         status=status.HTTP_200_OK,
     )
 
-
 def _parse_token_from_formats(uid_param, token_param):  # noqa: C901
-    """
-    Parse UID and token from different formats:
+    """Parse UID and token from different formats:
     1. Standard Django format: separate uid and token
     2. Allauth format: combined token like "4-cvtit9-cc6628ec2531c2cc114f2d6d8f06d72d"
     """
@@ -205,7 +195,6 @@ def _parse_token_from_formats(uid_param, token_param):  # noqa: C901
             user_id = force_str(urlsafe_base64_decode(uid_param))
             return user_id, token_param
         except (TypeError, ValueError):
-            pass
 
     # Try allauth format: "4-cvtit9-cc6628ec2531c2cc114f2d6d8f06d72d"
     full_token = uid_param or token_param
@@ -219,10 +208,8 @@ def _parse_token_from_formats(uid_param, token_param):  # noqa: C901
                 token = "-".join(parts[1:])  # Join remaining parts as token
                 return user_id, token
             except ValueError:
-                pass
 
     raise ValueError("Invalid token format")
-
 
 @extend_schema(
     summary="Verify password reset token",
@@ -278,7 +265,6 @@ def password_reset_verify_token(request):  # noqa: C901
         {"error": "Invalid or expired reset link", "valid": False},
         status=status.HTTP_400_BAD_REQUEST,
     )
-
 
 @extend_schema(
     summary="Confirm password reset",
@@ -372,7 +358,6 @@ def password_reset_confirm_view(request):  # noqa: C901
         {"message": "Password has been reset successfully"},
         status=status.HTTP_200_OK,
     )
-
 
 class SessionCheckView(APIView):
     """Check if user has valid session"""

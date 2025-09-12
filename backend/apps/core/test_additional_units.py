@@ -1,21 +1,21 @@
 import unittest
 from unittest.mock import Mock
-            from apps.core import utils
-            from apps.core import validators
-            from apps.core import enums
-            from apps.core import mixins
-            from apps.core import permissions
-            from apps.core import middleware
-            from apps.core import cache
-            from apps.core import throttling
-            from apps.core import decorators
-            from apps.core import circuit_breaker
-            from apps.core import storage
-"""
+
+from apps.core import (
+    cache,
+    circuit_breaker,
+    decorators,
+    enums,
+    middleware,
+    mixins,
+    permissions,
+    storage,
+    throttling,
+    utils,
+    validators,
+)
+
 Additional unit tests for core app to boost coverage.
-"""
-
-
 
 class TestCoreUtilityFunctions(unittest.TestCase):
     """Test core utility functions."""
@@ -26,7 +26,6 @@ class TestCoreUtilityFunctions(unittest.TestCase):
 
             self.assertTrue(hasattr(utils, "__name__"))
         except ImportError:
-            pass
 
     def test_core_validators_import(self):
         """Test that core validators can be imported."""
@@ -51,7 +50,6 @@ class TestCoreUtilityFunctions(unittest.TestCase):
                     except Exception:
                         pass  # Validation may fail, that's expected
         except ImportError:
-            pass
 
     def test_core_enums_access(self):
         """Test accessing core enums."""
@@ -69,7 +67,6 @@ class TestCoreUtilityFunctions(unittest.TestCase):
                             str_repr = str(member)
                             self.assertIsInstance(str_repr, str)
         except ImportError:
-            pass
 
     def test_core_mixins_classes(self):
         """Test core mixin classes."""
@@ -93,9 +90,8 @@ class TestCoreUtilityFunctions(unittest.TestCase):
                                         return_value=Mock
                                     )
                             except Exception:
-                                pass
+
         except ImportError:
-            pass
 
     def test_core_permissions_classes(self):
         """Test core permission classes."""
@@ -120,13 +116,10 @@ class TestCoreUtilityFunctions(unittest.TestCase):
                                     )
                                     self.assertIsInstance(result, bool)
                                 except Exception:
-                                    pass
 
                         except Exception:
-                            pass
-        except ImportError:
-            pass
 
+        except ImportError:
 
 class TestCoreMiddleware(unittest.TestCase):
     """Test core middleware classes."""
@@ -156,10 +149,8 @@ class TestCoreMiddleware(unittest.TestCase):
                                     pass  # Middleware may require specific setup
 
                         except Exception:
-                            pass
-        except ImportError:
-            pass
 
+        except ImportError:
 
 class TestCoreCache(unittest.TestCase):
     """Test core cache functionality."""
@@ -186,8 +177,6 @@ class TestCoreCache(unittest.TestCase):
                         except Exception:
                             pass  # Cache operations may fail without proper setup
         except ImportError:
-            pass
-
 
 class TestCoreThrottling(unittest.TestCase):
     """Test core throttling functionality."""
@@ -215,19 +204,15 @@ class TestCoreThrottling(unittest.TestCase):
                                     )
                                     self.assertIsInstance(result, bool)
                                 except Exception:
-                                    pass
 
                             if hasattr(throttle, "get_rate"):
                                 try:
                                     throttle.get_rate()
                                 except Exception:
-                                    pass
 
                         except Exception:
-                            pass
-        except ImportError:
-            pass
 
+        except ImportError:
 
 class TestCoreDecorators(unittest.TestCase):
     """Test core decorators."""
@@ -259,10 +244,8 @@ class TestCoreDecorators(unittest.TestCase):
                                 if callable(decorated):
                                     decorated()
                             except Exception:
-                                pass
-        except ImportError:
-            pass
 
+        except ImportError:
 
 class TestCoreCircuitBreaker(unittest.TestCase):
     """Test core circuit breaker functionality."""
@@ -286,7 +269,6 @@ class TestCoreCircuitBreaker(unittest.TestCase):
                                     try:
                                         cb.call(lambda: "success")
                                     except Exception:
-                                        pass
 
                                 if hasattr(cb, "record_success"):
                                     cb.record_success()
@@ -295,10 +277,8 @@ class TestCoreCircuitBreaker(unittest.TestCase):
                                     cb.record_failure()
 
                         except Exception:
-                            pass
-        except ImportError:
-            pass
 
+        except ImportError:
 
 class TestCoreStorage(unittest.TestCase):
     """Test core storage utilities."""
@@ -326,8 +306,6 @@ class TestCoreStorage(unittest.TestCase):
                         except Exception:
                             pass  # Storage operations may fail without proper setup
         except ImportError:
-            pass
-
 
 if __name__ == "__main__":
     unittest.main()

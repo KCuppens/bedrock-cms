@@ -10,22 +10,17 @@ from django.db.models import (
 
 from apps.i18n.models import Locale
 
-"""
 Role-Based Access Control (RBAC) models and utilities.
 
 This module provides scoped permissions that allow users to be granted
 permissions only for specific locales and/or path sections.
-"""
-
-
 
 class ScopedLocale(models.Model):
-    """
+
     Scopes a Django Group to specific locales.
 
     Users in the group will only have permissions for content
     in the specified locales.
-    """
 
     group: ForeignKey = models.ForeignKey(
         Group,
@@ -52,14 +47,12 @@ class ScopedLocale(models.Model):
     def __str__(self):
         return f"{self.group.name} → {self.locale.name}"
 
-
 class ScopedSection(models.Model):
-    """
+
     Scopes a Django Group to specific path sections.
 
     Users in the group will only have permissions for content
     under the specified path prefixes.
-    """
 
     group: ForeignKey = models.ForeignKey(
         Group,
@@ -111,16 +104,14 @@ class ScopedSection(models.Model):
     def __str__(self):
         return f"{self.group.name} → {self.name} ({self.path_prefix})"
 
-
 class RBACMixin:
-    """
+
     Mixin to add RBAC scope checking methods to models.
 
     Usage:
         class Page(models.Model, RBACMixin):
             locale: ForeignKey = models.ForeignKey(Locale, ...)
             path: CharField = models.CharField(...)
-    """
 
     def user_has_locale_access(self, user):
         """Check if user has access to this object's locale."""

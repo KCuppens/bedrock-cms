@@ -4,11 +4,8 @@ from django.utils.translation import gettext_lazy as _
 
 from apps.i18n.models import Locale, UiMessage, UiMessageTranslation
 
-"""
 Import Django's built-in translation strings into the database.
 This includes admin interface strings, form validation messages, etc.
-"""
-
 
 class Command(BaseCommand):
     help = "Import Django built-in translation strings into database"
@@ -136,7 +133,7 @@ class Command(BaseCommand):
             help="Update existing translations",
         )
 
-    def handle(self, *args, **options):
+    def handle(self, *args, **options):  # noqa: C901
         locale_code = options.get("locale")
         namespace = options["namespace"]
         update_existing = options.get("update_existing", False)
@@ -149,7 +146,6 @@ class Command(BaseCommand):
 
         if not locales.exists():
             self.stdout.write(self.style.ERROR("No active locales found"))
-            return
 
         created_messages = 0
         created_translations = 0
@@ -159,7 +155,6 @@ class Command(BaseCommand):
         default_locale = Locale.objects.filter(is_default=True).first()
         if not default_locale:
             self.stdout.write(self.style.ERROR("No default locale set"))
-            return
 
         # Import each string
         for key, lazy_string in self.DJANGO_STRINGS.items():
@@ -185,7 +180,6 @@ class Command(BaseCommand):
             for locale in locales:
                 # Skip if same as default and not forced
                 if locale.id == default_locale.id and not update_existing:
-                    continue
 
                 # Get translated value
                 with translation.override(locale.code):
@@ -193,7 +187,6 @@ class Command(BaseCommand):
 
                 # Skip if translation is same as default (not actually translated)
                 if translated_value == default_value and locale.id != default_locale.id:
-                    continue
 
                 # Create or update translation
                 if update_existing:

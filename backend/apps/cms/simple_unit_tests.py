@@ -1,22 +1,17 @@
 import os
 import sys
+import unittest
 from unittest.mock import Mock, patch
-        from apps.cms.views.pages import PagesViewSet
-        from apps.cms.views.pages import PagesViewSet
-        from apps.cms.views.pages import PagesViewSet
-        from apps.cms.views.pages import PagesViewSet
-        from rest_framework.response import Response
-        from apps.cms.views.pages import PagesViewSet
-    import unittest
-"""
+
+from rest_framework.response import Response
+
+from apps.cms.views.pages import PagesViewSet
+
 Simple unit tests for CMS views without full Django test framework.
 These tests focus on specific methods and logic that can be tested in isolation.
-"""
-
 
 # Add the project root to the path so we can import apps
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
-
 
 def test_pages_viewset_get_serializer_class():
     """Test serializer class selection in PagesViewSet."""
@@ -46,7 +41,6 @@ def test_pages_viewset_get_serializer_class():
         viewset.action = "retrieve"
         serializer_class = viewset.get_serializer_class()
         assert serializer_class.__name__ == "PageReadSerializer"
-
 
 def test_pages_viewset_get_permissions():
     """Test permission selection in PagesViewSet."""
@@ -80,7 +74,6 @@ def test_pages_viewset_get_permissions():
             assert permissions[0].__class__.__name__ == "IsAuthenticated"
             assert permissions[1].__class__.__name__ == "DjangoModelPermissions"
 
-
 @patch("apps.cms.views.pages.Page.objects")
 def test_pages_viewset_get_queryset(mock_page_objects):
     """Test queryset optimization in PagesViewSet."""
@@ -102,7 +95,6 @@ def test_pages_viewset_get_queryset(mock_page_objects):
 
         assert result == mock_queryset
 
-
 def test_pages_viewset_throttle_classes():
     """Test that throttle classes are properly configured."""
     with patch("django.conf.settings"):
@@ -121,7 +113,6 @@ def test_pages_viewset_throttle_classes():
         for expected in expected_throttles:
             assert expected in throttle_class_names
 
-
 @patch("apps.cms.views.pages.get_object_or_404")
 @patch("apps.cms.views.pages.Locale.objects")
 def test_pages_viewset_get_by_path_validation(
@@ -129,7 +120,6 @@ def test_pages_viewset_get_by_path_validation(
 ):
     """Test get_by_path parameter validation."""
     with patch("django.conf.settings"):
-
 
         viewset = PagesViewSet()
         viewset.request = Mock()
@@ -160,7 +150,6 @@ def test_pages_viewset_get_by_path_validation(
 
             assert isinstance(response, Response)
             assert response.status_code == 200
-
 
 if __name__ == "__main__":
     # Run tests directly

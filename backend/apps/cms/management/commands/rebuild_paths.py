@@ -4,7 +4,6 @@ from django.db import transaction
 from apps.cms.models import Page
 from apps.i18n.models import Locale
 
-
 class Command(BaseCommand):
     help = "Rebuild page paths and resequence positions"
 
@@ -18,7 +17,7 @@ class Command(BaseCommand):
             help="Root page ID to rebuild subtree (default: rebuild all)",
         )
 
-    def handle(self, *args, **options):
+    def handle(self, *args, **options):  # noqa: C901
         locale_code = options.get("locale")
         root_id = options.get("root")
 
@@ -28,7 +27,6 @@ class Command(BaseCommand):
             locales = locales.filter(code=locale_code)
             if not locales.exists():
                 self.stdout.write(self.style.ERROR(f'Locale "{locale_code}" not found'))
-                return
 
         for locale in locales:
             self.stdout.write(f"Processing locale: {locale.code}")
@@ -46,7 +44,6 @@ class Command(BaseCommand):
                             f"Root page {root_id} not found for locale {locale.code}"
                         )
                     )
-                    continue
 
             with transaction.atomic():
                 # Rebuild paths for all pages

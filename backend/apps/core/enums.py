@@ -1,6 +1,5 @@
 from django.db import models
 
-
 class UserRole(models.TextChoices):
     """User role choices"""
 
@@ -8,7 +7,6 @@ class UserRole(models.TextChoices):
     MANAGER = "manager", "Manager"
     MEMBER = "member", "Member"
     READ_ONLY = "readonly", "Read Only"
-
 
 class EmailStatus(models.TextChoices):
     """Email status choices"""
@@ -21,7 +19,6 @@ class EmailStatus(models.TextChoices):
     OPENED = "opened", "Opened"
     CLICKED = "clicked", "Clicked"
 
-
 class FileType(models.TextChoices):
     """File type choices"""
 
@@ -32,7 +29,6 @@ class FileType(models.TextChoices):
     ARCHIVE = "archive", "Archive"
     OTHER = "other", "Other"
 
-
 class NotificationType(models.TextChoices):
     """Notification type choices"""
 
@@ -40,7 +36,6 @@ class NotificationType(models.TextChoices):
     SUCCESS = "success", "Success"
     WARNING = "warning", "Warning"
     ERROR = "error", "Error"
-
 
 class Priority(models.TextChoices):
     """Priority choices"""
@@ -50,7 +45,6 @@ class Priority(models.TextChoices):
     HIGH = "high", "High"
     URGENT = "urgent", "Urgent"
 
-
 class Status(models.TextChoices):
     """Generic status choices"""
 
@@ -59,7 +53,6 @@ class Status(models.TextChoices):
     INACTIVE = "inactive", "Inactive"
     ARCHIVED = "archived", "Archived"
     DELETED = "deleted", "Deleted"
-
 
 class TaskStatus(models.TextChoices):
     """Task status choices"""

@@ -1,15 +1,11 @@
+from datetime import datetime, timedelta
+
 from rest_framework import serializers
 
 from apps.cms.models import Page
+from apps.cms.seo_utils import generate_seo_links, resolve_seo
+from apps.i18n.models import Locale
 from apps.i18n.serializers import LocaleSerializer
-from django.core.exceptions import ValidationError
-            from apps.cms.seo_utils import resolve_seo
-            from apps.cms.seo_utils import generate_seo_links
-            from datetime import datetime, timedelta
-        from datetime import datetime, timedelta
-        from apps.i18n.models import Locale
-        from apps.i18n.models import Locale
-
 
 class PageTreeItemSerializer(serializers.ModelSerializer):
     """Serializer for page tree items"""
@@ -43,7 +39,6 @@ class PageTreeItemSerializer(serializers.ModelSerializer):
         if hasattr(obj, "_children_count"):
             return obj._children_count
         return obj.children.count()
-
 
 class PageReadSerializer(serializers.ModelSerializer):
     """Serializer for reading page data"""
@@ -106,7 +101,7 @@ class PageReadSerializer(serializers.ModelSerializer):
             if latest_revision and latest_revision.created_by:
                 return latest_revision.created_by.id
         except Exception:
-            pass
+
         return None
 
     def get_updated_by_name(self, obj):
@@ -128,7 +123,7 @@ class PageReadSerializer(serializers.ModelSerializer):
                 else:
                     return user.username
         except Exception:
-            pass
+
         return "System"
 
     def get_resolved_seo(self, obj):
@@ -246,7 +241,6 @@ class PageReadSerializer(serializers.ModelSerializer):
 
         # print(f"DEBUG: recent_revisions length: {len(data['recent_revisions']
         return data
-
 
 class PageWriteSerializer(serializers.ModelSerializer):
     """Serializer for writing page data"""

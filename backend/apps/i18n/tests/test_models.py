@@ -2,23 +2,24 @@ from django.contrib.auth import get_user_model
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ValidationError
 from django.test import TestCase
+
 from apps.i18n.models import (
-"""
-Test cases for i18n models.
-"""
-
-
     Locale,
+    Test,
     TranslationGlossary,
     TranslationHistory,
     TranslationQueue,
     TranslationUnit,
     UiMessage,
     UiMessageTranslation,
+
+    cases,
+
+    i18n,
+    # models
 )
 
 User = get_user_model()
-
 
 class LocaleModelTest(TestCase):
     """Test cases for Locale model."""
@@ -114,7 +115,6 @@ class LocaleModelTest(TestCase):
         self.assertEqual(locales[1], self.locale_fr)
         self.assertEqual(locales[2], self.locale_es)
 
-
 class UiMessageModelTest(TestCase):
     """Test cases for UiMessage model."""
 
@@ -161,7 +161,6 @@ class UiMessageModelTest(TestCase):
         self.assertEqual(messages[0], message2)  # auth.login.title
         self.assertEqual(messages[1], message3)  # common.buttons.cancel
         self.assertEqual(messages[2], self.message)  # common.buttons.save
-
 
 class UiMessageTranslationModelTest(TestCase):
     """Test cases for UiMessageTranslation model."""
@@ -223,7 +222,6 @@ class UiMessageTranslationModelTest(TestCase):
             self.translation.status = status
             self.translation.save()
             self.assertEqual(self.translation.status, status)
-
 
 class TranslationUnitModelTest(TestCase):
     """Test cases for TranslationUnit model."""
@@ -302,7 +300,6 @@ class TranslationUnitModelTest(TestCase):
             self.translation_unit.save()
             self.assertEqual(self.translation_unit.status, status)
 
-
 class TranslationGlossaryModelTest(TestCase):
     """Test cases for TranslationGlossary model."""
 
@@ -357,7 +354,6 @@ class TranslationGlossaryModelTest(TestCase):
                 target_locale=self.locale_es,  # Same target
                 created_by=self.user,
             )
-
 
 class TranslationQueueModelTest(TestCase):
     """Test cases for TranslationQueue model."""
@@ -431,7 +427,6 @@ class TranslationQueueModelTest(TestCase):
             self.queue_item.status = status
             self.queue_item.save()
             self.assertEqual(self.queue_item.status, status)
-
 
 class TranslationHistoryModelTest(TestCase):
     """Test cases for TranslationHistory model."""

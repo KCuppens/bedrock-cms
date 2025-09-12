@@ -1,12 +1,13 @@
-from .base import (  # noqa: F403
-    BASE_DIR,  # noqa: F405
-    INSTALLED_APPS,  # noqa: F405
-    DATABASES,  # noqa: F405
-    REST_FRAMEWORK,  # noqa: F405
-    LOGGING,  # noqa: F405
-    env,  # noqa: F405
-)
 from typing import Any
+
+from .base import (
+    BASE_DIR,  # noqa: F405
+    DATABASES,  # noqa: F405
+    INSTALLED_APPS,  # noqa: F405
+    LOGGING,  # noqa: F405
+    REST_FRAMEWORK,  # noqa: F405
+    env,  # noqa: F403; noqa: F405
+)
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -19,7 +20,9 @@ ALLOWED_HOSTS = ["localhost", "127.0.0.1"]
 # DATABASE_URL=postgres://user:pass@localhost:5432/dbname
 # DATABASE_URL=mysql://user:pass@localhost:3306/dbname
 DATABASES = {  # noqa: F811
-    "default": env.db("DATABASE_URL", default=f"sqlite:///{BASE_DIR}/db.sqlite3")  # noqa: F405
+    "default": env.db(
+        "DATABASE_URL", default=f"sqlite:///{BASE_DIR}/db.sqlite3"
+    )  # noqa: F405
 }
 
 # Email backend for development

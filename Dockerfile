@@ -33,7 +33,8 @@ RUN curl -sSL https://install.python-poetry.org | python3 -
 # Copy project requirement files
 WORKDIR $PYSETUP_PATH
 COPY backend/pyproject.toml backend/poetry.lock* ./
-COPY backend/requirements*.txt ./
+COPY backend/requirements.txt ./
+COPY backend/requirements/ ./requirements/
 
 # Install runtime dependencies
 RUN poetry install --only main --no-root || pip install -r requirements.txt

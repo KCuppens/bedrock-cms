@@ -1,12 +1,9 @@
 from rest_framework import serializers
+
 from .models import Page, Redirect
-                from .seo_utils import resolve_seo
-"""
+from .seo_utils import resolve_seo
+
 Optimized serializers for CMS with reduced field loading.
-"""
-
-
-
 
 class PageListSerializer(serializers.ModelSerializer):
     """Minimal serializer for page lists."""
@@ -30,7 +27,6 @@ class PageListSerializer(serializers.ModelSerializer):
             "is_homepage",
             "updated_at",
         ]
-
 
 class PageDetailSerializer(serializers.ModelSerializer):
     """Full serializer for page detail views."""
@@ -71,14 +67,12 @@ class PageDetailSerializer(serializers.ModelSerializer):
                 return None
         return None
 
-
 class PageMinimalSerializer(serializers.ModelSerializer):
     """Ultra-minimal serializer for references."""
 
     class Meta:
         model = Page
         fields = ["id", "title", "slug", "path"]
-
 
 class PageTreeSerializer(serializers.ModelSerializer):
     """Optimized serializer for tree structures."""
@@ -98,14 +92,12 @@ class PageTreeSerializer(serializers.ModelSerializer):
             return PageTreeSerializer(obj.children.all(), many=True).data
         return []
 
-
 class RedirectListSerializer(serializers.ModelSerializer):
     """Optimized serializer for redirect lists."""
 
     class Meta:
         model = Redirect
         fields = ["id", "from_path", "to_path", "status", "is_active", "hits"]
-
 
 class RedirectDetailSerializer(serializers.ModelSerializer):
     """Full serializer for redirect details."""

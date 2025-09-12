@@ -1,26 +1,25 @@
+import secrets
+
+from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Group, Permission
+from django.contrib.auth.tokens import default_token_generator
+from django.core.mail import send_mail
 from django.db.models import Count, Q
-
+from django.utils.encoding import force_bytes
+from django.utils.http import urlsafe_base64_encode
 from drf_spectacular.utils import extend_schema, extend_schema_view
 from rest_framework import serializers, status, viewsets
 from rest_framework.decorators import action, api_view, permission_classes
 from rest_framework.permissions import IsAdminUser
 from rest_framework.response import Response
 
-from .serializers import UserSerializer
-from django.core.exceptions import ValidationError
-from django.contrib.auth.tokens import default_token_generator
-from django.utils.encoding import force_bytes
-from django.utils.http import urlsafe_base64_encode
-from django.conf import settings
-from django.core.mail import send_mail
-import secrets
 from apps.i18n.models import Locale
+
 from .rbac import ScopedLocale
+from .serializers import UserSerializer
 
 User = get_user_model()
-
 
 class RoleSerializer(serializers.ModelSerializer):
     """Serializer for Role/Group model"""
@@ -69,7 +68,6 @@ class RoleSerializer(serializers.ModelSerializer):
             for scope in obj.locale_scopes.select_related("locale").all()
         ]
 
-
 class PermissionSerializer(serializers.ModelSerializer):
     """Serializer for Permission model"""
 
@@ -80,7 +78,6 @@ class PermissionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Permission
         fields = ["id", "name", "codename", "content_type", "content_type_display"]
-
 
 class UserInviteSerializer(serializers.Serializer):
     """Serializer for user invitation"""
@@ -120,7 +117,6 @@ class UserInviteSerializer(serializers.Serializer):
                 )
 
         return data
-
 
 @extend_schema_view(
     list=extend_schema(summary="List all users", tags=["User Management"]),
@@ -205,7 +201,7 @@ class UserManagementViewSet(viewsets.ModelViewSet):
 
                     If you already have an account, you can sign in at:
                     {settings.FRONTEND_URL}/sign-in
-                    """,
+
                     from_email=settings.DEFAULT_FROM_EMAIL,
                     recipient_list=[email],
                     fail_silently=False,
@@ -239,14 +235,13 @@ class UserManagementViewSet(viewsets.ModelViewSet):
                         group = Group.objects.get(pk=role_id)
                         user.groups.add(group)
                     except Group.DoesNotExist:
-                        pass
+
             # Fallback to single role name for backward compatibility
             elif role:
                 try:
                     group = Group.objects.get(name=role)
                     user.groups.add(group)
                 except Group.DoesNotExist:
-                    pass
 
             # Generate password reset token for new user
 
@@ -265,7 +260,7 @@ class UserManagementViewSet(viewsets.ModelViewSet):
 
                 Please use the following link to set up your password:
                 {settings.FRONTEND_URL}/accounts/password/reset/key/{user.pk}-{token}/
-                """,
+
                 from_email=settings.DEFAULT_FROM_EMAIL,
                 recipient_list=[email],
                 fail_silently=False,
@@ -292,7 +287,6 @@ class UserManagementViewSet(viewsets.ModelViewSet):
                 group = Group.objects.get(pk=role_id)
                 user.groups.add(group)
             except Group.DoesNotExist:
-                pass
 
         return Response(
             {
@@ -348,7 +342,6 @@ class UserManagementViewSet(viewsets.ModelViewSet):
 
         return Response({"message": f"User {user_email} has been deleted successfully"})
 
-
 @extend_schema_view(
     list=extend_schema(summary="List all roles", tags=["Role Management"]),
     create=extend_schema(summary="Create new role", tags=["Role Management"]),
@@ -388,14 +381,12 @@ class RoleViewSet(viewsets.ModelViewSet):
             # Create locale scopes if provided
             if locale_scope_ids:
 
-
                 for locale_id in locale_scope_ids:
                     try:
                         locale = Locale.objects.get(pk=locale_id)
                         ScopedLocale.objects.create(group=group, locale=locale)
                     except Locale.DoesNotExist:
                         # Skip invalid locale IDs
-                        pass
 
             serializer = self.get_serializer(group)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
@@ -422,7 +413,6 @@ class RoleViewSet(viewsets.ModelViewSet):
         # Update locale scopes if provided
         if "locale_scope_ids" in data:
 
-
             # Clear existing locale scopes
             ScopedLocale.objects.filter(group=instance).delete()
 
@@ -433,7 +423,6 @@ class RoleViewSet(viewsets.ModelViewSet):
                     ScopedLocale.objects.create(group=instance, locale=locale)
                 except Locale.DoesNotExist:
                     # Skip invalid locale IDs
-                    pass
 
         serializer = self.get_serializer(instance)
         return Response(serializer.data)
@@ -472,7 +461,6 @@ class RoleViewSet(viewsets.ModelViewSet):
                     permission = Permission.objects.get(pk=perm_id)
                     role.permissions.add(permission)
                 except Permission.DoesNotExist:
-                    pass
 
             return Response(
                 {
@@ -480,7 +468,6 @@ class RoleViewSet(viewsets.ModelViewSet):
                     "permissions": [p.codename for p in role.permissions.all()],
                 }
             )
-
 
 @extend_schema_view(
     list=extend_schema(summary="List all permissions", tags=["Permission Management"]),
@@ -512,7 +499,6 @@ class PermissionViewSet(viewsets.ReadOnlyModelViewSet):
             )
 
         return queryset.select_related("content_type")
-
 
 @extend_schema(summary="Get available scopes", tags=["Permission Management"])
 @api_view(["GET"])

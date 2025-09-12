@@ -1,8 +1,7 @@
 #!/usr/bin/env python
-"""
+
 Performance review script for Bedrock CMS.
 Analyzes database queries, caching, API performance, and identifies bottlenecks.
-"""
 
 import json
 import os
@@ -20,15 +19,14 @@ from django.utils import timezone
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "apps.config.settings.development")
 
-import django
+import django  # noqa: E402
 
 django.setup()
 
-from apps.blog.models import BlogPost
-from apps.cms.blocks.validation import validate_blocks
-from apps.cms.models import Page
-from apps.media.models import Asset
-
+from apps.blog.models import BlogPost  # noqa: E402
+from apps.cms.blocks.validation import validate_blocks  # noqa: E402
+from apps.cms.models import Page  # noqa: E402
+from apps.media.models import Asset  # noqa: E402
 
 class PerformanceReviewer:
     """Comprehensive performance analysis for Bedrock CMS."""
@@ -626,7 +624,6 @@ class PerformanceReviewer:
 
         self.results["performance_score"] = score
 
-
 def main():
     """Main function to run performance review."""
     reviewer = PerformanceReviewer()
@@ -640,7 +637,6 @@ def main():
 
     print(f"\n📄 Detailed results saved to: {output_file}")
     return results
-
 
 if __name__ == "__main__":
     main()

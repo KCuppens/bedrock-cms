@@ -2,12 +2,10 @@ from django.db.models.signals import post_delete, post_save, pre_save
 from django.dispatch import receiver
 from django.utils import timezone
 
-from .models import Page
-        from apps.media.usage import update_usage_for_instance
-        from apps.media.usage import cleanup_usage_for_instance
-        from django.conf import settings
-        from .versioning import AuditEntry, PageRevision
+from apps.media.usage import cleanup_usage_for_instance, update_usage_for_instance
 
+from .models import Page
+from .versioning import AuditEntry, PageRevision
 
 @receiver(post_save, sender=Page)
 def update_descendant_paths(sender, instance, created, **kwargs):
@@ -24,7 +22,6 @@ def update_descendant_paths(sender, instance, created, **kwargs):
                 descendant.path = descendant.compute_path()
                 descendant.save(update_fields=["path"])
 
-
 @receiver(pre_save, sender=Page)
 def store_old_path(sender, instance, **kwargs):
     """Store old path to compare after save."""
@@ -35,7 +32,6 @@ def store_old_path(sender, instance, **kwargs):
         except Page.DoesNotExist:
             instance._old_path = None
 
-
 @receiver(post_save, sender=Page)
 def update_asset_usage(sender, instance, created, **kwargs):
     """Update asset usage tracking when page is saved."""
@@ -44,8 +40,6 @@ def update_asset_usage(sender, instance, created, **kwargs):
         update_usage_for_instance(instance)
     except ImportError:
         # Media app not available
-        pass
-
 
 @receiver(post_delete, sender=Page)
 def cleanup_asset_usage(sender, instance, **kwargs):
@@ -55,18 +49,14 @@ def cleanup_asset_usage(sender, instance, **kwargs):
         cleanup_usage_for_instance(instance)
     except ImportError:
         # Media app not available
-        pass
-
 
 @receiver(post_save, sender=Page)
 def create_page_revision(sender, instance, created, **kwargs):
     """Create revision snapshots when pages are saved."""
     try:
 
-
         # Skip if this is being called during revision restoration
         if getattr(instance, "_skip_revision_creation", False):
-            return
 
         # Get user from thread-local storage or request context
         user = getattr(instance, "_current_user", None)
@@ -123,8 +113,6 @@ def create_page_revision(sender, instance, created, **kwargs):
 
     except ImportError:
         # Versioning models not available
-        pass
-
 
 @receiver(pre_save, sender=Page)
 def detect_publish_status_change(sender, instance, **kwargs):
@@ -152,4 +140,3 @@ def detect_publish_status_change(sender, instance, **kwargs):
                 instance._was_unpublished_now = True
 
         except Page.DoesNotExist:
-            pass

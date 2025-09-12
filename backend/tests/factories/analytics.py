@@ -1,6 +1,5 @@
-"""
+
 Analytics factories for testing metrics and events.
-"""
 
 from django.utils import timezone
 
@@ -14,7 +13,6 @@ from .base import BaseFactory, UserFactory
 from .cms import PageFactory
 
 fake = Faker()
-
 
 class SessionFactory(BaseFactory):
     """Factory for user sessions."""
@@ -30,7 +28,6 @@ class SessionFactory(BaseFactory):
     ended_at = factory.LazyAttribute(
         lambda obj: fake.date_time_between(start_date=obj.started_at, end_date="+1h")
     )
-
 
 class EventFactory(BaseFactory):
     """Factory for analytics events."""
@@ -65,7 +62,6 @@ class EventFactory(BaseFactory):
     )
 
     timestamp = factory.LazyFunction(timezone.now)
-
 
 class PageViewFactory(BaseFactory):
     """Factory for page view analytics."""

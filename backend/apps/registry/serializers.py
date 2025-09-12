@@ -5,21 +5,17 @@ from rest_framework import serializers
 from .config import ContentConfig
 from .registry import content_registry
 
-"""
 Auto-generated serializers for registered content models.
-"""
-
 
 class ContentSerializerFactory:
-    """
+
     Factory for creating serializers for registered content models.
-    """
 
     @classmethod
     def create_serializer(
         cls, config: ContentConfig
     ) -> type[serializers.ModelSerializer]:
-        """
+
         Create a serializer class for a content configuration.
 
         Args:
@@ -27,7 +23,7 @@ class ContentSerializerFactory:
 
         Returns:
             ModelSerializer class
-        """
+
         model = config.model
         form_fields = list(config.get_effective_form_fields())
         custom_fields = cls._get_custom_fields(config)
@@ -129,7 +125,6 @@ class ContentSerializerFactory:
 
         return methods
 
-
 class RegistrySerializer(serializers.Serializer):
     """Serializer for registry information."""
 
@@ -153,7 +148,6 @@ class RegistrySerializer(serializers.Serializer):
     supports_publishing = serializers.BooleanField()
     supports_localization = serializers.BooleanField()
 
-
 class RegistrySummarySerializer(serializers.Serializer):
     """Serializer for registry summary."""
 
@@ -161,11 +155,10 @@ class RegistrySummarySerializer(serializers.Serializer):
     by_kind = serializers.DictField()
     configs = serializers.DictField()
 
-
 def get_serializer_for_model(
     model_label: str,
 ) -> type[serializers.ModelSerializer]:  # noqa: C901
-    """
+
     Get or create a serializer for a registered model.
 
     Args:
@@ -176,18 +169,17 @@ def get_serializer_for_model(
 
     Raises:
         ValueError: If model is not registered
-    """
+
     config = content_registry.get_config(model_label)
     if not config:
         raise ValueError(f"Model {model_label} is not registered")
 
     return ContentSerializerFactory.create_serializer(config)
 
-
 def get_serializer_for_config(
     config: ContentConfig,
 ) -> type[serializers.ModelSerializer]:
-    """
+
     Get or create a serializer for a content configuration.
 
     Args:
@@ -195,5 +187,5 @@ def get_serializer_for_config(
 
     Returns:
         ModelSerializer class
-    """
+
     return ContentSerializerFactory.create_serializer(config)

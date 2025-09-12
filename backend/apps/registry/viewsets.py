@@ -1,37 +1,38 @@
 from typing import Any
+
 from django.db.models import Q
 from django.shortcuts import get_object_or_404
+
 from django_filters.rest_framework import DjangoFilterBackend
 from drf_spectacular.utils import OpenApiParameter, extend_schema
 from rest_framework import filters, permissions, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
+
 from apps.i18n.models import Locale
+
 from .config import ContentConfig
 from .registry import content_registry
 from .serializers import (
-"""
-Auto-generated ViewSets for registered content models.
-"""
-
-
-
-
-
+    Auto-generated,
     RegistrySerializer,
     RegistrySummarySerializer,
+    ViewSets,
+
+    content,
+
     get_serializer_for_config,
+    # models
+    registered,
 )
 
-
 class ContentViewSetFactory:
-    """
+
     Factory for creating ViewSets for registered content models.
-    """
 
     @classmethod
     def create_viewset(cls, config: ContentConfig) -> type[viewsets.ModelViewSet]:
-        """
+
         Create a ViewSet class for a content configuration.
 
         Args:
@@ -39,7 +40,7 @@ class ContentViewSetFactory:
 
         Returns:
             ModelViewSet class
-        """
+
         model = config.model
         serializer_class = get_serializer_for_config(config)
 
@@ -99,7 +100,7 @@ class ContentViewSetFactory:
                 # Handle nested JSON fields differently
                 if field.endswith(".title") or field.endswith(".description"):
                     # For SEO fields, we'll handle these in custom search
-                    continue
+
                 else:
                     search_fields.append(field.split(".")[0])
             else:
@@ -240,11 +241,9 @@ class ContentViewSetFactory:
 
         return methods
 
-
 class RegistryViewSet(viewsets.ReadOnlyModelViewSet):
-    """
+
     ViewSet for browsing the content registry.
-    """
 
     serializer_class = RegistrySerializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
@@ -293,9 +292,8 @@ class RegistryViewSet(viewsets.ReadOnlyModelViewSet):
         export_data = content_registry.export_configs()
         return Response(export_data, content_type="application/json")
 
-
 def get_viewset_for_model(model_label: str) -> type[viewsets.ModelViewSet]:
-    """
+
     Get or create a ViewSet for a registered model.
 
     Args:
@@ -306,16 +304,15 @@ def get_viewset_for_model(model_label: str) -> type[viewsets.ModelViewSet]:
 
     Raises:
         ValueError: If model is not registered
-    """
+
     config = content_registry.get_config(model_label)
     if not config:
         raise ValueError(f"Model {model_label} is not registered")
 
     return ContentViewSetFactory.create_viewset(config)
 
-
 def get_viewset_for_config(config: ContentConfig) -> type[viewsets.ModelViewSet]:
-    """
+
     Get or create a ViewSet for a content configuration.
 
     Args:
@@ -323,5 +320,5 @@ def get_viewset_for_config(config: ContentConfig) -> type[viewsets.ModelViewSet]
 
     Returns:
         ModelViewSet class
-    """
+
     return ContentViewSetFactory.create_viewset(config)

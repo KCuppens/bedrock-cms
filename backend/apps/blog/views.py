@@ -3,6 +3,7 @@ from django.db.models import Count, Q
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
 from django.utils.text import slugify
+
 from django_filters.rest_framework import DjangoFilterBackend
 from drf_spectacular.utils import OpenApiParameter, extend_schema, extend_schema_view
 from rest_framework import filters, permissions, status, viewsets
@@ -10,23 +11,35 @@ from rest_framework.decorators import action
 from rest_framework.permissions import AllowAny, IsAdminUser, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.throttling import UserRateThrottle
+
 from apps.core.throttling import (
-from apps.i18n.models import Locale
-from .models import BlogPost, BlogSettings, Category, Tag
-from .serializers import (
-from .versioning import BlogPostRevision
-        from django.db.models import Prefetch
-            from apps.core.tasks import track_view_async
-from rest_framework.decorators import api_view, permission_classes
-"""
-Blog API views and viewsets.
-"""
-
-
-
+    API,
+    Blog,
+    BlogPost,
+    BlogPostRevision,
+    BlogSettings,
     BurstWriteThrottle,
+    Category,
+    Locale,
+    Prefetch,
     PublishOperationThrottle,
+    Tag,
     WriteOperationThrottle,
+
+    .models,
+    .serializers,
+    .versioning,
+
+    api_view,
+    apps.core.tasks,
+    apps.i18n.models,
+    django.db.models,
+
+    permission_classes,
+    rest_framework.decorators,
+    track_view_async,
+    views,
+    # viewsets
 )
 
     BlogPostAutosaveSerializer,
@@ -40,7 +53,6 @@ Blog API views and viewsets.
     TagSerializer,
 )
 
-
 @extend_schema_view(
     list=extend_schema(description="List all blog posts with filtering and pagination"),
     create=extend_schema(description="Create a new blog post"),
@@ -50,7 +62,7 @@ Blog API views and viewsets.
     destroy=extend_schema(description="Delete a blog post"),
 )
 class BlogPostViewSet(viewsets.ModelViewSet):
-    """
+
     ViewSet for managing blog posts with full CRUD operations and additional actions.
 
     Provides comprehensive blog post management including:
@@ -60,7 +72,6 @@ class BlogPostViewSet(viewsets.ModelViewSet):
     - Revision tracking
     - Autosave functionality
     - View count tracking
-    """
 
     throttle_classes = [
         UserRateThrottle,
@@ -389,7 +400,6 @@ class BlogPostViewSet(viewsets.ModelViewSet):
         serializer = BlogPostSerializer(restored_post)
         return Response(serializer.data)
 
-
 @extend_schema_view(
     list=extend_schema(description="List all blog categories"),
     create=extend_schema(description="Create a new blog category"),
@@ -424,7 +434,6 @@ class BlogCategoryViewSet(viewsets.ModelViewSet):
             return [AllowAny()]
         return [IsAuthenticated(), permissions.DjangoModelPermissions()]
 
-
 @extend_schema_view(
     list=extend_schema(description="List all blog tags"),
     create=extend_schema(description="Create a new blog tag"),
@@ -458,7 +467,6 @@ class BlogTagViewSet(viewsets.ModelViewSet):
         if self.action in ["list", "retrieve"]:
             return [AllowAny()]
         return [IsAuthenticated(), permissions.DjangoModelPermissions()]
-
 
 @extend_schema_view(
     list=extend_schema(description="List blog settings for all locales"),
@@ -508,21 +516,19 @@ class BlogSettingsViewSet(viewsets.ModelViewSet):
         else:
             serializer.save()
 
-
 # Legacy function-based views for backwards compatibility
-
 
 @api_view(["GET", "POST", "PATCH", "PUT"])
 @permission_classes([IsAuthenticated, IsAdminUser])
 def blog_settings_api(request, locale_code=None):  # noqa: C901
-    """
+
     Legacy API for blog settings.
 
     GET /api/v1/blog/settings/{locale_code}/
     POST /api/v1/blog/settings/{locale_code}/
     PATCH /api/v1/blog/settings/{locale_code}/
     PUT /api/v1/blog/settings/{locale_code}/
-    """
+
     if locale_code:
         locale = get_object_or_404(Locale, code=locale_code)
     else:
@@ -583,15 +589,14 @@ def blog_settings_api(request, locale_code=None):  # noqa: C901
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
-
 @api_view(["GET"])
 @permission_classes([IsAuthenticated, IsAdminUser])
 def blog_settings_list(request):  # noqa: C901
-    """
+
     Legacy API to list all blog settings across locales.
 
     GET /api/v1/blog/settings/
-    """
+
     settings = BlogSettings.objects.select_related(
         "locale", "default_presentation_page"
     ).all()

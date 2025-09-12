@@ -6,6 +6,7 @@ from django.core.exceptions import ValidationError
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase, override_settings
 from django.urls import reverse
+
 from PIL import Image
 from rest_framework import status
 from rest_framework.test import APIClient, APITestCase
@@ -15,16 +16,9 @@ from apps.files.models import File, FileTag, FileVersion, MediaCategory
 from apps.files.serializers import FileSerializer, FileUploadSerializer
 from apps.files.views import FileViewSet
 
-"""
 Files app tests with high coverage and real database operations.
-"""
-
-
-
-
 
 User = get_user_model()
-
 
 class FilesModelTests(TestCase):
     """Comprehensive tests for Files models."""
@@ -177,7 +171,6 @@ class FilesModelTests(TestCase):
                 usage_count = self.tag.get_usage_count()
                 self.assertEqual(usage_count, 2)
 
-
 class FilesAPITests(APITestCase):
     """Comprehensive API tests for Files endpoints."""
 
@@ -303,7 +296,6 @@ class FilesAPITests(APITestCase):
         except Exception:
             pass  # URL may not exist
 
-
 class FilesSerializerTests(TestCase):
     """Test Files app serializers."""
 
@@ -370,7 +362,6 @@ class FilesSerializerTests(TestCase):
                 serializer.validate_file(large_file)
             except Exception as e:
                 self.assertIsInstance(e, Exception)
-
 
 class FilesServiceTests(TestCase):
     """Test Files app services."""
@@ -442,7 +433,6 @@ class FilesServiceTests(TestCase):
         except (AttributeError, ImportError):
             pass  # Service may not exist
 
-
 class FilesViewTests(TestCase):
     """Test Files app views."""
 
@@ -477,7 +467,6 @@ class FilesViewTests(TestCase):
                 self.assertIsInstance(permissions, list)
         except (AttributeError, ImportError):
             pass  # ViewSet may not exist
-
 
 class FilesIntegrationTests(TestCase):
     """Integration tests for Files app workflows."""

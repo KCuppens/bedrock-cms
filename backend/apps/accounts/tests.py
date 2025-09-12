@@ -8,7 +8,6 @@ from apps.accounts.models import UserProfile
 
 User = get_user_model()
 
-
 class UserModelTest(APITestCase):
     """Test User model functionality"""
 
@@ -37,7 +36,6 @@ class UserModelTest(APITestCase):
         """Test user string representation"""
         user = User(email="test@example.com")
         self.assertEqual(str(user), "test@example.com")
-
 
 class UserAPITest(APITestCase):
     """Test User API endpoints"""
@@ -72,14 +70,12 @@ class UserAPITest(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data["email"], self.user.email)
 
-
 @pytest.fixture
 def user():
     """Create a test user"""
     return User.objects.create_user(
         email="test@example.com", password="testpass123", name="Test User"
     )
-
 
 @pytest.fixture
 def admin_user():
@@ -93,7 +89,6 @@ def admin_user():
     )
     return user
 
-
 @pytest.fixture
 def auth_client(user):
     """Create an authenticated API client"""
@@ -101,7 +96,6 @@ def auth_client(user):
     client = APIClient()
     client.force_authenticate(user=user)
     return client
-
 
 @pytest.fixture
 def celery_eager(settings):

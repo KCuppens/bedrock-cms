@@ -7,13 +7,9 @@ from apps.cms.models import Page
 from apps.cms.views import PagesViewSet
 from apps.i18n.models import Locale
 
-"""
 Basic CMS Views tests - simplified approach for quick coverage gains.
-"""
-
 
 User = get_user_model()
-
 
 class PagesViewSetBasicTestCase(APITestCase):
     """Basic tests for PagesViewSet core functionality."""
@@ -87,7 +83,6 @@ class PagesViewSetBasicTestCase(APITestCase):
         data = response.json()
         self.assertEqual(data["id"], self.published_page.id)
         self.assertEqual(data["title"], self.published_page.title)
-
 
 class PageModelTestCase(TestCase):
     """Test Page model functionality."""

@@ -1,9 +1,6 @@
 from django.db import migrations
 
-"""
 Migration to add custom permissions to CMS models.
-"""
-
 
 class Migration(migrations.Migration):
     dependencies = [

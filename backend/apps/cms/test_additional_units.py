@@ -1,21 +1,14 @@
 import unittest
 from unittest.mock import Mock
-            from apps.cms import seo
-            from apps.cms import security
-            from apps.cms import presentation
-            from apps.cms import versioning
-            from apps.cms import tasks
-            from apps.cms import serializers as cms_serializers
-            from apps.cms.serializers import pages
-            from apps.cms import views as cms_views
-            from apps.cms.views import pages
-            from apps.cms.blocks import validation
-            from apps.cms import middleware
-"""
+
+from apps.cms import middleware, presentation, security, seo, tasks, versioning
+from apps.cms import serializers as cms_serializers
+from apps.cms import views as cms_views
+from apps.cms.blocks import validation
+from apps.cms.serializers import pages
+from apps.cms.views import pages
+
 Additional unit tests for CMS app to boost coverage.
-"""
-
-
 
 class TestCMSModelUtilities(unittest.TestCase):
     """Test CMS model utilities and helper functions."""
@@ -43,7 +36,6 @@ class TestCMSModelUtilities(unittest.TestCase):
                             elif "extract" in attr_name.lower():
                                 attr("Test content with keywords")
                         except Exception:
-                            pass
 
                     elif hasattr(attr, "__init__"):
                         # Test SEO class instantiation
@@ -60,9 +52,8 @@ class TestCMSModelUtilities(unittest.TestCase):
                             if hasattr(instance, "analyze"):
                                 instance.analyze("Content to analyze for SEO metrics")
                         except Exception:
-                            pass
+
         except ImportError:
-            pass
 
     def test_cms_security_import(self):
         """Test CMS security module functionality."""
@@ -84,7 +75,6 @@ class TestCMSModelUtilities(unittest.TestCase):
                                 mock_object = Mock()
                                 attr(mock_user, mock_object)
                         except Exception:
-                            pass
 
                     elif hasattr(attr, "__init__"):
                         # Test security manager classes
@@ -100,9 +90,8 @@ class TestCMSModelUtilities(unittest.TestCase):
                                 mock_user = Mock()
                                 instance.validate_permissions(mock_user, "read")
                         except Exception:
-                            pass
+
         except ImportError:
-            pass
 
     def test_cms_presentation_import(self):
         """Test CMS presentation module functionality."""
@@ -122,7 +111,6 @@ class TestCMSModelUtilities(unittest.TestCase):
                             elif "process" in attr_name.lower():
                                 attr([{"type": "heading", "content": "Title"}])
                         except Exception:
-                            pass
 
                     elif hasattr(attr, "__init__"):
                         # Test presentation classes
@@ -142,9 +130,8 @@ class TestCMSModelUtilities(unittest.TestCase):
                             if hasattr(instance, "process_content"):
                                 instance.process_content("Raw content to process")
                         except Exception:
-                            pass
+
         except ImportError:
-            pass
 
     def test_cms_versioning_import(self):
         """Test CMS versioning module functionality."""
@@ -175,7 +162,6 @@ class TestCMSModelUtilities(unittest.TestCase):
                             elif "compare" in attr_name.lower():
                                 attr(1, 2)  # version1_id, version2_id
                         except Exception:
-                            pass
 
                     elif hasattr(attr, "__init__"):
                         # Test versioning manager classes
@@ -191,9 +177,8 @@ class TestCMSModelUtilities(unittest.TestCase):
                             if hasattr(instance, "restore_version"):
                                 instance.restore_version(1, Mock())  # version_id, user
                         except Exception:
-                            pass
+
         except ImportError:
-            pass
 
     def test_cms_tasks_import(self):
         """Test CMS tasks module functionality."""
@@ -219,10 +204,8 @@ class TestCMSModelUtilities(unittest.TestCase):
                                 elif "index" in attr_name.lower():
                                     attr()  # No params for indexing
                         except Exception:
-                            pass
-        except ImportError:
-            pass
 
+        except ImportError:
 
 class TestCMSSerializers(unittest.TestCase):
     """Test CMS serializers functionality."""
@@ -252,13 +235,12 @@ class TestCMSSerializers(unittest.TestCase):
                                 serializer.is_valid()
                             if hasattr(serializer, "validated_data"):
                                 try:
-                                    pass
+
                                 except Exception:
-                                    pass
+
                         except Exception:
-                            pass
+
         except ImportError:
-            pass
 
     def test_cms_page_serializers(self):
         """Test CMS page-specific serializers."""
@@ -291,10 +273,8 @@ class TestCMSSerializers(unittest.TestCase):
                                 self.assertIsInstance(fields, dict)
 
                         except Exception:
-                            pass
-        except ImportError:
-            pass
 
+        except ImportError:
 
 class TestCMSViews(unittest.TestCase):
     """Test CMS views functionality."""
@@ -319,25 +299,21 @@ class TestCMSViews(unittest.TestCase):
                                 try:
                                     view.get_queryset()
                                 except Exception:
-                                    pass
 
                             if hasattr(view, "get_serializer_class"):
                                 try:
                                     view.get_serializer_class()
                                 except Exception:
-                                    pass
 
                             if hasattr(view, "get_permissions"):
                                 try:
                                     permissions = view.get_permissions()
                                     self.assertIsInstance(permissions, list)
                                 except Exception:
-                                    pass
 
                         except Exception:
-                            pass
+
         except ImportError:
-            pass
 
     def test_cms_page_views(self):
         """Test CMS page views functionality."""
@@ -361,7 +337,6 @@ class TestCMSViews(unittest.TestCase):
                                 try:
                                     view.get_object()
                                 except Exception:
-                                    pass
 
                             # Test custom actions
                             for method_name in [
@@ -375,13 +350,10 @@ class TestCMSViews(unittest.TestCase):
                                         method = getattr(view, method_name)
                                         method(view.request)
                                     except Exception:
-                                        pass
 
                         except Exception:
-                            pass
-        except ImportError:
-            pass
 
+        except ImportError:
 
 class TestCMSBlocksValidation(unittest.TestCase):
     """Test CMS blocks validation functionality."""
@@ -417,7 +389,6 @@ class TestCMSBlocksValidation(unittest.TestCase):
                             elif "process" in attr_name.lower():
                                 attr([{"type": "text", "content": "Process me"}])
                         except Exception:
-                            pass
 
                     elif hasattr(attr, "__init__"):
                         # Test validation classes
@@ -436,10 +407,8 @@ class TestCMSBlocksValidation(unittest.TestCase):
                                 result = validator.is_valid(test_block)
                                 self.assertIsInstance(result, bool)
                         except Exception:
-                            pass
-        except ImportError:
-            pass
 
+        except ImportError:
 
 class TestCMSMiddleware(unittest.TestCase):
     """Test CMS middleware functionality."""
@@ -468,14 +437,12 @@ class TestCMSMiddleware(unittest.TestCase):
                                 try:
                                     middleware_instance(mock_request)
                                 except Exception:
-                                    pass
 
                             # Test process methods
                             if hasattr(middleware_instance, "process_request"):
                                 try:
                                     middleware_instance.process_request(mock_request)
                                 except Exception:
-                                    pass
 
                             if hasattr(middleware_instance, "process_response"):
                                 mock_response = Mock()
@@ -484,13 +451,10 @@ class TestCMSMiddleware(unittest.TestCase):
                                         mock_request, mock_response
                                     )
                                 except Exception:
-                                    pass
 
                         except Exception:
-                            pass
-        except ImportError:
-            pass
 
+        except ImportError:
 
 if __name__ == "__main__":
     unittest.main()

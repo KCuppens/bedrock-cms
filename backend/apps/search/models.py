@@ -1,8 +1,7 @@
-"""
+
 Search models for the CMS.
 
 This module provides search functionality including indexing, analytics, and query logging.
-"""
 
 import uuid
 
@@ -29,6 +28,7 @@ from apps.registry.registry import content_registry
 # PostgreSQL search functionality (optional)
 try:
     from django.contrib.postgres.indexes import GinIndex
+
     HAS_POSTGRES_SEARCH = True
 except ImportError:
     HAS_POSTGRES_SEARCH = False
@@ -36,14 +36,12 @@ except ImportError:
 
 User = get_user_model()
 
-
 class SearchIndex(models.Model):
-    """
+
     Search index for all searchable content.
 
     This model stores preprocessed search data for fast full-text search
     across all registered content types.
-    """
 
     id: UUIDField = models.UUIDField(
         primary_key=True, default=uuid.uuid4, editable=False
@@ -214,11 +212,9 @@ class SearchIndex(models.Model):
             tags.append(obj.category.name)
         self.search_tags = tags
 
-
 class SearchQuery(models.Model):
-    """
+
     Log of search queries for analytics and improvement.
-    """
 
     id: UUIDField = models.UUIDField(
         primary_key=True, default=uuid.uuid4, editable=False
@@ -280,11 +276,9 @@ class SearchQuery(models.Model):
     def __str__(self):  # noqa: C901
         return f'"{self.query_text}" ({self.result_count} results)'
 
-
 class SearchSuggestion(models.Model):
-    """
+
     Search suggestions and autocomplete data.
-    """
 
     id: UUIDField = models.UUIDField(
         primary_key=True, default=uuid.uuid4, editable=False

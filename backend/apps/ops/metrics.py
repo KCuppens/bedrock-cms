@@ -4,20 +4,19 @@ import logging
 import time
 
 from django.contrib.auth import get_user_model
+from django.core.cache import cache
 from django.db import connection
 from django.http import HttpResponse
+
+import psutil
 
 from apps.api.models import Note
 from apps.emails.models import EmailMessageLog
 from apps.files.models import FileUpload
-            from django.core.cache import cache
-            import psutil
-        from django.core.cache import cache
 
 logger = logging.getLogger(__name__)
 
 User = get_user_model()
-
 
 def prometheus_metrics(request):
     """Prometheus metrics endpoint"""
@@ -202,7 +201,7 @@ def prometheus_metrics(request):
             )
         except ImportError:
             # psutil not available
-            pass
+
         except Exception as e:
             logger.warning("Failed to collect notes metrics: %s", e)
 
@@ -228,7 +227,6 @@ def prometheus_metrics(request):
     return HttpResponse(
         "\n".join(metrics), content_type="text/plain; version=0.0.4; charset=utf-8"
     )
-
 
 def health_metrics(request):
     """Simple health metrics for monitoring"""

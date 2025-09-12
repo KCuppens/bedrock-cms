@@ -1,32 +1,32 @@
 import os
 from unittest.mock import Mock
+
 import django
-        from apps.i18n.views import (  # noqa: F401
-        from apps.i18n.models import (  # noqa: F401
-        from apps.i18n.serializers import (  # noqa: F401
-        from apps.i18n import services  # noqa: F401
-        from apps.i18n import tasks  # noqa: F401
-        from apps.i18n import signals  # noqa: F401
-        from apps.i18n import admin  # noqa: F401
-"""
-i18n app coverage booster - targets internationalization components.
-"""
-
-
 
 # Configure minimal Django
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "apps.config.settings.base")
 
 try:
+    from apps.i18n import (
+        models,
+        serializers,
+        views,
+        tasks,
+        services,
+        signals,
+        admin,
+    )
+except ImportError:
+
+try:
     django.setup()
 except Exception:
-    pass
-
 
 def test_i18n_views():  # noqa: C901
     """Target i18n views.py."""
 
     try:
+        from apps.i18n.views import (
             LocaleViewSet,
             TranslationMemoryViewSet,
             TranslationUnitViewSet,
@@ -56,25 +56,21 @@ def test_i18n_views():  # noqa: C901
                     try:
                         viewset.get_serializer_class()
                     except Exception:
-                        pass
 
                     try:
                         viewset.get_permissions()
                     except Exception:
-                        pass
 
                 # Test get_queryset
                 try:
                     viewset.get_queryset()
                 except Exception:
-                    pass
 
                 # Test custom actions
                 if hasattr(viewset, "active"):
                     try:
                         viewset.active(viewset.request)
                     except Exception:
-                        pass
 
                 if hasattr(viewset, "set_default"):
                     try:
@@ -83,7 +79,6 @@ def test_i18n_views():  # noqa: C901
                         viewset.get_object = Mock(return_value=mock_locale)
                         viewset.set_default(viewset.request, pk=1)
                     except Exception:
-                        pass
 
                 if hasattr(viewset, "translate"):
                     try:
@@ -94,14 +89,10 @@ def test_i18n_views():  # noqa: C901
                         }
                         viewset.translate(viewset.request)
                     except Exception:
-                        pass
 
             except Exception:
-                pass
 
     except ImportError:
-        pass
-
 
 def test_i18n_models():  # noqa: C901
     """Target i18n models.py."""
@@ -156,27 +147,21 @@ def test_i18n_models():  # noqa: C901
                 try:
                     model_class.__str__(mock_instance)
                 except Exception:
-                    pass
 
                 # Test model methods
                 if hasattr(model_class, "get_translations"):
                     try:
                         model_class.get_translations(mock_instance)
                     except Exception:
-                        pass
 
                 if hasattr(model_class, "is_complete"):
                     try:
                         model_class.is_complete(mock_instance)
                     except Exception:
-                        pass
 
             except Exception:
-                pass
 
     except ImportError:
-        pass
-
 
 def test_i18n_serializers():  # noqa: C901
     """Target i18n serializers.py."""
@@ -235,14 +220,10 @@ def test_i18n_serializers():  # noqa: C901
                 try:
                     serializer.is_valid()
                 except Exception:
-                    pass
 
             except Exception:
-                pass
 
     except ImportError:
-        pass
-
 
 def test_i18n_translation_services():  # noqa: C901
     """Target i18n translation services."""
@@ -260,17 +241,17 @@ def test_i18n_translation_services():  # noqa: C901
                             try:
                                 attr("Hello", "en", "es")
                             except Exception:
-                                pass
+
                         elif "detect" in attr_name.lower():
                             try:
                                 attr("Hello world")
                             except Exception:
-                                pass
+
                         elif "validate" in attr_name.lower():
                             try:
                                 attr("en")
                             except Exception:
-                                pass
+
                     elif hasattr(attr, "__init__"):
                         # Try to instantiate service classes
                         try:
@@ -280,17 +261,12 @@ def test_i18n_translation_services():  # noqa: C901
                                 try:
                                     service.translate("Hello", "en", "es")
                                 except Exception:
-                                    pass
 
                         except Exception:
-                            pass
 
                 except Exception:
-                    pass
 
     except ImportError:
-        pass
-
 
 def test_i18n_tasks():  # noqa: C901
     """Target i18n tasks.py."""
@@ -313,11 +289,8 @@ def test_i18n_tasks():  # noqa: C901
                             getattr(attr, "name", None)
 
                 except Exception:
-                    pass
 
     except ImportError:
-        pass
-
 
 def test_i18n_signals():  # noqa: C901
     """Target i18n signals.py."""
@@ -344,14 +317,10 @@ def test_i18n_signals():  # noqa: C901
                                 mock_instance = Mock()
                                 attr(sender=mock_sender, instance=mock_instance)
                             except Exception:
-                                pass
 
                 except Exception:
-                    pass
 
     except ImportError:
-        pass
-
 
 def test_i18n_admin():  # noqa: C901
     """Target i18n admin.py."""
@@ -374,14 +343,10 @@ def test_i18n_admin():  # noqa: C901
                                 admin_instance = attr(Mock(), Mock())
                                 admin_instance.get_queryset(mock_request)
                             except Exception:
-                                pass
 
                 except Exception:
-                    pass
 
     except ImportError:
-        pass
-
 
 # Run all i18n coverage tests
 if __name__ == "__main__":

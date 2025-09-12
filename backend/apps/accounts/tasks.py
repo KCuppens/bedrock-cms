@@ -1,21 +1,16 @@
 import logging
+from datetime import timedelta
+
+from celery import shared_task
 from django.contrib.auth import get_user_model
+from django.contrib.sessions.models import Session
 from django.core.cache import cache
 from django.utils import timezone
-from celery import shared_task
-from datetime import timedelta
-from django.contrib.sessions.models import Session
 
-"""
 Celery tasks for accounts app.
-"""
-
-
-
 
 logger = logging.getLogger(__name__)
 User = get_user_model()
-
 
 @shared_task(
     bind=True,
@@ -26,17 +21,16 @@ User = get_user_model()
     ignore_result=True,
 )
 def update_user_last_seen(self, user_id):  # noqa: C901
-    """
+
     Update user's last_seen timestamp asynchronously.
 
     Uses cache-based throttling to avoid excessive database writes.
-    """
+
     try:
         # Check cache to avoid too frequent updates
         cache_key = f"last_seen_update:{user_id}"
         if cache.get(cache_key):
             # Skip if updated recently (within 5 minutes)
-            return
 
         # Update user's last_seen
         User.objects.filter(id=user_id).update(last_seen=timezone.now())
@@ -53,14 +47,13 @@ def update_user_last_seen(self, user_id):  # noqa: C901
         # Retry with exponential backoff
         raise self.retry(exc=e, countdown=2**self.request.retries)
 
-
 @shared_task(bind=True, max_retries=3, soft_time_limit=30, time_limit=60, queue="low")
 def bulk_update_last_seen(self, user_ids):  # noqa: C901
-    """
+
     Bulk update last_seen for multiple users.
 
     More efficient for batch processing.
-    """
+
     try:
         now = timezone.now()
 
@@ -87,17 +80,15 @@ def bulk_update_last_seen(self, user_ids):  # noqa: C901
         logger.error("Error in bulk last_seen update: %s", str(e))
         raise self.retry(exc=e, countdown=2**self.request.retries)
 
-
 @shared_task(bind=True, max_retries=3, soft_time_limit=60, time_limit=120, queue="low")
 def cleanup_inactive_sessions(self, days=30):  # noqa: C901
-    """
+
     Clean up sessions for inactive users.
 
     Args:
         days: Number of days of inactivity before cleanup
-    """
-    try:
 
+    try:
 
         cutoff_date = timezone.now() - timedelta(days=days)
 

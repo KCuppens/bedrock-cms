@@ -1,20 +1,18 @@
 import datetime
+import glob
 import logging
 import os
+import shutil
 import subprocess  # nosec B404
 
 from django.conf import settings
+from django.core.cache import cache
 from django.core.management import call_command
+from django.db import connection
 
 from celery import shared_task
-        import glob
-            from django.core.cache import cache
-            from django.db import connection
-            from django.core.cache import cache
-            import shutil
 
 logger = logging.getLogger(__name__)
-
 
 @shared_task(name="apps.ops.tasks.backup_database")
 def backup_database():  # noqa: C901
@@ -84,7 +82,6 @@ def backup_database():  # noqa: C901
         logger.error("Database backup failed: %s", str(e))
         return {"success": False, "error": str(e)}
 
-
 @shared_task(name="apps.ops.tasks.cleanup_old_backups")
 def cleanup_old_backups(days_to_keep=7):  # noqa: C901
     """Clean up old backup files"""
@@ -126,7 +123,6 @@ def cleanup_old_backups(days_to_keep=7):  # noqa: C901
         logger.error("Backup cleanup failed: %s", str(e))
         return {"success": False, "error": str(e)}
 
-
 @shared_task(name="apps.ops.tasks.system_maintenance")
 def system_maintenance():  # noqa: C901
     """Perform system maintenance tasks"""
@@ -167,7 +163,6 @@ def system_maintenance():  # noqa: C901
     except Exception as e:
         logger.error("System maintenance failed: %s", str(e))
         return {"success": False, "error": str(e)}
-
 
 @shared_task(name="apps.ops.tasks.health_check_task")
 def health_check_task():  # noqa: C901

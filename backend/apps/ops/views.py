@@ -1,14 +1,13 @@
 import logging
+import subprocess  # nosec B404
 
 from django.conf import settings
+from django.core.cache import cache
+from django.db import connection
 from django.http import JsonResponse
 from django.utils import timezone
-        from django.db import connection
-        from django.core.cache import cache
-        import subprocess  # nosec B404
 
 logger = logging.getLogger(__name__)
-
 
 def health_check(request):  # noqa: C901
     """Simple health check endpoint"""
@@ -19,7 +18,6 @@ def health_check(request):  # noqa: C901
             "service": "django-saas-boilerplate",
         }
     )
-
 
 def readiness_check(request):  # noqa: C901
     """Readiness check for container orchestration"""
@@ -63,7 +61,6 @@ def readiness_check(request):  # noqa: C901
             status=503,
         )
 
-
 def liveness_check(request):  # noqa: C901
     """Liveness check for container orchestration"""
     return JsonResponse(
@@ -72,7 +69,6 @@ def liveness_check(request):  # noqa: C901
             "timestamp": timezone.now().isoformat(),
         }
     )
-
 
 def version_info(request):  # noqa: C901
     """Version and build information"""

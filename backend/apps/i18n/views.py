@@ -1,23 +1,20 @@
-"""
+
 API views for translation management.
-"""
 
 import io
 import logging
 
+from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
 from django.core.management import call_command
 from django.core.management.base import CommandError
 from django.db import models
+
 from django_filters.rest_framework import DjangoFilterBackend
 from drf_spectacular.utils import OpenApiParameter, extend_schema
 from rest_framework import filters, permissions, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
-
-logger = logging.getLogger(__name__)
-
-from django.conf import settings
 
 from .models import (
     Locale,
@@ -47,13 +44,13 @@ from .serializers import (
 )
 from .tasks import bulk_auto_translate_ui_messages
 
+logger = logging.getLogger(__name__)
 
 class LocaleViewSet(viewsets.ModelViewSet):
-    """
+
     ViewSet for managing locales.
 
     Provides full CRUD operations for locale management.
-    """
 
     queryset = Locale.objects.all()
     serializer_class = LocaleSerializer
@@ -75,12 +72,10 @@ class LocaleViewSet(viewsets.ModelViewSet):
 
     @extend_schema(
         summary="Toggle locale active status",
-        description="Toggle the active status of a "
-            "locale. Requires authentication.",
+        description="Toggle the active status of a " "locale. Requires authentication.",
     )
     @action(
-        detail=True, methods=["post"],
-        permission_classes=[permissions.IsAuthenticated]
+        detail=True, methods=["post"], permission_classes=[permissions.IsAuthenticated]
     )
     def toggle_active(self, request, pk=None):
         """Toggle the active status of a locale."""
@@ -111,11 +106,10 @@ class LocaleViewSet(viewsets.ModelViewSet):
     @extend_schema(
         summary="Set locale as default",
         description="Set this locale as the default "
-            "locale. Requires authentication.",
+        "locale. Requires authentication.",
     )
     @action(
-        detail=True, methods=["post"],
-        permission_classes=[permissions.IsAuthenticated]
+        detail=True, methods=["post"], permission_classes=[permissions.IsAuthenticated]
     )
     def set_default(self, request, pk=None):
         """Set the locale as default."""
@@ -158,7 +152,7 @@ class LocaleViewSet(viewsets.ModelViewSet):
             return Response(
                 {
                     "error": "Cannot delete the default locale. Set "
-                        "another locale as default first."
+                    "another locale as default first."
                 },
                 status=status.HTTP_400_BAD_REQUEST,
             )
@@ -172,14 +166,12 @@ class LocaleViewSet(viewsets.ModelViewSet):
 
         return Response(status=status.HTTP_204_NO_CONTENT)
 
-
 class TranslationUnitViewSet(viewsets.ModelViewSet):
-    """
+
     ViewSet for managing translation units.
 
     Provides CRUD operations for translation units with filtering and bulk oper
         ations.
-    """
 
     queryset = TranslationUnit.objects.select_related(
         "source_locale", "target_locale", "updated_by", "content_type"
@@ -239,8 +231,7 @@ class TranslationUnitViewSet(viewsets.ModelViewSet):
             )
         except (ValueError, ContentType.DoesNotExist):
             return Response(
-                {"error": "Invalid model_label"},
-                    status=status.HTTP_400_BAD_REQUEST
+                {"error": "Invalid model_label"}, status=status.HTTP_400_BAD_REQUEST
             )
 
         queryset = self.get_queryset().filter(
@@ -262,8 +253,7 @@ class TranslationUnitViewSet(viewsets.ModelViewSet):
 
     @extend_schema(
         summary="Get translation status for an object",
-        description="Get translation status for all "
-            "locales for a specific object.",
+        description="Get translation status for all " "locales for a specific object.",
         parameters=[
             OpenApiParameter(
                 "model_label", str, description="Model label (e.g., cms.page)"
@@ -303,8 +293,7 @@ class TranslationUnitViewSet(viewsets.ModelViewSet):
         for locale in locales:
             # Get translation units for this locale
             units = TranslationUnit.objects.filter(
-                content_type=content_type,
-                    object_id=object_id, target_locale=locale
+                content_type=content_type, object_id=object_id, target_locale=locale
             )
 
             # Calculate completion
@@ -641,8 +630,7 @@ class TranslationUnitViewSet(viewsets.ModelViewSet):
         response_data["assignment"] = {
             "assigned_to": assigned_to.id if assigned_to else None,
             "assigned_to_email": assigned_to.email if assigned_to else None,
-            "previous_assignee": previous_assignee.id if previous_assignee else
-                None,
+            "previous_assignee": previous_assignee.id if previous_assignee else None,
             "previous_assignee_email": (
                 previous_assignee.email if previous_assignee else None
             ),
@@ -661,8 +649,7 @@ class TranslationUnitViewSet(viewsets.ModelViewSet):
         serializer = BulkAssignmentSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
-        translation_unit_ids = serializer.validated_data["translation_unit_ids"
-            ]
+        translation_unit_ids = serializer.validated_data["translation_unit_ids"]
         assigned_to = serializer.validated_data.get("assigned_to")
         comment = serializer.validated_data.get("comment", "")
         # Get translation units
@@ -796,11 +783,9 @@ class TranslationUnitViewSet(viewsets.ModelViewSet):
         serializer = TranslationHistorySerializer(history, many=True)
         return Response(serializer.data)
 
-
 class UiMessageViewSet(viewsets.ModelViewSet):
-    """
+
     ViewSet for managing UI messages.
-    """
 
     queryset = UiMessage.objects.all()
     serializer_class = UiMessageSerializer
@@ -878,8 +863,7 @@ class UiMessageViewSet(viewsets.ModelViewSet):
 
     @extend_schema(
         summary="Import Django built-in strings",
-        description="Import Django's built-in translation "
-            "strings into the database",
+        description="Import Django's built-in translation " "strings into the database",
         parameters=[
             OpenApiParameter(
                 "locale", str, description="Specific locale code (optional)"
@@ -942,7 +926,7 @@ class UiMessageViewSet(viewsets.ModelViewSet):
     )
     def bundle(self, request, locale_code=None):
         """Get message bundle for a locale - "
-            "publicly accessible for frontend."""
+        "publicly accessible for frontend."""
         try:
             locale = Locale.objects.get(code=locale_code)
         except Locale.DoesNotExist:
@@ -969,7 +953,7 @@ class UiMessageViewSet(viewsets.ModelViewSet):
     @extend_schema(
         summary="Sync translation keys from frontend",
         description="Accept translation keys from frontend "
-            "and create missing UiMessage entries",
+        "and create missing UiMessage entries",
         request={
             "application/json": {
                 "type": "object",
@@ -996,13 +980,13 @@ class UiMessageViewSet(viewsets.ModelViewSet):
     )
     @action(detail=False, methods=["post"], url_path="sync-keys")
     def sync_keys(self, request):
-        """
+
         Accept translation keys from frontend and create missing UiMessage entr
             ies.
 
         Keys from build process are auto-approved.
         Keys from runtime discovery need review.
-        """
+
         from django.conf import settings
 
         keys_data = request.data.get("keys", [])
@@ -1021,7 +1005,6 @@ class UiMessageViewSet(viewsets.ModelViewSet):
         for key_data in keys_data:
             key = key_data.get("key")
             if not key:
-                continue
 
             try:
                 # Extract namespace from key if not provided
@@ -1101,8 +1084,7 @@ class UiMessageViewSet(viewsets.ModelViewSet):
 
     @extend_schema(
         summary="Report missing translation keys",
-        description="Report missing translation keys "
-            "detected at runtime for review",
+        description="Report missing translation keys " "detected at runtime for review",
         request={
             "application/json": {
                 "type": "object",
@@ -1117,10 +1099,10 @@ class UiMessageViewSet(viewsets.ModelViewSet):
     )
     @action(detail=False, methods=["post"], url_path="report-missing")
     def report_missing(self, request):
-        """
+
         Report missing translation keys detected at runtime.
         These are logged for review but not auto-created.
-        """
+
         from datetime import datetime
 
         from django.core.cache import cache
@@ -1147,8 +1129,7 @@ class UiMessageViewSet(viewsets.ModelViewSet):
 
         cache.set(cache_key, existing, 86400)  # Store for 24 hours
         return Response(
-            {"reported": len(keys), "message": "Missing keys logged for review"
-                }
+            {"reported": len(keys), "message": "Missing keys logged for review"}
         )
 
     @extend_schema(
@@ -1365,7 +1346,6 @@ class UiMessageViewSet(viewsets.ModelViewSet):
                     # Log full traceback for debugging
                     # print(f"DEBUG: {error_msg}")
                     # print(f"DEBUG: Traceback: {traceback.format_exc()}")
-                    continue
 
             # Check if any actual work was done
             total_changes = (
@@ -1381,7 +1361,7 @@ class UiMessageViewSet(viewsets.ModelViewSet):
                 response_data = {
                     "status": "error",
                     "message": f"Import failed: {len(errors)} errors "
-                        "occurred, no data was imported",
+                    "occurred, no data was imported",
                     "details": {
                         "total_keys": len(translations),
                         "messages_created": created_messages,
@@ -1399,7 +1379,7 @@ class UiMessageViewSet(viewsets.ModelViewSet):
                 response_data = {
                     "status": "warning",
                     "message": f"Partially imported {total_changes} "
-                        "changes with {len(errors)} errors",
+                    "changes with {len(errors)} errors",
                     "details": {
                         "total_keys": len(translations),
                         "messages_created": created_messages,
@@ -1416,7 +1396,7 @@ class UiMessageViewSet(viewsets.ModelViewSet):
                 response_data = {
                     "status": "success",
                     "message": f"Successfully imported {total_changes} "
-                        "changes from {len(translations)} keys",
+                    "changes from {len(translations)} keys",
                     "details": {
                         "total_keys": len(translations),
                         "messages_created": created_messages,
@@ -1431,8 +1411,7 @@ class UiMessageViewSet(viewsets.ModelViewSet):
 
         except json.JSONDecodeError as e:
             return Response(
-                {"status": "error", "message": f"Invalid JSON format: {str(e)}"
-                    },
+                {"status": "error", "message": f"Invalid JSON format: {str(e)}"},
                 status=status.HTTP_400_BAD_REQUEST,
             )
         except Exception as e:
@@ -1441,11 +1420,9 @@ class UiMessageViewSet(viewsets.ModelViewSet):
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR,
             )
 
-
 class UiMessageTranslationViewSet(viewsets.ModelViewSet):
-    """
+
     ViewSet for managing UI message translations.
-    """
 
     queryset = UiMessageTranslation.objects.select_related(
         "message", "locale", "updated_by"
@@ -1555,8 +1532,7 @@ class UiMessageTranslationViewSet(viewsets.ModelViewSet):
             locale_stats = []
             for locale in locales:
                 translated_count = UiMessageTranslation.objects.filter(
-                    message__namespace=namespace,
-                        locale=locale, status="approved"
+                    message__namespace=namespace, locale=locale, status="approved"
                 ).count()
 
                 locale_stats.append(
@@ -1585,7 +1561,7 @@ class UiMessageTranslationViewSet(viewsets.ModelViewSet):
     @extend_schema(
         summary="Bulk auto-translate UI messages",
         description="Start background task to automatically translate missing "
-            "UI messages using DeepL for the selected locale.",
+        "UI messages using DeepL for the selected locale.",
         parameters=[
             OpenApiParameter(
                 "locale",
@@ -1629,10 +1605,7 @@ class UiMessageTranslationViewSet(viewsets.ModelViewSet):
 
         try:
             # Validate locale exists
-            target_locale = Locale.objects.get(
-                code=locale_code,
-                is_active=True
-            )
+            target_locale = Locale.objects.get(code=locale_code, is_active=True)
 
             # Check how many messages need translation
             messages_query = UiMessage.objects.exclude(
@@ -1768,8 +1741,7 @@ class UiMessageTranslationViewSet(viewsets.ModelViewSet):
                 response_data.update(
                     {
                         "message": "Task is waiting to start",
-                        "progress": {"current": 0, "total": 0, "percentage": 0}
-                            ,
+                        "progress": {"current": 0, "total": 0, "percentage": 0},
                     }
                 )
             elif task_result.status == "PROGRESS":
@@ -1840,11 +1812,9 @@ class UiMessageTranslationViewSet(viewsets.ModelViewSet):
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR,
             )
 
-
 class TranslationGlossaryViewSet(viewsets.ModelViewSet):
-    """
+
     ViewSet for managing translation glossary.
-    """
 
     queryset = TranslationGlossary.objects.select_related(
         "source_locale", "target_locale", "created_by", "updated_by"
@@ -1903,11 +1873,9 @@ class TranslationGlossaryViewSet(viewsets.ModelViewSet):
         )  # Limit to 20 results
         return Response(serializer.data)
 
-
 class TranslationQueueViewSet(viewsets.ModelViewSet):
-    """
+
     ViewSet for managing translation queue.
-    """
 
     queryset = TranslationQueue.objects.select_related(
         "translation_unit",
@@ -1939,8 +1907,7 @@ class TranslationQueueViewSet(viewsets.ModelViewSet):
 
         if not user_id:
             return Response(
-                {"error": "user_id is required"},
-                    status=status.HTTP_400_BAD_REQUEST
+                {"error": "user_id is required"}, status=status.HTTP_400_BAD_REQUEST
             )
 
         try:
@@ -1979,7 +1946,7 @@ class TranslationQueueViewSet(viewsets.ModelViewSet):
     @extend_schema(
         summary="Get translation queue summary",
         description="Get summary statistics for translation "
-            "queue including status counts by locale.",
+        "queue including status counts by locale.",
     )
     @action(detail=False, methods=["get"])
     def summary(self, request):
@@ -1988,8 +1955,7 @@ class TranslationQueueViewSet(viewsets.ModelViewSet):
         from django.utils import timezone
 
         # Get all active locales except the default source locale
-        locales = Locale.objects.filter(is_active=True).exclude(is_default=True
-            )
+        locales = Locale.objects.filter(is_active=True).exclude(is_default=True)
 
         locale_summaries = []
 
@@ -2064,8 +2030,7 @@ class TranslationQueueViewSet(viewsets.ModelViewSet):
         overall_queue = self.get_queryset()
         overall_total = overall_queue.count()
         overall_pending = overall_queue.filter(status="pending").count()
-        overall_in_progress = overall_queue.filter(status="in_progress").count(
-            )
+        overall_in_progress = overall_queue.filter(status="in_progress").count()
         overall_completed = overall_queue.filter(status="completed").count()
         overall_overdue = overall_queue.filter(
             deadline__lt=timezone.now(),
@@ -2093,11 +2058,9 @@ class TranslationQueueViewSet(viewsets.ModelViewSet):
             }
         )
 
-
 class TranslationHistoryViewSet(viewsets.ReadOnlyModelViewSet):
-    """
+
     ViewSet for viewing translation history (read-only).
-    """
 
     queryset = TranslationHistory.objects.select_related(
         "translation_unit", "performed_by"

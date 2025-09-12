@@ -10,17 +10,20 @@ from rest_framework.response import Response
 
 from apps.cms.models import BlockType, BlockTypeCategory
 from apps.cms.serializers.block_types import (
-from apps.core.permissions import RBACPermission
-        import json
-        from django.db.models import Q
-        from rest_framework import serializers
     BlockTypeCategorySerializer,
     BlockTypeCreateSerializer,
     BlockTypeListSerializer,
     BlockTypeSerializer,
     BlockTypeUpdateSerializer,
-)
+    Q,
+    RBACPermission,
+    apps.core.permissions,
+    django.db.models,
 
+    json,
+    rest_framework,
+    serializers,
+)
 
 @extend_schema_view(
     list=extend_schema(
@@ -49,9 +52,8 @@ from apps.core.permissions import RBACPermission
     ),
 )
 class BlockTypeViewSet(viewsets.ModelViewSet):
-    """
+
     ViewSet for managing block types with full CRUD operations.
-    """
 
     queryset = BlockType.objects.select_related("created_by", "updated_by").all()
     permission_classes = [IsAuthenticated, RBACPermission]
@@ -308,7 +310,6 @@ class BlockTypeViewSet(viewsets.ModelViewSet):
     @action(detail=False, methods=["get"])
     def fetch_data(self, request):
         """Fetch dynamic data for a block based on its model configuration."""
-
 
         block_type_str = request.query_params.get("block_type")
         if not block_type_str:

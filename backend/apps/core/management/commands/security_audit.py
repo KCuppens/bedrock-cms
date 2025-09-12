@@ -1,15 +1,12 @@
+import io
 import json
+import sys
+
 from django.core.management.base import BaseCommand
+
 from apps.core.security_audit import print_security_audit_report, run_security_audit
-            import io
-            import sys
-"""
+
 Management command to run security audit on all API endpoints.
-"""
-
-
-
-
 
 class Command(BaseCommand):
     help = "Run security audit on all API endpoints"
@@ -34,7 +31,6 @@ class Command(BaseCommand):
             report = run_security_audit()
         except Exception as e:
             self.stdout.write(self.style.ERROR(f"Security audit failed: {e}"))
-            return
 
         # Output results
         if options["output"] == "json":

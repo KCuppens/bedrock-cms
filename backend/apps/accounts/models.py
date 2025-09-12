@@ -15,7 +15,6 @@ from django.utils import timezone
 from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 
-
 class CustomUserManager(BaseUserManager["User"]):
     """Custom user manager for email-based authentication"""
 
@@ -44,7 +43,6 @@ class CustomUserManager(BaseUserManager["User"]):
             raise ValueError("Superuser must have is_superuser=True.")
 
         return self.create_user(email, password, **extra_fields)
-
 
 class User(AbstractUser):
     """Custom user model with email as username"""
@@ -130,7 +128,6 @@ class User(AbstractUser):
         """Check if user is a member, manager, or admin"""
         return "Member" in self.user_groups or self.is_manager()
 
-
 class UserProfile(models.Model):
     """Extended user profile information"""
 
@@ -164,6 +161,5 @@ class UserProfile(models.Model):
 
     def __str__(self):  # noqa: C901
         return f"{self.user.email} Profile"
-
 
 # Import RBAC models

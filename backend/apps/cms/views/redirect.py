@@ -12,7 +12,6 @@ from rest_framework.response import Response
 from apps.cms.models import Redirect
 from apps.cms.serializers.redirect import RedirectSerializer
 
-
 @extend_schema_view(
     list=extend_schema(summary="List redirects", tags=["Redirects"]),
     create=extend_schema(summary="Create redirect", tags=["Redirects"]),

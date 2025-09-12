@@ -2,17 +2,13 @@ from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-"""
 Standalone blocks API endpoint.
-"""
 
 # Force reload
 
-
 class BlockTypesAPIView(APIView):
-    """
+
     Simple API view for getting available block types.
-    """
 
     permission_classes = [IsAuthenticatedOrReadOnly]
 
@@ -91,11 +87,9 @@ class BlockTypesAPIView(APIView):
 
         return Response({"block_types": block_types})
 
-
 class BlockSchemaAPIView(APIView):
-    """
+
     Simple API view for getting the schema of a specific block type.
-    """
 
     permission_classes = [IsAuthenticatedOrReadOnly]
 

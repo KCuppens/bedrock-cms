@@ -8,7 +8,6 @@ from django.db import migrations, models
 
 import apps.accounts.rbac
 
-
 class Migration(migrations.Migration):
     initial = True
 

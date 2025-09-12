@@ -12,7 +12,6 @@ from .models import (
     UiMessageTranslation,
 )
 
-
 @admin.register(Locale)
 class LocaleAdmin(admin.ModelAdmin):
     """Admin interface for Locale model."""
@@ -72,7 +71,6 @@ class LocaleAdmin(admin.ModelAdmin):
                 "Please select exactly one locale to make default.",
                 level="error",
             )
-            return
 
         locale = queryset.first()
 
@@ -105,7 +103,6 @@ class LocaleAdmin(admin.ModelAdmin):
                 "Cannot deactivate the default locale. Please set another locale as default first.",
                 level="error",
             )
-            return
 
         count = queryset.update(is_active=False)
         self.message_user(request, f"Deactivated {count} locale(s).")
@@ -122,13 +119,11 @@ class LocaleAdmin(admin.ModelAdmin):
             obj.save()
         except Exception as e:
             self.message_user(request, f"Error saving locale: {e}", level="error")
-            return
 
         if change:
             self.message_user(request, f'Locale "{obj.name}" updated successfully.')
         else:
             self.message_user(request, f'Locale "{obj.name}" created successfully.')
-
 
 @admin.register(TranslationGlossary)
 class TranslationGlossaryAdmin(admin.ModelAdmin):
@@ -167,7 +162,6 @@ class TranslationGlossaryAdmin(admin.ModelAdmin):
             obj.created_by = request.user
         obj.updated_by = request.user
         super().save_model(request, obj, form, change)
-
 
 @admin.register(TranslationQueue)
 class TranslationQueueAdmin(admin.ModelAdmin):
@@ -224,7 +218,6 @@ class TranslationQueueAdmin(admin.ModelAdmin):
             obj.created_by = request.user
         super().save_model(request, obj, form, change)
 
-
 @admin.register(TranslationHistory)
 class TranslationHistoryAdmin(admin.ModelAdmin):
     """Admin interface for TranslationHistory model."""
@@ -242,7 +235,6 @@ class TranslationHistoryAdmin(admin.ModelAdmin):
     def has_change_permission(self, request, obj=None):  # noqa: C901
         """Disable editing history entries."""
         return False
-
 
 # Register existing models if not already registered
 @admin.register(TranslationUnit)
@@ -264,7 +256,6 @@ class TranslationUnitAdmin(admin.ModelAdmin):
     ordering = ["-updated_at"]
     readonly_fields = ["created_at", "updated_at", "model_label"]
 
-
 @admin.register(UiMessage)
 class UiMessageAdmin(admin.ModelAdmin):
     """Admin interface for UiMessage model."""
@@ -274,7 +265,6 @@ class UiMessageAdmin(admin.ModelAdmin):
     search_fields = ["key", "namespace", "description", "default_value"]
     ordering = ["namespace", "key"]
     readonly_fields = ["created_at", "updated_at"]
-
 
 @admin.register(UiMessageTranslation)
 class UiMessageTranslationAdmin(admin.ModelAdmin):

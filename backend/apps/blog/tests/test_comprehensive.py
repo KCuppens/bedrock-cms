@@ -1,6 +1,5 @@
-"""
+
 Blog app tests with high coverage and real database operations.
-"""
 
 from datetime import datetime, timedelta
 
@@ -22,7 +21,6 @@ from apps.blog.serializers import (
 from apps.blog.versioning import create_post_version, revert_post_to_version
 
 User = get_user_model()
-
 
 class BlogModelTests(TestCase):
     """Comprehensive tests for Blog models."""
@@ -218,7 +216,6 @@ class BlogModelTests(TestCase):
         except Exception:
             pass  # User model may not exist
 
-
 class BlogVersioningTests(TestCase):
     """Test Blog versioning functionality."""
 
@@ -269,7 +266,6 @@ class BlogVersioningTests(TestCase):
             self.assertEqual(self.post.content, original_content)
         except Exception:
             pass  # Versioning models/functions may not exist
-
 
 class BlogAPITests(APITestCase):
     """Comprehensive API tests for Blog endpoints."""
@@ -460,7 +456,6 @@ class BlogAPITests(APITestCase):
         except Exception:
             pass  # URL or filtering may not exist
 
-
 class BlogSerializerTests(TestCase):
     """Test Blog app serializers."""
 
@@ -593,7 +588,6 @@ class BlogSerializerTests(TestCase):
         except Exception:
             pass  # User model or serializer may not exist
 
-
 class BlogIntegrationTests(TransactionTestCase):
     """Integration tests for Blog app workflows."""
 
@@ -638,7 +632,6 @@ class BlogIntegrationTests(TransactionTestCase):
             version = create_post_version(post, self.user)
             self.assertIsNotNone(version)
         except Exception:
-            pass
 
         # Publish post
         if hasattr(post, "publish"):

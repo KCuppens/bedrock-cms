@@ -1,7 +1,4 @@
 import sentry_sdk
-from sentry_sdk.integrations.celery import CeleryIntegration
-from sentry_sdk.integrations.django import DjangoIntegration
-from sentry_sdk.integrations.redis import RedisIntegration
 from opentelemetry import trace
 from opentelemetry.exporter.otlp.proto.grpc.trace_exporter import OTLPSpanExporter
 from opentelemetry.instrumentation.django import DjangoInstrumentor
@@ -9,14 +6,14 @@ from opentelemetry.instrumentation.psycopg2 import Psycopg2Instrumentor
 from opentelemetry.instrumentation.redis import RedisInstrumentor
 from opentelemetry.sdk.trace import TracerProvider
 from opentelemetry.sdk.trace.export import BatchSpanProcessor
+from sentry_sdk.integrations.celery import CeleryIntegration
+from sentry_sdk.integrations.django import DjangoIntegration
+from sentry_sdk.integrations.redis import RedisIntegration
 
-from .base import (  # noqa: F403
-    BASE_DIR,  # noqa: F405
-    INSTALLED_APPS,  # noqa: F405
+from .base import (
     DATABASES,  # noqa: F405
-    REST_FRAMEWORK,  # noqa: F405
     LOGGING,  # noqa: F405
-    env,  # noqa: F405
+    env,  # noqa: F403; noqa: F405
 )
 
 # SECURITY WARNING: don't run with debug turned on in production!
@@ -24,7 +21,9 @@ DEBUG = False
 
 # Security
 SECURE_SSL_REDIRECT = env.bool("SECURE_SSL_REDIRECT", default=True)  # noqa: F405
-SECURE_HSTS_SECONDS = env.int("SECURE_HSTS_SECONDS", default=31536000)  # 1 year  # noqa: F405
+SECURE_HSTS_SECONDS = env.int(
+    "SECURE_HSTS_SECONDS", default=31536000
+)  # 1 year  # noqa: F405
 SECURE_HSTS_INCLUDE_SUBDOMAINS = True
 SECURE_HSTS_PRELOAD = True
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
@@ -38,7 +37,9 @@ CSRF_COOKIE_HTTPONLY = True
 # Database
 DATABASES = {"default": env.db("DATABASE_URL")}  # noqa: F405, F811
 # Optimal connection pooling for production
-DATABASES["default"]["CONN_MAX_AGE"] = env.int("DB_CONN_MAX_AGE", 600)  # 10 minutes  # noqa: F405
+DATABASES["default"]["CONN_MAX_AGE"] = env.int(
+    "DB_CONN_MAX_AGE", 600
+)  # 10 minutes  # noqa: F405
 DATABASES["default"]["CONN_HEALTH_CHECKS"] = True
 DATABASES["default"]["OPTIONS"] = {
     "connect_timeout": 10,
@@ -92,7 +93,9 @@ if SENTRY_DSN:
             ),
             RedisIntegration(),
         ],
-        traces_sample_rate=env.float("SENTRY_TRACES_SAMPLE_RATE", default=0.1),  # noqa: F405
+        traces_sample_rate=env.float(
+            "SENTRY_TRACES_SAMPLE_RATE", default=0.1
+        ),  # noqa: F405
         send_default_pii=False,
         debug=False,
     )
@@ -159,7 +162,9 @@ RATELIMIT_ENABLE = True
 RATELIMIT_USE_CACHE = "default"
 
 # OpenTelemetry
-OTEL_EXPORTER_OTLP_ENDPOINT = env("OTEL_EXPORTER_OTLP_ENDPOINT", default=None)  # noqa: F405
+OTEL_EXPORTER_OTLP_ENDPOINT = env(
+    "OTEL_EXPORTER_OTLP_ENDPOINT", default=None
+)  # noqa: F405
 if OTEL_EXPORTER_OTLP_ENDPOINT:
     trace.set_tracer_provider(TracerProvider())
     tracer = trace.get_tracer(__name__)

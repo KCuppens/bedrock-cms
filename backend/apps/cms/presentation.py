@@ -1,23 +1,18 @@
 from typing import Any
+
 from django.core.exceptions import ValidationError
 from django.http import Http404
+
+from apps.blog.models import BlogPost, BlogSettings
 from apps.core.cache import cache_manager
 from apps.registry.registry import get_all_configs
-            from apps.blog.models import BlogPost
-        from apps.blog.models import BlogPost
-        from apps.blog.models import BlogSettings
-"""
+
 Presentation page resolver for content_detail blocks.
 
 Handles the resolution of which presentation page to use for rendering
 registered content models, with support for precedence and caching.
-"""
 
 # mypy: ignore-errors
-
-
-
-
 
 class PresentationPageResolver:
     """Resolves presentation pages for content detail rendering."""
@@ -26,7 +21,7 @@ class PresentationPageResolver:
         self.registry_configs = get_all_configs()
 
     def resolve_from_route(self, path: str, locale_code: str) -> dict[str, Any]:
-        """
+
         Resolve content and presentation page from a URL path.
 
         Args:
@@ -38,7 +33,7 @@ class PresentationPageResolver:
 
         Raises:
             Http404: If content or presentation page not found
-        """
+
         # Parse path to determine content type and slug
         path_parts = path.strip("/").split("/")
 
@@ -63,7 +58,7 @@ class PresentationPageResolver:
     def resolve_by_id(
         self, content_label: str, content_id: int, locale_code: str
     ) -> dict[str, Any]:
-        """
+
         Resolve content and presentation page by explicit ID.
 
         Args:
@@ -73,7 +68,7 @@ class PresentationPageResolver:
 
         Returns:
             Dict containing 'content', 'presentation_page', 'display_options'
-        """
+
         if content_label == "blog.blogpost":
 
             try:
@@ -143,11 +138,11 @@ class PresentationPageResolver:
         }
 
     def build_cache_key(self, content, presentation_page=None) -> str:
-        """
+
         Build composite cache key for presentation page rendering.
 
         Format: post:{locale}:{slug}:{post_rev}:{page_rev}
-        """
+
         # Get post revision ID (could be extended for other content types)
         post_rev = getattr(content, "updated_at", None)
         if post_rev:
@@ -167,13 +162,13 @@ class PresentationPageResolver:
     def validate_content_detail_block(
         self, blocks: list, allowed_labels: list | None = None
     ) -> None:
-        """
+
         Validate that a page has exactly one content_detail block for presentation pages.
 
         Args:
             blocks: List of block data
             allowed_labels: Optional list of allowed content labels
-        """
+
         content_detail_blocks = [
             block
             for block in blocks
@@ -203,10 +198,8 @@ class PresentationPageResolver:
                 f"content_detail block label '{label}' not in allowed list: {allowed_labels}"
             )
 
-
 # Global resolver instance
 presentation_resolver = PresentationPageResolver()
-
 
 def resolve_presentation_page(
     path: str = None,
@@ -214,7 +207,7 @@ def resolve_presentation_page(
     content_id: int = None,
     locale_code: str = "en",
 ) -> dict[str, Any]:
-    """
+
     Convenience function to resolve presentation pages.
 
     Args:
@@ -225,7 +218,7 @@ def resolve_presentation_page(
 
     Returns:
         Dict with content, presentation_page, and display_options
-    """
+
     if path:
         return presentation_resolver.resolve_from_route(path, locale_code)
     elif content_label and content_id:

@@ -1,24 +1,25 @@
 from django.contrib.auth import get_user_model
+
 from rest_framework import serializers
+
 from .models import (
-from django.core.exceptions import ValidationError
-"""
-Serializers for translation models.
-"""
-
-
-
     Locale,
+    Serializers,
     TranslationGlossary,
     TranslationHistory,
     TranslationQueue,
     TranslationUnit,
     UiMessage,
     UiMessageTranslation,
+    ValidationError,
+
+    django.core.exceptions,
+
+    # models
+    translation,
 )
 
 User = get_user_model()
-
 
 class LocaleSerializer(serializers.ModelSerializer):
     """Serializer for Locale model."""
@@ -44,7 +45,6 @@ class LocaleSerializer(serializers.ModelSerializer):
             "updated_at",
         ]
         read_only_fields = ["id", "created_at", "updated_at"]
-
 
 class TranslationUnitSerializer(serializers.ModelSerializer):
     """Serializer for TranslationUnit model."""
@@ -90,7 +90,6 @@ class TranslationUnitSerializer(serializers.ModelSerializer):
             "created_at",
         ]
 
-
 class TranslationUnitUpdateSerializer(serializers.ModelSerializer):
     """Serializer for updating translation units."""
 
@@ -119,7 +118,6 @@ class TranslationUnitUpdateSerializer(serializers.ModelSerializer):
 
         return value
 
-
 class UiMessageSerializer(serializers.ModelSerializer):
     """Serializer for UiMessage model."""
 
@@ -142,7 +140,6 @@ class UiMessageSerializer(serializers.ModelSerializer):
     def get_translation_count(self, obj):  # noqa: C901
         """Get count of translations for this message."""
         return obj.translations.count()
-
 
 class UiMessageTranslationSerializer(serializers.ModelSerializer):
     """Serializer for UiMessageTranslation model."""
@@ -180,7 +177,6 @@ class UiMessageTranslationSerializer(serializers.ModelSerializer):
             "updated_at",
         ]
 
-
 class TranslationStatusSerializer(serializers.Serializer):
     """Serializer for translation status information."""
 
@@ -190,14 +186,12 @@ class TranslationStatusSerializer(serializers.Serializer):
     fallback_locale = serializers.CharField(allow_null=True)
     needs_update = serializers.BooleanField()
 
-
 class ObjectTranslationStatusSerializer(serializers.Serializer):
     """Serializer for object translation status."""
 
     object_id = serializers.IntegerField()
     model_label = serializers.CharField()
     fields = serializers.DictField(child=TranslationStatusSerializer())
-
 
 class BulkTranslationUpdateSerializer(serializers.Serializer):
     """Serializer for bulk translation updates."""
@@ -220,7 +214,6 @@ class BulkTranslationUpdateSerializer(serializers.Serializer):
                 )
 
         return value
-
 
 class TranslationGlossarySerializer(serializers.ModelSerializer):
     """Serializer for TranslationGlossary model."""
@@ -264,7 +257,6 @@ class TranslationGlossarySerializer(serializers.ModelSerializer):
             "updated_at",
         ]
 
-
 class GlossarySearchSerializer(serializers.Serializer):
     """Serializer for glossary search requests."""
 
@@ -279,7 +271,6 @@ class GlossarySearchSerializer(serializers.Serializer):
     verified_only = serializers.BooleanField(
         default=False, help_text="Only return verified terms"
     )
-
 
 class TranslationQueueSerializer(serializers.ModelSerializer):
     """Serializer for TranslationQueue model."""
@@ -354,7 +345,6 @@ class TranslationQueueSerializer(serializers.ModelSerializer):
             "updated_at",
         ]
 
-
 class TranslationHistorySerializer(serializers.ModelSerializer):
     """Serializer for TranslationHistory model."""
 
@@ -388,14 +378,12 @@ class TranslationHistorySerializer(serializers.ModelSerializer):
             "created_at",
         ]
 
-
 class TranslationApprovalSerializer(serializers.Serializer):
     """Serializer for translation approval/rejection requests."""
 
     comment = serializers.CharField(
         required=False, help_text="Optional comment for the action"
     )
-
 
 class MachineTranslationSuggestionSerializer(serializers.Serializer):
     """Serializer for machine translation suggestion requests."""
@@ -414,7 +402,6 @@ class MachineTranslationSuggestionSerializer(serializers.Serializer):
         help_text="Machine translation service to use",
     )
 
-
 class BulkUiMessageUpdateSerializer(serializers.Serializer):
     """Serializer for bulk UI message updates."""
 
@@ -432,7 +419,6 @@ class BulkUiMessageUpdateSerializer(serializers.Serializer):
                 )
         return value
 
-
 class NamespaceSerializer(serializers.Serializer):
     """Serializer for UI message namespaces."""
 
@@ -442,7 +428,6 @@ class NamespaceSerializer(serializers.Serializer):
         child=serializers.FloatField(),
         help_text="Translation progress per locale as percentage",
     )
-
 
 class TranslationAssignmentSerializer(serializers.Serializer):
     """Serializer for assigning translations to users."""
@@ -459,7 +444,6 @@ class TranslationAssignmentSerializer(serializers.Serializer):
         allow_blank=True,
         help_text="Optional comment for the assignment",
     )
-
 
 class BulkAssignmentSerializer(serializers.Serializer):
     """Serializer for bulk assignment of translations."""

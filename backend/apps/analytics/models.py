@@ -9,7 +9,6 @@ from django.utils import timezone
 
 User = get_user_model()
 
-
 class PageView(models.Model):
     """Track page views and visitor analytics"""
 
@@ -77,7 +76,6 @@ class PageView(models.Model):
     def __str__(self):  # noqa: C901
         return f"View of {self.url} at {self.viewed_at}"
 
-
 class UserActivity(models.Model):
     """Track user actions and interactions"""
 
@@ -134,7 +132,6 @@ class UserActivity(models.Model):
 
     def __str__(self):  # noqa: C901
         return f"{self.user.email} - {self.get_action_display()} at {self.created_at}"
-
 
 class ContentMetrics(models.Model):
     """Aggregate content performance metrics"""
@@ -194,7 +191,6 @@ class ContentMetrics(models.Model):
 
     def __str__(self):  # noqa: C901
         return f"Metrics for {self.content_object} on {self.date}"
-
 
 class Assessment(models.Model):
     """Security and compliance assessments"""
@@ -272,7 +268,6 @@ class Assessment(models.Model):
 
     def __str__(self):  # noqa: C901
         return f"{self.title} ({self.get_assessment_type_display()})"
-
 
 class Risk(models.Model):
     """Risk management and tracking"""
@@ -387,7 +382,6 @@ class Risk(models.Model):
     def __str__(self):  # noqa: C901
         return f"{self.title} (Risk Score: {self.risk_score})"
 
-
 class Threat(models.Model):
     """Security threat tracking and monitoring"""
 
@@ -474,7 +468,6 @@ class Threat(models.Model):
 
     def __str__(self):  # noqa: C901
         return f"{self.title} ({self.get_severity_display()})"
-
 
 class AnalyticsSummary(models.Model):
     """Daily/weekly/monthly analytics summaries for dashboard"""

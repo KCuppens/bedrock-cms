@@ -5,10 +5,7 @@ from django.utils import timezone
 
 from apps.i18n.models import Locale, UiMessageTranslation
 
-"""
 Check recently created translations.
-"""
-
 
 class Command(BaseCommand):
     help = "Check recently created translations"
@@ -35,7 +32,6 @@ class Command(BaseCommand):
             locale = Locale.objects.get(code=locale_code)
         except Locale.DoesNotExist:
             self.stdout.write(self.style.ERROR(f"Locale {locale_code} not found"))
-            return
 
         # Get translations created recently
         recent_time = timezone.now() - timedelta(hours=hours)

@@ -1,31 +1,26 @@
 import logging
 from datetime import date, datetime, timedelta
+
+from celery import shared_task
 from django.contrib.auth import get_user_model
 from django.utils import timezone
-from celery import shared_task
+
 from .aggregation import AnalyticsAggregator
-from .models import PageView, UserActivity
-    from .models import ContentMetrics
-"""
+from .models import ContentMetrics, PageView, UserActivity
+
 Celery tasks for analytics data processing and aggregation.
-"""
-
-
-
-
 
 User = get_user_model()
 logger = logging.getLogger(__name__)
 
-
 @shared_task
 def generate_daily_analytics_summary(target_date=None):  # noqa: C901
-    """
+
     Generate daily analytics summary for a specific date.
 
     Args:
         target_date: Date string in YYYY-MM-DD format, defaults to yesterday
-    """
+
     if target_date is None:
         target_date = (timezone.now() - timedelta(days=1)).date()
     elif isinstance(target_date, str):
@@ -42,15 +37,14 @@ def generate_daily_analytics_summary(target_date=None):  # noqa: C901
     except Exception as e:
         return {"success": False, "error": str(e), "date": str(target_date)}
 
-
 @shared_task
 def generate_weekly_analytics_summary(week_start=None):  # noqa: C901
-    """
+
     Generate weekly analytics summary.
 
     Args:
         week_start: Week start date string in YYYY-MM-DD format
-    """
+
     if week_start is None:
         # Default to start of current week (Monday)
         today = timezone.now().date()
@@ -69,15 +63,14 @@ def generate_weekly_analytics_summary(week_start=None):  # noqa: C901
     except Exception as e:
         return {"success": False, "error": str(e), "week_start": str(week_start)}
 
-
 @shared_task
 def generate_monthly_analytics_summary(month_start=None):  # noqa: C901
-    """
+
     Generate monthly analytics summary.
 
     Args:
         month_start: Month start date string in YYYY-MM-DD format
-    """
+
     if month_start is None:
         # Default to start of current month
         today = timezone.now().date()
@@ -96,15 +89,14 @@ def generate_monthly_analytics_summary(month_start=None):  # noqa: C901
     except Exception as e:
         return {"success": False, "error": str(e), "month_start": str(month_start)}
 
-
 @shared_task
 def cleanup_old_page_views(days=90):  # noqa: C901
-    """
+
     Clean up old page view records to manage database size.
 
     Args:
         days: Number of days to keep (default: 90)
-    """
+
     cutoff_date = timezone.now() - timedelta(days=days)
 
     deleted_count = PageView.objects.filter(viewed_at__lt=cutoff_date).delete()[0]
@@ -115,15 +107,14 @@ def cleanup_old_page_views(days=90):  # noqa: C901
         "cutoff_date": cutoff_date.isoformat(),
     }
 
-
 @shared_task
 def cleanup_old_user_activities(days=180):  # noqa: C901
-    """
+
     Clean up old user activity records.
 
     Args:
         days: Number of days to keep (default: 180)
-    """
+
     cutoff_date = timezone.now() - timedelta(days=days)
 
     deleted_count = UserActivity.objects.filter(created_at__lt=cutoff_date).delete()[0]
@@ -134,12 +125,10 @@ def cleanup_old_user_activities(days=180):  # noqa: C901
         "cutoff_date": cutoff_date.isoformat(),
     }
 
-
 @shared_task
 def calculate_content_performance_scores():  # noqa: C901
-    """
+
     Calculate performance scores for all content items.
-    """
 
     updated_count = 0
 
@@ -160,16 +149,14 @@ def calculate_content_performance_scores():  # noqa: C901
             logger.error(
                 f"Failed to calculate performance score for {item['content_type']}:{item['object_id']}: {e}"
             )
-            continue
 
     return {"success": True, "updated_count": updated_count}
 
-
 @shared_task
 def generate_security_report():  # noqa: C901
-    """
+
     Generate daily security overview report.
-    """
+
     try:
         security_data = AnalyticsAggregator.get_security_overview()
 
@@ -186,12 +173,11 @@ def generate_security_report():  # noqa: C901
     except Exception as e:
         return {"success": False, "error": str(e)}
 
-
 @shared_task
 def aggregate_hourly_traffic():  # noqa: C901
-    """
+
     Aggregate hourly traffic data for the last 24 hours.
-    """
+
     end_time = timezone.now()
     start_time = end_time - timedelta(hours=24)
 
@@ -206,7 +192,6 @@ def aggregate_hourly_traffic():  # noqa: C901
         }
     except Exception as e:
         return {"success": False, "error": str(e)}
-
 
 # Periodic task configuration for Celery Beat
 ANALYTICS_CELERY_BEAT_SCHEDULE = {

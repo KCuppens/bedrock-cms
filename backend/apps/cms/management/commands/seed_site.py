@@ -10,10 +10,7 @@ from apps.cms.models import Page, Redirect
 from apps.i18n.models import Locale
 from apps.media.models import Asset
 
-"""
 Management command to seed the site with demo data.
-"""
-
 
 class Command(BaseCommand):
     help = "Seed the site with demo data for development and testing"
@@ -25,7 +22,7 @@ class Command(BaseCommand):
             help="Clear existing data before seeding",
         )
 
-    def handle(self, *args, **options):
+    def handle(self, *args, **options):  # noqa: C901
         if options["clear"]:
             self.clear_data()
 
@@ -159,7 +156,7 @@ class Command(BaseCommand):
 
         return assets
 
-    def create_page_tree(self, en_locale, es_locale, assets):
+    def create_page_tree(self, en_locale, es_locale, assets):  # noqa: C901
         """Create sample page tree."""
         self.stdout.write("Creating page tree...")
 
@@ -400,7 +397,7 @@ class Command(BaseCommand):
 
         return pages
 
-    def create_blog_content(self, en_locale, es_locale, user, assets, pages):
+    def create_blog_content(self, en_locale, es_locale, user, assets, pages):  # noqa: C901
         """Create sample blog content."""
         self.stdout.write("Creating blog content...")
 
@@ -572,7 +569,7 @@ class Command(BaseCommand):
                 },
             )
 
-    def show_summary(self, locales, pages, blog_data, assets):
+    def show_summary(self, locales, pages, blog_data, assets):  # noqa: C901
         """Show summary of created data."""
         self.stdout.write("\n" + "=" * 50)
         self.stdout.write("DEMO DATA SUMMARY")

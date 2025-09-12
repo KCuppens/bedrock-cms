@@ -1,42 +1,37 @@
 from datetime import date, datetime, timedelta
+
 from django.contrib.auth import get_user_model
 from django.db.models import Avg, Count, Sum
 from django.db.models.functions import TruncDate, TruncHour, TruncMonth, TruncWeek
 from django.utils import timezone
+
+"""Analytics aggregation functions for calculating metrics and summaries."""
 from .models import (
-"""
-Analytics aggregation functions for calculating metrics and summaries.
-"""
-
-
-
-    AnalyticsSummary,
-    Assessment,
-    ContentMetrics,
-    PageView,
-    Risk,
-    Threat,
-    UserActivity,
+# AnalyticsSummary,
+# Assessment,
+# ContentMetrics,
+# PageView,
+# Risk,
+# Threat,
+# UserActivity,
 )
 
 User = get_user_model()
-
 
 class AnalyticsAggregator:
     """Main aggregation class for analytics calculations"""
 
     @staticmethod
     def get_traffic_trends(days: int = 30, period: str = "daily") -> list[dict]:
-        """
-        Calculate traffic trends over a specified period.
 
+        """Calculate traffic trends over a specified period."""
         Args:
             days: Number of days to look back
             period: Aggregation period ('daily', 'weekly', 'monthly', 'hourly')
 
         Returns:
-            List of dictionaries containing trend data
-        """
+# List of dictionaries containing trend data
+
         end_date = timezone.now()
         start_date = end_date - timedelta(days=days)
 
@@ -71,17 +66,16 @@ class AnalyticsAggregator:
     def calculate_bounce_rate(
         start_date: datetime, end_date: datetime, page_id: int | None = None
     ) -> float:
-        """
-        Calculate bounce rate for a given period.
 
+        """Calculate bounce rate for a given period."""
         Args:
             start_date: Start date for calculation
             end_date: End date for calculation
             page_id: Optional page ID to filter by
 
         Returns:
-            Bounce rate as percentage
-        """
+# Bounce rate as percentage
+
         base_query = PageView.objects.filter(viewed_at__range=[start_date, end_date])
 
         if page_id:
@@ -107,17 +101,16 @@ class AnalyticsAggregator:
     def get_top_content(
         days: int = 30, limit: int = 20, content_type: str | None = None
     ) -> list[dict]:
-        """
-        Get top performing content by views and engagement.
 
+        """Get top performing content by views and engagement."""
         Args:
             days: Number of days to look back
             limit: Maximum number of results to return
             content_type: Optional content type filter
 
         Returns:
-            List of top performing content with metrics
-        """
+# List of top performing content with metrics
+
         end_date = timezone.now().date()
         start_date = end_date - timedelta(days=days)
 
@@ -140,16 +133,15 @@ class AnalyticsAggregator:
 
     @staticmethod
     def get_user_engagement_metrics(user_id: int | None = None, days: int = 30) -> dict:
-        """
-        Calculate user engagement metrics.
 
+        """Calculate user engagement metrics."""
         Args:
             user_id: Optional specific user ID
             days: Number of days to look back
 
         Returns:
-            Dictionary containing engagement metrics
-        """
+# Dictionary containing engagement metrics
+
         end_date = timezone.now()
         start_date = end_date - timedelta(days=days)
 
@@ -190,17 +182,16 @@ class AnalyticsAggregator:
     def calculate_content_performance_score(
         content_type_id: int, object_id: int, days: int = 30
     ) -> dict:
-        """
-        Calculate a comprehensive performance score for content.
 
+        """Calculate a comprehensive performance score for content."""
         Args:
             content_type_id: ContentType ID
             object_id: Object ID
             days: Number of days to analyze
 
         Returns:
-            Dictionary with performance metrics and score
-        """
+# Dictionary with performance metrics and score
+
         end_date = timezone.now().date()
         start_date = end_date - timedelta(days=days)
 
@@ -263,15 +254,14 @@ class AnalyticsAggregator:
 
     @staticmethod
     def get_security_overview(days: int = 30) -> dict:
-        """
-        Get security overview including threats, risks, and assessments.
 
+        """Get security overview including threats, risks, and assessments."""
         Args:
             days: Number of days to analyze
 
         Returns:
-            Dictionary with security metrics
-        """
+# Dictionary with security metrics
+
         end_date = timezone.now()
         start_date = end_date - timedelta(days=days)
 
@@ -347,17 +337,16 @@ class AnalyticsAggregator:
     def _calculate_security_score(
         threat_stats: dict, risk_stats: dict, assessment_stats: dict
     ) -> float:
-        """
-        Calculate an overall security score based on various metrics.
 
+        """Calculate an overall security score based on various metrics."""
         Args:
             threat_stats: Threat statistics
             risk_stats: Risk statistics
             assessment_stats: Assessment statistics
 
         Returns:
-            Security score (0-100)
-        """
+# Security score (0-100)
+
         # Base score
         score = 100.0
 
@@ -385,15 +374,14 @@ class AnalyticsAggregator:
 
     @staticmethod
     def generate_daily_summary(target_date: date) -> AnalyticsSummary:
-        """
-        Generate or update daily analytics summary.
 
+        """Generate or update daily analytics summary."""
         Args:
             target_date: Date to generate summary for
 
         Returns:
-            AnalyticsSummary instance
-        """
+# AnalyticsSummary instance
+
         # Get or create summary
         summary, created = AnalyticsSummary.objects.get_or_create(
             date=target_date, period_type="daily", defaults={}

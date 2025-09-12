@@ -4,13 +4,11 @@ from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-
 class MockRevisionsView(APIView):
     permission_classes = [AllowAny]  # Allow unauthenticated access for testing
-    """
+
     Temporary mock endpoint for page revisions while database issues are resolved.
     This provides the same revision data that was implemented in the serializer.
-    """
 
     def get(self, request, page_id):
         """Return mock revision data for a specific page."""

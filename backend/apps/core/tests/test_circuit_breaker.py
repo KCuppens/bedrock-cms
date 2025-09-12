@@ -5,10 +5,7 @@ from django.test import TestCase
 
 from apps.core.circuit_breaker import CircuitOpenException, circuit_breaker
 
-"""
 Test cases for circuit breaker functionality.
-"""
-
 
 class CircuitBreakerTest(TestCase):
     """Test circuit breaker functionality."""
@@ -137,7 +134,6 @@ class CircuitBreakerTest(TestCase):
         """Test that circuit breaker preserves original exception types."""
 
         class CustomException(Exception):
-            pass
 
         @circuit_breaker(failure_threshold=2, recovery_timeout=60)
         def operation_with_custom_exception():

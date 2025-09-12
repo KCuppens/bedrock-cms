@@ -2,10 +2,7 @@ from rest_framework import serializers
 
 from .models import BlogPost, Category, Tag
 
-"""
 Optimized serializers for Blog with reduced field loading.
-"""
-
 
 class BlogPostMinimalSerializer(serializers.ModelSerializer):
     """Ultra-minimal serializer for references."""
@@ -13,7 +10,6 @@ class BlogPostMinimalSerializer(serializers.ModelSerializer):
     class Meta:
         model = BlogPost
         fields = ["id", "title", "slug"]
-
 
 class BlogPostListSerializer(serializers.ModelSerializer):
     """Optimized serializer for blog post lists."""
@@ -51,7 +47,6 @@ class BlogPostListSerializer(serializers.ModelSerializer):
         ):
             return [tag.name for tag in obj.tags.all()]
         return []
-
 
 class BlogPostDetailSerializer(serializers.ModelSerializer):
     """Full serializer for blog post detail views."""
@@ -109,7 +104,6 @@ class BlogPostDetailSerializer(serializers.ModelSerializer):
             ]
         return []
 
-
 class CategoryListSerializer(serializers.ModelSerializer):
     """Optimized serializer for category lists."""
 
@@ -124,7 +118,6 @@ class CategoryListSerializer(serializers.ModelSerializer):
         if hasattr(obj, "post_count"):
             return obj.post_count
         return 0
-
 
 class TagListSerializer(serializers.ModelSerializer):
     """Optimized serializer for tag lists."""

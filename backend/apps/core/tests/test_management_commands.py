@@ -7,7 +7,6 @@ from django.test import TestCase
 Test cases for core management commands.
 """
 
-
 class ManagementCommandsTest(TestCase):
     """Test management commands in core app."""
 

@@ -3,7 +3,6 @@ from django.db import transaction
 
 from apps.cms.models import BlockType, BlockTypeCategory
 
-
 class Command(BaseCommand):
     help = "Seed the database with default block types from existing configurations"
 

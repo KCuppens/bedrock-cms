@@ -1,8 +1,7 @@
-"""
+
 Simple CMS Views tests to start building coverage.
 
 Basic tests for CMS views without complex factory dependencies.
-"""
 
 from datetime import timedelta
 
@@ -17,7 +16,6 @@ from apps.cms.views import PagesViewSet
 from apps.i18n.models import Locale
 
 User = get_user_model()
-
 
 class PagesViewSetBasicTestCase(APITestCase):
     """Basic tests for PagesViewSet core functionality."""
@@ -271,7 +269,6 @@ class PagesViewSetBasicTestCase(APITestCase):
 
         # Verify page was deleted
         self.assertFalse(Page.objects.filter(id=self.draft_page.id).exists())
-
 
 class PagePublishingTestCase(APITestCase):
     """Test page publishing operations."""

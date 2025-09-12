@@ -3,10 +3,7 @@ from django.urls import path
 from . import views
 from .global_search import global_search, search_suggestions
 
-"""
 URL patterns for search functionality.
-"""
-
 
 app_name = "search"
 

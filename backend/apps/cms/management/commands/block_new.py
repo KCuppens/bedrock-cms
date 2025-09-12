@@ -1,16 +1,15 @@
 from pathlib import Path
+
+from django.core.exceptions import ValidationError
 from django.core.management.base import BaseCommand, CommandError
 from django.template import Context, Template
-from django.core.exceptions import ValidationError
+
 import pytest
-from apps.cms.blocks.validation import validate_blocks, {{ block_class }}BlockModel
 from rest_framework.exceptions import ValidationError
-"""
+
+from apps.cms.blocks.validation import validate_blocks, {{ block_class }}BlockModel
+
 Management command to scaffold new block types.
-"""
-
-
-
 
 class Command(BaseCommand):
     help = "Create a new block type with schema, tests, and documentation"
@@ -64,7 +63,6 @@ class Command(BaseCommand):
 
         if dry_run:
             self._show_dry_run(context)
-            return
 
         try:
             # Update validation.py
@@ -246,9 +244,6 @@ class {{ block_class }}BlockModel(BaseBlockModel):
         template = Template(
             '''"""
 Tests for {{ block_type }} block.
-"""
-
-
 
 class Test{{ block_class }}Block:
     """Tests for {{ block_type }} block validation."""
@@ -441,7 +436,7 @@ pytest tests/unit/test_blocks_{{ block_type }}.py -v
 - [Block System Overview](../blocks.md)
 - [Block Validation](../validation.md)
 - [Creating Custom Blocks](../custom-blocks.md)
-"""
+
         )
 
         with open(docs_file, "w") as f:

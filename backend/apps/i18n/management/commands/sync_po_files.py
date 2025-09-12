@@ -1,16 +1,14 @@
 from pathlib import Path
 
-import polib
 from django.apps import apps
 from django.core.management.base import BaseCommand
 
+import polib
+
 from apps.i18n.models import Locale, UiMessage, UiMessageTranslation
 
-"""
 Management command to sync .po files with database translations.
 Imports Django's .po files into the database and exports database translations back to .po files.
-"""
-
 
 class Command(BaseCommand):
     help = "Sync .po files with database translations (bidirectional)"
@@ -57,7 +55,7 @@ class Command(BaseCommand):
                 self.stdout.write(
                     self.style.ERROR(f"Locale {locale_code} not found or not active")
                 )
-                return
+
         else:
             locales = Locale.objects.filter(is_active=True)
 
@@ -65,7 +63,7 @@ class Command(BaseCommand):
         if app_name:
             if app_name not in [app.name for app in apps.get_app_configs()]:
                 self.stdout.write(self.style.ERROR(f"App {app_name} not found"))
-                return
+
             app_configs = [apps.get_app_config(app_name.split(".")[-1])]
         else:
             app_configs = apps.get_app_configs()
@@ -86,7 +84,6 @@ class Command(BaseCommand):
             # Check for locale directory in app
             locale_dir = Path(app_config.path) / "locale"
             if not locale_dir.exists():
-                continue
 
             self.stdout.write(f"Processing app: {app_config.name}")
 
@@ -98,7 +95,6 @@ class Command(BaseCommand):
                     lang_code = locale.code.split("_")[0].split("-")[0]
                     po_file_path = locale_dir / lang_code / "LC_MESSAGES" / "django.po"
                     if not po_file_path.exists():
-                        continue
 
                 self.stdout.write(f"  Importing {locale.code} from {po_file_path}")
 
@@ -109,12 +105,10 @@ class Command(BaseCommand):
                     self.stdout.write(
                         self.style.WARNING(f"    Failed to parse {po_file_path}: {e}")
                     )
-                    continue
 
                 # Import entries
                 for entry in po:
                     if not entry.msgid:
-                        continue
 
                     # Create message key from msgid
                     # Use app name and msgid to create unique key
@@ -135,7 +129,6 @@ class Command(BaseCommand):
 
                     # Skip if no translation
                     if not entry.msgstr:
-                        continue
 
                     # Create or update translation
                     translation, trans_created = (
@@ -180,21 +173,18 @@ class Command(BaseCommand):
         for app_config in app_configs:
             app_label = app_config.label
             if app_label not in messages_by_app:
-                continue
 
             # Ensure locale directory exists
             locale_dir = Path(app_config.path) / "locale"
             if not locale_dir.exists() and create_missing:
                 locale_dir.mkdir(parents=True)
             elif not locale_dir.exists():
-                continue
 
             self.stdout.write(f"Exporting translations for app: {app_config.name}")
 
             for locale in locales:
                 # Skip default locale (usually 'en')
                 if locale.is_default:
-                    continue
 
                 # Determine .po file path
                 po_dir = locale_dir / locale.code / "LC_MESSAGES"
@@ -216,7 +206,6 @@ class Command(BaseCommand):
                         "Content-Transfer-Encoding": "8bit",
                     }
                 else:
-                    continue
 
                 self.stdout.write(f"  Exporting {locale.code} to {po_file_path}")
 
@@ -228,7 +217,6 @@ class Command(BaseCommand):
                             message=ui_message, locale=locale
                         )
                     except UiMessageTranslation.DoesNotExist:
-                        continue
 
                     # Extract msgid from key (remove app prefix)
                     msgid = (

@@ -1,21 +1,16 @@
 from django.core.cache import cache
-
 from drf_spectacular.utils import extend_schema
 from rest_framework import views
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 
 from apps.cms.models import Page
-            from apps.i18n.models import Locale
-            from apps.i18n.models import Locale
-                from apps.i18n.models import Locale
-
+from apps.i18n.models import Locale
 
 class NavigationView(views.APIView):
-    """
+
     API view for getting navigation menu items.
     Returns pages marked as in_main_menu.
-    """
 
     permission_classes = [AllowAny]
 
@@ -114,12 +109,10 @@ class NavigationView(views.APIView):
 
         return Response({"menu_items": menu_items})
 
-
 class FooterView(views.APIView):
-    """
+
     API view for getting footer menu items.
     Returns pages marked as in_footer.
-    """
 
     permission_classes = [AllowAny]
 
@@ -194,11 +187,9 @@ class FooterView(views.APIView):
 
         return Response({"footer_items": footer_items})
 
-
 class SiteSettingsView(views.APIView):
-    """
+
     API view for getting site-wide settings like homepage, navigation, and footer.
-    """
 
     permission_classes = [AllowAny]
 
@@ -267,7 +258,6 @@ class SiteSettingsView(views.APIView):
                         "path": homepage_page.path,
                     }
             except Page.DoesNotExist:
-                pass
 
             # Get navigation items (reuse logic from NavigationView)
             nav_filters = {"in_main_menu": True, "status": "published"}

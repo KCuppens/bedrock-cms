@@ -1,14 +1,11 @@
+from datetime import datetime, timedelta
+
+from django.utils import timezone
 from rest_framework import serializers
 
 from .models import Page
 from .seo import SeoSettings
-from django.core.exceptions import ValidationError
-                from .seo_utils import resolve_seo
-                from .seo_utils import generate_seo_links
-        from datetime import datetime, timedelta
-            from django.utils import timezone
-            from django.utils import timezone
-
+from .seo_utils import generate_seo_links, resolve_seo
 
 class PageReadSerializer(serializers.ModelSerializer):
     children_count = serializers.SerializerMethodField()
@@ -141,7 +138,6 @@ class PageReadSerializer(serializers.ModelSerializer):
         # )
         return mock_revisions
 
-
 class PageTreeItemSerializer(serializers.ModelSerializer):
     children_count = serializers.SerializerMethodField()
 
@@ -154,7 +150,6 @@ class PageTreeItemSerializer(serializers.ModelSerializer):
         if hasattr(obj, "_children_count"):
             return obj._children_count
         return obj.children.count()
-
 
 class PageWriteSerializer(serializers.ModelSerializer):
     class Meta:
@@ -210,7 +205,6 @@ class PageWriteSerializer(serializers.ModelSerializer):
 
         return attrs
 
-
 class SeoSettingsSerializer(serializers.ModelSerializer):
     class Meta:
         model = SeoSettings
@@ -225,6 +219,5 @@ class SeoSettingsSerializer(serializers.ModelSerializer):
             "updated_at",
             # 'default_og_asset' will be added in Phase 3
         ]
-
 
 # SeoDefaultsSerializer removed - section-based defaults no longer needed

@@ -1,20 +1,21 @@
 from django.contrib.auth import get_user_model
 from django.contrib.contenttypes.models import ContentType
 from django.test import TestCase
+
 from apps.i18n.models import Locale, TranslationUnit, UiMessage, UiMessageTranslation
 from apps.i18n.translation import (
-"""
-Test cases for translation utilities.
-"""
-
-
+    Test,
     TranslationManager,
     TranslationResolver,
     UiMessageResolver,
+
+    cases,
+
+    translation,
+    # utilities
 )
 
 User = get_user_model()
-
 
 class TranslationResolverTest(TestCase):
     """Test cases for TranslationResolver."""
@@ -134,7 +135,6 @@ class TranslationResolverTest(TestCase):
         self.assertEqual(chain[1], self.locale_fr)
         self.assertEqual(chain[2], self.locale_es)
         self.assertEqual(chain[3], self.locale_en)
-
 
 class TranslationManagerTest(TestCase):
     """Test cases for TranslationManager."""
@@ -282,7 +282,6 @@ class TranslationManagerTest(TestCase):
         self.assertEqual(progress["pending_fields"], 1)
         self.assertEqual(progress["missing_fields"], 1)
         self.assertAlmostEqual(progress["completion_percentage"], 33.33, places=1)
-
 
 class UiMessageResolverTest(TestCase):
     """Test cases for UiMessageResolver."""

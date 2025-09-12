@@ -6,10 +6,7 @@ from rest_framework.response import Response
 
 from .version import VersionService
 
-"""
 Core application views
-"""
-
 
 @extend_schema(
     summary="Get application version information",
@@ -36,15 +33,14 @@ Core application views
 @api_view(["GET"])
 @permission_classes([AllowAny])
 def version_info(request):  # noqa: C901
-    """
+
     Get application version and environment information.
 
     This endpoint is public and can be accessed without authentication.
     It provides version tracking information from git and the environment.
-    """
+
     info = VersionService.get_version_info()
     return Response(info, status=status.HTTP_200_OK)
-
 
 @extend_schema(
     summary="Get simple version string",
@@ -60,11 +56,11 @@ def version_info(request):  # noqa: C901
 @api_view(["GET"])
 @permission_classes([AllowAny])
 def version_simple(request):  # noqa: C901
-    """
+
     Get a simple version string.
 
     Returns just the version string in a simple format,
     including commit hash if ahead of tag and dirty flag if uncommitted changes.
-    """
+
     version = VersionService.get_simple_version()
     return Response({"version": version}, status=status.HTTP_200_OK)

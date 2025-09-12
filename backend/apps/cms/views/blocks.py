@@ -6,15 +6,11 @@ from rest_framework.response import Response
 from ..blocks.validation import BLOCK_MODELS
 from ..models import BlockType
 
-"""
 API views for CMS blocks registry.
-"""
-
 
 class BlockTypesView(views.APIView):
-    """
+
     API view for getting available block types and their schemas.
-    """
 
     permission_classes = [IsAuthenticatedOrReadOnly]
 
@@ -73,7 +69,6 @@ class BlockTypesView(views.APIView):
                     model_class = BLOCK_MODELS[block_type]
                     model_schema = model_class.schema()
                 except Exception:
-                    pass
 
             # Use database schema if available, otherwise fallback to model schema
             schema = (
@@ -102,11 +97,9 @@ class BlockTypesView(views.APIView):
 
         return Response({"block_types": block_types})
 
-
 class BlockSchemaView(views.APIView):
-    """
+
     API view for getting the schema of a specific block type.
-    """
 
     permission_classes = [IsAuthenticatedOrReadOnly]
 

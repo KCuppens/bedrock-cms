@@ -37,7 +37,6 @@ from .serializers import (
 from .services.scheduling import SchedulingService
 from .versioning_views import VersioningMixin
 
-
 class PagesViewSet(VersioningMixin, viewsets.ModelViewSet):
     """API endpoints for managing pages."""
 
@@ -379,7 +378,6 @@ class PagesViewSet(VersioningMixin, viewsets.ModelViewSet):
     def schedule(self, request, pk=None):  # noqa: C901
         """Schedule a page for future publishing."""
 
-
         page = self.get_object()
         publish_at_str = request.data.get("publish_at")
         unpublish_at_str = request.data.get("unpublish_at")
@@ -463,7 +461,6 @@ class PagesViewSet(VersioningMixin, viewsets.ModelViewSet):
     def schedule_unpublish(self, request, pk=None):  # noqa: C901
         """Schedule a published page to be unpublished at a future time."""
 
-
         page = self.get_object()
         unpublish_at_str = request.data.get("unpublish_at")
 
@@ -529,7 +526,6 @@ class PagesViewSet(VersioningMixin, viewsets.ModelViewSet):
                 if start_dt:
                     scheduled_pages = scheduled_pages.filter(published_at__gte=start_dt)
             except ValueError:
-                pass
 
         if end_date:
             try:
@@ -538,7 +534,6 @@ class PagesViewSet(VersioningMixin, viewsets.ModelViewSet):
                 if end_dt:
                     scheduled_pages = scheduled_pages.filter(published_at__lte=end_dt)
             except ValueError:
-                pass
 
         serializer = PageReadSerializer(scheduled_pages, many=True)
         return Response(serializer.data)
@@ -546,7 +541,6 @@ class PagesViewSet(VersioningMixin, viewsets.ModelViewSet):
     @action(detail=False, methods=["get"], url_path="scheduled-tasks")
     def scheduled_tasks(self, request):  # noqa: C901
         """Get all scheduled tasks for pages."""
-
 
         # Get query parameters
         status = request.query_params.get("status", "pending")
@@ -705,7 +699,6 @@ class PagesViewSet(VersioningMixin, viewsets.ModelViewSet):
                     pagerevision__user=author
                 ).distinct()
             except (ValueError, User.DoesNotExist):
-                pass
 
         serializer = PageReadSerializer(pending_pages, many=True)
         return Response(serializer.data)
@@ -724,7 +717,6 @@ class PagesViewSet(VersioningMixin, viewsets.ModelViewSet):
         }
 
         # Top reviewers this month
-
 
         last_month = timezone.now() - timedelta(days=30)
         reviewer_stats = (
@@ -890,7 +882,6 @@ class PagesViewSet(VersioningMixin, viewsets.ModelViewSet):
                 for block in page.blocks:
                     if isinstance(block, dict) and block.get("type") == block_type:
                         template_pages.append(page)
-                        break
 
         return Response(
             {
@@ -985,7 +976,6 @@ class PagesViewSet(VersioningMixin, viewsets.ModelViewSet):
                     presentation_page = settings.default_presentation_page
                     resolution_source = "global_default"
             except BlogSettings.DoesNotExist:
-                pass
 
         # Build SEO data
         seo_data = {
@@ -1008,10 +998,6 @@ class PagesViewSet(VersioningMixin, viewsets.ModelViewSet):
         }
 
         return Response(response_data)
-
-
-
-
 
 @cache_page(60 * 60)  # Cache for 1 hour
 @ratelimit(key="ip", rate="10/h", method="GET")

@@ -1,10 +1,13 @@
 from typing import Any
+
 from django.contrib.auth import get_user_model
 from django.db.models import Count, Q
+
 from drf_spectacular.utils import OpenApiParameter, extend_schema
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
+
 from apps.blog.models import BlogPost
 from apps.blog.models import Category as BlogCategory
 from apps.blog.models import Tag as BlogTag
@@ -12,17 +15,11 @@ from apps.cms.model_parts.category import Collection
 from apps.cms.models import Page, Redirect
 from apps.files.models import FileUpload
 from apps.i18n.models import TranslationUnit
-    from apps.search.models import SearchQuery
-"""
+from apps.search.models import SearchQuery
+
 Global search functionality for the dashboard search bar.
-"""
-
-
-
-
 
 User = get_user_model()
-
 
 def search_pages(query: str, limit: int = 5) -> list[dict[str, Any]]:
     """Search CMS pages"""
@@ -43,7 +40,6 @@ def search_pages(query: str, limit: int = 5) -> list[dict[str, Any]]:
         }
         for page in pages
     ]
-
 
 def search_blog_posts(query: str, limit: int = 5) -> list[dict[str, Any]]:
     """Search blog posts"""
@@ -67,7 +63,6 @@ def search_blog_posts(query: str, limit: int = 5) -> list[dict[str, Any]]:
         for post in posts
     ]
 
-
 def search_media(query: str, limit: int = 5) -> list[dict[str, Any]]:
     """Search media files"""
     files = FileUpload.objects.filter(
@@ -87,7 +82,6 @@ def search_media(query: str, limit: int = 5) -> list[dict[str, Any]]:
         }
         for file in files
     ]
-
 
 def search_collections(query: str, limit: int = 5) -> list[dict[str, Any]]:
     """Search collections"""
@@ -111,7 +105,6 @@ def search_collections(query: str, limit: int = 5) -> list[dict[str, Any]]:
         for collection in collections
     ]
 
-
 def search_categories(query: str, limit: int = 5) -> list[dict[str, Any]]:
     """Search categories"""
     categories = BlogCategory.objects.filter(
@@ -131,7 +124,6 @@ def search_categories(query: str, limit: int = 5) -> list[dict[str, Any]]:
         for category in categories
     ]
 
-
 def search_tags(query: str, limit: int = 5) -> list[dict[str, Any]]:
     """Search tags"""
     tags = BlogTag.objects.filter(
@@ -150,7 +142,6 @@ def search_tags(query: str, limit: int = 5) -> list[dict[str, Any]]:
         }
         for tag in tags
     ]
-
 
 def search_translations(query: str, limit: int = 5) -> list[dict[str, Any]]:
     """Search translations"""
@@ -178,7 +169,6 @@ def search_translations(query: str, limit: int = 5) -> list[dict[str, Any]]:
         for translation in translations
     ]
 
-
 def search_users(query: str, limit: int = 5) -> list[dict[str, Any]]:
     """Search users (admin only)"""
     users = User.objects.filter(
@@ -200,7 +190,6 @@ def search_users(query: str, limit: int = 5) -> list[dict[str, Any]]:
         for user in users
     ]
 
-
 def search_redirects(query: str, limit: int = 5) -> list[dict[str, Any]]:
     """Search redirects"""
     redirects = Redirect.objects.filter(
@@ -219,7 +208,6 @@ def search_redirects(query: str, limit: int = 5) -> list[dict[str, Any]]:
         }
         for redirect in redirects
     ]
-
 
 @extend_schema(
     summary="Global dashboard search",
@@ -252,11 +240,11 @@ def search_redirects(query: str, limit: int = 5) -> list[dict[str, Any]]:
 @api_view(["GET"])
 @permission_classes([IsAuthenticated])
 def global_search(request):
-    """
+
     Global search endpoint for dashboard search bar.
 
     Searches across multiple content types and returns grouped results.
-    """
+
     query = request.query_params.get("q", "").strip()
 
     if not query or len(query) < 2:
@@ -302,14 +290,11 @@ def global_search(request):
                 total += len(type_results)
         except Exception:
             # Log error but continue with other searches
-            pass
-            continue
 
     # Format response
     return Response(
         {"query": query, "results": results, "total": total, "grouped": True}
     )
-
 
 @extend_schema(
     summary="Search suggestions",
@@ -328,11 +313,11 @@ def global_search(request):
 @api_view(["GET"])
 @permission_classes([IsAuthenticated])
 def search_suggestions(request):
-    """
+
     Get search suggestions for autocomplete.
 
     Returns quick suggestions based on partial query.
-    """
+
     query = request.query_params.get("q", "").strip()
 
     if not query:

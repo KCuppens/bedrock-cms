@@ -8,7 +8,6 @@ from .models import UserProfile
 
 User = get_user_model()
 
-
 class UserProfileSerializer(serializers.ModelSerializer):
     """Serializer for UserProfile"""
 
@@ -24,7 +23,6 @@ class UserProfileSerializer(serializers.ModelSerializer):
             "receive_notifications",
             "receive_marketing_emails",
         ]
-
 
 class UserSerializer(serializers.ModelSerializer):
     """Serializer for User model"""
@@ -74,7 +72,6 @@ class UserSerializer(serializers.ModelSerializer):
             return obj.avatar.url
         return None
 
-
 class UserRegistrationSerializer(serializers.Serializer):
     """Serializer for user registration"""
 
@@ -118,7 +115,6 @@ class UserRegistrationSerializer(serializers.Serializer):
 
         return user
 
-
 class PasswordChangeSerializer(serializers.Serializer):
     """Serializer for password change"""
 
@@ -156,7 +152,6 @@ class PasswordChangeSerializer(serializers.Serializer):
         user.set_password(password)
         user.save()
         return user
-
 
 class UserUpdateSerializer(serializers.ModelSerializer):
     """Serializer for updating user profile"""

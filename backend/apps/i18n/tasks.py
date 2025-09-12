@@ -1,26 +1,27 @@
 import logging
+from datetime import datetime, timedelta
 from typing import Any
+
 from django.contrib.contenttypes.models import ContentType
 from django.db import transaction
+
 from celery import shared_task
+
+from apps.cms.models import Page
 from apps.registry.registry import content_registry
-from .models import Locale, TranslationUnit, UiMessage, UiMessageTranslation
+
+from .models import (
+    Locale,
+    TranslationQueue,
+    TranslationUnit,
+    UiMessage,
+    UiMessageTranslation,
+)
 from .services import DeepLTranslationService
-    from apps.cms.models import Page
-        from .models import TranslationQueue
-        from django.contrib.contenttypes.models import ContentType
-        from datetime import datetime, timedelta
-"""
+
 Background tasks for internationalization and localization.
-"""
-
-
-
-
-
 
 logger = logging.getLogger(__name__)
-
 
 class TranslationService:
     """Mock translation service for testing."""
@@ -29,17 +30,15 @@ class TranslationService:
         """Mock translation method."""
         return f"Translated: {text}"
 
-
 def get_translation_service(service_name: str = None):  # noqa: C901
     """Get translation service instance."""
     return TranslationService()
-
 
 @shared_task(bind=True)
 def seed_locale_translation_units(
     self, locale_code: str, force_reseed: bool = False
 ) -> dict[str, Any]:
-    """
+
     Seed TranslationUnits for a new locale.
 
     Scans all registered models and pages to create translation units
@@ -51,7 +50,7 @@ def seed_locale_translation_units(
 
     Returns:
         Dict with summary of seeding results
-    """
+
     try:
         # Get the locale
         try:
@@ -159,8 +158,6 @@ def seed_locale_translation_units(
         error_msg = f"Failed to seed locale {locale_code}: {str(e)}"
         logger.error(error_msg)
         self.update_state(state="FAILURE", meta={"error": error_msg})
-        raise
-
 
 def _seed_page_translation_units(
     locale: Locale, force_reseed: bool = False
@@ -185,7 +182,6 @@ def _seed_page_translation_units(
 
             if not target_page:
                 # No corresponding page in target locale, skip
-                continue
 
             for field_name in translatable_fields:
                 # Create or get translation unit
@@ -214,7 +210,6 @@ def _seed_page_translation_units(
                     skipped_count += 1
 
     return {"created": created_count, "skipped": skipped_count}
-
 
 def _seed_model_translation_units(
     model_class,
@@ -247,7 +242,6 @@ def _seed_model_translation_units(
                 ).first()
 
             if not target_obj:
-                continue
 
             for field_name in translatable_fields:
                 # Create or get translation unit
@@ -277,14 +271,13 @@ def _seed_model_translation_units(
 
     return {"created": created_count, "skipped": skipped_count}
 
-
 @shared_task(bind=True)
 def cleanup_orphaned_translation_units(self) -> dict[str, Any]:  # noqa: C901
-    """
+
     Clean up orphaned translation units.
 
     Removes translation units that reference deleted objects.
-    """
+
     try:
         results = {"total_cleaned": 0, "models_processed": []}
 
@@ -298,7 +291,6 @@ def cleanup_orphaned_translation_units(self) -> dict[str, Any]:  # noqa: C901
             model_class = content_type.model_class()
 
             if not model_class:
-                continue
 
             # Find orphaned units for this model
             orphaned_units = []
@@ -341,16 +333,14 @@ def cleanup_orphaned_translation_units(self) -> dict[str, Any]:  # noqa: C901
         error_msg = f"Failed to cleanup translation units: {str(e)}"
         logger.error(error_msg)
         self.update_state(state="FAILURE", meta={"error": error_msg})
-        raise
-
 
 @shared_task
 def process_translation_queue() -> dict[str, Any]:  # noqa: C901
-    """
+
     Process translation queue items.
 
     Processes pending translation queue items and updates their status.
-    """
+
     try:
 
         results = {"total_processed": 0, "total_completed": 0, "total_failed": 0}
@@ -393,8 +383,6 @@ def process_translation_queue() -> dict[str, Any]:  # noqa: C901
     except Exception as e:
         error_msg = f"Failed to process translation queue: {str(e)}"
         logger.error(error_msg)
-        raise
-
 
 @shared_task
 def auto_translate_content(
@@ -404,9 +392,9 @@ def auto_translate_content(
     target_locale_code: str,
     service: str = None,
 ) -> dict[str, Any]:
-    """
+
     Auto translate content using machine translation service.
-    """
+
     try:
 
         # Validate parameters
@@ -445,8 +433,6 @@ def auto_translate_content(
     except Exception as e:
         error_msg = f"Failed to auto translate content: {str(e)}"
         logger.error(error_msg)
-        raise
-
 
 @shared_task
 def generate_translation_report(
@@ -455,9 +441,9 @@ def generate_translation_report(
     date_from: str = None,
     date_to: str = None,
 ) -> dict[str, Any]:
-    """
+
     Generate translation completion report.
-    """
+
     try:
         results = {
             "total_units": 0,
@@ -491,14 +477,12 @@ def generate_translation_report(
     except Exception as e:
         error_msg = f"Failed to generate translation report: {str(e)}"
         logger.error(error_msg)
-        raise
-
 
 @shared_task
 def sync_locale_fallbacks(locale_code: str = None) -> dict[str, Any]:  # noqa: C901
-    """
+
     Sync locale fallback configurations.
-    """
+
     try:
         results = {"locales_synced": 0, "fallbacks_updated": 0}
 
@@ -516,14 +500,12 @@ def sync_locale_fallbacks(locale_code: str = None) -> dict[str, Any]:  # noqa: C
     except Exception as e:
         error_msg = f"Failed to sync locale fallbacks: {str(e)}"
         logger.error(error_msg)
-        raise
-
 
 @shared_task
 def cleanup_old_translations(days_old: int = 90, days: int = None) -> dict[str, Any]:  # noqa: C901
-    """
+
     Cleanup old translation records.
-    """
+
     try:
 
         # Use days parameter if provided, otherwise use days_old
@@ -555,8 +537,6 @@ def cleanup_old_translations(days_old: int = 90, days: int = None) -> dict[str, 
     except Exception as e:
         error_msg = f"Failed to cleanup old translations: {str(e)}"
         logger.error(error_msg)
-        raise
-
 
 @shared_task(bind=True)
 def bulk_auto_translate_ui_messages(
@@ -566,7 +546,7 @@ def bulk_auto_translate_ui_messages(
     namespace: str = None,
     max_translations: int = None,
 ) -> dict[str, Any]:
-    """
+
     Auto-translate all missing UI messages for a locale using DeepL.
 
     This task runs in the background to avoid timeout issues when translating
@@ -580,7 +560,7 @@ def bulk_auto_translate_ui_messages(
 
     Returns:
         Dict with translation results and statistics
-    """
+
     try:
         # Validate required parameters
         if not locale_code:
@@ -667,7 +647,6 @@ def bulk_auto_translate_ui_messages(
                         logger.info(f"Skipping {message.key}: empty default_value")
                         skipped_count += 1
                         current_processed += 1
-                        continue
 
                     # Translate using DeepL
                     translated_text = deepl_service.translate(
@@ -756,4 +735,3 @@ def bulk_auto_translate_ui_messages(
         logger.error(error_msg)
         if self:
             self.update_state(state="FAILURE", meta={"error": error_msg})
-        raise

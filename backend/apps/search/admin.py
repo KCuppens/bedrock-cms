@@ -4,16 +4,12 @@ from django.utils.html import format_html
 
 from .models import SearchIndex, SearchQuery, SearchSuggestion
 
-"""
 Admin interface for search functionality.
-"""
-
 
 @admin.register(SearchIndex)
 class SearchIndexAdmin(admin.ModelAdmin):
-    """
+
     Admin interface for search index entries.
-    """
 
     list_display = (
         "title",
@@ -106,12 +102,10 @@ class SearchIndexAdmin(admin.ModelAdmin):
 
     content_object_link.short_description = "Original Object"
 
-
 @admin.register(SearchQuery)
 class SearchQueryAdmin(admin.ModelAdmin):
-    """
+
     Admin interface for search query logs.
-    """
 
     list_display = (
         "query_text",
@@ -155,12 +149,10 @@ class SearchQueryAdmin(admin.ModelAdmin):
 
     user_display.short_description = "User"
 
-
 @admin.register(SearchSuggestion)
 class SearchSuggestionAdmin(admin.ModelAdmin):
-    """
+
     Admin interface for search suggestions.
-    """
 
     list_display = (
         "suggestion_text",

@@ -1,6 +1,5 @@
 from rest_framework import permissions
 
-
 class HasGroup(permissions.BasePermission):
     """Permission class to check if user belongs to a specific group"""
 
@@ -12,7 +11,6 @@ class HasGroup(permissions.BasePermission):
             return False
 
         return request.user.groups.filter(name=self.group_name).exists()
-
 
 class IsAdminOrReadOnly(permissions.BasePermission):
     """Permission that allows admins to modify, others to read only"""
@@ -27,7 +25,6 @@ class IsAdminOrReadOnly(permissions.BasePermission):
 
         # Write permissions only for admins
         return request.user.is_admin()
-
 
 class IsOwnerOrAdmin(permissions.BasePermission):
     """Permission that allows owners or admins to access"""
@@ -51,7 +48,6 @@ class IsOwnerOrAdmin(permissions.BasePermission):
         # Default to checking if obj is the user themselves
         return obj == request.user
 
-
 class IsManagerOrAdmin(permissions.BasePermission):
     """Permission that allows managers or admins to access"""
 
@@ -60,7 +56,6 @@ class IsManagerOrAdmin(permissions.BasePermission):
             return False
 
         return request.user.is_manager()
-
 
 class IsMemberOrAbove(permissions.BasePermission):
     """Permission that allows members, managers, or admins to access"""
@@ -71,15 +66,13 @@ class IsMemberOrAbove(permissions.BasePermission):
 
         return request.user.is_member()
 
-
 class RBACPermission(permissions.BasePermission):
-    """
+
     Role-Based Access Control permission that checks both locale and section access.
 
     This permission integrates with the RBAC system to verify that users have
     the appropriate permissions for the locale and path section of the object
     they're trying to access.
-    """
 
     def has_permission(self, request, view):
         """Check if user is authenticated - object-level checks happen in has_object_permission."""

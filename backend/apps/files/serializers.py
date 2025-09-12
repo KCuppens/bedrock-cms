@@ -1,9 +1,10 @@
+import os
+
+from django.core.exceptions import ValidationError
+
 from rest_framework import serializers
 
 from .models import FileUpload
-from django.core.exceptions import ValidationError
-        import os
-
 
 class FileUploadSerializer(serializers.ModelSerializer):
     """Serializer for FileUpload model"""
@@ -69,7 +70,6 @@ class FileUploadSerializer(serializers.ModelSerializer):
             return request.build_absolute_uri(f"/api/v1/files/{obj.id}/download/")
         return None
 
-
 class FileUploadCreateSerializer(serializers.ModelSerializer):
     """Serializer for creating FileUpload"""
 
@@ -78,7 +78,6 @@ class FileUploadCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = FileUpload
         fields = ["file", "description", "tags", "is_public", "expires_at"]
-
 
 class SignedUrlSerializer(serializers.Serializer):
     """Serializer for signed upload URL request"""
@@ -109,7 +108,6 @@ class SignedUrlSerializer(serializers.Serializer):
             raise serializers.ValidationError("Filename must have an extension")
 
         return value
-
 
 class FileStatsSerializer(serializers.Serializer):
     """Serializer for file statistics"""

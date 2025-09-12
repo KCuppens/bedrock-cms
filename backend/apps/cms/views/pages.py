@@ -9,35 +9,46 @@ from rest_framework.response import Response
 from rest_framework.throttling import UserRateThrottle
 
 from apps.cms.serializers import (
-from apps.cms.serializers.public import PublicPageSerializer
-from apps.core.throttling import (
-from apps.i18n.models import Locale
-from ..models import Page
-from ..versioning_views import VersioningMixin
-        from django.db.models import Count
-        from django.db.models import Count
-            from django.db.models import Case, IntegerField, Value, When
-        import copy
-        import uuid
-        from django.utils import timezone
-        import copy
-        import uuid
-            from ..versioning import AuditEntry
-                from ..versioning import AuditEntry
-from django.shortcuts import redirect
-from django.views.decorators.cache import cache_page
-from django_ratelimit.decorators import ratelimit
-            from ..seo_utils import generate_hreflang_alternates
+    AuditEntry,
+    Case,
+    Count,
+    IntegerField,
+    Locale,
+    Page,
     PageReadSerializer,
     PageTreeItemSerializer,
     PageWriteSerializer,
+    PublicPageSerializer,
+    Value,
+    VersioningMixin,
+    When,
+    ..models,
+    ..seo_utils,
+    ..versioning,
+    ..versioning_views,
+    apps.cms.serializers.public,
+    apps.core.throttling,
+    apps.i18n.models,
+    cache_page,
+    copy,
+    django.db.models,
+    django.shortcuts,
+    django.utils,
+    django.views.decorators.cache,
+    django_ratelimit.decorators,
+
+    generate_hreflang_alternates,
+
+    ratelimit,
+    redirect,
+    timezone,
+    uuid,
 )
+
     BurstWriteThrottle,
     PublishOperationThrottle,
     WriteOperationThrottle,
 )
-
-
 
 class PagesViewSet(VersioningMixin, viewsets.ModelViewSet):
     """API endpoints for managing pages."""
@@ -108,7 +119,7 @@ class PagesViewSet(VersioningMixin, viewsets.ModelViewSet):
     )
     @action(detail=False, methods=["get"])
     def get_by_path(self, request):
-        """
+
         Get page by path with optimized SEO data for frontend consumption.
 
         This endpoint is optimized for public-facing pages and includes:
@@ -116,7 +127,7 @@ class PagesViewSet(VersioningMixin, viewsets.ModelViewSet):
         - Canonical URLs and hreflang alternates
         - Block data for rendering
         - Minimal response payload for performance
-        """
+
         path = request.query_params.get("path")
         locale_code = request.query_params.get("locale", "en")
         preview_token = request.query_params.get("preview")
@@ -380,7 +391,7 @@ class PagesViewSet(VersioningMixin, viewsets.ModelViewSet):
     )
     @action(detail=False, methods=["post"], url_path="reorder")
     def reorder(self, request):
-        """
+
         Reorder pages by providing an ordered list of page IDs.
 
         This endpoint efficiently updates the position field for multiple pages
@@ -398,7 +409,7 @@ class PagesViewSet(VersioningMixin, viewsets.ModelViewSet):
             "reordered_count": 3,
             "parent_id": null | number
         }
-        """
+
         parent_id = request.data.get("parent_id")
         page_ids = request.data.get("page_ids", [])
 
@@ -689,7 +700,6 @@ class PagesViewSet(VersioningMixin, viewsets.ModelViewSet):
         """Publish a page."""
         page = self.get_object()
 
-
         page.status = "published"
         page.published_at = timezone.now()
         page._current_user = request.user
@@ -827,10 +837,6 @@ class PagesViewSet(VersioningMixin, viewsets.ModelViewSet):
                 {"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
 
-
-
-
-
 def default_sitemap_view(request):
     """Redirect /sitemap.xml to the default locale's sitemap."""
     try:
@@ -846,7 +852,6 @@ def default_sitemap_view(request):
             return HttpResponse("No active locales found", status=404)
     except Exception:
         return HttpResponse("Service unavailable", status=503)
-
 
 @cache_page(60 * 60)  # Cache for 1 hour
 @ratelimit(key="ip", rate="10/h", method="GET")
