@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo, useCallback, useRef, lazy, Suspense } from "react";
 import { toast } from "sonner";
-import { api } from "@/lib/api.ts";
+import { api } from '@/lib/api';
 import { useDebounce } from "@/hooks/useDebounce";
 import Sidebar from "@/components/Sidebar";
 import TopNavbar from "@/components/TopNavbar";

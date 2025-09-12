@@ -1,5 +1,5 @@
 """
-Comprehensive Files app tests targeting high coverage with real database operations.
+Files app tests with high coverage and real database operations.
 """
 
 import tempfile

@@ -1,5 +1,5 @@
 """
-Comprehensive Blog app tests targeting high coverage with real database operations.
+Blog app tests with high coverage and real database operations.
 """
 
 from datetime import datetime, timedelta
@@ -548,7 +548,7 @@ class BlogSerializerTests(TestCase):
             pass  # Serializer may not exist
 
     def test_blog_post_detail_serializer(self):
-        """Test BlogPostDetailSerializer for detail views."""
+        """Test BlogPostSerializer for detail views."""
         post = BlogPost.objects.create(
             title="Detail Post",
             content="Detailed content",
@@ -561,7 +561,7 @@ class BlogSerializerTests(TestCase):
             post.tags.add(tag)
 
         try:
-            serializer = BlogPostDetailSerializer(post)
+            serializer = BlogPostSerializer(post)
             data = serializer.data
 
             self.assertEqual(data["title"], "Detail Post")

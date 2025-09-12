@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { api } from "@/lib/api.ts";
+import { api } from '@/lib/api';
 import { useToast } from "@/components/ui/use-toast";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";

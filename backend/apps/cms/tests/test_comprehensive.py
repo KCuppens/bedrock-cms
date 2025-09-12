@@ -1,4 +1,6 @@
 """
+Comprehensive CMS tests targeting 80%+ coverage with real database operations.
+"""
 
 from datetime import datetime, timedelta
 

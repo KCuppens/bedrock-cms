@@ -9,7 +9,7 @@ import TopNavbar from "@/components/TopNavbar";
 import TagModal from "@/components/modals/TagModal";
 import DeleteConfirmModal from "@/components/modals/DeleteConfirmModal";
 import React, { useState, useEffect, useCallback, useMemo, memo } from "react";
-import { api } from "@/lib/api.ts";
+import { api } from '@/lib/api';
 import { useToast } from "@/hooks/use-toast";
 
 // Memoized Tag Card Component

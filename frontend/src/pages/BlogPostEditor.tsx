@@ -34,7 +34,7 @@ import {
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import Sidebar from "@/components/Sidebar";
 import TopNavbar from "@/components/TopNavbar";
-import { api } from "@/lib/api.ts";
+import { api } from '@/lib/api';
 import { useToast } from "@/components/ui/use-toast";
 
 const BlogPostEditor = () => {

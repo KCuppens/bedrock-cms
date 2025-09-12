@@ -11,7 +11,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { MediaPicker } from "@/components/ui/media-picker";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/components/ui/use-toast";
-import { api } from "@/lib/api.ts";
+import { api } from '@/lib/api';
 import {
   Settings,
   Globe,

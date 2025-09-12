@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo, useCallback, memo } from "react";
-import { api } from "@/lib/api.ts";
+import { api } from '@/lib/api';
 import { useToast } from "@/hooks/use-toast";
 import { useTranslation } from "@/contexts/TranslationContext";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";

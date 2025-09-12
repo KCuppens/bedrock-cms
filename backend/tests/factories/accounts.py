@@ -82,7 +82,7 @@ class ScopedLocaleFactory(BaseFactory):
 
 
 # Specialized user factories with specific roles
-class EditorUserFactory(lambda: None):
+class EditorUserFactory(UserFactory):
     """Factory for editor users with CMS permissions."""
 
     @factory.post_generation
@@ -101,7 +101,7 @@ class EditorUserFactory(lambda: None):
         ScopedSectionFactory(user=self, section="cms", permission_level="edit")
 
 
-class TranslatorUserFactory(lambda: None):
+class TranslatorUserFactory(UserFactory):
     """Factory for translator users with i18n permissions."""
 
     @factory.post_generation
@@ -117,7 +117,7 @@ class TranslatorUserFactory(lambda: None):
         UserProfileFactory(user=self)
 
         # Add locale access for Spanish
-        locale_es = lambda: None(code="es")
+        locale_es = LocaleFactory(code="es")
         ScopedLocaleFactory(user=self,
             locale=locale_es,
             permission_level="edit")

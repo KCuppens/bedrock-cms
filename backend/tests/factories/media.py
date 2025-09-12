@@ -81,3 +81,6 @@ class DocumentFactory(MediaItemFactory):
 
     file_type = "document"
     mime_type = "application/pdf"
+
+
+__all__ = ["MediaItemFactory", "ImageFactory", "DocumentFactory"]
