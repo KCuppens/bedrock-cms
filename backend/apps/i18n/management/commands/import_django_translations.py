@@ -10,9 +10,10 @@ from apps.i18n.models import Locale, UiMessage, UiMessageTranslation
 
 
 
-Import Django's built-in translation strings into the database.
+"""Import Django's built-in translation strings into the database.
 
 This includes admin interface strings, form validation messages, etc.
+"""
 
 
 
@@ -444,7 +445,7 @@ class Command(BaseCommand):
 
         # Show statistics per locale
 
-        self.stdout.write("\nTranslation coverage by locale:")
+        """self.stdout.write("\nTranslation coverage by locale:")"""
 
         for locale in locales:
 

@@ -66,5 +66,5 @@ class RegistryConfig(AppConfig):
 
             # Don't raise in production, just log the error
 
-            if not getattr(self, "testing", False):
+            """if not getattr(self, "testing", False):"""
 

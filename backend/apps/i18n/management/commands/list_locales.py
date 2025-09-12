@@ -6,7 +6,7 @@ from apps.i18n.models import Locale
 
 
 
-List all available locales.
+"""List all available locales."""
 
 
 
@@ -28,7 +28,7 @@ class Command(BaseCommand):
 
             if locale.is_active:
 
-                status.append("active")
+                """status.append("active")"""
 
             if locale.is_default:
 

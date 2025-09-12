@@ -8,11 +8,7 @@ from rest_framework.routers import DefaultRouter
 
 from . import views
 
-
-
-Blog URL configuration.
-
-
+"""Blog URL configuration."""
 
 app_name = "blog"
 

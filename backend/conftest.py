@@ -2,8 +2,8 @@
 
 import pytest
 
-# Let pytest-django handle Django setup
-pytest_plugins = ["django.test"]
+# Let pytest-django handle Django setup automatically
+pytest_plugins = ["pytest_django"]
 
 @pytest.fixture
 def user(db):

@@ -36,7 +36,7 @@ from apps.search.models import SearchQuery
 
 
 
-Global search functionality for the dashboard search bar.
+"""Global search functionality for the dashboard search bar."""
 
 
 

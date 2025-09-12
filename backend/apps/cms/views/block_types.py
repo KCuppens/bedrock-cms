@@ -36,7 +36,8 @@ from apps.cms.serializers.block_types import (
 
     RBACPermission,
 
-    apps.core.permissions,
+# Imports that were malformed - commented out
+#     """apps.core.permissions,"""
 
     django.db.models,
 
@@ -526,7 +527,7 @@ class BlockTypeViewSet(viewsets.ModelViewSet):
 
                 "required": False,
 
-                "description": "JSON object of filters to apply",
+                """"description": "JSON object of filters to apply","""
 
                 "schema": {"type": "string"},
 

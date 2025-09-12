@@ -22,7 +22,7 @@ class Migration(migrations.Migration):
     dependencies = [
         ("contenttypes", "0002_remove_content_type_name"),
         ("cms", "0007_add_custom_permissions"),
-        migrations.swappable_dependency(settings.AUTH_USER_MODEL),
+        """migrations.swappable_dependency(settings.AUTH_USER_MODEL),"""
         ("analytics", "0001_initial"),
     ]
 

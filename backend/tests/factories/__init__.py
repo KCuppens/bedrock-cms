@@ -1,12 +1,12 @@
 
 
-Test data factories for all applications.
+"""Test data factories for all applications."""
 
 
 
-Provides Factory Boy factories for creating consistent test data across
+"""Provides Factory Boy factories for creating consistent test data across"""
 
-all test suites with realistic, varied data generation.
+"""all test suites with realistic, varied data generation."""
 
 
 
@@ -31,6 +31,7 @@ try:
     )
 
 except ImportError:
+    pass
 
 
 
@@ -39,6 +40,7 @@ try:
     from .analytics import AnalyticsEventFactory
 
 except ImportError:
+    pass
 
 
 
@@ -47,6 +49,7 @@ try:
     from .cms import PageFactory
 
 except ImportError:
+    pass
 
 
 
@@ -55,6 +58,7 @@ try:
     from .i18n import LocaleFactory, TranslationUnitFactory
 
 except ImportError:
+    pass
 
 
 
@@ -63,6 +67,7 @@ try:
     from .media import MediaItemFactory
 
 except ImportError:
+    pass
 
 
 

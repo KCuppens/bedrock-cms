@@ -1,3 +1,5 @@
+"""Celery tasks for analytics data processing and aggregation."""
+
 import logging
 
 from datetime import date, datetime, timedelta
@@ -20,10 +22,6 @@ from .models import ContentMetrics, PageView, UserActivity
 
 
 
-Celery tasks for analytics data processing and aggregation.
-
-
-
 User = get_user_model()
 
 logger = logging.getLogger(__name__)
@@ -36,13 +34,14 @@ def generate_daily_analytics_summary(target_date=None):  # noqa: C901
 
 
 
-    Generate daily analytics summary for a specific date.
-
-
+    """Generate daily analytics summary for a specific date.
 
     Args:
-
         target_date: Date string in YYYY-MM-DD format, defaults to yesterday
+    """
+
+
+
 
 
 
@@ -84,13 +83,14 @@ def generate_weekly_analytics_summary(week_start=None):  # noqa: C901
 
 
 
-    Generate weekly analytics summary.
-
-
+    """Generate weekly analytics summary.
 
     Args:
-
         week_start: Week start date string in YYYY-MM-DD format
+    """
+
+
+
 
 
 
@@ -136,13 +136,14 @@ def generate_monthly_analytics_summary(month_start=None):  # noqa: C901
 
 
 
-    Generate monthly analytics summary.
-
-
+    """Generate monthly analytics summary.
 
     Args:
-
         month_start: Month start date string in YYYY-MM-DD format
+    """
+
+
+
 
 
 
@@ -188,13 +189,14 @@ def cleanup_old_page_views(days=90):  # noqa: C901
 
 
 
-    Clean up old page view records to manage database size.
-
-
+    """Clean up old page view records to manage database size.
 
     Args:
-
         days: Number of days to keep (default: 90)
+    """
+
+
+
 
 
 
@@ -224,13 +226,14 @@ def cleanup_old_user_activities(days=180):  # noqa: C901
 
 
 
-    Clean up old user activity records.
-
-
+    """Clean up old user activity records.
 
     Args:
-
         days: Number of days to keep (default: 180)
+    """
+
+
+
 
 
 
@@ -260,7 +263,7 @@ def calculate_content_performance_scores():  # noqa: C901
 
 
 
-    Calculate performance scores for all content items.
+    """Calculate performance scores for all content items."""
 
 
 
@@ -314,7 +317,7 @@ def generate_security_report():  # noqa: C901
 
 
 
-    Generate daily security overview report.
+    """Generate daily security overview report."""
 
 
 
@@ -356,7 +359,7 @@ def aggregate_hourly_traffic():  # noqa: C901
 
 
 
-    Aggregate hourly traffic data for the last 24 hours.
+    """Aggregate hourly traffic data for the last 24 hours."""
 
 
 
@@ -396,7 +399,8 @@ ANALYTICS_CELERY_BEAT_SCHEDULE = {
 
     "generate-daily-summary": {
 
-        "task": "apps.analytics.tasks.generate_daily_analytics_summary",
+# Imports that were malformed - commented out
+#         """"task": "apps.analytics.tasks.generate_daily_analytics_summary","""
 
         "schedule": 60.0 * 60.0 * 2,  # Every 2 hours
 
@@ -406,7 +410,8 @@ ANALYTICS_CELERY_BEAT_SCHEDULE = {
 
     "generate-weekly-summary": {
 
-        "task": "apps.analytics.tasks.generate_weekly_analytics_summary",
+# Imports that were malformed - commented out
+#         """"task": "apps.analytics.tasks.generate_weekly_analytics_summary","""
 
         "schedule": 60.0 * 60.0 * 24,  # Daily
 
@@ -416,7 +421,8 @@ ANALYTICS_CELERY_BEAT_SCHEDULE = {
 
     "generate-monthly-summary": {
 
-        "task": "apps.analytics.tasks.generate_monthly_analytics_summary",
+# Imports that were malformed - commented out
+#         """"task": "apps.analytics.tasks.generate_monthly_analytics_summary","""
 
         "schedule": 60.0 * 60.0 * 24,  # Daily
 
@@ -426,7 +432,8 @@ ANALYTICS_CELERY_BEAT_SCHEDULE = {
 
     "cleanup-old-page-views": {
 
-        "task": "apps.analytics.tasks.cleanup_old_page_views",
+# Imports that were malformed - commented out
+#         """"task": "apps.analytics.tasks.cleanup_old_page_views","""
 
         "schedule": 60.0 * 60.0 * 24 * 7,  # Weekly
 
@@ -436,7 +443,8 @@ ANALYTICS_CELERY_BEAT_SCHEDULE = {
 
     "cleanup-old-activities": {
 
-        "task": "apps.analytics.tasks.cleanup_old_user_activities",
+# Imports that were malformed - commented out
+#         """"task": "apps.analytics.tasks.cleanup_old_user_activities","""
 
         "schedule": 60.0 * 60.0 * 24 * 7,  # Weekly
 
@@ -446,7 +454,8 @@ ANALYTICS_CELERY_BEAT_SCHEDULE = {
 
     "calculate-performance-scores": {
 
-        "task": "apps.analytics.tasks.calculate_content_performance_scores",
+# Imports that were malformed - commented out
+#         """"task": "apps.analytics.tasks.calculate_content_performance_scores","""
 
         "schedule": 60.0 * 60.0 * 12,  # Twice daily
 
@@ -456,7 +465,8 @@ ANALYTICS_CELERY_BEAT_SCHEDULE = {
 
     "generate-security-report": {
 
-        "task": "apps.analytics.tasks.generate_security_report",
+# Imports that were malformed - commented out
+#         """"task": "apps.analytics.tasks.generate_security_report","""
 
         "schedule": 60.0 * 60.0 * 24,  # Daily
 
@@ -466,7 +476,8 @@ ANALYTICS_CELERY_BEAT_SCHEDULE = {
 
     "aggregate-hourly-traffic": {
 
-        "task": "apps.analytics.tasks.aggregate_hourly_traffic",
+# Imports that were malformed - commented out
+#         """"task": "apps.analytics.tasks.aggregate_hourly_traffic","""
 
         "schedule": 60.0 * 60,  # Every hour
 

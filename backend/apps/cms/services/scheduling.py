@@ -17,12 +17,11 @@ from ..models import Page
 from ..scheduling import ScheduledTask
 
 
-
+"""
 Scheduling service for CMS content.
 
-
-
 This module provides services for scheduling content publishing and unpublishing.
+"""
 
 
 
@@ -39,9 +38,7 @@ class SchedulingService:
         content_object, publish_at, unpublish_at=None, user=None
 
     ) -> tuple[ScheduledTask, ScheduledTask | None]:
-
-
-
+        """
         Schedule content for publishing.
 
 
@@ -67,9 +64,7 @@ class SchedulingService:
         Raises:
 
             ValidationError: If scheduling parameters are invalid
-
-
-
+        """
         # Validate
 
         if publish_at <= timezone.now():
@@ -157,9 +152,7 @@ class SchedulingService:
     @staticmethod
 
     def schedule_unpublish(content_object, unpublish_at, user=None) -> ScheduledTask:
-
-
-
+        """
         Schedule content for unpublishing (content must be already published).
 
 
@@ -183,9 +176,7 @@ class SchedulingService:
         Raises:
 
             ValidationError: If content is not published or time is invalid
-
-
-
+        """
         if content_object.status != "published":
 
             raise ValidationError(
@@ -255,9 +246,7 @@ class SchedulingService:
     @staticmethod
 
     def cancel_scheduling(content_object, skip_status_update=False):
-
-
-
+        """
         Cancel all scheduled tasks for content.
 
 
@@ -267,9 +256,7 @@ class SchedulingService:
             content_object: The Page or BlogPost
 
             skip_status_update: If True, don't update content status
-
-
-
+        """
         content_type = ContentType.objects.get_for_model(content_object)
 
 
@@ -313,9 +300,7 @@ class SchedulingService:
         content_type=None, status="pending", from_date=None, to_date=None
 
     ):
-
-
-
+        """
         Get scheduled tasks with filters.
 
 
@@ -335,9 +320,7 @@ class SchedulingService:
         Returns:
 
             QuerySet of ScheduledTask objects
-
-
-
+        """
         queryset = ScheduledTask.objects.all()
 
 
@@ -389,9 +372,7 @@ class SchedulingService:
     @staticmethod
 
     def reschedule_task(task, new_scheduled_for, user=None):
-
-
-
+        """
         Reschedule an existing task to a new time.
 
 
@@ -409,9 +390,7 @@ class SchedulingService:
         Raises:
 
             ValidationError: If task cannot be rescheduled or time is invalid
-
-
-
+        """
         if task.status != "pending":
 
             raise ValidationError("Can only reschedule pending tasks")

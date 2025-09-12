@@ -6,7 +6,7 @@ from apps.i18n.models import Locale
 
 
 
-Activate a locale.
+"""Activate a locale."""
 
 
 

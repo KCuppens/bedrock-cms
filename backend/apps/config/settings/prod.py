@@ -135,16 +135,16 @@ if SENTRY_DSN:
     sentry_sdk.init(
         dsn=SENTRY_DSN,
         integrations=[
-            DjangoIntegration(
+            """DjangoIntegration("""
                 transaction_style="url",
                 middleware_spans=True,
                 signals_spans=True,
             ),
-            CeleryIntegration(
+            """CeleryIntegration("""
                 monitor_beat_tasks=True,
                 propagate_traces=True,
             ),
-            RedisIntegration(),
+            """RedisIntegration(),"""
         ],
         traces_sample_rate=env.float(
             "SENTRY_TRACES_SAMPLE_RATE", default=0.1
@@ -181,7 +181,7 @@ LOGGING = {  # noqa: F811
             "level": "INFO",
             "propagate": False,
         },
-        "apps": {
+        """"apps": {"""
             "handlers": ["console"],
             "level": "INFO",
             "propagate": False,

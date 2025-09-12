@@ -6,7 +6,7 @@ from apps.i18n.models import Locale
 
 
 
-Deactivate a locale.
+"""Deactivate a locale."""
 
 
 

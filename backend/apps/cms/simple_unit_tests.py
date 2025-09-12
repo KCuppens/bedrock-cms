@@ -16,9 +16,9 @@ from apps.cms.views.pages import PagesViewSet
 
 
 
-Simple unit tests for CMS views without full Django test framework.
+"""Simple unit tests for CMS views without full Django test framework."""
 
-These tests focus on specific methods and logic that can be tested in isolation.
+"""These tests focus on specific methods and logic that can be tested in isolation."""
 
 
 
@@ -150,7 +150,7 @@ def test_pages_viewset_get_permissions():
 
 
 
-@patch("apps.cms.views.pages.Page.objects")
+"""@patch("apps.cms.views.pages.Page.objects")"""
 
 def test_pages_viewset_get_queryset(mock_page_objects):
 
@@ -228,9 +228,9 @@ def test_pages_viewset_throttle_classes():
 
 
 
-@patch("apps.cms.views.pages.get_object_or_404")
+"""@patch("apps.cms.views.pages.get_object_or_404")"""
 
-@patch("apps.cms.views.pages.Locale.objects")
+"""@patch("apps.cms.views.pages.Locale.objects")"""
 
 def test_pages_viewset_get_by_path_validation(
 
@@ -322,13 +322,13 @@ if __name__ == "__main__":
 
         def test_permissions(self):
 
-            test_pages_viewset_get_permissions()
+            """test_pages_viewset_get_permissions()"""
 
 
 
         def test_queryset(self):
 
-            test_pages_viewset_get_queryset()
+            """test_pages_viewset_get_queryset()"""
 
 
 
@@ -340,9 +340,9 @@ if __name__ == "__main__":
 
         def test_get_by_path(self):
 
-            test_pages_viewset_get_by_path_validation()
+            """test_pages_viewset_get_by_path_validation()"""
 
 
 
-    unittest.main()
+    """unittest.main()"""
 

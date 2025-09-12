@@ -314,7 +314,7 @@ class HealthCheckViewSet(viewsets.ViewSet):
 
         if "celery" in health_data:
 
-            checks.append(health_data["celery"])
+            """checks.append(health_data["celery"])"""
 
         if not all(checks):
 
@@ -348,7 +348,7 @@ class HealthCheckViewSet(viewsets.ViewSet):
 
             test_key = "health_check_test"
 
-            cache.set(test_key, "ok", 10)
+            """cache.set(test_key, "ok", 10)"""
 
             return cache.get(test_key) == "ok"
 

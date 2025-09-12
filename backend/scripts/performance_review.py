@@ -36,7 +36,8 @@ from django.utils import timezone
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "apps.config.settings.development")
+# Imports that were malformed - commented out
+# os.environ.setdefault("DJANGO_SETTINGS_MODULE", "apps.config.settings.development")
 
 
 
@@ -92,7 +93,7 @@ class PerformanceReviewer:
 
         """Run complete performance review."""
 
-        print("🚀 Starting Comprehensive Performance Review")
+        """print("🚀 Starting Comprehensive Performance Review")"""
 
         print("=" * 60)
 
@@ -108,7 +109,7 @@ class PerformanceReviewer:
 
         # API performance
 
-        print("\n🌐 Testing API Response Times...")
+        """print("\n🌐 Testing API Response Times...")"""
 
         self.analyze_api_performance()
 
@@ -124,7 +125,7 @@ class PerformanceReviewer:
 
         # Block validation performance
 
-        print("\n🧩 Testing Block Validation Performance...")
+        """print("\n🧩 Testing Block Validation Performance...")"""
 
         self.analyze_block_performance()
 
@@ -176,7 +177,7 @@ class PerformanceReviewer:
 
         # Test 1: Page tree queries
 
-        print("  • Testing page tree queries...")
+        """print("  • Testing page tree queries...")"""
 
         start_time = time.time()
 
@@ -186,7 +187,7 @@ class PerformanceReviewer:
 
         pages = list(Page.objects.all())
 
-        for page in pages[:5]:  # Test first 5
+        """for page in pages[:5]:  # Test first 5"""
 
             _ = page.parent
 
@@ -242,7 +243,7 @@ class PerformanceReviewer:
 
         # Test 3: Blog post queries
 
-        print("  • Testing blog post queries...")
+        """print("  • Testing blog post queries...")"""
 
         start_time = time.time()
 
@@ -390,7 +391,7 @@ class PerformanceReviewer:
 
         for method, endpoint, name in endpoints:
 
-            print(f"  • Testing {name} ({endpoint})")
+            """print(f"  • Testing {name} ({endpoint})")"""
 
             times = []
 
@@ -410,13 +411,13 @@ class PerformanceReviewer:
 
                     response_time = (time.time() - start_time) * 1000  # Convert to ms
 
-                    times.append(response_time)
+                    """times.append(response_time)"""
 
                 except Exception as e:
 
-                    print(f"    ⚠️  Error testing {endpoint}: {e}")
+                    """print(f"    ⚠️  Error testing {endpoint}: {e}")"""
 
-                    times.append(0)
+                    """times.append(0)"""
 
 
 
@@ -476,7 +477,7 @@ class PerformanceReviewer:
 
         """Analyze caching implementation and performance."""
 
-        print("  • Testing cache performance...")
+        """print("  • Testing cache performance...")"""
 
 
 
@@ -502,7 +503,7 @@ class PerformanceReviewer:
 
         start_time = time.time()
 
-        cache.set("perf_test_key", test_data, 300)
+        """cache.set("perf_test_key", test_data, 300)"""
 
         set_time = (time.time() - start_time) * 1000
 
@@ -522,7 +523,7 @@ class PerformanceReviewer:
 
         start_time = time.time()
 
-        cache.delete("perf_test_key")
+        """cache.delete("perf_test_key")"""
 
         delete_time = (time.time() - start_time) * 1000
 
@@ -568,7 +569,7 @@ class PerformanceReviewer:
 
         """Test block validation performance with various sizes."""
 
-        print("  • Testing block validation performance...")
+        """print("  • Testing block validation performance...")"""
 
 
 
@@ -580,9 +581,9 @@ class PerformanceReviewer:
 
 
 
-        for count in test_cases:
+        """for count in test_cases:"""
 
-            print(f"    • Testing {count} blocks...")
+            """print(f"    • Testing {count} blocks...")"""
 
 
 
@@ -594,7 +595,7 @@ class PerformanceReviewer:
 
                 block_type = ["rich_text", "hero", "image", "cta_band"][i % 4]
 
-                blocks.append(
+                """blocks.append("""
 
                     {
 
@@ -604,7 +605,7 @@ class PerformanceReviewer:
 
                         "props": {
 
-                            "title": f"Test Block {i}",
+                            """"title": f"Test Block {i}","""
 
                             "content": f"Content for block {i}"
 
@@ -632,13 +633,13 @@ class PerformanceReviewer:
 
                     validation_time = (time.time() - start_time) * 1000
 
-                    times.append(validation_time)
+                    """times.append(validation_time)"""
 
                 except Exception as e:
 
                     print(f"      ⚠️  Error validating blocks: {e}")
 
-                    times.append(0)
+                    """times.append(0)"""
 
 
 
@@ -688,7 +689,7 @@ class PerformanceReviewer:
 
         """Analyze media handling performance."""
 
-        print("  • Testing media operations...")
+        """print("  • Testing media operations...")"""
 
 
 
@@ -776,7 +777,7 @@ class PerformanceReviewer:
 
         if db_results.get("page_tree", {}).get("naive", {}).get("queries", 0) > 5:
 
-            recommendations.append(
+            """recommendations.append("""
 
                 {
 
@@ -798,7 +799,7 @@ class PerformanceReviewer:
 
         if db_results.get("blog_posts", {}).get("naive", {}).get("queries", 0) > 5:
 
-            recommendations.append(
+            """recommendations.append("""
 
                 {
 
@@ -836,7 +837,7 @@ class PerformanceReviewer:
 
         if slow_apis:
 
-            recommendations.append(
+            """recommendations.append("""
 
                 {
 
@@ -862,7 +863,7 @@ class PerformanceReviewer:
 
         if not cache_results.get("redis_available", False):
 
-            recommendations.append(
+            """recommendations.append("""
 
                 {
 
@@ -900,7 +901,7 @@ class PerformanceReviewer:
 
         if slow_blocks:
 
-            recommendations.append(
+            """recommendations.append("""
 
                 {
 

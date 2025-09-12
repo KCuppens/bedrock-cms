@@ -34,7 +34,8 @@ from apps.accounts.serializers import RoleSerializer, UserSerializer  # noqa: F4
 
 # Configure minimal Django
 
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "apps.config.settings.base")
+# Imports that were malformed - commented out
+# os.environ.setdefault("DJANGO_SETTINGS_MODULE", "apps.config.settings.base")
 
 
 try:

@@ -38,19 +38,14 @@ def send_email_task(self, email_log_id: int):  # noqa: C901
 
 
 
-    Celery task to send email asynchronously
-
-
+    """Celery task to send email asynchronously.
 
     Args:
-
         email_log_id: ID of EmailMessageLog to send
 
-
-
     Returns:
-
         dict: Task result with success status and details
+    """
 
 
 
@@ -131,6 +126,7 @@ def send_email_task(self, email_log_id: int):  # noqa: C901
             email_log.mark_as_failed(error_msg)
 
         except EmailMessageLog.DoesNotExist:
+            pass
 
 
 
@@ -146,19 +142,14 @@ def cleanup_old_email_logs(days_to_keep: int = 30):  # noqa: C901
 
 
 
-    Celery task to clean up old email logs
-
-
+    """Celery task to clean up old email logs.
 
     Args:
-
         days_to_keep: Number of days to keep email logs (default: 30)
 
-
-
     Returns:
-
         dict: Task result with cleanup details
+    """
 
 
 
@@ -218,23 +209,16 @@ def send_bulk_email_task(
 
 
 
-    Celery task to send bulk emails with batch processing
-
-
+    """Celery task to send bulk emails with batch processing.
 
     Args:
-
         template_key: Email template key
-
         recipient_emails: List of recipient email addresses
-
         context: Template context data
 
-
-
     Returns:
-
         dict: Task result with bulk send details
+    """
 
 
 
@@ -406,19 +390,14 @@ def retry_failed_emails(max_retries: int = 3):  # noqa: C901
 
 
 
-    Celery task to retry failed emails with exponential backoff
-
-
+    """Celery task to retry failed emails with exponential backoff.
 
     Args:
-
         max_retries: Maximum number of retry attempts
 
-
-
     Returns:
-
         dict: Task result with retry details
+    """
 
 
 

@@ -1,10 +1,9 @@
 
-
+"""
 Cache invalidation signals for CMS.
 
-
-
 Automatically invalidates relevant cache entries when content changes.
+"""
 
 
 
@@ -43,14 +42,11 @@ logger = logging.getLogger(__name__)
 @receiver(post_save)
 
 def invalidate_cache_on_save(sender, instance, created, **kwargs):
-
-
-
+    """
     Invalidate cache when models are saved.
 
-
-
     Handles Page, BlogPost, and any registered content types.
+    """
 
 
 
@@ -111,10 +107,9 @@ def invalidate_cache_on_save(sender, instance, created, **kwargs):
 @receiver(post_delete)
 
 def invalidate_cache_on_delete(sender, instance, **kwargs):
-
-
-
+    """
     Invalidate cache when models are deleted.
+    """
 
 
 
@@ -167,16 +162,12 @@ def invalidate_cache_on_delete(sender, instance, **kwargs):
 
 
 def invalidate_page_cache(page):
-
-
-
+    """
     Invalidate cache for a specific page and related entries.
 
-
-
     Args:
-
         page: Page instance
+    """
 
 
 
@@ -223,16 +214,12 @@ def invalidate_page_cache(page):
 
 
 def invalidate_blog_cache(blog_post):
-
-
-
+    """
     Invalidate cache for a specific blog post.
 
-
-
     Args:
-
         blog_post: BlogPost instance
+    """
 
 
 
@@ -297,18 +284,13 @@ def invalidate_blog_cache(blog_post):
 
 
 def invalidate_content_cache(instance, model_label):
-
-
-
+    """
     Invalidate cache for registered content types.
 
-
-
     Args:
-
         instance: Model instance
-
         model_label: Model label (app.model)
+    """
 
 
 
@@ -319,8 +301,7 @@ def invalidate_content_cache(instance, model_label):
         config = content_registry.get_config(model_label)
 
         if not config:
-
-
+            return
 
         # Get slug and locale from the instance
 
@@ -379,10 +360,9 @@ def invalidate_content_cache(instance, model_label):
 @receiver(m2m_changed)
 
 def invalidate_cache_on_m2m_change(sender, instance, action, pk_set, **kwargs):
-
-
-
+    """
     Invalidate cache when many-to-many relationships change.
+    """
 
 
 
@@ -441,22 +421,17 @@ def invalidate_cache_on_m2m_change(sender, instance, action, pk_set, **kwargs):
 @receiver(post_save)
 
 def invalidate_cache_on_asset_change(sender, instance, created, **kwargs):
-
-
-
+    """
     Invalidate cache when assets are updated.
 
-
-
     This is important for media replacements that should update all
-
     pages/content using those assets.
+    """
 
 
 
     if sender._meta.model_name != "asset":
-
-
+        return
 
     try:
 
@@ -497,18 +472,13 @@ def invalidate_cache_on_asset_change(sender, instance, created, **kwargs):
 # CDN Webhook Support (optional)
 
 def send_cdn_purge_webhook(keys: list, tags: list = None):
-
-
-
+    """
     Send cache purge webhook to CDN.
 
-
-
     Args:
-
         keys: List of cache keys to purge
-
         tags: List of cache tags to purge (if CDN supports tag-based purging)
+    """
 
 
 
@@ -525,8 +495,7 @@ def send_cdn_purge_webhook(keys: list, tags: list = None):
 
 
         if not webhook_url:
-
-
+            return
 
         # Prepare webhook payload
 
@@ -595,16 +564,12 @@ def invalidate_all_cache():
 
 
 def invalidate_content_type_cache(model_label: str):
-
-
-
+    """
     Invalidate all cache entries for a specific content type.
 
-
-
     Args:
-
         model_label: Model label (e.g., 'blog.blogpost')
+    """
 
 
 
@@ -615,14 +580,10 @@ def invalidate_content_type_cache(model_label: str):
         config = content_registry.get_config(model_label)
 
         if not config:
-
             logger.warning(
-
                 "Unknown model label for cache invalidation: %s", model_label
-
             )
-
-
+            return
 
         # Get all objects of this type and invalidate their cache
 
@@ -643,22 +604,15 @@ def invalidate_content_type_cache(model_label: str):
 
 
 def invalidate_blog_settings_cache(blog_settings):
-
-
-
+    """
     Invalidate cache when blog settings change.
 
-
-
     This affects all blog posts in that locale since presentation
-
     page and display options may have changed.
 
-
-
     Args:
-
         blog_settings: BlogSettings instance
+    """
 
 
 

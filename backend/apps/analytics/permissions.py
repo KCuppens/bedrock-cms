@@ -1,8 +1,7 @@
+"""Custom permissions for analytics functionality."""
+
 from rest_framework.permissions import BasePermission
 
-
-
-"""Custom permissions for analytics functionality."""
 
 class AnalyticsViewPermission(BasePermission):
 
@@ -32,11 +31,9 @@ class AnalyticsEditPermission(BasePermission):
 
 
 
-    Permission to edit analytics data (create/update/delete).
-
-
-
-    """Requires user to be authenticated and have admin role."""
+    """Permission to edit analytics data (create/update/delete).
+    
+    Requires user to be authenticated and have admin role."""
 
     def has_permission(self, request, view):
 
@@ -58,9 +55,8 @@ class SecurityAnalyticsPermission(BasePermission):
 
     """Permission to view security analytics (threats, risks, assessments).
 
-
-
-    Requires user to be authenticated and have appropriate security clearance."""
+    Requires user to be authenticated and have appropriate security clearance.
+    """
 
     def has_permission(self, request, view):
 
@@ -138,11 +134,11 @@ class DashboardPermission(BasePermission):
 
 
 
-        """Get dashboard data scope based on user role."""
-
+        """Get dashboard data scope based on user role.
+        
         Returns:
-
             str: Dashboard scope level ('basic', 'detailed', 'full')
+        """
 
 
 

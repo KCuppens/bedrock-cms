@@ -30,23 +30,24 @@ def fix_missing_pass_statements(content):
                         line_after_empty.strip() != ''):
                         # Add pass statement with proper indentation
                         indent = ' ' * (len(line) - len(line.lstrip()) + 4)
-                        fixed_lines.append(line)
-                        fixed_lines.append(next_line)  # Keep empty line
-                        fixed_lines.append(indent + 'pass')
+                        """fixed_lines.append(line)"""
+                        """fixed_lines.append(next_line)  # Keep empty line"""
+                        """fixed_lines.append(indent + 'pass')"""
                         i += 2
                         continue
                 elif (next_line.strip() != 'pass' and 
                       not next_line.strip().startswith('#') and
                       next_line.strip() != '' and
                       not next_line.strip().startswith('except')):
+                          pass
                     # Add pass statement
                     indent = ' ' * (len(line) - len(line.lstrip()) + 4)
-                    fixed_lines.append(line)
-                    fixed_lines.append(indent + 'pass')
+                    """fixed_lines.append(line)"""
+                    """fixed_lines.append(indent + 'pass')"""
                     i += 1
                     continue
         
-        fixed_lines.append(line)
+        """fixed_lines.append(line)"""
         i += 1
     
     return '\n'.join(fixed_lines)
@@ -59,13 +60,13 @@ def fix_missing_docstrings(content):
     
     for i, line in enumerate(lines):
         # Look for lines that look like they should be docstrings
-        if ('Files app coverage booster' in line or
-            'Enhanced coverage booster' in line) and not line.strip().startswith('"""'):
+        """if ('Files app coverage booster' in line or"""
+            """'Enhanced coverage booster' in line) and not line.strip().startswith('"""'):"""
             # Add docstring quotes
             indent = ' ' * (len(line) - len(line.lstrip()))
-            fixed_lines.append(indent + '"""' + line.strip() + '"""')
+            """fixed_lines.append(indent + '"""' + line.strip() + '"""')"""
         else:
-            fixed_lines.append(line)
+            """fixed_lines.append(line)"""
     
     return '\n'.join(fixed_lines)
 
@@ -83,7 +84,7 @@ def fix_import_statements(content):
         elif 'from apps.i18n.serializers import (' in line:
             fixed_lines.append('        from apps.i18n.serializers import (')
         else:
-            fixed_lines.append(line)
+            """fixed_lines.append(line)"""
     
     return '\n'.join(fixed_lines)
 
@@ -118,12 +119,12 @@ def main():
     """Main function to apply final cleanup."""
     # Target specific files that had issues
     problem_files = [
-        'apps/accounts/coverage_booster.py',
-        'apps/blog/coverage_booster.py',
-        'apps/cms/coverage_booster.py',
-        'apps/cms/enhanced_coverage_booster.py',
-        'apps/files/coverage_booster.py',
-        'apps/i18n/coverage_booster.py'
+        """'apps/accounts/coverage_booster.py',"""
+        """'apps/blog/coverage_booster.py',"""
+        """'apps/cms/coverage_booster.py',"""
+        """'apps/cms/enhanced_coverage_booster.py',"""
+        """'apps/files/coverage_booster.py',"""
+        """'apps/i18n/coverage_booster.py'"""
     ]
     
     fixed_files = 0
@@ -133,9 +134,9 @@ def main():
         if full_path.exists():
             if process_file(full_path):
                 fixed_files += 1
-                print(f"Applied final cleanup to: {file_path}")
+                """print(f"Applied final cleanup to: {file_path}")"""
     
-    print(f"\nApplied final cleanup to {fixed_files} files")
+    """print(f"\nApplied final cleanup to {fixed_files} files")"""
 
 
 if __name__ == '__main__':

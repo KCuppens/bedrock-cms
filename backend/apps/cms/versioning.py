@@ -21,12 +21,11 @@ from django.utils import timezone
 from .models import Page
 
 
-
+"""
 Versioning and audit models for the CMS.
 
-
-
 This module provides content versioning, autosave, and audit trail functionality.
+"""
 
 
 
@@ -35,21 +34,16 @@ This module provides content versioning, autosave, and audit trail functionality
 
 
 if TYPE_CHECKING:
-
-
+    pass
 
 User = get_user_model()
 
 
 
 class PageRevision(models.Model):
-
-
-
+    """
     Store snapshots of page content for versioning and autosave.
-
-
-
+    """
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
 
     page = models.ForeignKey(
@@ -163,9 +157,7 @@ class PageRevision(models.Model):
         comment: str = "",
 
     ) -> "PageRevision":
-
-
-
+        """
         Create a new revision snapshot of a page.
 
 
@@ -187,9 +179,7 @@ class PageRevision(models.Model):
         Returns:
 
             Created PageRevision instance
-
-
-
+        """
         # Create complete snapshot of page data
 
         snapshot_data = {
@@ -267,9 +257,7 @@ class PageRevision(models.Model):
     @classmethod
 
     def should_create_autosave(cls, page: "Page", user: User) -> bool:
-
-
-
+        """
         Check if an autosave revision should be created.
 
 
@@ -289,9 +277,7 @@ class PageRevision(models.Model):
         Returns:
 
             True if autosave should be created
-
-
-
+        """
         if not user:
 
             return False
@@ -526,7 +512,7 @@ class AuditEntry(models.Model):
 
             obj: Object being acted upon
 
-            meta: Additional metadata
+            """meta: Additional metadata"""
 
             request: HTTP request (for IP/user agent)
 
@@ -666,7 +652,7 @@ class RevisionDiffer:
 
         basic_fields = ["title", "slug", "path", "status", "published_at"]
 
-        for field in basic_fields:
+        """for field in basic_fields:"""
 
             old_val = old_data.get(field)
 
@@ -778,7 +764,7 @@ class RevisionDiffer:
 
                 # Block added
 
-                diff["added"].append({"index": i, "block": new_block})
+                """diff["added"].append({"index": i, "block": new_block})"""
 
                 diff["has_changes"] = True
 
@@ -788,7 +774,7 @@ class RevisionDiffer:
 
                 # Block removed
 
-                diff["removed"].append({"index": i, "block": old_block})
+                """diff["removed"].append({"index": i, "block": old_block})"""
 
                 diff["has_changes"] = True
 
@@ -798,7 +784,7 @@ class RevisionDiffer:
 
                 # Block modified
 
-                diff["modified"].append(
+                """diff["modified"].append("""
 
                     {"index": i, "old": old_block, "new": new_block}
 

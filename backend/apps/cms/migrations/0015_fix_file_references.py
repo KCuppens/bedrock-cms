@@ -10,7 +10,7 @@ class Migration(migrations.Migration):
 
     dependencies = [
         ("files", "0001_initial"),
-        ("cms", "0014_add_comprehensive_seo_fields"),
+        """("cms", "0014_add_comprehensive_seo_fields"),"""
     ]
 
     operations = [

@@ -1,6 +1,6 @@
 
 
-Internationalization factories for translation testing.
+"""Internationalization factories for translation testing."""
 
 
 

@@ -51,20 +51,15 @@ else:
 
 
 # Define User type properly for mypy
-
 if TYPE_CHECKING:
-
+    from django.contrib.auth.models import AbstractUser as User
 else:
-
     User = get_user_model()
 
 
 
 class BlogPostRevision(models.Model):
-
-
-
-    Store snapshots of blog post content for versioning and autosave.
+    """Store snapshots of blog post content for versioning and autosave."""
 
 
 
@@ -185,33 +180,18 @@ class BlogPostRevision(models.Model):
         comment: str = "",
 
     ) -> "BlogPostRevision":  # type: ignore
-
-
-
-        Create a new revision snapshot of a blog post.
-
-
+        """Create a new revision snapshot of a blog post.
 
         Args:
-
             blog_post: BlogPost to snapshot
-
             user: User creating the snapshot
-
             is_published: Whether this is a published snapshot
-
             is_autosave: Whether this is an autosave snapshot
-
             comment: Optional comment
 
-
-
         Returns:
-
             Created BlogPostRevision instance
-
-
-
+        """
         # Create complete snapshot of blog post data
 
         snapshot_data = {
@@ -303,21 +283,12 @@ class BlogPostRevision(models.Model):
     @classmethod
 
     def cleanup_old_autosave_revisions(cls, blog_post: "BlogPost", keep_count: int = 5):
-
-
-
-        Clean up old autosave revisions for a blog post.
-
-
+        """Clean up old autosave revisions for a blog post.
 
         Args:
-
             blog_post: BlogPost to clean up revisions for
-
             keep_count: Number of recent autosave revisions to keep
-
-
-
+        """
         # Get autosave revisions older than the keep_count
 
         old_autosaves = cls.objects.filter(
@@ -339,21 +310,12 @@ class BlogPostRevision(models.Model):
     @classmethod
 
     def cleanup_old_revisions(cls, blog_post: "BlogPost", days_to_keep: int = 90):
-
-
-
-        Clean up very old revisions for a blog post.
-
-
+        """Clean up very old revisions for a blog post.
 
         Args:
-
             blog_post: BlogPost to clean up revisions for
-
             days_to_keep: Number of days of revisions to keep
-
-
-
+        """
         cutoff_date = timezone.now() - timedelta(days=days_to_keep)
 
 
@@ -379,27 +341,15 @@ class BlogPostRevision(models.Model):
         self, user: Optional["User"] = None, create_backup: bool = True
 
     ) -> "BlogPost":  # type: ignore
-
-
-
-        Restore this revision's content to the blog post.
-
-
+        """Restore this revision's content to the blog post.
 
         Args:
-
             user: User performing the restore
-
             create_backup: Whether to create a backup revision before restoring
 
-
-
         Returns:
-
             Updated BlogPost instance
-
-
-
+        """
         blog_post = self.blog_post
 
         snapshot = self.snapshot
@@ -488,6 +438,7 @@ class BlogPostRevision(models.Model):
 
                 tag_ids = snapshot["tag_ids"]
 
+                from .models import Tag
                 tags = Tag.objects.filter(id__in=tag_ids)
 
                 blog_post.tags.set(tags)
@@ -499,10 +450,9 @@ class BlogPostRevision(models.Model):
 
 
 class BlogPostViewTracker(models.Model):
-
-
-
+    """
     Track view counts for blog posts.
+    """
 
 
 
@@ -557,16 +507,12 @@ class BlogPostViewTracker(models.Model):
 
 
     def increment_view(self, is_unique: bool = False):
-
-
-
+        """
         Increment view count for this blog post.
 
-
-
         Args:
-
             is_unique: Whether this is a unique view (new visitor)
+        """
 
 
 
@@ -595,10 +541,9 @@ class BlogPostViewTracker(models.Model):
 @receiver(post_save, sender="blog.BlogPost")
 
 def create_blog_post_revision_on_publish(sender, instance, created, **kwargs):
-
-
-
+    """
     Automatically create a revision when a blog post is published.
+    """
 
 
 
@@ -633,10 +578,9 @@ def create_blog_post_revision_on_publish(sender, instance, created, **kwargs):
 @receiver(post_save, sender="blog.BlogPost")
 
 def ensure_view_tracker_exists(sender, instance, created, **kwargs):
-
-
-
+    """
     Ensure a view tracker exists for every blog post.
+    """
 
 
 

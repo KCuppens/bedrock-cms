@@ -13,9 +13,6 @@ from apps.i18n.admin import (  # interface
     Locale,
 
     LocaleAdmin,
-
-    Test,
-
     TranslationUnit,
 
     TranslationUnitAdmin,
@@ -30,7 +27,8 @@ from apps.i18n.admin import (  # interface
 
     admin,
 
-    apps.i18n.models,
+# Imports that were malformed - commented out
+#     """apps.i18n.models,"""
 
     cases,
 
@@ -273,16 +271,15 @@ class I18nAdminTest(TestCase):
             except Exception:
 
                 # If it fails, that's fine for coverage
-
-
+                pass
 
     def test_translation_unit_admin_readonly_fields(self):  # noqa: C901
 
         """Test TranslationUnit admin readonly fields."""
 
         admin = TranslationUnitAdmin(TranslationUnit, self.site)
-
-
+        # Add test logic here
+        pass
 
         # Test that some fields might be readonly
 

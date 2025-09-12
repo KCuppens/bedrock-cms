@@ -8,7 +8,7 @@ from django.conf import settings
 from django.db import connection
 
 
-from .settings_sync import DjangoSettingsSync
+# Import moved to method to avoid circular import during Django setup
 
 
 logger = logging.getLogger(__name__)
@@ -42,6 +42,8 @@ class I18nConfig(AppConfig):
                 connection.introspection.table_names()
                 and "i18n_locale" in connection.introspection.table_names()
             ):
+                # Import here to avoid circular import during Django setup
+                from .settings_sync import DjangoSettingsSync
 
                 # Get dynamic settings from database
 

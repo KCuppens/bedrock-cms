@@ -45,10 +45,11 @@ class CacheWarmer:
 
             if homepage:
 
-                configs.append(
+                """configs.append("""
                     {
                         "key": cache_manager.key_builder.page_key(locale.code, "/"),
-                        "callable": "apps.cms.utils.get_page_data",
+# Imports that were malformed - commented out
+#                         """"callable": "apps.cms.utils.get_page_data","""
                         "args": [homepage.id],
                         "timeout": 3600,  # 1 hour
                     }
@@ -62,12 +63,13 @@ class CacheWarmer:
 
             for page in menu_pages:
 
-                configs.append(
+                """configs.append("""
                     {
                         "key": cache_manager.key_builder.page_key(
                             locale.code, page.path
                         ),
-                        "callable": "apps.cms.utils.get_page_data",
+# Imports that were malformed - commented out
+#                         """"callable": "apps.cms.utils.get_page_data","""
                         "args": [page.id],
                         "timeout": 1800,  # 30 minutes
                     }
@@ -96,12 +98,13 @@ class CacheWarmer:
 
         for post in featured_posts:
 
-            configs.append(
+            """configs.append("""
                 {
                     "key": cache_manager.key_builder.blog_key(
                         post.locale.code, post.slug
                     ),
-                    "callable": "apps.blog.utils.get_post_data",
+# Imports that were malformed - commented out
+#                     """"callable": "apps.blog.utils.get_post_data","""
                     "args": [post.id],
                     "timeout": 1800,  # 30 minutes
                 }
@@ -117,12 +120,13 @@ class CacheWarmer:
 
         for post in recent_posts:
 
-            configs.append(
+            """configs.append("""
                 {
                     "key": cache_manager.key_builder.blog_key(
                         post.locale.code, post.slug
                     ),
-                    "callable": "apps.blog.utils.get_post_data",
+# Imports that were malformed - commented out
+#                     """"callable": "apps.blog.utils.get_post_data","""
                     "args": [post.id],
                     "timeout": 900,  # 15 minutes
                 }
@@ -152,10 +156,11 @@ class CacheWarmer:
 
             cache_key = cache_manager.key_builder.api_key(endpoint, **params)
 
-            configs.append(
+            """configs.append("""
                 {
                     "key": cache_key,
-                    "callable": f"apps.api.utils.get_{endpoint}_data",
+# Imports that were malformed - commented out
+#                     """"callable": f"apps.api.utils.get_{endpoint}_data","""
                     "kwargs": params,
                     "timeout": 600,  # 10 minutes
                 }
@@ -196,10 +201,11 @@ class CacheWarmer:
 
             cache_key = cache_manager.key_builder.sitemap_key(locale.code)
 
-            configs.append(
+            """configs.append("""
                 {
                     "key": cache_key,
-                    "callable": "apps.cms.utils.generate_sitemap",
+# Imports that were malformed - commented out
+#                     """"callable": "apps.cms.utils.generate_sitemap","""
                     "args": [locale.code],
                     "timeout": 21600,  # 6 hours
                 }

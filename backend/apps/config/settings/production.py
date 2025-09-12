@@ -1,6 +1,7 @@
 
-
+"""
 Production settings with CDN and performance optimizations.
+"""
 
 
 

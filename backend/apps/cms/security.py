@@ -262,11 +262,11 @@ def sanitize_block_content(block_data: dict[str, Any]) -> dict[str, Any]:
                                     sanitized_item[field]
                                 )
 
-                        sanitized_items.append(sanitized_item)
+                        """sanitized_items.append(sanitized_item)"""
 
                     else:
 
-                        sanitized_items.append(item)
+                        """sanitized_items.append(item)"""
 
                 props["items"] = sanitized_items
 

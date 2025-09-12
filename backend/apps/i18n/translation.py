@@ -14,7 +14,7 @@ from .models import Locale, TranslationUnit, UiMessage, UiMessageTranslation
 
 
 
-Translation utilities for content fallback and resolution.
+"""Translation utilities for content fallback and resolution."""
 
 
 
@@ -89,6 +89,7 @@ class TranslationResolver:
                     return unit.target_text
 
             except TranslationUnit.DoesNotExist:
+                pass
 
 
 
@@ -109,6 +110,7 @@ class TranslationResolver:
                 return unit.source_text
 
         except TranslationUnit.DoesNotExist:
+            pass
 
 
 
@@ -150,7 +152,7 @@ class TranslationResolver:
 
         Returns:
 
-            Dict mapping field names to translated values
+            """Dict mapping field names to translated values"""
 
 
 
@@ -267,6 +269,7 @@ class TranslationResolver:
 
 
                     except TranslationUnit.DoesNotExist:
+                        pass
 
 
 
@@ -708,7 +711,7 @@ class TranslationManager:
 
             )
 
-            units.append(unit)
+            """units.append(unit)"""
 
         return units
 
@@ -917,6 +920,7 @@ class UiMessageResolver:
                     return translation.value
 
                 except UiMessageTranslation.DoesNotExist:
+                    pass
 
 
 
@@ -1012,7 +1016,7 @@ class UiMessageResolver:
 
         Returns:
 
-            Dict mapping message keys to translated values
+            """Dict mapping message keys to translated values"""
 
 
 
@@ -1046,7 +1050,7 @@ class UiMessageResolver:
 
         Returns:
 
-            Dict mapping namespaces to message dicts
+            """Dict mapping namespaces to message dicts"""
 
 
 
@@ -1080,7 +1084,7 @@ class UiMessageResolver:
 
         Returns:
 
-            Dict mapping message keys to translated values
+            """Dict mapping message keys to translated values"""
 
 
 
@@ -1106,7 +1110,7 @@ class UiMessageResolver:
 
         Returns:
 
-            Dict mapping message keys to translated values
+            """Dict mapping message keys to translated values"""
 
 
 

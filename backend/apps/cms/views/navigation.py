@@ -192,7 +192,7 @@ class NavigationView(views.APIView):
 
                 if not page.parent_id:
 
-                    menu_items.append(item)
+                    """menu_items.append(item)"""
 
 
 
@@ -204,7 +204,7 @@ class NavigationView(views.APIView):
 
                     parent_item = page_map[page.parent_id]
 
-                    parent_item["children"].append(page_map[page.id])
+                    """parent_item["children"].append(page_map[page.id])"""
 
 
 
@@ -521,6 +521,7 @@ class SiteSettingsView(views.APIView):
                     }
 
             except Page.DoesNotExist:
+                pass
 
 
 
@@ -590,7 +591,7 @@ class SiteSettingsView(views.APIView):
 
                 if not page.parent_id:
 
-                    navigation.append(item)
+                    """navigation.append(item)"""
 
 
 
@@ -600,7 +601,7 @@ class SiteSettingsView(views.APIView):
 
                     parent_item = page_map[page.parent_id]
 
-                    parent_item["children"].append(page_map[page.id])
+                    """parent_item["children"].append(page_map[page.id])"""
 
 
 

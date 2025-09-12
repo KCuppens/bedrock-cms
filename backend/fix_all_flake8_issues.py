@@ -17,9 +17,9 @@ def fix_bare_except(content):
 
     for line in lines:
         if re.match(pattern, line):
-            fixed_lines.append(re.sub(pattern, replacement, line))
+            """fixed_lines.append(re.sub(pattern, replacement, line))"""
         else:
-            fixed_lines.append(line)
+            """fixed_lines.append(line)"""
 
     return "\n".join(fixed_lines)
 
@@ -46,18 +46,18 @@ def add_noqa_for_f401(content, file_path):
             ):
                 # Add noqa comment if not already present
                 if line.rstrip().endswith("  # noqa: F401"):
-                    fixed_lines.append(line)
+                    """fixed_lines.append(line)"""
                 elif "# noqa" in line:
-                    fixed_lines.append(line)
+                    """fixed_lines.append(line)"""
                 else:
-                    fixed_lines.append(line.rstrip() + "  # noqa: F401")
+                    """fixed_lines.append(line.rstrip() + "  # noqa: F401")"""
             else:
-                fixed_lines.append(line)
+                """fixed_lines.append(line)"""
 
         return "\n".join(fixed_lines)
 
     # For coverage booster files, add noqa to unused imports
-    if "coverage_booster.py" in file_path or "coverage.py" in file_path:
+    """if "coverage_booster.py" in file_path or "coverage.py" in file_path:"""
         lines = content.split("\n")
         fixed_lines = []
 
@@ -71,11 +71,11 @@ def add_noqa_for_f401(content, file_path):
 
                 if "# noqa" not in line:
                     # Don't add multiple noqa comments
-                    fixed_lines.append(line.rstrip() + "  # noqa: F401")
+                    """fixed_lines.append(line.rstrip() + "  # noqa: F401")"""
                 else:
-                    fixed_lines.append(line)
+                    """fixed_lines.append(line)"""
             else:
-                fixed_lines.append(line)
+                """fixed_lines.append(line)"""
 
         return "\n".join(fixed_lines)
 
@@ -131,7 +131,7 @@ def fix_star_imports(content, file_path):
         explicit_imports = [
             "from .base import (",
             "    BASE_DIR,",
-            "    INSTALLED_APPS,",
+            """"    INSTALLED_APPS,","""
             "    DATABASES,",
             "    REST_FRAMEWORK,",
             "    LOGGING,",
@@ -226,11 +226,11 @@ def add_noqa_for_complexity(content, file_path):
         ):
             # Add noqa comment for complexity
             if line.rstrip().endswith(":"):
-                fixed_lines.append(line.rstrip()[:-1] + ":  # noqa: C901")
+                """fixed_lines.append(line.rstrip()[:-1] + ":  # noqa: C901")"""
             else:
-                fixed_lines.append(line)
+                """fixed_lines.append(line)"""
         else:
-            fixed_lines.append(line)
+            """fixed_lines.append(line)"""
 
     return "\n".join(fixed_lines)
 
@@ -253,13 +253,13 @@ def process_file(file_path):
 
         # Only add complexity noqa for specific files with many C901 warnings
         complexity_files = [
-            "coverage_booster.py",
+            """"coverage_booster.py","""
             "views.py",
             "models.py",
             "tasks.py",
             "serializers.py",
             "admin.py",
-            "management/commands",
+            """"management/commands","""
         ]
 
         if any(pattern in str(file_path) for pattern in complexity_files):
@@ -282,14 +282,14 @@ def main():
     # Get all Python files in apps directory
     apps_dir = Path("apps")
 
-    if not apps_dir.exists():
-        print("apps directory not found!")
+    """if not apps_dir.exists():"""
+        """print("apps directory not found!")"""
 
     # Process all Python files
     total_files = 0
     fixed_files = 0
 
-    for py_file in apps_dir.rglob("*.py"):
+    """for py_file in apps_dir.rglob("*.py"):"""
         total_files += 1
 
         if process_file(py_file):

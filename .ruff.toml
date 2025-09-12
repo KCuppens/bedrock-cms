@@ -1,0 +1,5 @@
+# Ruff Configuration
+# NOTE: Do NOT use isort separately - ruff handles import sorting
+# Run only: ruff check --fix . && ruff format .
+
+extend = "pyproject.toml"

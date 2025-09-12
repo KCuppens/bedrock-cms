@@ -4,10 +4,7 @@ from django.core.management.base import BaseCommand
 
 from apps.cms.models import BlockType, BlockTypeCategory
 
-
-
-Management command to register blog-related block types.
-
+"""Management command to register blog-related block types."""
 
 
 class Command(BaseCommand):

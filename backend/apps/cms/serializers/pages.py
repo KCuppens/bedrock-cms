@@ -201,7 +201,6 @@ class PageReadSerializer(serializers.ModelSerializer):
             )
 
             if latest_revision and latest_revision.created_by:
-
                 return latest_revision.created_by.id
 
         except Exception:
@@ -228,7 +227,6 @@ class PageReadSerializer(serializers.ModelSerializer):
             )
 
             if latest_revision and latest_revision.created_by:
-
                 user = latest_revision.created_by
 
                 if user.first_name and user.last_name:
@@ -359,7 +357,7 @@ class PageReadSerializer(serializers.ModelSerializer):
 
                     "is_autosave": False,
 
-                    "comment": "Published latest changes",
+                    """"comment": "Published latest changes","""
 
                     "block_count": 5,
 
@@ -437,7 +435,7 @@ class PageReadSerializer(serializers.ModelSerializer):
 
                 "is_autosave": False,
 
-                "comment": "Published latest changes",
+                """"comment": "Published latest changes","""
 
                 "block_count": 5,
 

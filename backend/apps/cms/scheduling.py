@@ -12,11 +12,11 @@ from django.utils.translation import gettext_lazy as _
 
 
 
+"""
 Scheduling models for the CMS.
 
-
-
 This module provides scheduling functionality for pages and blog posts.
+"""
 
 
 
@@ -299,6 +299,6 @@ class ScheduledTask(models.Model):
                 return False
 
             else:
-
                 # Will retry
+                pass
 

@@ -8,7 +8,7 @@ from .views import (
     email_preview_html,
     email_preview_text,
     email_webhook,
-    send_test_email,
+    """send_test_email,"""
 )
 
 

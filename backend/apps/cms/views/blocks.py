@@ -139,6 +139,7 @@ class BlockTypesView(views.APIView):
                     model_schema = model_class.schema()
 
                 except Exception:
+                    pass
 
 
 
@@ -152,7 +153,7 @@ class BlockTypesView(views.APIView):
 
 
 
-            block_types.append(
+            """block_types.append("""
 
                 {
 

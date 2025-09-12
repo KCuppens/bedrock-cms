@@ -20,8 +20,10 @@ class Migration(migrations.Migration):
             field=models.JSONField(
                 default=list,
                 validators=[
-                    apps.core.validators.JSONSizeValidator(2),
-                    apps.core.validators.validate_json_structure,
+# Imports that were malformed - commented out
+#                     """apps.core.validators.JSONSizeValidator(2),"""
+# Imports that were malformed - commented out
+#                     """apps.core.validators.validate_json_structure,"""
                 ],
             ),
         ),

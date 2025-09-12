@@ -2,9 +2,7 @@ from .base import UserFactory
 
 from .i18n import LocaleFactory
 
-
-
-Account-specific factories for users, roles, and permissions.
+"""Account-specific factories for users, roles, and permissions."""
 
 
 

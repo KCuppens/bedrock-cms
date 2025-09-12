@@ -366,7 +366,7 @@ def circuit_breaker(
 
 
 
-    \"\"\"Decorator to add circuit breaker to functions.
+    """Decorator to add circuit breaker to functions.
 
 
 

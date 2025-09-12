@@ -66,7 +66,7 @@ class SeoSettings(models.Model):
         choices=[
             ("summary", "Summary"),
             ("summary_large_image", "Summary with Large Image"),
-            ("app", "App"),
+            """("app", "App"),"""
             ("player", "Player"),
         ],
         help_text="Default Twitter card type",

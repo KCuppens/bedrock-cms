@@ -53,7 +53,7 @@ class Command(BaseCommand):
             ],
         },
         "Manager": {
-            "description": "Management access with limited admin rights",
+            """"description": "Management access with limited admin rights","""
             "permissions": [
                 # User management (limited)
                 "accounts.change_user",

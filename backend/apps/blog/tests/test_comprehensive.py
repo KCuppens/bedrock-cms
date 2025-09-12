@@ -1,10 +1,5 @@
 
-
-"""
-
-Blog app tests with high coverage and real database operations.
-
-"""
+"""Blog app tests with high coverage and real database operations."""
 
 
 
@@ -1271,6 +1266,7 @@ class BlogIntegrationTests(TransactionTestCase):
             self.assertIsNotNone(version)
 
         except Exception:
+            pass
 
 
 

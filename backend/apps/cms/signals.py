@@ -283,4 +283,5 @@ def detect_publish_status_change(sender, instance, **kwargs):
 
 
         except Page.DoesNotExist:
+            pass
 

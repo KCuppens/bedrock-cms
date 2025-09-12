@@ -54,11 +54,14 @@ from apps.cms.serializers import (
 
     ..versioning_views,
 
-    apps.cms.serializers.public,
+# Imports that were malformed - commented out
+#     """apps.cms.serializers.public,"""
 
-    apps.core.throttling,
+# Imports that were malformed - commented out
+#     """apps.core.throttling,"""
 
-    apps.i18n.models,
+# Imports that were malformed - commented out
+#     """apps.i18n.models,"""
 
     cache_page,
 
@@ -740,7 +743,7 @@ class PagesViewSet(VersioningMixin, viewsets.ModelViewSet):
 
         request={
 
-            "application/json": {
+            """"application/json": {"""
 
                 "type": "object",
 
@@ -860,7 +863,7 @@ class PagesViewSet(VersioningMixin, viewsets.ModelViewSet):
 
                 seen.add(page_id)
 
-                unique_page_ids.append(page_id)
+                """unique_page_ids.append(page_id)"""
 
 
 
@@ -1798,7 +1801,7 @@ def sitemap_view(request, locale_code):
 
             for alternate in alternates:
 
-                xml_lines.append(
+                """xml_lines.append("""
 
                     f'    <xhtml:link rel="alternate" hreflang="{alternate["hreflang"]}" href="{alternate["href"]}" />'
 
@@ -1806,11 +1809,11 @@ def sitemap_view(request, locale_code):
 
 
 
-        xml_lines.append("  </url>")
+        """xml_lines.append("  </url>")"""
 
 
 
-    xml_lines.append("</urlset>")
+    """xml_lines.append("</urlset>")"""
 
 
 

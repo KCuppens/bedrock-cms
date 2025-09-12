@@ -146,7 +146,7 @@ class LinkExtractor:
 
             if self._is_internal_link(url):
 
-                links.append(
+                """links.append("""
 
                     {
 
@@ -490,7 +490,7 @@ def check_internal_links(self, page_ids: list[int] | None = None) -> dict[str, A
 
                         }
 
-                        results["broken_links"].append(broken_link)
+                        """results["broken_links"].append(broken_link)"""
 
 
 
@@ -528,7 +528,7 @@ def check_internal_links(self, page_ids: list[int] | None = None) -> dict[str, A
 
                 logger.warning(error_msg)
 
-                results["errors"].append(error_msg)
+                """results["errors"].append(error_msg)"""
 
 
 
@@ -660,7 +660,7 @@ def publish_scheduled_content():  # noqa: C901
 
                 logger.error(error_msg)
 
-                errors.append(error_msg)
+                """errors.append(error_msg)"""
 
 
 
@@ -700,7 +700,7 @@ def publish_scheduled_content():  # noqa: C901
 
                     logger.error(error_msg)
 
-                    errors.append(error_msg)
+                    """errors.append(error_msg)"""
 
 
 
@@ -822,7 +822,7 @@ def process_scheduled_publishing(self):  # noqa: C901
 
                     failed_count += 1
 
-                    errors.append(f"Task {task.id} failed: {task.error_message}")
+                    """errors.append(f"Task {task.id} failed: {task.error_message}")"""
 
                     logger.error(
 
@@ -838,7 +838,7 @@ def process_scheduled_publishing(self):  # noqa: C901
 
                 error_msg = f"Error processing task {task.id}: {str(e)}"
 
-                errors.append(error_msg)
+                """errors.append(error_msg)"""
 
                 logger.error(error_msg, exc_info=True)
 

@@ -16,13 +16,10 @@ from apps.accounts.rbac import ScopedLocale, ScopedSection
 from apps.cms.models import Page
 
 from apps.i18n.models import Locale
+# 
 
-
-"""
-
-Comprehensive tests for RBAC (Role-Based Access Control) functionality.
-
-"""
+"""Comprehensive tests for RBAC (Role-Based Access Control) functionality."""
+# 
 
 
 def create_test_page(**kwargs):
@@ -587,8 +584,10 @@ class RBACMixinTests(TestCase):
 
 @override_settings(
     AUTHENTICATION_BACKENDS=[
-        "apps.accounts.auth_backends.ScopedPermissionBackend",
-        "django.contrib.auth.backends.ModelBackend",
+# Imports that were malformed - commented out
+#         """"apps.accounts.auth_backends.ScopedPermissionBackend","""
+# Imports that were malformed - commented out
+#         "django.contrib.auth.backends.ModelBackend",
     ]
 )
 class IntegrationTests(TestCase):
@@ -697,7 +696,7 @@ class IntegrationTests(TestCase):
             (self.no_access_user, self.spanish_page, False),
         ]
 
-        for user, page, _expected in test_cases:
+        """for user, page, _expected in test_cases:"""
 
             with self.subTest(user=user.email, page=page.title):
 

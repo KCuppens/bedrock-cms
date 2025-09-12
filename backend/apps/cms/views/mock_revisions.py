@@ -48,7 +48,7 @@ class MockRevisionsView(APIView):
 
                 "is_autosave": False,
 
-                "comment": "Published latest changes",
+                """"comment": "Published latest changes","""
 
                 "block_count": 5,
 

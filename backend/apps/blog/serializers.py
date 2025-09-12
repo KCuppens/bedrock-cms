@@ -22,11 +22,7 @@ from .models import BlogPost, BlogSettings, Category, Tag
 
 from .versioning import BlogPostRevision
 
-
-
-Blog serializers for API endpoints.
-
-
+"""Blog serializers for API endpoints."""
 
 User = get_user_model()
 
@@ -426,7 +422,7 @@ class BlogPostSerializer(serializers.ModelSerializer):
 
 
 
-            processed_blocks.append(processed_block)
+            """processed_blocks.append(processed_block)"""
 
 
 
@@ -441,8 +437,7 @@ class BlogPostSerializer(serializers.ModelSerializer):
         if self.instance and self.instance.status == "published" and value == "draft":
 
             # Allow unpublishing but warn about SEO impact
-
-
+            pass
 
         return value
 

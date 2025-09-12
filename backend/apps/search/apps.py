@@ -6,7 +6,7 @@ from . import signals  # noqa
 
 
 
-Search app configuration.
+"""Search app configuration."""
 
 
 
@@ -33,4 +33,5 @@ class SearchConfig(AppConfig):
         try:
 
         except ImportError:
+            pass
 

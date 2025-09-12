@@ -20,7 +20,7 @@ from apps.i18n.models import Locale, UiMessage, UiMessageTranslation
 
 
 
-Test cases for i18n management commands.
+"""Test cases for i18n management commands."""
 
 
 
@@ -36,7 +36,7 @@ class InitLocalesCommandTest(TestCase):
 
         # Run command
 
-        call_command("init_locales")
+        """call_command("init_locales")"""
 
 
 
@@ -66,13 +66,13 @@ class InitLocalesCommandTest(TestCase):
 
         # Run command twice
 
-        call_command("init_locales")
+        """call_command("init_locales")"""
 
         initial_count = Locale.objects.count()
 
 
 
-        call_command("init_locales")
+        """call_command("init_locales")"""
 
         final_count = Locale.objects.count()
 
@@ -96,7 +96,7 @@ class InitLocalesCommandTest(TestCase):
 
         # Run command with reset
 
-        call_command("init_locales", "--reset")
+        """call_command("init_locales", "--reset")"""
 
 
 
@@ -298,7 +298,7 @@ class SyncPoFilesCommandTest(TestCase):
 
 
 
-    @patch("apps.i18n.management.commands.sync_po_files.polib")
+    """@patch("apps.i18n.management.commands.sync_po_files.polib")"""
 
     def test_import_from_po_files(self, mock_polib):
 
@@ -354,7 +354,7 @@ class SyncPoFilesCommandTest(TestCase):
 
 
 
-    @patch("apps.i18n.management.commands.sync_po_files.polib")
+    """@patch("apps.i18n.management.commands.sync_po_files.polib")"""
 
     def test_export_to_po_files(self, mock_polib):
 
@@ -407,9 +407,7 @@ class SyncPoFilesCommandTest(TestCase):
             out = StringIO()
 
             call_command(
-
                 "sync_po_files", direction="export", create_missing=True, stdout=out
-
             )
 
 
@@ -427,19 +425,12 @@ class SyncPoFilesCommandTest(TestCase):
         """Test bidirectional sync."""
 
         with (
-
             patch(
-
                 "apps.i18n.management.commands.sync_po_files.Command.import_from_po_files"
-
             ) as mock_import,
-
             patch(
-
                 "apps.i18n.management.commands.sync_po_files.Command.export_to_po_files"
-
             ) as mock_export,
-
         ):
 
             # Run sync command

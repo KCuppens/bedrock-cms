@@ -1,6 +1,6 @@
 
 
-API views for translation management.
+"""API views for translation management."""
 
 
 
@@ -66,7 +66,7 @@ from .serializers import (
 
     MachineTranslationSuggestionSerializer,
 
-    TranslationApprovalSerializer,
+    # TranslationApprovalSerializer,
 
     TranslationAssignmentSerializer,
 
@@ -98,11 +98,10 @@ class LocaleViewSet(viewsets.ModelViewSet):
 
 
 
-    ViewSet for managing locales.
-
-
+    """ViewSet for managing locales.
 
     Provides full CRUD operations for locale management.
+    """
 
 
 
@@ -602,7 +601,7 @@ class TranslationUnitViewSet(viewsets.ModelViewSet):
 
 
 
-            status_data.append(
+            """status_data.append("""
 
                 {
 
@@ -702,13 +701,13 @@ class TranslationUnitViewSet(viewsets.ModelViewSet):
 
 
 
-                updated_units.append(unit.id)
+                """updated_units.append(unit.id)"""
 
 
 
             except TranslationUnit.DoesNotExist:
 
-                errors.append(
+                """errors.append("""
 
                     {"id": unit_data["id"], "error": "Translation unit not found"}
 
@@ -716,7 +715,7 @@ class TranslationUnitViewSet(viewsets.ModelViewSet):
 
             except Exception as e:
 
-                errors.append({"id": unit_data["id"], "error": str(e)})
+                """errors.append({"id": unit_data["id"], "error": str(e)})"""
 
         return Response(
 
@@ -768,7 +767,7 @@ class TranslationUnitViewSet(viewsets.ModelViewSet):
 
             return Response(
 
-                {"error": "Cannot approve translation without target text"},
+                """{"error": "Cannot approve translation without target text"},"""
 
                 status=status.HTTP_400_BAD_REQUEST,
 
@@ -1382,7 +1381,7 @@ class TranslationUnitViewSet(viewsets.ModelViewSet):
 
 
 
-                assigned_units.append(
+                """assigned_units.append("""
 
                     {
 
@@ -1412,7 +1411,7 @@ class TranslationUnitViewSet(viewsets.ModelViewSet):
 
             except Exception as e:
 
-                errors.append({"id": translation_unit.id, "error": str(e)})
+                """errors.append({"id": translation_unit.id, "error": str(e)})"""
 
         return Response(
 
@@ -1696,7 +1695,7 @@ class UiMessageViewSet(viewsets.ModelViewSet):
 
             )
 
-        except CommandError as e:
+        """except CommandError as e:"""
 
             return Response(
 
@@ -1802,7 +1801,7 @@ class UiMessageViewSet(viewsets.ModelViewSet):
 
             )
 
-        except CommandError as e:
+        """except CommandError as e:"""
 
             return Response(
 
@@ -1912,7 +1911,7 @@ class UiMessageViewSet(viewsets.ModelViewSet):
 
         request={
 
-            "application/json": {
+            """"application/json": {"""
 
                 "type": "object",
 
@@ -1992,7 +1991,7 @@ class UiMessageViewSet(viewsets.ModelViewSet):
 
         auto_approve = source == "build" or getattr(
 
-            settings, "AUTO_APPROVE_TRANSLATIONS", False
+            """settings, "AUTO_APPROVE_TRANSLATIONS", False"""
 
         )
 
@@ -2055,13 +2054,13 @@ class UiMessageViewSet(viewsets.ModelViewSet):
 
                 if was_created:
 
-                    created.append(key)
+                    """created.append(key)"""
 
 
 
                     # Auto-create approved translation for default locale if requested
 
-                    if auto_approve:
+                    """if auto_approve:"""
 
                         default_locale = Locale.objects.filter(is_default=True).first()
 
@@ -2107,13 +2106,13 @@ class UiMessageViewSet(viewsets.ModelViewSet):
 
                         ui_message.save()
 
-                        updated.append(key)
+                        """updated.append(key)"""
 
 
 
             except Exception as e:
 
-                errors.append({"key": key, "error": str(e)})
+                """errors.append({"key": key, "error": str(e)})"""
 
         # Log the sync activity
 
@@ -2157,7 +2156,7 @@ class UiMessageViewSet(viewsets.ModelViewSet):
 
                 "source": source,
 
-                "auto_approved": auto_approve,
+                """"auto_approved": auto_approve,"""
 
             }
 
@@ -2173,7 +2172,7 @@ class UiMessageViewSet(viewsets.ModelViewSet):
 
         request={
 
-            "application/json": {
+            """"application/json": {"""
 
                 "type": "object",
 
@@ -2251,7 +2250,7 @@ class UiMessageViewSet(viewsets.ModelViewSet):
 
             }
 
-            existing.append(entry)
+            """existing.append(entry)"""
 
 
 
@@ -2555,7 +2554,7 @@ class UiMessageViewSet(viewsets.ModelViewSet):
 
                     else:
 
-                        items.append((new_key, str(v)))
+                        """items.append((new_key, str(v)))"""
 
                 return dict(items)
 
@@ -2685,7 +2684,7 @@ class UiMessageViewSet(viewsets.ModelViewSet):
 
                     error_msg = f"Error processing key '{key}': {str(e)}"
 
-                    errors.append(error_msg)
+                    """errors.append(error_msg)"""
 
                     # Log full traceback for debugging
                     pass
@@ -2968,13 +2967,13 @@ class UiMessageTranslationViewSet(viewsets.ModelViewSet):
 
 
 
-                updated_translations.append(translation.id)
+                """updated_translations.append(translation.id)"""
 
 
 
             except Exception as e:
 
-                errors.append(
+                """errors.append("""
 
                     {
 
@@ -3068,7 +3067,7 @@ class UiMessageTranslationViewSet(viewsets.ModelViewSet):
 
 
 
-                locale_stats.append(
+                """locale_stats.append("""
 
                     {
 
@@ -3094,7 +3093,7 @@ class UiMessageTranslationViewSet(viewsets.ModelViewSet):
 
 
 
-            result.append(
+            """result.append("""
 
                 {
 
@@ -3996,7 +3995,7 @@ class TranslationQueueViewSet(viewsets.ModelViewSet):
 
 
 
-            locale_summaries.append(
+            """locale_summaries.append("""
 
                 {
 

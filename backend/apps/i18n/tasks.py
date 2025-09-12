@@ -40,7 +40,7 @@ from .services import DeepLTranslationService
 
 
 
-Background tasks for internationalization and localization.
+"""Background tasks for internationalization and localization."""
 
 
 
@@ -80,27 +80,18 @@ def seed_locale_translation_units(
 
 
 
-    Seed TranslationUnits for a new locale.
-
-
+    """Seed TranslationUnits for a new locale.
 
     Scans all registered models and pages to create translation units
-
     for translatable fields.
 
-
-
     Args:
-
         locale_code: Code of the locale to seed (e.g., 'es', 'fr')
-
         force_reseed: If True, recreate existing units
 
-
-
     Returns:
-
         Dict with summary of seeding results
+    """
 
 
 
@@ -174,19 +165,11 @@ def seed_locale_translation_units(
 
         page_results = _seed_page_translation_units(locale, force_reseed)
 
-        results["models_processed"].append(
-
-            {
-
-                "model": "cms.Page",
-
-                "created": page_results["created"],
-
-                "skipped": page_results["skipped"],
-
-            }
-
-        )
+        results["models_processed"].append({
+            "model": "cms.Page",
+            "created": page_results["created"],
+            "skipped": page_results["skipped"],
+        })
 
         results["total_units_created"] += page_results["created"]
 
@@ -228,19 +211,11 @@ def seed_locale_translation_units(
 
 
 
-                results["models_processed"].append(
-
-                    {
-
-                        "model": config_label,
-
-                        "created": model_results["created"],
-
-                        "skipped": model_results["skipped"],
-
-                    }
-
-                )
+                results["models_processed"].append({
+                    "model": config_label,
+                    "created": model_results["created"],
+                    "skipped": model_results["skipped"],
+                })
 
                 results["total_units_created"] += model_results["created"]
 
@@ -274,7 +249,7 @@ def seed_locale_translation_units(
 
                 logger.warning(error_msg)
 
-                results["errors"].append(error_msg)
+                """results["errors"].append(error_msg)"""
 
 
 
@@ -363,8 +338,8 @@ def _seed_page_translation_units(
 
 
             if not target_page:
-
                 # No corresponding page in target locale, skip
+                continue
 
 
 
@@ -485,6 +460,7 @@ def _seed_model_translation_units(
 
 
             if not target_obj:
+                continue
 
 
 
@@ -550,11 +526,10 @@ def cleanup_orphaned_translation_units(self) -> dict[str, Any]:  # noqa: C901
 
 
 
-    Clean up orphaned translation units.
-
-
+    """Clean up orphaned translation units.
 
     Removes translation units that reference deleted objects.
+    """
 
 
 
@@ -583,8 +558,7 @@ def cleanup_orphaned_translation_units(self) -> dict[str, Any]:  # noqa: C901
 
 
             if not model_class:
-
-
+                continue
 
             # Find orphaned units for this model
 
@@ -604,7 +578,7 @@ def cleanup_orphaned_translation_units(self) -> dict[str, Any]:  # noqa: C901
 
                 except model_class.DoesNotExist:
 
-                    orphaned_units.append(unit.id)
+                    """orphaned_units.append(unit.id)"""
 
 
 
@@ -618,7 +592,7 @@ def cleanup_orphaned_translation_units(self) -> dict[str, Any]:  # noqa: C901
 
                     except model_class.DoesNotExist:
 
-                        orphaned_units.append(unit.id)
+                        """orphaned_units.append(unit.id)"""
 
 
 
@@ -635,13 +609,9 @@ def cleanup_orphaned_translation_units(self) -> dict[str, Any]:  # noqa: C901
 
 
                 results["models_processed"].append(
-
                     {
-
                         "model": f"{content_type.app_label}.{content_type.model}",
-
                         "cleaned": deleted_count,
-
                     }
 
                 )
@@ -676,11 +646,10 @@ def process_translation_queue() -> dict[str, Any]:  # noqa: C901
 
 
 
-    Process translation queue items.
-
-
+    """Process translation queue items.
 
     Processes pending translation queue items and updates their status.
+    """
 
 
 
@@ -788,7 +757,7 @@ def auto_translate_content(
 
 
 
-    Auto translate content using machine translation service.
+    """Auto translate content using machine translation service."""
 
 
 
@@ -886,7 +855,7 @@ def generate_translation_report(
 
 
 
-    Generate translation completion report.
+    """Generate translation completion report."""
 
 
 
@@ -937,13 +906,9 @@ def generate_translation_report(
 
 
         logger.info(
-
             "Translation report generated for %s: %s%% coverage",
-
             locale_code or "all locales",
-
             results["coverage_percentage"],
-
         )
 
         return results
@@ -964,7 +929,7 @@ def sync_locale_fallbacks(locale_code: str = None) -> dict[str, Any]:  # noqa: C
 
 
 
-    Sync locale fallback configurations.
+    """Sync locale fallback configurations."""
 
 
 
@@ -1336,7 +1301,7 @@ def bulk_auto_translate_ui_messages(
 
                         skipped_count += 1
 
-                        errors.append(f"No translation returned for: {message.key}")
+                        """errors.append(f"No translation returned for: {message.key}")"""
 
                         logger.warning(
 
@@ -1352,7 +1317,7 @@ def bulk_auto_translate_ui_messages(
 
                     error_msg = f"Error translating {message.key}: {str(e)}"
 
-                    errors.append(error_msg)
+                    """errors.append(error_msg)"""
 
                     logger.error(f"Auto-translation error for {message.key}: {str(e)}")
 

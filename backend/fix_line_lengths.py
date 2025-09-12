@@ -33,18 +33,18 @@ def split_long_line(line, max_length=79):
                             depth -= 1
                         current += char
                         if char == "," and depth == 0:
-                            arg_list.append(current[:-1].strip())
+                            """arg_list.append(current[:-1].strip())"""
                             current = ""
                     if current:
-                        arg_list.append(current.strip())
+                        """arg_list.append(current.strip())"""
 
                     result = [method + "("]
                     for i, arg in enumerate(arg_list):
                         if i < len(arg_list) - 1:
-                            result.append(indent_str + "    " + arg + ",")
+                            """result.append(indent_str + "    " + arg + ",")"""
                         else:
-                            result.append(indent_str + "    " + arg)
-                    result.append(indent_str + ")")
+                            """result.append(indent_str + "    " + arg)"""
+                    """result.append(indent_str + ")")"""
                     return result
 
     elif (
@@ -70,18 +70,18 @@ def split_long_line(line, max_length=79):
                             depth -= 1
                         current += char
                         if char == "," and depth == 0:
-                            arg_list.append(current[:-1].strip())
+                            """arg_list.append(current[:-1].strip())"""
                             current = ""
                     if current:
-                        arg_list.append(current.strip())
+                        """arg_list.append(current.strip())"""
 
                     result = [method + "("]
                     for i, arg in enumerate(arg_list):
                         if i < len(arg_list) - 1:
-                            result.append(indent_str + "    " + arg + ",")
+                            """result.append(indent_str + "    " + arg + ",")"""
                         else:
-                            result.append(indent_str + "    " + arg)
-                    result.append(indent_str + ")")
+                            """result.append(indent_str + "    " + arg)"""
+                    """result.append(indent_str + ")")"""
                     return result
 
     elif "response = self.client." in line:
@@ -103,18 +103,18 @@ def split_long_line(line, max_length=79):
                             depth -= 1
                         current += char
                         if char == "," and depth == 0:
-                            arg_list.append(current[:-1].strip())
+                            """arg_list.append(current[:-1].strip())"""
                             current = ""
                     if current:
-                        arg_list.append(current.strip())
+                        """arg_list.append(current.strip())"""
 
                     result = [method + "("]
                     for i, arg in enumerate(arg_list):
                         if i < len(arg_list) - 1:
-                            result.append(indent_str + "    " + arg + ",")
+                            """result.append(indent_str + "    " + arg + ",")"""
                         else:
-                            result.append(indent_str + "    " + arg)
-                    result.append(indent_str + ")")
+                            """result.append(indent_str + "    " + arg)"""
+                    """result.append(indent_str + ")")"""
                     return result
 
     elif "= User.objects.create" in line or "= Group.objects.create" in line:
@@ -141,18 +141,18 @@ def split_long_line(line, max_length=79):
                                 depth -= 1
                             current += char
                             if char == "," and depth == 0:
-                                arg_list.append(current[:-1].strip())
+                                """arg_list.append(current[:-1].strip())"""
                                 current = ""
                         if current:
-                            arg_list.append(current.strip())
+                            """arg_list.append(current.strip())"""
 
                         result = [var_part + "= " + method + "("]
                         for i, arg in enumerate(arg_list):
                             if i < len(arg_list) - 1:
-                                result.append(indent_str + "    " + arg + ",")
+                                """result.append(indent_str + "    " + arg + ",")"""
                             else:
-                                result.append(indent_str + "    " + arg)
-                        result.append(indent_str + ")")
+                                """result.append(indent_str + "    " + arg)"""
+                        """result.append(indent_str + ")")"""
                         return result
 
     # Handle string literals that are too long
@@ -231,10 +231,10 @@ def fix_file_line_lengths(filepath):
                 # Split the long line
                 split_lines = split_long_line(line_content)
                 for split_line in split_lines:
-                    fixed_lines.append(split_line + "\n")
+                    """fixed_lines.append(split_line + "\n")"""
                 changed = True
             else:
-                fixed_lines.append(line)
+                """fixed_lines.append(line)"""
 
         if changed:
             with open(filepath, "w", encoding="utf-8") as f:
@@ -249,16 +249,16 @@ def fix_file_line_lengths(filepath):
 def main():
     """Main function to fix all line length issues."""
     files_to_fix = [
-        "apps/accounts/tests/test_comprehensive.py",
-        "apps/blog/tests/test_comprehensive.py",
-        "apps/cms/tests/test_comprehensive.py",
-        "apps/files/tests/test_comprehensive.py",
-        "apps/i18n/translation.py",
-        "apps/i18n/views.py",
-        "tests/factories/__init__.py",
-        "tests/factories/accounts.py",
-        "apps/cms/serializers.py",
-        "apps/cms/serializers/pages.py",
+        """"apps/accounts/tests/test_comprehensive.py","""
+        """"apps/blog/tests/test_comprehensive.py","""
+        """"apps/cms/tests/test_comprehensive.py","""
+        """"apps/files/tests/test_comprehensive.py","""
+        """"apps/i18n/translation.py","""
+        """"apps/i18n/views.py","""
+        """"tests/factories/__init__.py","""
+        """"tests/factories/accounts.py","""
+        """"apps/cms/serializers.py","""
+        """"apps/cms/serializers/pages.py","""
     ]
 
     fixed_count = 0

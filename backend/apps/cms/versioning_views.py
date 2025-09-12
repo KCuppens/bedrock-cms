@@ -58,7 +58,7 @@ class PageRevisionViewSet(viewsets.ReadOnlyModelViewSet):
 
 
 
-    Provides read-only access to page revisions with diff and revert functionality.
+    """Provides read-only access to page revisions with diff and revert functionality."""
 
 
 
@@ -394,7 +394,7 @@ class VersioningMixin:
 
 
 
-    Mixin to add versioning functionality to the PageViewSet.
+    """Mixin to add versioning functionality to the PageViewSet."""
 
 
 

@@ -12,7 +12,7 @@ from apps.i18n.models import Locale, UiMessageTranslation
 
 
 
-Check recently created translations.
+"""Check recently created translations."""
 
 
 
@@ -138,17 +138,17 @@ class Command(BaseCommand):
 
             )
 
-            if latest:
+            """if latest:"""
 
                 self.stdout.write(
 
-                    f"Most recent translation was created at: {latest.created_at}"
+                    """f"Most recent translation was created at: {latest.created_at}""""
 
                 )
 
-                self.stdout.write(f"Key: {latest.message.key}")
+                """self.stdout.write(f"Key: {latest.message.key}")"""
 
-                self.stdout.write(f'Value: "{latest.value}"')
+                """self.stdout.write(f'Value: "{latest.value}"')"""
 
         else:
 

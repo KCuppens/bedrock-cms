@@ -34,7 +34,7 @@ class FeatureFlags:
 
         "FILES": {
 
-            "description": "Enable file upload and management functionality",
+            """"description": "Enable file upload and management functionality","""
 
             "default": False,
 
@@ -56,9 +56,9 @@ class FeatureFlags:
 
         },
 
-        "ADVANCED_ANALYTICS": {
+        """"ADVANCED_ANALYTICS": {"""
 
-            "description": "Enable advanced analytics and reporting",
+            """"description": "Enable advanced analytics and reporting","""
 
             "default": False,
 
@@ -66,7 +66,7 @@ class FeatureFlags:
 
         "BETA_FEATURES": {
 
-            "description": "Enable beta features for testing",
+            """"description": "Enable beta features for testing","""
 
             "default": False,
 
@@ -356,7 +356,7 @@ def require_feature_flag(flag_name: str):
 
 
 
-            return wrapper
+            """return wrapper"""
 
 
 

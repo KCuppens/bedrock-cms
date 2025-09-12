@@ -11,10 +11,10 @@ def fix_f401_issues(content, file_path):
 
     # Files that commonly have "unused" imports that are actually used by tests or imports
     test_files = [
-        "coverage_booster.py",
-        "test_",
-        "advanced_coverage.py",
-        "mega_coverage_booster.py",
+        """"coverage_booster.py","""
+        """"test_","""
+        """"advanced_coverage.py","""
+        """"mega_coverage_booster.py","""
     ]
     factories_files = ["factories/", "__init__.py"]
 
@@ -26,7 +26,7 @@ def fix_f401_issues(content, file_path):
         should_add_noqa = False
 
         # In test files, imports are often used indirectly
-        if is_test_file and (
+        """if is_test_file and ("""
             "import" in line and ("from apps." in line or "from django." in line)
         ):
             should_add_noqa = True
@@ -38,19 +38,30 @@ def fix_f401_issues(content, file_path):
         # Specific unused imports that are actually used
         specific_imports = [
             "imported but unused",
-            "apps.files.models.FileTag",
-            "apps.files.views.FileBulkOperationView",
-            "apps.files.views.FileUploadView",
-            "apps.files.serializers.FileBulkSerializer",
-            "apps.files.serializers.FileSerializer",
+# Imports that were malformed - commented out
+#             """"apps.files.models.FileTag","""
+# Imports that were malformed - commented out
+#             """"apps.files.views.FileBulkOperationView","""
+# Imports that were malformed - commented out
+#             """"apps.files.views.FileUploadView","""
+# Imports that were malformed - commented out
+#             """"apps.files.serializers.FileBulkSerializer","""
+# Imports that were malformed - commented out
+#             """"apps.files.serializers.FileSerializer","""
             "rest_framework.response.Response",
-            "apps.cms.models.SeoSettings",
-            "apps.cms.serializers.category.CategorySerializer",
-            "apps.cms.views.blocks",
-            "apps.cms.views.registry",
+# Imports that were malformed - commented out
+#             """"apps.cms.models.SeoSettings","""
+# Imports that were malformed - commented out
+#             """"apps.cms.serializers.category.CategorySerializer","""
+# Imports that were malformed - commented out
+#             """"apps.cms.views.blocks","""
+# Imports that were malformed - commented out
+#             """"apps.cms.views.registry","""
             "django.conf.settings",
-            "apps.search.models.SearchFacet",
-            "apps.search.serializers.SearchFacetSerializer",
+# Imports that were malformed - commented out
+#             """"apps.search.models.SearchFacet","""
+# Imports that were malformed - commented out
+#             """"apps.search.serializers.SearchFacetSerializer","""
             "django.contrib.postgres.search.SearchRank",
             "django.contrib.postgres.search.SearchVector",
         ]
@@ -65,13 +76,13 @@ def fix_f401_issues(content, file_path):
             if "import" in line:
                 if line.rstrip().endswith(","):
                     # Handle imports with trailing commas
-                    fixed_lines.append(line.rstrip()[:-1] + ",  # noqa: F401")
+                    """fixed_lines.append(line.rstrip()[:-1] + ",  # noqa: F401")"""
                 else:
-                    fixed_lines.append(line.rstrip() + "  # noqa: F401")
+                    """fixed_lines.append(line.rstrip() + "  # noqa: F401")"""
             else:
-                fixed_lines.append(line)
+                """fixed_lines.append(line)"""
         else:
-            fixed_lines.append(line)
+            """fixed_lines.append(line)"""
 
     return "\n".join(fixed_lines)
 
@@ -99,17 +110,17 @@ def main():
     """Main function to process files with F401 issues."""
     # List of files with known F401 issues based on the flake8 output
     f401_files = [
-        "apps/accounts/coverage_booster.py",
-        "apps/cms/signals.py",
-        "apps/cms/ultra_coverage_booster.py",
-        "apps/cms/views_deep_coverage.py",
-        "apps/config/settings/local.py",
-        "apps/config/settings/prod.py",
-        "apps/config/settings/production.py",
-        "apps/config/settings/test.py",
-        "apps/files/advanced_coverage.py",
-        "apps/search/mega_coverage_booster.py",
-        "apps/search/models.py",
+        """"apps/accounts/coverage_booster.py","""
+        """"apps/cms/signals.py","""
+        """"apps/cms/ultra_coverage_booster.py","""
+        """"apps/cms/views_deep_coverage.py","""
+        """"apps/config/settings/local.py","""
+        """"apps/config/settings/prod.py","""
+        """"apps/config/settings/production.py","""
+        """"apps/config/settings/test.py","""
+        """"apps/files/advanced_coverage.py","""
+        """"apps/search/mega_coverage_booster.py","""
+        """"apps/search/models.py","""
     ]
 
     fixed_files = 0

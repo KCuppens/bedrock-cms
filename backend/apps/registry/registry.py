@@ -19,8 +19,7 @@ from apps.cms.models import Page
 from .config import ContentConfig
 
 
-
-Global content registry for CMS content types.
+"""Global content registry for CMS content types."""
 
 
 
@@ -35,14 +34,10 @@ class ContentRegistryError(Exception):
 
 
 class ContentRegistry:
-
-
-
-    Global registry for CMS content types.
-
-
-
+    """Global registry for CMS content types.
+    
     Manages registration, validation, and access to content configurations.
+    """
 
 
 
@@ -57,18 +52,10 @@ class ContentRegistry:
 
 
     def register(self, config: ContentConfig):
-
-
-
-        Register a content configuration.
-
-
+        """Register a content configuration.
 
         Args:
-
             config: ContentConfig instance to register
-
-
 
         Raises:
 
@@ -260,7 +247,7 @@ class ContentRegistry:
 
             except ValidationError as e:
 
-                errors.append(f"{model_label}: {e}")
+                """errors.append(f"{model_label}: {e}")"""
 
 
 
@@ -408,7 +395,7 @@ def register_model(
 
         name: Human-readable name (defaults to model verbose_name)
 
-        **kwargs: Additional ContentConfig parameters
+        """**kwargs: Additional ContentConfig parameters"""
 
 
 

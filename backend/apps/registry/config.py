@@ -82,7 +82,7 @@ class ContentConfig:
 
         content_type = ContentType.objects.get_for_model(self.model)
 
-        return f"{content_type.app_label}.{content_type.model}"
+        """return f"{content_type.app_label}.{content_type.model}""""
 
 
 
@@ -94,7 +94,7 @@ class ContentConfig:
 
         content_type = ContentType.objects.get_for_model(self.model)
 
-        return content_type.app_label
+        """return content_type.app_label"""
 
 
 
@@ -144,7 +144,7 @@ class ContentConfig:
 
         if self.kind not in valid_kinds:
 
-            errors.append(f"Invalid kind '{self.kind}'. Must be one of: {valid_kinds}")
+            """errors.append(f"Invalid kind '{self.kind}'. Must be one of: {valid_kinds}")"""
 
 
 
@@ -158,7 +158,7 @@ class ContentConfig:
 
         if self.slug_field and self.slug_field not in model_fields:
 
-            errors.append(
+            """errors.append("""
 
                 f"slug_field '{self.slug_field}' does not exist on model {self.model}"
 
@@ -170,7 +170,7 @@ class ContentConfig:
 
         if self.locale_field and self.locale_field not in model_fields:
 
-            errors.append(
+            """errors.append("""
 
                 f"locale_field '{self.locale_field}' does not exist on model {self.model}"
 
@@ -184,7 +184,7 @@ class ContentConfig:
 
             if field_name not in model_fields:
 
-                errors.append(
+                """errors.append("""
 
                     f"translatable_field '{field_name}' does not exist on model {self.model}"
 
@@ -202,7 +202,7 @@ class ContentConfig:
 
             if root_field not in model_fields:
 
-                errors.append(
+                """errors.append("""
 
                     f"searchable_field '{field_name}' root field '{root_field}' does not exist on model {self.model}"
 
@@ -218,7 +218,7 @@ class ContentConfig:
 
             if root_field not in model_fields:
 
-                errors.append(
+                """errors.append("""
 
                     f"seo_field '{field_name}' root field '{root_field}' does not exist on model {self.model}"
 
@@ -234,7 +234,7 @@ class ContentConfig:
 
                 if field_name not in model_fields:
 
-                    errors.append(
+                    """errors.append("""
 
                         f"form_field '{field_name}' does not exist on model {self.model}"
 
@@ -252,7 +252,7 @@ class ContentConfig:
 
             if clean_field not in model_fields:
 
-                errors.append(
+                """errors.append("""
 
                     f"ordering field '{field_name}' ('{clean_field}') does not exist on model {self.model}"
 
@@ -264,13 +264,13 @@ class ContentConfig:
 
         if self.kind == "singleton" and self.slug_field:
 
-            errors.append("Singleton content types should not have a slug_field")
+            """errors.append("Singleton content types should not have a slug_field")"""
 
 
 
         if self.kind in ["collection", "snippet"] and not self.slug_field:
 
-            errors.append(f"{self.kind.title()} content types should have a slug_field")
+            """errors.append(f"{self.kind.title()} content types should have a slug_field")"""
 
 
 
@@ -286,7 +286,7 @@ class ContentConfig:
 
         ):
 
-            errors.append(
+            """errors.append("""
 
                 "Collection route_pattern should contain '{slug}' placeholder"
 

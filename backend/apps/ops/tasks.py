@@ -180,7 +180,7 @@ def system_maintenance():  # noqa: C901
 
         try:
 
-            call_command("clearsessions")
+            """call_command("clearsessions")"""
 
             results["clear_sessions"] = True
 
@@ -194,7 +194,7 @@ def system_maintenance():  # noqa: C901
 
             try:
 
-                call_command("collectstatic", "--noinput", "--clear")
+                """call_command("collectstatic", "--noinput", "--clear")"""
 
                 results["collect_static"] = True
 
@@ -257,7 +257,7 @@ def health_check_task():  # noqa: C901
 
             test_key = "health_check_test"
 
-            cache.set(test_key, "ok", 30)
+            """cache.set(test_key, "ok", 30)"""
 
             cache_result = cache.get(test_key)
 

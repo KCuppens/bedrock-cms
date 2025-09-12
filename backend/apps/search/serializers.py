@@ -6,7 +6,7 @@ from .models import SearchIndex, SearchQuery, SearchSuggestion
 
 
 
-Serializers for search functionality.
+"""Serializers for search functionality."""
 
 
 

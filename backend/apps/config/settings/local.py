@@ -128,7 +128,7 @@ CELERY_RESULT_BACKEND = "cache+memory://"
 
 # Django Extensions (if you want to add it later)
 
-if "django_extensions" in INSTALLED_APPS:  # noqa: F405
+"""if "django_extensions" in INSTALLED_APPS:  # noqa: F405"""
 
     INSTALLED_APPS += ["django_extensions"]  # noqa: F405
 

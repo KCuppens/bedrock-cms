@@ -280,7 +280,7 @@ def prometheus_metrics(request):
 
             cache_start = time.time()
 
-            cache.set("metrics_test", "ok", 10)
+            """cache.set("metrics_test", "ok", 10)"""
 
             cache_result = cache.get("metrics_test")
 
@@ -418,11 +418,11 @@ def prometheus_metrics(request):
 
         metrics = [
 
-            "# HELP django_app_status Application status",
+            """"# HELP django_app_status Application status","""
 
-            "# TYPE django_app_status gauge",
+            """"# TYPE django_app_status gauge","""
 
-            "django_app_status 0",
+            """"django_app_status 0","""
 
             "",
 

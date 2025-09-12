@@ -98,7 +98,7 @@ class CacheKeyBuilder:
 
         if revision_id:
 
-            parts.append(revision_id)
+            """parts.append(revision_id)"""
 
         return self.build_key("page", *parts)
 
@@ -118,7 +118,7 @@ class CacheKeyBuilder:
 
         if revision_id:
 
-            parts.append(revision_id)
+            """parts.append(revision_id)"""
 
         return self.build_key("content", *parts)
 
@@ -138,11 +138,11 @@ class CacheKeyBuilder:
 
         if post_rev:
 
-            parts.append(post_rev)
+            """parts.append(post_rev)"""
 
         if page_rev:
 
-            parts.append(page_rev)
+            """parts.append(page_rev)"""
 
         return self.build_key("blog", *parts)
 
@@ -311,7 +311,7 @@ class CacheManager:
 
             base_key = self.key_builder.page_key(locale, path)
 
-            keys_to_invalidate.append(base_key)
+            """keys_to_invalidate.append(base_key)"""
 
             # Also invalidate with any potential revision IDs
 
@@ -353,7 +353,7 @@ class CacheManager:
 
             base_key = self.key_builder.content_key(model_label, locale, slug)
 
-            keys_to_invalidate.append(base_key)
+            """keys_to_invalidate.append(base_key)"""
 
             # Pattern for revision variants
 

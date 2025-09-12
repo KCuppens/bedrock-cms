@@ -1,10 +1,10 @@
 
 
-Simple CMS Views tests to start building coverage.
+"""Simple CMS Views tests to start building coverage."""
 
 
 
-Basic tests for CMS views without complex factory dependencies.
+"""Basic tests for CMS views without complex factory dependencies."""
 
 
 

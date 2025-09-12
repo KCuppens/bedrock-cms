@@ -10,7 +10,7 @@ from . import views
 
 
 
-URL configuration for i18n app.
+"""URL configuration for i18n app."""
 
 
 

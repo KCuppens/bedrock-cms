@@ -26,76 +26,27 @@ from rest_framework.throttling import UserRateThrottle
 
 
 
-from apps.core.throttling import (  # viewsets
-
-    API,
-
-    Blog,
-
-    BlogPost,
-
-    BlogPostRevision,
-
-    BlogSettings,
-
+from apps.core.throttling import (
     BurstWriteThrottle,
-
-    Category,
-
-    Locale,
-
-    Prefetch,
-
     PublishOperationThrottle,
-
-    Tag,
-
     WriteOperationThrottle,
-
-    .models,
-
-    .serializers,
-
-    .versioning,
-
-    api_view,
-
-    apps.core.tasks,
-
-    apps.i18n.models,
-
-    django.db.models,
-
-    permission_classes,
-
-    rest_framework.decorators,
-
-    track_view_async,
-
-    views,
-
 )
+from apps.i18n.models import Locale
+from rest_framework.decorators import api_view, permission_classes
+from django.db.models import Prefetch
+from apps.core.tasks import track_view_async
 
-
-
+from .models import BlogPost, BlogPostRevision, BlogSettings, Category, Tag
+from .serializers import (
     BlogPostAutosaveSerializer,
-
     BlogPostDuplicateSerializer,
-
     BlogPostListSerializer,
-
     BlogPostRevisionSerializer,
-
     BlogPostSerializer,
-
     BlogPostWriteSerializer,
-
     BlogSettingsSerializer,
-
     CategorySerializer,
-
     TagSerializer,
-
 )
 
 
@@ -120,23 +71,18 @@ class BlogPostViewSet(viewsets.ModelViewSet):
 
 
 
-    ViewSet for managing blog posts with full CRUD operations and additional actions.
+    """ViewSet for managing blog posts with full CRUD operations and additional actions."""
 
 
 
-    Provides comprehensive blog post management including:
-
+    """Provides comprehensive blog post management including:
     - Standard CRUD operations
-
     - Publishing/unpublishing
-
     - Duplication across locales
-
     - Revision tracking
-
     - Autosave functionality
-
     - View count tracking
+    """
 
 
 
@@ -1035,23 +981,13 @@ class BlogSettingsViewSet(viewsets.ModelViewSet):
 @permission_classes([IsAuthenticated, IsAdminUser])
 
 def blog_settings_api(request, locale_code=None):  # noqa: C901
-
-
-
-    Legacy API for blog settings.
-
-
+    """Legacy API for blog settings.
 
     GET /api/v1/blog/settings/{locale_code}/
-
     POST /api/v1/blog/settings/{locale_code}/
-
     PATCH /api/v1/blog/settings/{locale_code}/
-
     PUT /api/v1/blog/settings/{locale_code}/
-
-
-
+    """
     if locale_code:
 
         locale = get_object_or_404(Locale, code=locale_code)
@@ -1177,17 +1113,10 @@ def blog_settings_api(request, locale_code=None):  # noqa: C901
 @permission_classes([IsAuthenticated, IsAdminUser])
 
 def blog_settings_list(request):  # noqa: C901
-
-
-
-    Legacy API to list all blog settings across locales.
-
-
+    """Legacy API to list all blog settings across locales.
 
     GET /api/v1/blog/settings/
-
-
-
+    """
     settings = BlogSettings.objects.select_related(
 
         "locale", "default_presentation_page"

@@ -1,6 +1,6 @@
 
 
-Media and file factories for testing uploads and media management.
+"""Media and file factories for testing uploads and media management."""
 
 
 
@@ -54,11 +54,11 @@ class MediaItemFactory(BaseFactory):
 
             "video": "video/mp4",
 
-            "document": "application/pdf",
+            """"document": "application/pdf","""
 
             "audio": "audio/mp3",
 
-        }.get(obj.file_type, "application/octet-stream")
+        """}.get(obj.file_type, "application/octet-stream")"""
 
     )
 

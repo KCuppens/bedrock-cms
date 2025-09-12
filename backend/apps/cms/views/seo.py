@@ -171,6 +171,7 @@ class SeoSettingsViewSet(viewsets.ModelViewSet):
             return Response(serializer.data)
 
         except Exception:
+            pass
 
 
 
@@ -502,7 +503,7 @@ class SeoSettingsViewSet(viewsets.ModelViewSet):
 
             if not locale_id:
 
-                errors.append({"error": "locale is required for each update"})
+                """errors.append({"error": "locale is required for each update"})"""
 
 
 
@@ -554,7 +555,7 @@ class SeoSettingsViewSet(viewsets.ModelViewSet):
 
                 serializer = self.get_serializer(instance)
 
-                results.append(serializer.data)
+                """results.append(serializer.data)"""
 
 
 
@@ -566,7 +567,7 @@ class SeoSettingsViewSet(viewsets.ModelViewSet):
 
             except Exception as e:
 
-                errors.append({"locale_id": locale_id, "error": str(e)})
+                """errors.append({"locale_id": locale_id, "error": str(e)})"""
 
 
 

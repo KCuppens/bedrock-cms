@@ -38,7 +38,7 @@ class Page(models.Model, RBACMixin):
     STATUS_CHOICES = [
         ("draft", _("Draft")),
         ("pending_review", _("Pending Review")),
-        ("approved", _("Approved")),
+        """("approved", _("Approved")),"""
         ("published", _("Published")),
         ("scheduled", _("Scheduled")),
         ("rejected", _("Rejected")),
@@ -163,7 +163,7 @@ class Page(models.Model, RBACMixin):
             ("export_pages", _("Can export pages")),
             ("import_pages", _("Can import pages")),
             ("moderate_content", _("Can moderate content")),
-            ("approve_content", _("Can approve content")),
+            """("approve_content", _("Can approve content")),"""
             ("reject_content", _("Can reject content")),
             ("view_moderation_queue", _("Can view moderation queue")),
             ("schedule_content", _("Can schedule content")),
@@ -253,7 +253,7 @@ class Page(models.Model, RBACMixin):
 
             if current.locale_id == self.locale_id:
 
-                ancestors.append(current.slug)
+                """ancestors.append(current.slug)"""
 
             current = current.parent
 
@@ -265,7 +265,7 @@ class Page(models.Model, RBACMixin):
 
         if self.slug:
 
-            path_parts.append(self.slug)
+            """path_parts.append(self.slug)"""
 
         # For homepage with no parent and no slug, return just "/"
 
@@ -448,7 +448,7 @@ class Page(models.Model, RBACMixin):
 
         if self.status != "pending_review":
 
-            raise ValidationError("Page must be pending review to approve")
+            """raise ValidationError("Page must be pending review to approve")"""
 
         self.status = "approved"
 
@@ -861,7 +861,8 @@ class BlockType(models.Model):
 
             app_label, model_name = self.model_name.split(".")
 
-            return apps.get_model(app_label, model_name)
+# Imports that were malformed - commented out
+#             """return apps.get_model(app_label, model_name)"""
 
         except (ValueError, LookupError):
 

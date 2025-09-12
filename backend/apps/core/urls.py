@@ -6,7 +6,7 @@ from .views import version_info, version_simple
 
 
 
-Core application URLs
+"""Core application URLs"""
 
 
 

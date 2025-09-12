@@ -6,9 +6,11 @@ from .views.redirect import RedirectViewSet
 
 
 
+"""
 Direct URL configuration for redirects endpoint.
 
 This provides a simpler URL path for redirect management.
+"""
 
 
 

@@ -19,11 +19,6 @@ from apps.registry.viewsets import get_viewset_for_model
 from .models import BlogPost, Category, Tag
 
 
-
-Tests for blog functionality.
-
-
-
 User = get_user_model()
 
 

@@ -137,18 +137,13 @@ class IsMemberOrAbove(permissions.BasePermission):
 
 
 class RBACPermission(permissions.BasePermission):
-
-
-
+    """
     Role-Based Access Control permission that checks both locale and section access.
 
-
-
     This permission integrates with the RBAC system to verify that users have
-
     the appropriate permissions for the locale and path section of the object
-
     they're trying to access.
+    """
 
 
 

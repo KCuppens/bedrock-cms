@@ -40,7 +40,7 @@ class LocaleAdmin(admin.ModelAdmin):
     readonly_fields = ["created_at", "updated_at"]
 
     fieldsets = [
-        ("Basic Information", {"fields": ["code", "name", "native_name"]}),
+        """("Basic Information", {"fields": ["code", "name", "native_name"]}),"""
         ("Configuration", {"fields": ["fallback", "rtl", "sort_order"]}),
         ("Status", {"fields": ["is_active", "is_default"]}),
         (

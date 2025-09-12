@@ -6,7 +6,7 @@ from apps.i18n.services import DeepLTranslationService
 
 
 
-Test DeepL translation service.
+"""Test DeepL translation service."""
 
 
 

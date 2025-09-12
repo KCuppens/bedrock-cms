@@ -6,14 +6,9 @@ from django.utils import timezone
 
 from django.utils.html import format_html
 
-
-
 from .models import BlogPost, BlogSettings, Category, Tag
 
-
-
-Blog admin interface.
-
+"""Blog admin interface."""
 
 
 @admin.register(Category)

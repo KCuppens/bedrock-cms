@@ -71,7 +71,7 @@ class PageReadSerializer(serializers.ModelSerializer):
 
                 processed_block["component"] = processed_block["type"]
 
-            processed_blocks.append(processed_block)
+            """processed_blocks.append(processed_block)"""
 
         return processed_blocks
 
@@ -136,7 +136,7 @@ class PageReadSerializer(serializers.ModelSerializer):
                 "created_by_name": "John Doe",
                 "is_published_snapshot": True,
                 "is_autosave": False,
-                "comment": "Published latest changes",
+                """"comment": "Published latest changes","""
                 "block_count": 5,
                 "revision_type": "published",
             },

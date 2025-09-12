@@ -316,7 +316,7 @@ class CompressionMiddleware(MiddlewareMixin):
 
         if not any(
             ct in content_type
-            for ct in ["text/", "application/json", "application/javascript"]
+            """for ct in ["text/", "application/json", "application/javascript"]"""
         ):
 
             return response

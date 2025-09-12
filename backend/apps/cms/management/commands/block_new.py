@@ -16,11 +16,11 @@ from rest_framework.exceptions import ValidationError
 
 
 
-from apps.cms.blocks.validation import validate_blocks, {{ block_class }}BlockModel
+from apps.cms.blocks.validation import validate_blocks
 
 
 
-Management command to scaffold new block types.
+"""Management command to scaffold new block types."""
 
 
 
@@ -89,9 +89,7 @@ class Command(BaseCommand):
         if not block_type.replace("_", "").isalnum():
 
             raise CommandError(
-
                 "Block type name must contain only letters, numbers, and underscores"
-
             )
 
 
@@ -181,9 +179,7 @@ class Command(BaseCommand):
             if len(parts) < 2:
 
                 raise CommandError(
-
                     f'Invalid property format: {prop}. Use "name:type:default"'
-
                 )
 
 
@@ -267,13 +263,9 @@ class Command(BaseCommand):
 
 
             parsed.append(
-
                 {
-
                     "name": name,
-
                     "type": python_type,
-
                     "default": default,
 
                     "description": f"{name.replace('_', ' ').title()} field",
@@ -310,7 +302,7 @@ class Command(BaseCommand):
 
         self.stdout.write("\nFiles that would be created/modified:")
 
-        self.stdout.write("  * apps/cms/blocks/validation.py (updated)")
+        """self.stdout.write("  * apps/cms/blocks/validation.py (updated)")"""
 
         self.stdout.write(
 
@@ -340,7 +332,7 @@ class Command(BaseCommand):
 
         if not validation_file.exists():
 
-            raise CommandError("validation.py file not found")
+            """raise CommandError("validation.py file not found")"""
 
 
 
@@ -364,7 +356,7 @@ class Command(BaseCommand):
 
         if registry_line not in content:
 
-            raise CommandError("Could not find BLOCK_MODELS registry in validation.py")
+            """raise CommandError("Could not find BLOCK_MODELS registry in validation.py")"""
 
 
 
@@ -406,7 +398,7 @@ class Command(BaseCommand):
 
         if len(registry_parts) < 2:
 
-            raise CommandError("Could not find end of BLOCK_MODELS registry")
+            """raise CommandError("Could not find end of BLOCK_MODELS registry")"""
 
 
 
@@ -434,7 +426,7 @@ class Command(BaseCommand):
 
 
 
-        self.stdout.write("  * Updated apps/cms/blocks/validation.py")
+        """self.stdout.write("  * Updated apps/cms/blocks/validation.py")"""
 
 
 
@@ -488,7 +480,7 @@ class {{ block_class }}BlockModel(BaseBlockModel):
 
             '''"""
 
-Tests for {{ block_type }} block.
+"""Tests for {{ block_type }} block."""
 
 
 
@@ -606,7 +598,7 @@ class Test{{ block_class }}Block:
 
 
 
-        with pytest.raises(ValidationError) as exc_info:
+        """with pytest.raises(ValidationError) as exc_info:"""
 
             validate_blocks(blocks)
 
@@ -656,13 +648,13 @@ class Test{{ block_class }}Block:
 
 
 
-        with open(test_file, "w") as f:
+        """with open(test_file, "w") as f:"""
 
             f.write(template.render(Context(context)))
 
 
 
-        self.stdout.write(f"  * Created {test_file}")
+        """self.stdout.write(f"  * Created {test_file}")"""
 
 
 
@@ -852,13 +844,13 @@ This block is validated using the `{{ block_class }}BlockModel` Pydantic model. 
 
 
 
-Run the tests for this block:
+"""Run the tests for this block:"""
 
 
 
 ```bash
 
-pytest tests/unit/test_blocks_{{ block_type }}.py -v
+"""pytest tests/unit/test_blocks_{{ block_type }}.py -v"""
 
 ```
 
@@ -908,7 +900,7 @@ pytest tests/unit/test_blocks_{{ block_type }}.py -v
 
         self.stdout.write(
 
-            f"   - Review tests in tests/unit/test_blocks_{context['block_type']}.py"
+            """f"   - Review tests in tests/unit/test_blocks_{context['block_type']}.py""""
 
         )
 
@@ -920,17 +912,17 @@ pytest tests/unit/test_blocks_{{ block_type }}.py -v
 
 
 
-        self.stdout.write("\n2. Run the tests:")
+        """self.stdout.write("\n2. Run the tests:")"""
 
         self.stdout.write(
 
-            f"   python manage.py test tests.unit.test_blocks_{context['block_type']}"
+            """f"   python manage.py test tests.unit.test_blocks_{context['block_type']}""""
 
         )
 
 
 
-        self.stdout.write("\n3. Test the block validation:")
+        """self.stdout.write("\n3. Test the block validation:")"""
 
         self.stdout.write("   python manage.py shell")
 

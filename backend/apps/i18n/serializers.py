@@ -1,35 +1,16 @@
 from django.contrib.auth import get_user_model
-
-
-
+from django.core.exceptions import ValidationError
+from django.utils import translation
 from rest_framework import serializers
 
-
-
-from .models import (  # models
-
+from .models import (
     Locale,
-
-    Serializers,
-
     TranslationGlossary,
-
     TranslationHistory,
-
     TranslationQueue,
-
     TranslationUnit,
-
     UiMessage,
-
     UiMessageTranslation,
-
-    ValidationError,
-
-    django.core.exceptions,
-
-    translation,
-
 )
 
 
@@ -204,13 +185,13 @@ class TranslationUnitUpdateSerializer(serializers.ModelSerializer):
 
             valid_transitions = {
 
-                "missing": ["draft", "approved"],
+                """"missing": ["draft", "approved"],"""
 
-                "draft": ["needs_review", "approved", "rejected", "missing"],
+                """"draft": ["needs_review", "approved", "rejected", "missing"],"""
 
-                "needs_review": ["approved", "rejected", "draft"],
+                """"needs_review": ["approved", "rejected", "draft"],"""
 
-                "approved": ["needs_review", "draft"],
+                """"approved": ["needs_review", "draft"],"""
 
                 "rejected": ["draft", "needs_review"],
 

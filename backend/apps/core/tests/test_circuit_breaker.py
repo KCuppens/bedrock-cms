@@ -12,7 +12,7 @@ from apps.core.circuit_breaker import CircuitOpenException, circuit_breaker
 
 
 
-Test cases for circuit breaker functionality.
+"""Test cases for circuit breaker functionality."""
 
 
 
@@ -60,7 +60,7 @@ class CircuitBreakerTest(TestCase):
 
         def failing_operation():
 
-            raise Exception("Test failure")
+            """raise Exception("Test failure")"""
 
 
 
@@ -206,7 +206,7 @@ class CircuitBreakerTest(TestCase):
 
         with self.assertRaises(Exception):
 
-            half_open_test()
+            """half_open_test()"""
 
 
 
@@ -214,7 +214,7 @@ class CircuitBreakerTest(TestCase):
 
         with self.assertRaises(CircuitOpenException):
 
-            half_open_test()
+            """half_open_test()"""
 
 
 
@@ -228,7 +228,7 @@ class CircuitBreakerTest(TestCase):
 
         with self.assertRaises(Exception):
 
-            half_open_test()
+            """half_open_test()"""
 
 
 
@@ -236,7 +236,7 @@ class CircuitBreakerTest(TestCase):
 
         with self.assertRaises(CircuitOpenException):
 
-            half_open_test()
+            """half_open_test()"""
 
 
 
@@ -269,8 +269,7 @@ class CircuitBreakerTest(TestCase):
 
 
         class CustomException(Exception):
-
-
+            pass
 
         @circuit_breaker(failure_threshold=2, recovery_timeout=60)
 

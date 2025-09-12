@@ -6,7 +6,7 @@ from apps.i18n.models import Locale, UiMessage, UiMessageTranslation
 
 
 
-Debug command to check UI messages that need translation.
+"""Debug command to check UI messages that need translation."""
 
 
 

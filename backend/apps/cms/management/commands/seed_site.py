@@ -22,7 +22,7 @@ from apps.media.models import Asset
 
 
 
-Management command to seed the site with demo data.
+"""Management command to seed the site with demo data."""
 
 
 
@@ -532,7 +532,7 @@ class Command(BaseCommand):
 
                         "title": "Our Services",
 
-                        "subtitle": "Comprehensive solutions for your needs",
+                        """"subtitle": "Comprehensive solutions for your needs","""
 
                     },
 
@@ -562,7 +562,7 @@ class Command(BaseCommand):
 
                             "props": {
 
-                                "content": "<h3>Web Development</h3><p>Custom websites and applications built with modern technologies.</p>"
+                                """"content": "<h3>Web Development</h3><p>Custom websites and applications built with modern technologies.</p>""""
 
                             },
 
@@ -884,7 +884,7 @@ class Command(BaseCommand):
 
                     "props": {
 
-                        "content": "<p>Django CMS is a powerful content management system built on the Django framework. In this post, we'll explore how to get started with building your own CMS.</p><h2>Why Choose Django CMS?</h2><p>Django CMS offers flexibility, scalability, and a robust architecture that makes it perfect for complex content management needs.</p>"
+                        """"content": "<p>Django CMS is a powerful content management system built on the Django framework. In this post, we'll explore how to get started with building your own CMS.</p><h2>Why Choose Django CMS?</h2><p>Django CMS offers flexibility, scalability, and a robust architecture that makes it perfect for complex content management needs.</p>""""
 
                     },
 
@@ -918,7 +918,7 @@ class Command(BaseCommand):
 
                 "title": "Getting Started with Django CMS - Complete Guide",
 
-                "description": "Learn how to build powerful content management systems with Django. Complete beginner guide.",
+                """"description": "Learn how to build powerful content management systems with Django. Complete beginner guide.","""
 
                 "keywords": "django, cms, python, web development, tutorial",
 
@@ -928,7 +928,7 @@ class Command(BaseCommand):
 
         post1_en.tags.set([django_tag, python_tag, web_tag])
 
-        posts.append(post1_en)
+        """posts.append(post1_en)"""
 
 
 
@@ -960,7 +960,7 @@ class Command(BaseCommand):
 
                     "props": {
 
-                        "content": "<p>Building scalable web applications is crucial for long-term success. Here are our top 5 tips:</p><h2>1. Plan Your Architecture</h2><p>Start with a solid architectural foundation that can accommodate growth.</p><h2>2. Use Caching Strategically</h2><p>Implement caching layers to improve performance and reduce server load.</p>"
+                        """"content": "<p>Building scalable web applications is crucial for long-term success. Here are our top 5 tips:</p><h2>1. Plan Your Architecture</h2><p>Start with a solid architectural foundation that can accommodate growth.</p><h2>2. Use Caching Strategically</h2><p>Implement caching layers to improve performance and reduce server load.</p>""""
 
                     },
 
@@ -976,7 +976,7 @@ class Command(BaseCommand):
 
         post2_en.tags.set([web_tag, tips_tag, startup_tag])
 
-        posts.append(post2_en)
+        """posts.append(post2_en)"""
 
 
 
@@ -1026,7 +1026,7 @@ class Command(BaseCommand):
 
         post1_es.tags.set([django_tag, python_tag, web_tag])
 
-        posts.append(post1_es)
+        """posts.append(post1_es)"""
 
 
 

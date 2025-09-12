@@ -4,7 +4,7 @@ Search models for the CMS.
 
 
 
-This module provides search functionality including indexing, analytics, and query logging.
+"""This module provides search functionality including indexing, analytics, and query logging."""
 
 
 
@@ -272,7 +272,7 @@ class SearchIndex(models.Model):
 
                     if isinstance(field_value, dict) and nested_key in field_value:
 
-                        content_parts.append(str(field_value[nested_key]))
+                        """content_parts.append(str(field_value[nested_key]))"""
 
                     elif isinstance(field_value, list):
 
@@ -286,7 +286,7 @@ class SearchIndex(models.Model):
 
                                 if nested_key in props:
 
-                                    content_parts.append(str(props[nested_key]))
+                                    """content_parts.append(str(props[nested_key]))"""
 
             else:
 
@@ -300,11 +300,11 @@ class SearchIndex(models.Model):
 
                         if field_name in ["title", "name"]:
 
-                            title_parts.append(str(field_value))
+                            """title_parts.append(str(field_value))"""
 
                         else:
 
-                            content_parts.append(str(field_value))
+                            """content_parts.append(str(field_value))"""
 
 
 
@@ -420,7 +420,7 @@ class SearchIndex(models.Model):
 
         if hasattr(obj, "category") and obj.category:
 
-            tags.append(obj.category.name)
+            """tags.append(obj.category.name)"""
 
         self.search_tags = tags
 

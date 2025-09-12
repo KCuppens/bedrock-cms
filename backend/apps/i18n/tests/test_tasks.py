@@ -13,9 +13,6 @@ from django.test import TestCase
 from apps.i18n.models import Locale, TranslationQueue, TranslationUnit
 
 from apps.i18n.tasks import (  # tasks
-
-    Test,
-
     auto_translate_content,
 
     background,
@@ -110,7 +107,7 @@ class I18nTasksTest(TestCase):
 
 
 
-    @patch("apps.i18n.tasks.logger")
+    """@patch("apps.i18n.tasks.logger")"""
 
     def test_process_translation_queue_success(self, mock_logger):  # noqa: C901
 
@@ -119,11 +116,7 @@ class I18nTasksTest(TestCase):
         # Mock external translation service
 
         with patch("apps.i18n.tasks.TranslationService") as mock_service:
-
             mock_service.return_value.translate.return_value = "Translated text"
-
-
-
             process_translation_queue()
 
 
@@ -134,7 +127,7 @@ class I18nTasksTest(TestCase):
 
 
 
-    @patch("apps.i18n.tasks.logger")
+    """@patch("apps.i18n.tasks.logger")"""
 
     def test_process_translation_queue_with_errors(self, mock_logger):  # noqa: C901
 
@@ -160,7 +153,7 @@ class I18nTasksTest(TestCase):
 
 
 
-    @patch("apps.i18n.tasks.logger")
+    """@patch("apps.i18n.tasks.logger")"""
 
     def test_auto_translate_content_basic(self, mock_logger):  # noqa: C901
 
@@ -188,7 +181,7 @@ class I18nTasksTest(TestCase):
 
 
 
-    @patch("apps.i18n.tasks.logger")
+    """@patch("apps.i18n.tasks.logger")"""
 
     def test_auto_translate_content_with_service(self, mock_logger):  # noqa: C901
 
@@ -224,7 +217,7 @@ class I18nTasksTest(TestCase):
 
 
 
-    @patch("apps.i18n.tasks.logger")
+    """@patch("apps.i18n.tasks.logger")"""
 
     def test_generate_translation_report(self, mock_logger):  # noqa: C901
 
@@ -240,7 +233,7 @@ class I18nTasksTest(TestCase):
 
 
 
-    @patch("apps.i18n.tasks.logger")
+    """@patch("apps.i18n.tasks.logger")"""
 
     def test_generate_translation_report_with_params(self, mock_logger):  # noqa: C901
 
@@ -260,7 +253,7 @@ class I18nTasksTest(TestCase):
 
 
 
-    @patch("apps.i18n.tasks.logger")
+    """@patch("apps.i18n.tasks.logger")"""
 
     def test_sync_locale_fallbacks(self, mock_logger):  # noqa: C901
 
@@ -276,7 +269,7 @@ class I18nTasksTest(TestCase):
 
 
 
-    @patch("apps.i18n.tasks.logger")
+    """@patch("apps.i18n.tasks.logger")"""
 
     def test_sync_locale_fallbacks_specific_locale(self, mock_logger):  # noqa: C901
 
@@ -292,7 +285,7 @@ class I18nTasksTest(TestCase):
 
 
 
-    @patch("apps.i18n.tasks.logger")
+    """@patch("apps.i18n.tasks.logger")"""
 
     def test_cleanup_old_translations(self, mock_logger):  # noqa: C901
 
@@ -308,7 +301,7 @@ class I18nTasksTest(TestCase):
 
 
 
-    @patch("apps.i18n.tasks.logger")
+    """@patch("apps.i18n.tasks.logger")"""
 
     def test_cleanup_old_translations_with_days(self, mock_logger):  # noqa: C901
 
@@ -324,7 +317,7 @@ class I18nTasksTest(TestCase):
 
 
 
-    @patch("apps.i18n.tasks.logger")
+    """@patch("apps.i18n.tasks.logger")"""
 
     def test_task_error_handling(self, mock_logger):  # noqa: C901
 
@@ -349,13 +342,10 @@ class I18nTasksTest(TestCase):
                 cleanup_old_translations()
 
             except Exception:
-
                 # If tasks don't handle errors, that's still coverage
-
-
+                pass
 
     @patch("apps.i18n.tasks.logger")
-
     def test_task_with_invalid_parameters(self, mock_logger):  # noqa: C901
 
         """Test tasks with invalid parameters."""

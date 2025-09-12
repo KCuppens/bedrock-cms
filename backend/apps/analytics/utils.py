@@ -1,3 +1,5 @@
+"""Utility functions for analytics functionality."""
+
 import re
 
 from datetime import date, datetime, timedelta
@@ -22,27 +24,21 @@ from .models import PageView
 
 
 
-Utility functions for analytics functionality.
-
-
-
 def parse_user_agent(user_agent_string: str) -> dict[str, str]:
 
 
 
-    Parse user agent string to extract browser and OS information.
-
-
+    """Parse user agent string to extract browser and OS information.
 
     Args:
-
         user_agent_string: Raw user agent string from request
 
-
-
     Returns:
-
         Dict containing browser, os, and device_type information
+    """
+
+
+
 
 
 
@@ -82,19 +78,17 @@ def get_client_ip(request) -> str:
 
 
 
-    Extract client IP address from request, handling proxies.
-
-
+    """Extract client IP address from request, handling proxies.
 
     Args:
-
         request: Django request object
 
-
-
     Returns:
-
         Client IP address as string
+    """
+
+
+
 
 
 
@@ -120,19 +114,17 @@ def get_geo_data(ip_address: str) -> dict[str, str | None]:
 
 
 
-    Get geographic data from IP address.
-
-
+    """Get geographic data from IP address.
 
     Args:
-
         ip_address: IP address string
 
-
-
     Returns:
-
         Dict containing country and city information
+    """
+
+
+
 
 
 
@@ -172,21 +164,18 @@ def sanitize_url(url: str, max_length: int = 1024) -> str:
 
 
 
-    Sanitize and truncate URL for storage.
-
-
+    """Sanitize and truncate URL for storage.
 
     Args:
-
         url: Raw URL string
-
         max_length: Maximum length for truncation
 
-
-
     Returns:
-
         Sanitized URL string
+    """
+
+
+
 
 
 
@@ -274,21 +263,18 @@ def calculate_session_duration(session_id: str, end_time: datetime = None) -> in
 
 
 
-    Calculate session duration in seconds.
-
-
+    """Calculate session duration in seconds.
 
     Args:
-
         session_id: Session identifier
-
         end_time: End time for calculation (defaults to now)
 
-
-
     Returns:
-
         Session duration in seconds
+    """
+
+
+
 
 
 
@@ -334,19 +320,17 @@ def get_content_type_and_id(obj) -> tuple[int, int]:
 
 
 
-    Get ContentType ID and object ID for any Django model instance.
-
-
+    """Get ContentType ID and object ID for any Django model instance.
 
     Args:
-
         obj: Django model instance
 
-
-
     Returns:
-
         Tuple of (content_type_id, object_id)
+    """
+
+
+
 
 
 
@@ -360,19 +344,17 @@ def format_duration(seconds: int) -> str:
 
 
 
-    Format duration in seconds to human-readable string.
-
-
+    """Format duration in seconds to human-readable string.
 
     Args:
-
         seconds: Duration in seconds
 
-
-
     Returns:
-
         Formatted duration string
+    """
+
+
+
 
 
 
@@ -402,21 +384,18 @@ def get_date_range(period: str, date_param: str = None) -> tuple[date, date]:
 
 
 
-    Get date range for analytics queries.
-
-
+    """Get date range for analytics queries.
 
     Args:
-
         period: Period type ('day', 'week', 'month', 'quarter', 'year')
-
         date_param: Optional date parameter (YYYY-MM-DD format)
 
-
-
     Returns:
-
         Tuple of (start_date, end_date)
+    """
+
+
+
 
 
 
@@ -524,19 +503,17 @@ def is_bot_user_agent(user_agent_string: str) -> bool:
 
 
 
-    Check if user agent string indicates a bot or crawler.
-
-
+    """Check if user agent string indicates a bot or crawler.
 
     Args:
-
         user_agent_string: User agent string to check
 
-
-
     Returns:
-
         True if appears to be a bot
+    """
+
+
+
 
 
 
@@ -608,19 +585,17 @@ def clean_referrer(referrer: str) -> str:
 
 
 
-    Clean and normalize referrer URL.
-
-
+    """Clean and normalize referrer URL.
 
     Args:
-
         referrer: Raw referrer URL
 
-
-
     Returns:
-
         Cleaned referrer URL
+    """
+
+
+
 
 
 
@@ -666,19 +641,17 @@ def get_analytics_context(request) -> dict:
 
 
 
-    Extract analytics context from Django request.
-
-
+    """Extract analytics context from Django request.
 
     Args:
-
         request: Django request object
 
-
-
     Returns:
-
         Dict containing analytics context data
+    """
+
+
+
 
 
 

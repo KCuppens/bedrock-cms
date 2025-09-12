@@ -13,8 +13,8 @@ from apps.core.model_permissions import get_all_custom_permissions
 """Management command to apply custom permissions to all models.
 
 Usage:
-    python manage.py apply_model_permissions
-    python manage.py apply_model_permissions --dry-run
+    """python manage.py apply_model_permissions"""
+    """python manage.py apply_model_permissions --dry-run"""
 """
 
 
@@ -72,7 +72,7 @@ class Command(BaseCommand):
                         app_label=app_label, model=model_name
                     )
 
-                    self.stdout.write(f"\nProcessing {app_label}.{model_name}:")
+                    """self.stdout.write(f"\nProcessing {app_label}.{model_name}:")"""
 
                     for codename, name in permissions:
 
@@ -116,7 +116,7 @@ class Command(BaseCommand):
 
                     self.stdout.write(
                         self.style.ERROR(
-                            f"\n✗ Model {app_label}.{model_name} does not exist"
+                            """f"\n✗ Model {app_label}.{model_name} does not exist""""
                         )
                     )
 
@@ -126,7 +126,7 @@ class Command(BaseCommand):
 
                     self.stdout.write(
                         self.style.ERROR(
-                            f"\n✗ Error processing {app_label}.{model_name}: {str(e)}"
+                            """f"\n✗ Error processing {app_label}.{model_name}: {str(e)}""""
                         )
                     )
 
@@ -154,7 +154,7 @@ class Command(BaseCommand):
 
                     except Exception:
 
-                        orphaned.append(perm)
+                        """orphaned.append(perm)"""
 
                 if orphaned:
 
@@ -163,7 +163,7 @@ class Command(BaseCommand):
                     for perm in orphaned:
 
                         self.stdout.write(
-                            f"  - {perm.content_type.app_label}.{perm.codename}"
+                            """f"  - {perm.content_type.app_label}.{perm.codename}""""
                         )
 
                     if not dry_run:
@@ -200,7 +200,7 @@ class Command(BaseCommand):
 
                 app_label, model_name = model_path.split(".")
 
-                self.stdout.write(f"\n{app_label}.{model_name}:")
+                """self.stdout.write(f"\n{app_label}.{model_name}:")"""
 
                 for action in default_perms:
 

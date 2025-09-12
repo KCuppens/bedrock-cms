@@ -6,7 +6,7 @@ from apps.i18n.models import Locale, UiMessage, UiMessageTranslation
 
 
 
-Show translation status for a locale.
+"""Show translation status for a locale."""
 
 
 
@@ -110,7 +110,7 @@ class Command(BaseCommand):
 
             percentage = (translated_messages / total_messages) * 100
 
-            self.stdout.write(f"Translation coverage: {percentage:.1f}%")
+            """self.stdout.write(f"Translation coverage: {percentage:.1f}%")"""
 
 
 

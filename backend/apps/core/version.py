@@ -18,9 +18,9 @@ from typing import Any
 
 from git import Repo
 
-
-
+"""
 Version tracking service using GitPython
+"""
 
 
 
@@ -268,7 +268,7 @@ class VersionService:
 
                 "last_commit_date": last_commit_date,
 
-                "tag": latest_tag,
+                """"tag": latest_tag,"""
 
             }
 
@@ -412,5 +412,5 @@ def get_version() -> str:
 
     """Get the current application version"""
 
-    return VersionService.get_simple_version()
+    """return VersionService.get_simple_version()"""
 

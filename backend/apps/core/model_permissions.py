@@ -1,14 +1,12 @@
 
-
+"""
 Model Permissions Configuration
-
-
 
 This module defines custom permissions for all models in the Bedrock CMS.
 
 Django automatically creates add, change, delete, and view permissions for each model,
-
 but we can add custom permissions for more fine-grained control.
+"""
 
 
 
@@ -50,7 +48,7 @@ CMS_REDIRECT_PERMISSIONS = [
 
     ("export_redirect", "Can export redirects to CSV"),
 
-    ("test_redirect", "Can test redirect rules"),
+    """("test_redirect", "Can test redirect rules"),"""
 
 ]
 
@@ -156,7 +154,7 @@ I18N_LOCALE_PERMISSIONS = [
 
 I18N_TRANSLATION_PERMISSIONS = [
 
-    ("approve_translation", "Can approve translations"),
+    """("approve_translation", "Can approve translations"),"""
 
     ("reject_translation", "Can reject translations"),
 
@@ -222,7 +220,7 @@ EMAIL_PERMISSIONS = [
 
     ("view_email_logs", "Can view email logs"),
 
-    ("test_email_templates", "Can test email templates"),
+    """("test_email_templates", "Can test email templates"),"""
 
 ]
 
@@ -330,7 +328,7 @@ def get_model_permissions(app_label, model_name):
 
     Args:
 
-        app_label: The app label (e.g., 'cms', 'blog')
+        """app_label: The app label (e.g., 'cms', 'blog')"""
 
         model_name: The model name (e.g., 'page', 'blogpost')
 
@@ -436,7 +434,7 @@ def get_model_permissions(app_label, model_name):
 
 
 
-    return permissions_map.get(app_label, {}).get(model_name.lower(), [])
+    """return permissions_map.get(app_label, {}).get(model_name.lower(), [])"""
 
 
 
@@ -498,7 +496,7 @@ PERMISSION_GROUPS = {
 
     "translation_reviewer": [
 
-        "i18n.approve_translation",
+        """"i18n.approve_translation","""
 
         "i18n.reject_translation",
 
@@ -516,7 +514,7 @@ PERMISSION_GROUPS = {
 
         "cms.delete_redirect",
 
-        "cms.test_redirect",
+        """"cms.test_redirect","""
 
         "search.manage_search_suggestions",
 
@@ -588,7 +586,7 @@ def get_all_custom_permissions():
 
     Returns:
 
-        Dictionary mapping app.model to list of permissions
+        """Dictionary mapping app.model to list of permissions"""
 
 
 

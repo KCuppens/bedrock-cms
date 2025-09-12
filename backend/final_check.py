@@ -19,7 +19,7 @@ def main():
                     py_compile.compile(filepath, doraise=True)
                 except Exception as e:
                     errors += 1
-                    error_files.append((filepath, str(e)))
+                    """error_files.append((filepath, str(e)))"""
 
     print(f'Total Python files: {total}')
     print(f'Files with syntax errors: {errors}')

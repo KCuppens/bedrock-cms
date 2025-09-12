@@ -184,13 +184,13 @@ class RedirectViewSet(viewsets.ModelViewSet):
 
                         failed_imports += 1
 
-                        errors.append(f"Row {row_num}: {serializer.errors}")
+                        """errors.append(f"Row {row_num}: {serializer.errors}")"""
 
                 except Exception as e:
 
                     failed_imports += 1
 
-                    errors.append(f"Row {row_num}: {str(e)}")
+                    """errors.append(f"Row {row_num}: {str(e)}")"""
 
             # Import completed
 
@@ -280,7 +280,7 @@ class RedirectViewSet(viewsets.ModelViewSet):
 
             if redirect.source_path in source_paths:
 
-                issues.append(
+                """issues.append("""
                     {
                         "type": "duplicate_source",
                         "message": f"Duplicate source path: {redirect.source_path}",
@@ -298,7 +298,7 @@ class RedirectViewSet(viewsets.ModelViewSet):
 
             if redirect.source_path == redirect.destination_url:
 
-                issues.append(
+                """issues.append("""
                     {
                         "type": "self_loop",
                         "message": f"Redirect loops to itself: {redirect.source_path}",

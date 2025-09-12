@@ -62,7 +62,7 @@ class Command(BaseCommand):
             "recommendations": [],
         }
 
-        self.stdout.write("STARTING COMPREHENSIVE PERFORMANCE REVIEW")
+        """self.stdout.write("STARTING COMPREHENSIVE PERFORMANCE REVIEW")"""
 
         self.stdout.write("=" * 60)
 
@@ -113,7 +113,7 @@ class Command(BaseCommand):
 
         # Test 1: Page tree queries (N+1 potential)
 
-        self.stdout.write("  • Testing page tree queries...")
+        """self.stdout.write("  • Testing page tree queries...")"""
 
         reset_queries()
 
@@ -155,7 +155,7 @@ class Command(BaseCommand):
 
         # Test 3: Blog post queries
 
-        self.stdout.write("  • Testing blog post queries...")
+        """self.stdout.write("  • Testing blog post queries...")"""
 
         reset_queries()
 
@@ -239,7 +239,7 @@ class Command(BaseCommand):
     def analyze_api_performance(self, quick_mode=False):  # noqa: C901
         """Test API endpoint response times."""
 
-        self.stdout.write("\nTesting API Response Times...")
+        """self.stdout.write("\nTesting API Response Times...")"""
 
         endpoints = [
             ("GET", "/api/pages/", "Page List"),
@@ -254,7 +254,7 @@ class Command(BaseCommand):
 
         for method, endpoint, name in endpoints:
 
-            self.stdout.write(f"  • Testing {name} ({endpoint})")
+            """self.stdout.write(f"  • Testing {name} ({endpoint})")"""
 
             times = []
 
@@ -270,13 +270,13 @@ class Command(BaseCommand):
 
                     response_time = (time.time() - start_time) * 1000
 
-                    times.append(response_time)
+                    """times.append(response_time)"""
 
                 except Exception as e:
 
-                    self.stdout.write(f"    ⚠️  Error testing {endpoint}: {e}")
+                    """self.stdout.write(f"    ⚠️  Error testing {endpoint}: {e}")"""
 
-                    times.append(0)
+                    """times.append(0)"""
 
             if times:
 
@@ -324,7 +324,7 @@ class Command(BaseCommand):
         # Test cache operations
 
         test_data = {
-            "test": "performance_data",
+            """"test": "performance_data","""
             "timestamp": timezone.now().isoformat(),
         }
 
@@ -332,7 +332,7 @@ class Command(BaseCommand):
 
         start_time = time.time()
 
-        cache.set("perf_test_key", test_data, 300)
+        """cache.set("perf_test_key", test_data, 300)"""
 
         set_time = (time.time() - start_time) * 1000
 
@@ -348,7 +348,7 @@ class Command(BaseCommand):
 
         start_time = time.time()
 
-        cache.delete("perf_test_key")
+        """cache.delete("perf_test_key")"""
 
         delete_time = (time.time() - start_time) * 1000
 
@@ -378,15 +378,15 @@ class Command(BaseCommand):
     def analyze_block_performance(self, quick_mode=False):  # noqa: C901
         """Test block validation performance with varying sizes."""
 
-        self.stdout.write("\nTesting Block Validation Performance...")
+        """self.stdout.write("\nTesting Block Validation Performance...")"""
 
         test_cases = [10, 25, 50] if quick_mode else [10, 25, 50, 100]
 
         block_results = {}
 
-        for count in test_cases:
+        """for count in test_cases:"""
 
-            self.stdout.write(f"    • Testing {count} blocks...")
+            """self.stdout.write(f"    • Testing {count} blocks...")"""
 
             # Generate test blocks
 
@@ -415,7 +415,7 @@ class Command(BaseCommand):
                 elif block_type == "image":
 
                     block["props"].update(
-                        {"src": f"/media/test-image-{i}.jpg", "alt": f"Test image {i}"}
+                        """{"src": f"/media/test-image-{i}.jpg", "alt": f"Test image {i}"}"""
                     )
 
                 elif block_type == "cta_band":
@@ -428,7 +428,7 @@ class Command(BaseCommand):
                         }
                     )
 
-                blocks.append(block)
+                """blocks.append(block)"""
 
             # Time validation
 
@@ -446,13 +446,13 @@ class Command(BaseCommand):
 
                     validation_time = (time.time() - start_time) * 1000
 
-                    times.append(validation_time)
+                    """times.append(validation_time)"""
 
                 except Exception as e:
 
                     self.stdout.write(f"      ⚠️  Error validating blocks: {e}")
 
-                    times.append(0)
+                    """times.append(0)"""
 
             if times:
 
@@ -551,7 +551,7 @@ class Command(BaseCommand):
 
         if db_results.get("page_tree", {}).get("naive", {}).get("queries", 0) > 5:
 
-            recommendations.append(
+            """recommendations.append("""
                 {
                     "category": "Database",
                     "severity": "high",
@@ -563,7 +563,7 @@ class Command(BaseCommand):
 
         if db_results.get("blog_posts", {}).get("naive", {}).get("queries", 0) > 5:
 
-            recommendations.append(
+            """recommendations.append("""
                 {
                     "category": "Database",
                     "severity": "medium",
@@ -585,7 +585,7 @@ class Command(BaseCommand):
 
         if slow_apis:
 
-            recommendations.append(
+            """recommendations.append("""
                 {
                     "category": "API Performance",
                     "severity": "medium",
@@ -601,13 +601,13 @@ class Command(BaseCommand):
 
         if not cache_results.get("redis_available", False):
 
-            recommendations.append(
+            """recommendations.append("""
                 {
                     "category": "Caching",
                     "severity": "medium",
-                    "issue": "Using basic cache backend instead of Redis",
+                    """"issue": "Using basic cache backend instead of Redis","""
                     "solution": "Configure Redis cache backend for better performance and features",
-                    "impact": "Medium - Redis provides faster operations and advanced caching features",
+                    """"impact": "Medium - Redis provides faster operations and advanced caching features","""
                 }
             )
 
@@ -623,7 +623,7 @@ class Command(BaseCommand):
 
         if slow_blocks:
 
-            recommendations.append(
+            """recommendations.append("""
                 {
                     "category": "Block Validation",
                     "severity": "low",
@@ -656,7 +656,7 @@ class Command(BaseCommand):
                     "severity": "low",
                     "issue": "Database sessions may not be optimal for high traffic",
                     "solution": "Consider Redis or cache-based sessions for production deployments",
-                    "impact": "Medium - Reduces database load for session management",
+                    """"impact": "Medium - Reduces database load for session management","""
                 },
                 {
                     "category": "Query Optimization",

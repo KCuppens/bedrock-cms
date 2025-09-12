@@ -14,13 +14,11 @@ from apps.i18n.settings_sync import DjangoSettingsSync
 
 
 
-Management command to synchronize database locales with Django settings.
-
-
+"""Management command to synchronize database locales with Django settings.
 
 This command provides comprehensive synchronization between the Locale model
-
 and Django's i18n settings (LANGUAGE_CODE and LANGUAGES).
+"""
 
 
 
@@ -521,9 +519,7 @@ class Command(BaseCommand):
                 created_count += 1
 
                 result["created_locales"].append(
-
                     {"code": django_language_code, "name": django_language_code.title()}
-
                 )
 
             else:
@@ -531,9 +527,7 @@ class Command(BaseCommand):
                 updated_count += 1
 
                 result["updated_locales"].append(
-
                     {"code": django_language_code, "name": django_language_code.title()}
-
                 )
 
 
@@ -563,9 +557,7 @@ class Command(BaseCommand):
             except Locale.DoesNotExist:
 
                 raise CommandError(
-
                     f'Locale with code "{default_locale_code}" not found'
-
                 )
 
 

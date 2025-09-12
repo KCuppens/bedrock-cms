@@ -14,7 +14,7 @@ from .version import VersionService
 
 
 
-Core application views
+"""Core application views"""
 
 
 
@@ -70,7 +70,7 @@ def version_info(request):  # noqa: C901
 
 
 
-    Get application version and environment information.
+    """Get application version and environment information."""
 
 
 
@@ -116,11 +116,11 @@ def version_simple(request):  # noqa: C901
 
 
 
-    Get a simple version string.
+    """Get a simple version string."""
 
 
 
-    Returns just the version string in a simple format,
+    """Returns just the version string in a simple format,"""
 
     including commit hash if ahead of tag and dirty flag if uncommitted changes.
 

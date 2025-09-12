@@ -273,15 +273,11 @@ BLOCK_MODELS: dict[str, type[BaseBlockModel]] = {
 
 
 def validate_blocks(blocks: list[dict[str, Any]]) -> list[dict[str, Any]]:
-
-
-
+    """
     Validate a list of blocks using database-driven block types and Pydantic models.
 
     Returns validated and sanitized blocks or raises DRF ValidationError.
-
-
-
+    """
     if not isinstance(blocks, list):
 
         raise DRFValidationError(
@@ -319,8 +315,8 @@ def validate_blocks(blocks: list[dict[str, Any]]) -> list[dict[str, Any]]:
             }
 
     except Exception:
-
         # Database not ready or table doesn't exist, continue with static validation
+        pass
 
 
 
@@ -339,24 +335,20 @@ def validate_blocks(blocks: list[dict[str, Any]]) -> list[dict[str, Any]]:
     for index, block_data in enumerate(sanitized_blocks):
 
         if not isinstance(block_data, dict):
-
             errors.append(
-
                 {"path": f"blocks[{index}]", "msg": "Block must be an object"}
-
             )
+            continue
 
 
 
         block_type = block_data.get("type")
 
         if not block_type:
-
             errors.append(
-
                 {"path": f"blocks[{index}].type", "msg": "Block type is required"}
-
             )
+            continue
 
 
 
@@ -367,18 +359,13 @@ def validate_blocks(blocks: list[dict[str, Any]]) -> list[dict[str, Any]]:
             # Fallback to hardcoded models for backwards compatibility
 
             if block_type not in BLOCK_MODELS:
-
                 errors.append(
-
                     {
-
                         "path": f"blocks[{index}].type",
-
                         "msg": f"Unknown block type: {block_type}",
-
                     }
-
                 )
+                continue
 
 
 
@@ -415,17 +402,11 @@ def validate_blocks(blocks: list[dict[str, Any]]) -> list[dict[str, Any]]:
                         # Re-path nested errors
 
                         for error in nested_error.detail.get("errors", []):
-
                             errors.append(
-
                                 {
-
                                     "path": f"blocks[{index}].{error['path']}",
-
                                     "msg": error["msg"],
-
                                 }
-
                             )
 
 
@@ -437,11 +418,8 @@ def validate_blocks(blocks: list[dict[str, Any]]) -> list[dict[str, Any]]:
                 for error in e.errors():
 
                     field_path = ".".join([str(loc) for loc in error["loc"]])
-
                     errors.append(
-
                         {"path": f"blocks[{index}].{field_path}", "msg": error["msg"]}
-
                     )
 
 
@@ -463,10 +441,9 @@ def validate_blocks(blocks: list[dict[str, Any]]) -> list[dict[str, Any]]:
             db_block_type = db_block_types[block_type]
 
             if db_block_type.schema:
-
                 # TODO: Add JSON schema validation here if needed
-
                 # For now, we trust the frontend to send valid data
+                pass
 
 
 

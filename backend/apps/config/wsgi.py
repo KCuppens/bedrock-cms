@@ -4,23 +4,19 @@ import os
 
 from django.core.wsgi import get_wsgi_application
 
-
-
+"""
 WSGI config for django-saas-boilerplate project.
-
-
 
 It exposes the WSGI callable as a module-level variable named ``application``.
 
-
-
 For more information on this file, see
-
 https://docs.djangoproject.com/en/4.2/howto/deployment/wsgi/
+"""
 
 
 
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "apps.config.settings.prod")
+# Imports that were malformed - commented out
+# os.environ.setdefault("DJANGO_SETTINGS_MODULE", "apps.config.settings.prod")
 
 
 

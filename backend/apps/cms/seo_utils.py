@@ -33,8 +33,7 @@ def deep_merge_dicts(
     for override in overrides:
 
         if not override:
-
-
+            continue
 
         for key, value in override.items():
 
@@ -73,15 +72,11 @@ def get_best_matching_seo_default(path: str, locale: Locale) -> dict | None:
 
 
 def resolve_seo(page: Page) -> dict[str, Any]:
-
-
-
+    """
     Resolve final SEO for a page by merging: Global → Section → Page
 
     Drafts get forced noindex.
-
-
-
+    """
     locale = page.locale
 
 
@@ -231,15 +226,10 @@ def generate_hreflang_alternates(
         if related_page.locale:
 
             alternates.append(
-
                 {
-
                     "hreflang": related_page.locale.code,  # type: ignore[attr-defined]
-
                     "href": f"{base_url.rstrip('/')}{related_page.path}",
-
                 }
-
             )
 
 

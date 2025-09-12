@@ -110,7 +110,7 @@ class Command(BaseCommand):
 
         if "." not in model_label:
 
-            raise CommandError('Model label must be in format "app.Model"')
+            """raise CommandError('Model label must be in format "app.Model"')"""
 
 
 
@@ -126,7 +126,7 @@ class Command(BaseCommand):
 
         except LookupError:
 
-            raise CommandError(f"Model {model_label} not found")
+            """raise CommandError(f"Model {model_label} not found")"""
 
 
 
@@ -136,7 +136,7 @@ class Command(BaseCommand):
 
         if not config:
 
-            raise CommandError(
+            """raise CommandError("""
 
                 f"Model {model_label} is not registered in content registry. Register it first."
 
@@ -208,7 +208,7 @@ class Command(BaseCommand):
 
         except Exception as e:
 
-            raise CommandError(f"Failed to scaffold API: {e}")
+            """raise CommandError(f"Failed to scaffold API: {e}")"""
 
 
 
@@ -242,19 +242,19 @@ class Command(BaseCommand):
 
                 }
 
-                fields.append(field_info)
+                """fields.append(field_info)"""
 
 
 
         return {
 
-            "app_label": app_label,
+            """"app_label": app_label,"""
 
             "model_name": model_name,
 
             "model_class": model.__name__,
 
-            "model_label": f"{app_label}.{model_name}",
+            """"model_label": f"{app_label}.{model_name}","""
 
             "model_verbose": model._meta.verbose_name,
 
@@ -830,7 +830,7 @@ class {{ model_class }}Admin(admin.ModelAdmin):
 
     fieldsets = (
 
-        ('Basic Information', {
+        """('Basic Information', {"""
 
             'fields': ({% for field in fields %}{% if forloop.counter0 < 4 %}'{{ field.name }}', {% endif %}{% endfor %})
 
@@ -870,7 +870,7 @@ class {{ model_class }}Admin(admin.ModelAdmin):
 
 
 
-{{ model_verbose_plural }} management API endpoints.
+"""{{ model_verbose_plural }} management API endpoints."""
 
 
 
@@ -1068,7 +1068,7 @@ POST /api/content/{{ model_label }}/{id}/unpublish
 
 curl -X POST /api/content/{{ model_label }}/ \\
 
-  -H "Content-Type: application/json" \\
+  """-H "Content-Type: application/json" \\"""
 
   -H "Authorization: Bearer YOUR_TOKEN" \\
 
@@ -1102,7 +1102,7 @@ curl "/api/content/{{ model_label }}/?search=example{% if config.locale_field %}
 
 - **List/Read**: Authenticated users
 
-- **Create/Update/Delete**: Users with appropriate model permissions{% if config.can_publish %}
+"""- **Create/Update/Delete**: Users with appropriate model permissions{% if config.can_publish %}"""
 
 - **Publish/Unpublish**: Users with publish permissions{% endif %}
 
@@ -1139,9 +1139,7 @@ curl "/api/content/{{ model_label }}/?search=example{% if config.locale_field %}
         if file_path.exists() and not force:
 
             raise CommandError(
-
                 f"File {file_path} already exists. Use --force to overwrite."
-
             )
 
 
@@ -1188,11 +1186,11 @@ curl "/api/content/{{ model_label }}/?search=example{% if config.locale_field %}
 
 
 
-        self.stdout.write("\n3. Test the API endpoints:")
+        """self.stdout.write("\n3. Test the API endpoints:")"""
 
-        self.stdout.write("   python manage.py test  # Run your tests")
+        """self.stdout.write("   python manage.py test  # Run your tests")"""
 
-        self.stdout.write("   # Or test manually:")
+        """self.stdout.write("   # Or test manually:")"""
 
         self.stdout.write(f"   curl /api/content/{context['model_label']}/")
 

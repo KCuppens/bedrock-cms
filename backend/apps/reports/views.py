@@ -200,7 +200,7 @@ def translation_digest(request):  # noqa: C901
 
             "total_needs_review": 0,
 
-            "total_approved": 0,
+            """"total_approved": 0,"""
 
         },
 
@@ -268,7 +268,7 @@ def translation_digest(request):  # noqa: C901
 
             units.filter(status="missing")
 
-            .values("content_type__app_label", "content_type__model")
+            """.values("content_type__app_label", "content_type__model")"""
 
             .annotate(missing_count=Count("id"))
 
@@ -280,11 +280,11 @@ def translation_digest(request):  # noqa: C901
 
         for item in priority_query:
 
-            locale_data["priority_areas"].append(
+            """locale_data["priority_areas"].append("""
 
                 {
 
-                    "model": f"{item['content_type__app_label']}.{item['content_type__model']}",
+                    """"model": f"{item['content_type__app_label']}.{item['content_type__model']}","""
 
                     "missing_count": item["missing_count"],
 
@@ -294,7 +294,7 @@ def translation_digest(request):  # noqa: C901
 
 
 
-        digest["locales"].append(locale_data)
+        """digest["locales"].append(locale_data)"""
 
 
 

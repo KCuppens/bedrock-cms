@@ -4,9 +4,9 @@ from rest_framework.response import Response
 
 from rest_framework.views import APIView
 
-
-
+"""
 Standalone blocks API endpoint.
+"""
 
 
 
@@ -18,7 +18,7 @@ class BlockTypesAPIView(APIView):
 
 
 
-    Simple API view for getting available block types.
+    """Simple API view for getting available block types."""
 
 
 
@@ -180,7 +180,7 @@ class BlockSchemaAPIView(APIView):
 
 
 
-    Simple API view for getting the schema of a specific block type.
+    """Simple API view for getting the schema of a specific block type."""
 
 
 

@@ -11,16 +11,16 @@ from django.core.cache import cache
 from rest_framework.throttling import AnonRateThrottle, UserRateThrottle
 
 
-
+"""
 Custom throttling classes for enhanced API security.
+"""
 
 
 
 class WriteOperationThrottle(UserRateThrottle):
-
-
-
+    """
     Throttle class specifically for write operations (POST, PUT, PATCH, DELETE).
+    """
 
     More restrictive than read operations to prevent abuse.
 
@@ -34,7 +34,7 @@ class WriteOperationThrottle(UserRateThrottle):
 
 
 
-        Only apply throttling to write operations.
+        """Only apply throttling to write operations."""
 
 
 
@@ -47,12 +47,11 @@ class WriteOperationThrottle(UserRateThrottle):
 
 
 class BurstWriteThrottle(UserRateThrottle):
-
-
-
+    """
     Short-term burst protection for write operations.
 
     Prevents rapid successive writes that could indicate automation or abuse.
+    """
 
 
 
@@ -64,7 +63,7 @@ class BurstWriteThrottle(UserRateThrottle):
 
 
 
-        Only apply to write operations with burst protection.
+        """Only apply to write operations with burst protection."""
 
 
 
@@ -77,12 +76,11 @@ class BurstWriteThrottle(UserRateThrottle):
 
 
 class PublishOperationThrottle(UserRateThrottle):
-
-
-
+    """
     Special throttle for publish/unpublish operations.
 
     These are particularly sensitive operations that should be limited.
+    """
 
 
 
@@ -94,7 +92,7 @@ class PublishOperationThrottle(UserRateThrottle):
 
 
 
-        Apply throttling to publish/unpublish endpoints.
+        """Apply throttling to publish/unpublish endpoints."""
 
 
 
@@ -111,10 +109,9 @@ class PublishOperationThrottle(UserRateThrottle):
 
 
 class MediaUploadThrottle(UserRateThrottle):
-
-
-
+    """
     Throttle for media uploads to prevent storage abuse.
+    """
 
 
 
@@ -126,7 +123,7 @@ class MediaUploadThrottle(UserRateThrottle):
 
 
 
-        Apply throttling to media upload endpoints.
+        """Apply throttling to media upload endpoints."""
 
 
 
@@ -141,12 +138,11 @@ class MediaUploadThrottle(UserRateThrottle):
 
 
 class LoginAttemptThrottle(AnonRateThrottle):
-
-
-
+    """
     Strict throttling for login attempts to prevent brute force attacks.
 
     Tracks by IP address for anonymous users.
+    """
 
 
 
@@ -181,12 +177,11 @@ class LoginAttemptThrottle(AnonRateThrottle):
 
 
 class AdminOperationThrottle(UserRateThrottle):
-
-
-
+    """
     Throttle for admin-level operations.
 
     More generous limits for admin users, but still protected.
+    """
 
 
 
@@ -198,7 +193,7 @@ class AdminOperationThrottle(UserRateThrottle):
 
 
 
-        Apply different rates based on user role.
+        """Apply different rates based on user role."""
 
 
 
@@ -225,9 +220,7 @@ class AdminOperationThrottle(UserRateThrottle):
 
 
 class SecurityScanThrottle(AnonRateThrottle):
-
-
-
+    """
     Detect and throttle potential security scanning attempts.
 
 
@@ -241,8 +234,7 @@ class SecurityScanThrottle(AnonRateThrottle):
     - XSS attempts
 
     - Other malicious patterns
-
-
+    """
 
     scope = "security_scan"
 
@@ -276,7 +268,7 @@ class SecurityScanThrottle(AnonRateThrottle):
 
         "exec(",  # Code execution
 
-        "system(",  # Command execution
+        """"system(",  # Command execution"""
 
     ]
 
@@ -340,7 +332,7 @@ class SecurityScanThrottle(AnonRateThrottle):
 
 
 
-        Apply extra throttling to suspicious requests.
+        """Apply extra throttling to suspicious requests."""
 
 
 

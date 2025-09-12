@@ -405,9 +405,7 @@ class UserManagementViewSet(viewsets.ModelViewSet):
                     If you already have an account, you can sign in at:
 
                     {settings.FRONTEND_URL}/sign-in
-
-
-
+                    """,
                     from_email=settings.DEFAULT_FROM_EMAIL,
 
                     recipient_list=[email],
@@ -473,6 +471,7 @@ class UserManagementViewSet(viewsets.ModelViewSet):
                         user.groups.add(group)
 
                     except Group.DoesNotExist:
+                        pass
 
 
 
@@ -487,6 +486,7 @@ class UserManagementViewSet(viewsets.ModelViewSet):
                     user.groups.add(group)
 
                 except Group.DoesNotExist:
+                    pass
 
 
 
@@ -566,8 +566,7 @@ class UserManagementViewSet(viewsets.ModelViewSet):
                 user.groups.add(group)
 
             except Group.DoesNotExist:
-
-
+                pass
 
         return Response(
 
@@ -766,6 +765,7 @@ class RoleViewSet(viewsets.ModelViewSet):
                     except Locale.DoesNotExist:
 
                         # Skip invalid locale IDs
+                        pass
 
 
 
@@ -838,6 +838,7 @@ class RoleViewSet(viewsets.ModelViewSet):
                 except Locale.DoesNotExist:
 
                     # Skip invalid locale IDs
+                    pass
 
 
 
@@ -914,6 +915,7 @@ class RoleViewSet(viewsets.ModelViewSet):
                     role.permissions.add(permission)
 
                 except Permission.DoesNotExist:
+                    pass
 
 
 

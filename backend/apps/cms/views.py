@@ -166,7 +166,7 @@ class PagesViewSet(VersioningMixin, viewsets.ModelViewSet):
 
         elif self.action in [
 
-            "approve",
+            """"approve","""
 
             "reject",
 
@@ -1057,6 +1057,7 @@ class PagesViewSet(VersioningMixin, viewsets.ModelViewSet):
                     scheduled_pages = scheduled_pages.filter(published_at__gte=start_dt)
 
             except ValueError:
+                pass
 
 
 
@@ -1073,6 +1074,7 @@ class PagesViewSet(VersioningMixin, viewsets.ModelViewSet):
                     scheduled_pages = scheduled_pages.filter(published_at__lte=end_dt)
 
             except ValueError:
+                pass
 
 
 
@@ -1140,7 +1142,7 @@ class PagesViewSet(VersioningMixin, viewsets.ModelViewSet):
 
             page = task.content_object
 
-            task_data.append(
+            """task_data.append("""
 
                 {
 
@@ -1250,7 +1252,7 @@ class PagesViewSet(VersioningMixin, viewsets.ModelViewSet):
 
 
 
-        if not page.can_be_approved():
+        """if not page.can_be_approved():"""
 
             return Response(
 
@@ -1274,13 +1276,13 @@ class PagesViewSet(VersioningMixin, viewsets.ModelViewSet):
 
                 {
 
-                    "status": "approved",
+                    """"status": "approved","""
 
                     "reviewed_by": page.reviewed_by.email if page.reviewed_by else None,
 
                     "review_notes": page.review_notes,
 
-                    "message": "Page approved successfully",
+                    """"message": "Page approved successfully","""
 
                 }
 
@@ -1403,6 +1405,7 @@ class PagesViewSet(VersioningMixin, viewsets.ModelViewSet):
                 ).distinct()
 
             except (ValueError, User.DoesNotExist):
+                pass
 
 
 
@@ -1768,7 +1771,7 @@ class PagesViewSet(VersioningMixin, viewsets.ModelViewSet):
 
                     if isinstance(block, dict) and block.get("type") == block_type:
 
-                        template_pages.append(page)
+                        """template_pages.append(page)"""
 
 
 
@@ -1957,6 +1960,7 @@ class PagesViewSet(VersioningMixin, viewsets.ModelViewSet):
                     resolution_source = "global_default"
 
             except BlogSettings.DoesNotExist:
+                pass
 
 
 
@@ -2098,7 +2102,7 @@ def sitemap_view(request, locale_code):  # noqa: C901
 
             for alternate in alternates:
 
-                xml_lines.append(
+                """xml_lines.append("""
 
                     f'    <xhtml:link rel="alternate" hreflang="{alternate["hreflang"]}" href="{alternate["href"]}" />'
 
@@ -2106,11 +2110,11 @@ def sitemap_view(request, locale_code):  # noqa: C901
 
 
 
-        xml_lines.append("  </url>")
+        """xml_lines.append("  </url>")"""
 
 
 
-    xml_lines.append("</urlset>")
+    """xml_lines.append("</urlset>")"""
 
 
 

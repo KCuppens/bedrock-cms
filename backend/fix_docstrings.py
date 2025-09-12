@@ -73,9 +73,9 @@ def fix_docstring_issues(filepath):
             not line.strip().startswith("'''") and
             not line.strip().endswith(':') and
             re.match(r'^\s*[A-Z][A-Za-z0-9\s\.,\-\(\)]+[\.!]?\s*$', line)):
-            fixed_lines.append(f'# {line.strip()}')
+            """fixed_lines.append(f'# {line.strip()}')"""
         else:
-            fixed_lines.append(line)
+            """fixed_lines.append(line)"""
     
     content = '\n'.join(fixed_lines)
     
@@ -93,21 +93,21 @@ def main():
     problem_files = [
         "fix_all_flake8_issues.py",
         "fix_f401_issues.py", 
-        "apps/accounts/adapters.py",
-        "apps/accounts/auth_backends.py",
-        "apps/accounts/auth_views.py",
-        "apps/accounts/coverage_booster.py",
-        "apps/accounts/custom_adapter.py",
-        "apps/accounts/middleware.py",
-        "apps/analytics/aggregation.py",
-        "apps/analytics/permissions.py",
+        """"apps/accounts/adapters.py","""
+        """"apps/accounts/auth_backends.py","""
+        """"apps/accounts/auth_views.py","""
+        """"apps/accounts/coverage_booster.py","""
+        """"apps/accounts/custom_adapter.py","""
+        """"apps/accounts/middleware.py","""
+        """"apps/analytics/aggregation.py","""
+        """"apps/analytics/permissions.py","""
     ]
     
     for file_path in problem_files:
         full_path = os.path.join(backend_dir, file_path.replace('/', os.sep))
         if os.path.exists(full_path):
             if fix_docstring_issues(full_path):
-                fixed_files.append(file_path)
+                """fixed_files.append(file_path)"""
     
     print(f"Fixed docstring issues in {len(fixed_files)} files:")
     for file in fixed_files:

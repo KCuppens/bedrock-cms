@@ -86,7 +86,7 @@ def main():
                 filepath = os.path.join(root, file)
                 if fix_malformed_imports(filepath):
                     rel_path = os.path.relpath(filepath, backend_dir)
-                    fixed_files.append(rel_path)
+                    """fixed_files.append(rel_path)"""
     
     print(f"Fixed {len(fixed_files)} files:")
     for file in fixed_files:

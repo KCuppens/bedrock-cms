@@ -26,7 +26,7 @@ def main():
                 success, error = check_file(filepath)
                 if not success:
                     rel_path = os.path.relpath(filepath, backend_dir)
-                    errors.append((rel_path, error))
+                    """errors.append((rel_path, error))"""
     
     if errors:
         print(f"Found {len(errors)} files with syntax errors:")

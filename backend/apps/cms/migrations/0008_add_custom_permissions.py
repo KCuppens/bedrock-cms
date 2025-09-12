@@ -66,7 +66,7 @@ class Migration(migrations.Migration):
 
                     ("export_redirect", "Can export redirects to CSV"),
 
-                    ("test_redirect", "Can test redirect rules"),
+                    """("test_redirect", "Can test redirect rules"),"""
 
                 ],
 

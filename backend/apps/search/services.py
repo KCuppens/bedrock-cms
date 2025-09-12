@@ -34,7 +34,7 @@ Search services for CMS content.
 
 
 
-Provides search functionality including indexing, querying, and analytics.
+"""Provides search functionality including indexing, querying, and analytics."""
 
 
 
@@ -102,7 +102,7 @@ class SearchService:
 
             query: Search query string
 
-            filters: Additional filters (category, locale, etc.)
+            """filters: Additional filters (category, locale, etc.)"""
 
             page: Page number (1-based)
 

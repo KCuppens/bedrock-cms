@@ -50,6 +50,8 @@ from apps.cms import versioning
 
 from apps.core.validators import JSONSizeValidator
 
+from apps.cms.models import validate_json_structure
+
 
 
 User = get_user_model()
@@ -581,9 +583,7 @@ class BlogPost(models.Model, RBACMixin):
                         current_length += len(text_to_add)
 
                         if current_length > max_text_length:
-
-
-
+                            break
                         text_parts.append(text_to_add)
 
 
@@ -829,15 +829,10 @@ class BlogSettings(models.Model):
 
 
     def get_display_options(self, category=None, post=None):  # noqa: C901
-
-
-
-        Get effective display options with precedence:
+        """Get effective display options with precedence:
 
         post override -> category override -> global settings
-
-
-
+        """
         options = {
 
             "show_toc": self.show_toc,
@@ -875,15 +870,10 @@ class BlogSettings(models.Model):
 
 
     def get_presentation_page(self, category=None, post=None):  # noqa: C901
-
-
-
-        Get the effective presentation page with precedence:
+        """Get the effective presentation page with precedence:
 
         post override -> category override -> global default
-
-
-
+        """
         # Post override (could be extended later)
 
         if post and hasattr(post, "presentation_page") and post.presentation_page:

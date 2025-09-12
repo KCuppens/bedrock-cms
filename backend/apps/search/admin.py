@@ -10,7 +10,7 @@ from .models import SearchIndex, SearchQuery, SearchSuggestion
 
 
 
-Admin interface for search functionality.
+"""Admin interface for search functionality."""
 
 
 
@@ -84,7 +84,7 @@ class SearchIndexAdmin(admin.ModelAdmin):
 
         (
 
-            "Basic Information",
+            """"Basic Information","""
 
             {"fields": ("id", "content_type", "object_id", "content_object_link")},
 
@@ -164,7 +164,7 @@ class SearchIndexAdmin(admin.ModelAdmin):
 
         """Display content type in a readable format."""
 
-        return f"{obj.content_type.app_label}.{obj.content_type.model}"
+        """return f"{obj.content_type.app_label}.{obj.content_type.model}""""
 
 
 
@@ -188,7 +188,7 @@ class SearchIndexAdmin(admin.ModelAdmin):
 
             url = reverse(
 
-                f"admin:{obj.content_type.app_label}_{obj.content_type.model}_change",
+                """f"admin:{obj.content_type.app_label}_{obj.content_type.model}_change","""
 
                 args=[obj.object_id],
 
@@ -370,7 +370,7 @@ class SearchSuggestionAdmin(admin.ModelAdmin):
 
         ("Categorization", {"fields": ("categories", "locale_codes")}),
 
-        ("Management", {"fields": ("is_active", "is_promoted")}),
+        """("Management", {"fields": ("is_active", "is_promoted")}),"""
 
         (
 

@@ -1,3 +1,5 @@
+"""Analytics aggregation functions for calculating metrics and summaries."""
+
 from datetime import date, datetime, timedelta
 
 
@@ -12,7 +14,10 @@ from django.utils import timezone
 
 
 
-"""Analytics aggregation functions for calculating metrics and summaries."""
+# Missing imports that are referenced in the code
+from .models import (
+    AnalyticsSummary, Assessment, ContentMetrics, PageView, Risk, Threat, UserActivity
+)
 
 
 
@@ -32,19 +37,15 @@ class AnalyticsAggregator:
 
 
 
-        """Calculate traffic trends over a specified period."""
-
+        """Calculate traffic trends over a specified period.
+        
         Args:
-
             days: Number of days to look back
-
             period: Aggregation period ('daily', 'weekly', 'monthly', 'hourly')
 
-
-
         Returns:
-
-# List of dictionaries containing trend data
+            list[dict]: List of dictionaries containing trend data
+        """
 
 
 
@@ -118,21 +119,16 @@ class AnalyticsAggregator:
 
 
 
-        """Calculate bounce rate for a given period."""
-
+        """Calculate bounce rate for a given period.
+        
         Args:
-
             start_date: Start date for calculation
-
             end_date: End date for calculation
-
             page_id: Optional page ID to filter by
 
-
-
         Returns:
-
-# Bounce rate as percentage
+            float: Bounce rate as percentage
+        """
 
 
 
@@ -188,21 +184,16 @@ class AnalyticsAggregator:
 
 
 
-        """Get top performing content by views and engagement."""
-
+        """Get top performing content by views and engagement.
+        
         Args:
-
             days: Number of days to look back
-
             limit: Maximum number of results to return
-
             content_type: Optional content type filter
 
-
-
         Returns:
-
-# List of top performing content with metrics
+            list[dict]: List of top performing content with metrics
+        """
 
 
 
@@ -252,19 +243,15 @@ class AnalyticsAggregator:
 
 
 
-        """Calculate user engagement metrics."""
-
+        """Calculate user engagement metrics.
+        
         Args:
-
             user_id: Optional specific user ID
-
             days: Number of days to look back
 
-
-
         Returns:
-
-# Dictionary containing engagement metrics
+            dict: Dictionary containing engagement metrics
+        """
 
 
 
@@ -350,21 +337,16 @@ class AnalyticsAggregator:
 
 
 
-        """Calculate a comprehensive performance score for content."""
-
+        """Calculate a comprehensive performance score for content.
+        
         Args:
-
             content_type_id: ContentType ID
-
             object_id: Object ID
-
             days: Number of days to analyze
 
-
-
         Returns:
-
-# Dictionary with performance metrics and score
+            dict: Dictionary with performance metrics and score
+        """
 
 
 
@@ -494,17 +476,14 @@ class AnalyticsAggregator:
 
 
 
-        """Get security overview including threats, risks, and assessments."""
-
+        """Get security overview including threats, risks, and assessments.
+        
         Args:
-
             days: Number of days to analyze
 
-
-
         Returns:
-
-# Dictionary with security metrics
+            dict: Dictionary with security metrics
+        """
 
 
 
@@ -660,21 +639,16 @@ class AnalyticsAggregator:
 
 
 
-        """Calculate an overall security score based on various metrics."""
-
+        """Calculate an overall security score based on various metrics.
+        
         Args:
-
             threat_stats: Threat statistics
-
             risk_stats: Risk statistics
-
             assessment_stats: Assessment statistics
 
-
-
         Returns:
-
-# Security score (0-100)
+            float: Security score (0-100)
+        """
 
 
 
@@ -734,17 +708,14 @@ class AnalyticsAggregator:
 
 
 
-        """Generate or update daily analytics summary."""
-
+        """Generate or update daily analytics summary.
+        
         Args:
-
             target_date: Date to generate summary for
 
-
-
         Returns:
-
-# AnalyticsSummary instance
+            AnalyticsSummary: AnalyticsSummary instance
+        """
 
 
 

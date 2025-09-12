@@ -29,26 +29,11 @@ from apps.core.permissions import IsOwnerOrAdmin
 from .models import FileUpload
 
 from .serializers import (
-
-    FileService,
-
     FileUploadCreateSerializer,
-
     FileUploadSerializer,
-
-    Q,
-
-    SignedUrlSerializer,
-
-    .services,
-
-    django.db.models,
-
-    os,
-
-    uuid,
-
+    SignedUrlSerializer
 )
+from .services import FileService
 
 
 

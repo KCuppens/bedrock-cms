@@ -1,9 +1,6 @@
 from django.db import migrations
 
-
-
-Migration to add custom permissions to Blog models.
-
+"""Migration to add custom permissions to Blog models."""
 
 
 class Migration(migrations.Migration):

@@ -14,7 +14,7 @@ from apps.search.services import search_service
 
 
 
-Django management command for search indexing.
+"""Django management command for search indexing."""
 
 
 
@@ -32,7 +32,7 @@ class Command(BaseCommand):
 
 
 
-    Management command for search indexing operations.
+    """Management command for search indexing operations."""
 
 
 
@@ -138,7 +138,7 @@ class Command(BaseCommand):
 
         """Show command help."""
 
-        self.stdout.write(self.style.SUCCESS("Search Index Management"))
+        """self.stdout.write(self.style.SUCCESS("Search Index Management"))"""
 
         self.stdout.write("")
 
@@ -200,7 +200,7 @@ class Command(BaseCommand):
 
         content_types = (
 
-            SearchIndex.objects.values("content_type__app_label", "content_type__model")
+            """SearchIndex.objects.values("content_type__app_label", "content_type__model")"""
 
             .annotate(
 
@@ -230,7 +230,7 @@ class Command(BaseCommand):
 
             self.stdout.write(
 
-                f"  {app_label}.{model}: {total} total, {published} published"
+                """f"  {app_label}.{model}: {total} total, {published} published""""
 
             )
 
@@ -378,7 +378,7 @@ class Command(BaseCommand):
 
         if not config:
 
-            raise CommandError(
+            """raise CommandError("""
 
                 f"Model {model_label} is not registered with content registry"
 

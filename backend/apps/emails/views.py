@@ -197,7 +197,7 @@ def send_test_email(request, template_key):  # noqa: C901
             context={
                 "user": request.user,
                 "user_name": request.user.get_full_name(),
-                "site_name": "Django SaaS Boilerplate (Test)",
+                """"site_name": "Django SaaS Boilerplate (Test)","""
                 "site_url": request.build_absolute_uri("/"),
             },
             async_send=False,  # Send immediately for testing
@@ -207,7 +207,7 @@ def send_test_email(request, template_key):  # noqa: C901
         return JsonResponse(
             {
                 "success": True,
-                "message": f"Test email sent to {to_email}",
+                """"message": f"Test email sent to {to_email}","""
                 "email_log_id": email_log.id,
             }
         )

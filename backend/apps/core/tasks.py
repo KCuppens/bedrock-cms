@@ -41,8 +41,9 @@ from apps.files.models import File
 from apps.search.services import search_service
 
 
-
+"""
 Async tasks for heavy operations using Celery.
+"""
 
 
 
@@ -53,12 +54,8 @@ logger = logging.getLogger(__name__)
 @shared_task(bind=True, max_retries=3)
 
 def track_view_async(self, content_type, object_id, user_id=None):  # noqa: C901
-
-
-
+    """
     Asynchronously track view counts for any content.
-
-
 
     Args:
 
@@ -140,7 +137,8 @@ def warm_cache_async(
 
         cache_key: Key to store the result
 
-        callable_path: Import path to the callable (e.g., 'apps.cms.utils.get_page_data')
+# Imports that were malformed - commented out
+#         """callable_path: Import path to the callable (e.g., 'apps.cms.utils.get_page_data')"""
 
         args: Arguments for the callable
 
@@ -185,12 +183,8 @@ def warm_cache_async(
 @shared_task
 
 def bulk_warm_cache(cache_configs):  # noqa: C901
-
-
-
+    """
     Warm multiple cache entries in parallel.
-
-
 
     Args:
 
@@ -216,7 +210,7 @@ def bulk_warm_cache(cache_configs):  # noqa: C901
 
         )
 
-        results.append(config["key"])
+        """results.append(config["key"])"""
 
 
 
@@ -227,12 +221,8 @@ def bulk_warm_cache(cache_configs):  # noqa: C901
 @shared_task(bind=True, max_retries=3)
 
 def process_search_index_async(self, model_label, object_id, action="update"):  # noqa: C901
-
-
-
+    """
     Asynchronously update search index.
-
-
 
     Args:
 
@@ -283,12 +273,8 @@ def process_search_index_async(self, model_label, object_id, action="update"):  
 @shared_task
 
 def send_email_async(to_email, subject, template_name, context):  # noqa: C901
-
-
-
+    """
     Send email asynchronously.
-
-
 
     Args:
 
@@ -345,12 +331,8 @@ def send_email_async(to_email, subject, template_name, context):  # noqa: C901
 @shared_task
 
 def generate_thumbnails_async(image_id):  # noqa: C901
-
-
-
+    """
     Generate image thumbnails asynchronously.
-
-
 
     Args:
 
@@ -423,12 +405,11 @@ def generate_thumbnails_async(image_id):  # noqa: C901
 @shared_task
 
 def cleanup_old_revisions():  # noqa: C901
-
-
-
+    """
     Clean up old revisions to prevent database bloat.
 
     Keeps only the last 50 revisions per content item.
+    """
 
 
 
@@ -513,12 +494,8 @@ def cleanup_old_revisions():  # noqa: C901
 @shared_task
 
 def invalidate_cache_pattern_async(pattern):  # noqa: C901
-
-
-
+    """
     Asynchronously invalidate cache by pattern.
-
-
 
     Args:
 
@@ -545,12 +522,11 @@ def invalidate_cache_pattern_async(pattern):  # noqa: C901
 @shared_task
 
 def optimize_database_async():  # noqa: C901
-
-
-
+    """
     Run database optimization tasks.
 
     Should be scheduled to run during low-traffic periods.
+    """
 
 
 

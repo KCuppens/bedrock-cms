@@ -97,7 +97,7 @@ class Migration(migrations.Migration):
                 choices=[
                     ("summary", "Summary"),
                     ("summary_large_image", "Summary with Large Image"),
-                    ("app", "App"),
+                    """("app", "App"),"""
                     ("player", "Player"),
                 ],
                 default="summary_large_image",

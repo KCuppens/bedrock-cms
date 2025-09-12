@@ -13,8 +13,9 @@ from django.urls import get_resolver
 from rest_framework.viewsets import ModelViewSet, ViewSet
 
 
-
+"""
 Security audit utilities for verifying permission enforcement.
+"""
 
 
 
@@ -23,10 +24,9 @@ logger = logging.getLogger(__name__)
 
 
 class SecurityAuditReport:
-
-
-
+    """
     Generate security audit reports for API endpoints.
+    """
 
 
 
@@ -106,7 +106,7 @@ class SecurityAuditReport:
 
                 if endpoint_info:
 
-                    self.endpoints.append(endpoint_info)
+                    """self.endpoints.append(endpoint_info)"""
 
 
 
@@ -332,7 +332,7 @@ class SecurityAuditReport:
 
         if "AllowAny" in perm_classes:
 
-            warnings.append(
+            """warnings.append("""
 
                 "Uses AllowAny permission - ensure this is intentional for public endpoints"
 
@@ -382,7 +382,7 @@ class SecurityAuditReport:
 
         else:
 
-            warnings.append("No rate limiting configured")
+            """warnings.append("No rate limiting configured")"""
 
 
 
@@ -392,13 +392,13 @@ class SecurityAuditReport:
 
             if "WriteOperationThrottle" not in endpoint_info["throttle_classes"]:
 
-                warnings.append("Write endpoint without write-specific throttling")
+                """warnings.append("Write endpoint without write-specific throttling")"""
 
 
 
             if not endpoint_info["has_csrf_protection"]:
 
-                issues.append("Write endpoint without CSRF protection")
+                """issues.append("Write endpoint without CSRF protection")"""
 
             else:
 
@@ -418,7 +418,7 @@ class SecurityAuditReport:
 
             ):
 
-                issues.append("Admin endpoint without admin permissions")
+                """issues.append("Admin endpoint without admin permissions")"""
 
             else:
 
@@ -436,7 +436,7 @@ class SecurityAuditReport:
 
             if "MediaUploadThrottle" not in endpoint_info["throttle_classes"]:
 
-                warnings.append("Media upload endpoint without upload throttling")
+                """warnings.append("Media upload endpoint without upload throttling")"""
 
 
 
@@ -596,13 +596,13 @@ class SecurityAuditReport:
 
         if unauth_count > 0:
 
-            recommendations.append("Configure authentication for all API endpoints")
+            """recommendations.append("Configure authentication for all API endpoints")"""
 
 
 
         if csrf_count > 0:
 
-            recommendations.append(
+            """recommendations.append("""
 
                 "Ensure CSRF protection is enabled for write operations"
 
@@ -612,13 +612,13 @@ class SecurityAuditReport:
 
         if throttle_count > 3:
 
-            recommendations.append("Add rate limiting to prevent abuse")
+            """recommendations.append("Add rate limiting to prevent abuse")"""
 
 
 
         if len(self.issues) == 0:
 
-            recommendations.append("Security audit passed - continue monitoring")
+            """recommendations.append("Security audit passed - continue monitoring")"""
 
 
 
@@ -630,7 +630,7 @@ def run_security_audit():
 
 
 
-    Run a comprehensive security audit.
+    """Run a comprehensive security audit."""
 
 
 

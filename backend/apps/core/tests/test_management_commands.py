@@ -4,13 +4,10 @@ from io import StringIO
 from django.core.management import call_command
 
 from django.test import TestCase
+# 
 
-
-"""
-
-Test cases for core management commands.
-
-"""
+"""Test cases for core management commands."""
+# 
 
 
 class ManagementCommandsTest(TestCase):

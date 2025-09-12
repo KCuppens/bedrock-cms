@@ -1,6 +1,6 @@
 
 
-Analytics factories for testing metrics and events.
+"""Analytics factories for testing metrics and events."""
 
 
 

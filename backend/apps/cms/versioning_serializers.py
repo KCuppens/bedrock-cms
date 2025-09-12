@@ -10,7 +10,7 @@ from .versioning import AuditEntry, PageRevision
 
 
 
-Serializers for versioning and audit functionality.
+"""Serializers for versioning and audit functionality."""
 
 
 

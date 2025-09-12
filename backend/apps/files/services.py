@@ -58,11 +58,11 @@ class FileService:
 
         "image/svg+xml": FileType.IMAGE,
 
-        "application/pdf": FileType.DOCUMENT,
+        """"application/pdf": FileType.DOCUMENT,"""
 
-        "application/msword": FileType.DOCUMENT,
+        """"application/msword": FileType.DOCUMENT,"""
 
-        "application/vnd.openxmlformats-officedocument.wordprocessingml.document": FileType.DOCUMENT,
+        """"application/vnd.openxmlformats-officedocument.wordprocessingml.document": FileType.DOCUMENT,"""
 
         "text/plain": FileType.DOCUMENT,
 
@@ -320,11 +320,11 @@ class FileService:
 
                 if content_type:
 
-                    conditions.append(["eq", "$Content-Type", content_type])
+                    """conditions.append(["eq", "$Content-Type", content_type])"""
 
                 if max_size:
 
-                    conditions.append(["content-length-range", "0", str(max_size)])
+                    """conditions.append(["content-length-range", "0", str(max_size)])"""
 
 
 
@@ -414,7 +414,7 @@ class FileService:
 
         if file.size > max_size_bytes:
 
-            errors.append(
+            """errors.append("""
 
                 f"File size ({file.size} bytes) exceeds maximum allowed ({max_size_bytes} bytes)"
 
@@ -462,7 +462,7 @@ class FileService:
 
         if file_extension not in allowed_extensions:
 
-            errors.append(f"File extension '{file_extension}' not allowed")
+            """errors.append(f"File extension '{file_extension}' not allowed")"""
 
 
 
@@ -480,7 +480,7 @@ class FileService:
 
         if mime_type not in allowed_mime_types:
 
-            warnings.append(f"MIME type '{mime_type}' may not be supported")
+            """warnings.append(f"MIME type '{mime_type}' may not be supported")"""
 
 
 
@@ -508,7 +508,7 @@ class FileService:
 
         if file_extension in dangerous_extensions:
 
-            errors.append(
+            """errors.append("""
 
                 f"File type '{file_extension}' is not allowed for security reasons"
 
@@ -580,7 +580,7 @@ class FileService:
 
                     if default_storage.exists(path):
 
-                        existing_paths.append(path)
+                        """existing_paths.append(path)"""
 
                 except Exception as e:
 

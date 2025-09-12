@@ -12,19 +12,20 @@ from apps.cms.seo_utils import generate_seo_links, resolve_seo
 
 
 
+"""
 Public-facing serializers optimized for frontend consumption.
 
 Includes resolved SEO data and minimal field exposure.
+"""
 
 
 
 class PublicPageSerializer(serializers.ModelSerializer):
-
-
-
+    """
     Optimized serializer for public page consumption.
 
     Includes resolved SEO and minimal necessary fields for performance.
+    """
 
 
 
@@ -175,12 +176,11 @@ class PublicPageSerializer(serializers.ModelSerializer):
 
 
 class PublicPageListSerializer(serializers.ModelSerializer):
-
-
-
+    """
     Lightweight serializer for page listings (navigation, search results).
 
     Excludes heavy fields like blocks and resolved SEO.
+    """
 
 
 
@@ -277,10 +277,9 @@ class PublicPageListSerializer(serializers.ModelSerializer):
 
 
 class BlockMetadataSerializer(serializers.Serializer):
-
-
-
+    """
     Serializer for block type metadata needed by the frontend.
+    """
 
 
 

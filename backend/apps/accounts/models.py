@@ -1,4 +1,4 @@
-from typing import Any
+from typing import Any, Optional
 
 
 from django.contrib.auth.models import AbstractUser, BaseUserManager
@@ -27,7 +27,7 @@ class CustomUserManager(BaseUserManager["User"]):
     """Custom user manager for email-based authentication"""
 
     def create_user(
-        self, email: str, password: str | None = None, **extra_fields: Any
+        self, email: str, password: Optional[str] = None, **extra_fields: Any
     ) -> "User":
         """Create and return a regular user with an email and password."""
 
@@ -46,7 +46,7 @@ class CustomUserManager(BaseUserManager["User"]):
         return user
 
     def create_superuser(
-        self, email: str, password: str | None = None, **extra_fields: Any
+        self, email: str, password: Optional[str] = None, **extra_fields: Any
     ) -> "User":
         """Create and return a superuser with an email and password."""
 

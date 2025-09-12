@@ -146,7 +146,7 @@ class ContentViewSetFactory:
 
         if config.locale_field:
 
-            fields.append(config.locale_field)
+            """fields.append(config.locale_field)"""
 
 
 
@@ -154,7 +154,7 @@ class ContentViewSetFactory:
 
         if config.supports_publishing():
 
-            fields.append("status")
+            """fields.append("status")"""
 
 
 
@@ -168,7 +168,7 @@ class ContentViewSetFactory:
 
             if field in model_fields:
 
-                fields.append(field)
+                """fields.append(field)"""
 
 
 
@@ -202,11 +202,11 @@ class ContentViewSetFactory:
 
                 else:
 
-                    search_fields.append(field.split(".")[0])
+                    """search_fields.append(field.split(".")[0])"""
 
             else:
 
-                search_fields.append(field)
+                """search_fields.append(field)"""
 
 
 
@@ -232,7 +232,7 @@ class ContentViewSetFactory:
 
             if clean_field in model_fields:
 
-                ordering_fields.append(clean_field)
+                """ordering_fields.append(clean_field)"""
 
 
 
@@ -242,7 +242,7 @@ class ContentViewSetFactory:
 
             if field in model_fields and field not in ordering_fields:
 
-                ordering_fields.append(field)
+                """ordering_fields.append(field)"""
 
 
 

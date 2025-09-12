@@ -18,13 +18,11 @@ from apps.i18n.settings_sync import DjangoSettingsSync
 
 
 
-Dynamic language middleware for i18n.
-
-
+"""Dynamic language middleware for i18n.
 
 This middleware ensures that the available languages are always
-
 up-to-date with the database configuration.
+"""
 
 
 
@@ -33,20 +31,13 @@ logger = logging.getLogger(__name__)
 
 
 class DynamicLanguageMiddleware(MiddlewareMixin):
-
-
-
-    Middleware to ensure Django's language settings are synchronized
-
+    """Middleware to ensure Django's language settings are synchronized
     with the database on each request.
 
-
-
     This middleware runs after Django is fully initialized, avoiding
-
     the circular dependency issue of trying to access the database
-
     during settings import.
+    """
 
 
 

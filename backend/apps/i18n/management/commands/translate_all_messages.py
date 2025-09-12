@@ -12,7 +12,7 @@ from apps.i18n.services import DeepLTranslationService
 
 
 
-Translate ALL UI messages to a target locale using DeepL.
+"""Translate ALL UI messages to a target locale using DeepL."""
 
 
 
@@ -213,6 +213,7 @@ class Command(BaseCommand):
                             )
 
                         except UiMessageTranslation.DoesNotExist:
+                            pass
 
 
 
@@ -344,11 +345,11 @@ class Command(BaseCommand):
 
 
 
-        self.stdout.write(f"\nFinal translation coverage for {target_locale.name}:")
+        """self.stdout.write(f"\nFinal translation coverage for {target_locale.name}:")"""
 
         self.stdout.write(
 
-            f"{total_translations}/{total_ui_messages} messages ({coverage:.1f}%)"
+            """f"{total_translations}/{total_ui_messages} messages ({coverage:.1f}%)""""
 
         )
 

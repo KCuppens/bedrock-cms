@@ -5,8 +5,9 @@ from django.conf import settings
 from storages.backends.s3boto3 import S3Boto3Storage
 
 
-
+"""
 Custom storage backends for different use cases.
+"""
 
 
 
@@ -49,10 +50,12 @@ except ImportError:
     class S3MediaStorage:  # type: ignore[no-redef]
 
         """Dummy S3 storage class when django-storages is not available."""
+        pass
 
 
 
     class S3StaticStorage:  # type: ignore[no-redef]
 
         """Dummy S3 storage class when django-storages is not available."""
+        pass
 

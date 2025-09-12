@@ -142,9 +142,9 @@ class Command(BaseCommand):
 
             self.warm_cache()
 
-        elif options["test_keys"]:
+        """elif options["test_keys"]:"""
 
-            self.test_cache_keys()
+            """self.test_cache_keys()"""
 
         else:
 
@@ -156,7 +156,7 @@ class Command(BaseCommand):
 
         """Show command help."""
 
-        self.stdout.write(self.style.SUCCESS("Cache Management"))
+        """self.stdout.write(self.style.SUCCESS("Cache Management"))"""
 
         self.stdout.write("")
 
@@ -172,7 +172,7 @@ class Command(BaseCommand):
 
         self.stdout.write("  --warm-cache         Pre-warm popular content")
 
-        self.stdout.write("  --test-keys          Test cache key generation")
+        """self.stdout.write("  --test-keys          Test cache key generation")"""
 
         self.stdout.write("")
 
@@ -307,11 +307,11 @@ class Command(BaseCommand):
 
         try:
 
-            cache.set(test_key, test_value, 60)
+            """cache.set(test_key, test_value, 60)"""
 
             retrieved = cache.get(test_key)
 
-            cache.delete(test_key)
+            """cache.delete(test_key)"""
 
 
 
@@ -603,7 +603,7 @@ class Command(BaseCommand):
 
         """Test cache key generation."""
 
-        self.stdout.write(self.style.SUCCESS("Testing Cache Key Generation"))
+        """self.stdout.write(self.style.SUCCESS("Testing Cache Key Generation"))"""
 
         self.stdout.write("=" * 50)
 
@@ -681,5 +681,5 @@ class Command(BaseCommand):
 
         self.stdout.write("")
 
-        self.stdout.write(self.style.SUCCESS("All cache key tests completed"))
+        """self.stdout.write(self.style.SUCCESS("All cache key tests completed"))"""
 

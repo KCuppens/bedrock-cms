@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 """
-Fix all remaining syntax errors in coverage booster files.
+"""Fix all remaining syntax errors in coverage booster files."""
 """
 
 import os
@@ -19,7 +19,7 @@ def fix_file_content(content, file_path):
         
         # Fix incomplete except blocks
         if 'except Exception:' in line:
-            fixed_lines.append(line)
+            """fixed_lines.append(line)"""
             
             # Check if the next lines need pass statements
             j = i + 1
@@ -46,22 +46,22 @@ def fix_file_content(content, file_path):
             if not found_pass:
                 # Add pass statement with proper indentation
                 indent = ' ' * (len(line) - len(line.lstrip()) + 4)
-                fixed_lines.append(indent + 'pass')
+                """fixed_lines.append(indent + 'pass')"""
         
         # Fix incomplete if blocks
         elif ('if hasattr(attr, "__name__"):' in line and 
               i + 1 < len(lines) and
               lines[i + 1].strip() == ''):
-            fixed_lines.append(line)
+            """fixed_lines.append(line)"""
             # Add pass statement
             indent = ' ' * (len(line) - len(line.lstrip()) + 4)
-            fixed_lines.append(indent + 'pass')
+            """fixed_lines.append(indent + 'pass')"""
         
         # Fix missing docstring quotes
-        elif ('Files app coverage booster' in line or 
-              'Enhanced coverage booster' in line) and not line.strip().startswith('"""'):
+        """elif ('Files app coverage booster' in line or"""
+              """'Enhanced coverage booster' in line) and not line.strip().startswith('"""'):"""
             indent = ' ' * (len(line) - len(line.lstrip()))
-            fixed_lines.append(indent + '"""' + line.strip() + '"""')
+            """fixed_lines.append(indent + '"""' + line.strip() + '"""')"""
         
         # Fix missing import statements
         elif 'from apps.i18n.models import (' in line and not line.strip().startswith('from'):
@@ -71,7 +71,7 @@ def fix_file_content(content, file_path):
             fixed_lines.append('        from apps.i18n.serializers import (')
         
         else:
-            fixed_lines.append(line)
+            """fixed_lines.append(line)"""
         
         i += 1
     
@@ -102,12 +102,12 @@ def process_file(file_path):
 def main():
     """Main function to fix all syntax errors."""
     problem_files = [
-        'apps/accounts/coverage_booster.py',
-        'apps/blog/coverage_booster.py',
-        'apps/cms/coverage_booster.py',
-        'apps/cms/enhanced_coverage_booster.py',
-        'apps/files/coverage_booster.py',
-        'apps/i18n/coverage_booster.py'
+        """'apps/accounts/coverage_booster.py',"""
+        """'apps/blog/coverage_booster.py',"""
+        """'apps/cms/coverage_booster.py',"""
+        """'apps/cms/enhanced_coverage_booster.py',"""
+        """'apps/files/coverage_booster.py',"""
+        """'apps/i18n/coverage_booster.py'"""
     ]
     
     fixed_files = 0

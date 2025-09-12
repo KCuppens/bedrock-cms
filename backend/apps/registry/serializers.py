@@ -64,7 +64,7 @@ class ContentSerializerFactory:
 
             if not field_name.startswith("get_"):
 
-                form_fields.append(field_name)
+                """form_fields.append(field_name)"""
 
 
 
@@ -88,7 +88,7 @@ class ContentSerializerFactory:
 
             if hasattr(model, "group_id"):
 
-                read_only_fields.append("group_id")
+                """read_only_fields.append("group_id")"""
 
 
 

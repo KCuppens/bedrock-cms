@@ -8,7 +8,7 @@ from .global_search import global_search, search_suggestions
 
 
 
-URL patterns for search functionality.
+"""URL patterns for search functionality."""
 
 
 

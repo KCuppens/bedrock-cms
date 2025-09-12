@@ -30,7 +30,7 @@ User = get_user_model()
 
 class EmailService:
 
-    """Service for sending emails using templates"""
+    """Service for sending emails using templates."""
 
 
 
@@ -62,37 +62,23 @@ class EmailService:
 
 
 
-        Send email using template
-
-
+        """Send email using template.
 
         Args:
-
             template_key: Email template key
-
             to_email: Recipient email address(es)
-
             context: Template context data
-
             from_email: Sender email (defaults to settings.DEFAULT_FROM_EMAIL)
-
             cc: CC recipients
-
             bcc: BCC recipients
-
             language: Template language
-
             user: User who triggered the email
-
             async_send: Whether to send asynchronously via Celery
-
             **kwargs: Additional email parameters
 
-
-
         Returns:
-
             EmailMessageLog: Created email log entry
+        """
 
 
 

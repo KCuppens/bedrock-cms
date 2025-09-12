@@ -7,8 +7,9 @@ from .models import Page, Redirect
 from .seo_utils import resolve_seo
 
 
-
+"""
 Optimized serializers for CMS with reduced field loading.
+"""
 
 
 
@@ -106,7 +107,7 @@ class PageDetailSerializer(serializers.ModelSerializer):
 
                 processed_block["component"] = processed_block["type"]
 
-            processed_blocks.append(processed_block)
+            """processed_blocks.append(processed_block)"""
 
 
 

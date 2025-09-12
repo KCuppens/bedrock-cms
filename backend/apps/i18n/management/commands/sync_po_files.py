@@ -16,9 +16,10 @@ from apps.i18n.models import Locale, UiMessage, UiMessageTranslation
 
 
 
-Management command to sync .po files with database translations.
+"""Management command to sync .po files with database translations.
 
 Imports Django's .po files into the database and exports database translations back to .po files.
+"""
 
 
 
@@ -121,14 +122,10 @@ class Command(BaseCommand):
 
 
         # Get apps to process
-
         if app_name:
-
             if app_name not in [app.name for app in apps.get_app_configs()]:
-
                 self.stdout.write(self.style.ERROR(f"App {app_name} not found"))
-
-
+                return
 
             app_configs = [apps.get_app_config(app_name.split(".")[-1])]
 
@@ -163,14 +160,10 @@ class Command(BaseCommand):
 
 
         for app_config in app_configs:
-
             # Check for locale directory in app
-
             locale_dir = Path(app_config.path) / "locale"
-
             if not locale_dir.exists():
-
-
+                continue
 
             self.stdout.write(f"Processing app: {app_config.name}")
 
@@ -191,8 +184,7 @@ class Command(BaseCommand):
                     po_file_path = locale_dir / lang_code / "LC_MESSAGES" / "django.po"
 
                     if not po_file_path.exists():
-
-
+                        continue
 
                 self.stdout.write(f"  Importing {locale.code} from {po_file_path}")
 
@@ -211,16 +203,12 @@ class Command(BaseCommand):
                         self.style.WARNING(f"    Failed to parse {po_file_path}: {e}")
 
                     )
-
-
+                    continue
 
                 # Import entries
-
                 for entry in po:
-
                     if not entry.msgid:
-
-
+                        continue
 
                     # Create message key from msgid
 
@@ -257,10 +245,8 @@ class Command(BaseCommand):
 
 
                     # Skip if no translation
-
                     if not entry.msgstr:
-
-
+                        continue
 
                     # Create or update translation
 
@@ -277,9 +263,7 @@ class Command(BaseCommand):
                                 "value": entry.msgstr,
 
                                 "status": (
-
                                     "approved" if not entry.fuzzy else "needs_review"
-
                                 ),
 
                             },
@@ -331,24 +315,17 @@ class Command(BaseCommand):
             parts = ui_message.key.split(".", 1)
 
             if len(parts) >= 2:
-
                 app_label = parts[0]
-
                 if app_label not in messages_by_app:
-
                     messages_by_app[app_label] = []
-
                 messages_by_app[app_label].append(ui_message)
 
 
 
         for app_config in app_configs:
-
             app_label = app_config.label
-
             if app_label not in messages_by_app:
-
-
+                continue
 
             # Ensure locale directory exists
 
@@ -359,8 +336,7 @@ class Command(BaseCommand):
                 locale_dir.mkdir(parents=True)
 
             elif not locale_dir.exists():
-
-
+                continue
 
             self.stdout.write(f"Exporting translations for app: {app_config.name}")
 
@@ -369,10 +345,8 @@ class Command(BaseCommand):
             for locale in locales:
 
                 # Skip default locale (usually 'en')
-
                 if locale.is_default:
-
-
+                    continue
 
                 # Determine .po file path
 
@@ -413,28 +387,21 @@ class Command(BaseCommand):
                     }
 
                 else:
-
-
+                    continue
 
                 self.stdout.write(f"  Exporting {locale.code} to {po_file_path}")
 
 
 
                 # Export translations
-
                 for ui_message in messages_by_app[app_label]:
-
                     # Get translation for this locale
-
                     try:
-
                         translation = UiMessageTranslation.objects.get(
-
                             message=ui_message, locale=locale
-
                         )
-
                     except UiMessageTranslation.DoesNotExist:
+                        continue
 
 
 
@@ -461,7 +428,6 @@ class Command(BaseCommand):
                         entry.msgstr = translation.value
 
                         if translation.status == "needs_review":
-
                             entry.flags.append("fuzzy")
 
                     else:

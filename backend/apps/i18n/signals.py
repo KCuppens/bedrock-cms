@@ -22,7 +22,7 @@ from .translation import TranslationManager
 
 
 
-Signal handlers for automatic translation unit creation and locale synchronization.
+"""Signal handlers for automatic translation unit creation and locale synchronization."""
 
 
 
@@ -39,10 +39,8 @@ def create_page_translation_units(sender, instance, created, **kwargs):
     try:
 
         # Skip if this is being restored from a revision
-
         if getattr(instance, "_skip_translation_units", False):
-
-
+            return
 
         # Get the page's locale (source locale)
 
@@ -63,10 +61,9 @@ def create_page_translation_units(sender, instance, created, **kwargs):
 
 
     except Exception:
-
         # Don't let translation unit creation break page saving
-
         # This would be logged in production
+        pass
 
 
 
@@ -100,11 +97,10 @@ def create_translation_units_handler(sender, instance, created, **kwargs):
 
 
 
-    Generic signal handler for creating translation units.
-
-
+    """Generic signal handler for creating translation units.
 
     This can be connected to any model that supports translation.
+    """
 
 
 
@@ -141,8 +137,8 @@ def create_translation_units_handler(sender, instance, created, **kwargs):
 
 
     except Exception:
-
         # Don't let translation unit creation break saving
+        pass
 
 
 
@@ -150,15 +146,12 @@ def register_model_for_translation(model_class, fields=None):
 
 
 
-    Register a model to automatically create translation units.
-
-
+    """Register a model to automatically create translation units.
 
     Args:
-
         model_class: Model class to register
-
         fields: List of translatable field names (optional)
+    """
 
 
 
@@ -188,13 +181,11 @@ def sync_django_settings_on_locale_save(sender, instance, created, **kwargs):
 
 
 
-    Sync Django settings when a locale is saved.
-
-
+    """Sync Django settings when a locale is saved.
 
     This clears the settings cache to ensure fresh data is loaded
-
     when Django settings are next accessed.
+    """
 
 
 
@@ -242,13 +233,11 @@ def sync_django_settings_on_locale_delete(sender, instance, **kwargs):
 
 
 
-    Sync Django settings when a locale is deleted.
-
-
+    """Sync Django settings when a locale is deleted.
 
     This clears the settings cache and ensures another locale
-
     becomes the default if the default locale was deleted.
+    """
 
 
 
@@ -310,13 +299,11 @@ def validate_locale_changes(sender, instance, **kwargs):
 
 
 
-    Validate locale changes before saving.
-
-
+    """Validate locale changes before saving.
 
     Ensures there's always at least one default locale and handles
-
     default locale transitions properly.
+    """
 
 
 

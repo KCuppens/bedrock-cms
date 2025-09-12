@@ -3,11 +3,9 @@ import tempfile
 from pathlib import Path
 
 
-from .base import DATABASES  # noqa: F405
-
-from .base import REST_FRAMEWORK  # noqa: F405
-
-from .base import env  # noqa: F403; noqa: F405
+# Import all base settings first
+from .base import *  # noqa: F403, F401
+from .base import env  # noqa: F401
 
 
 # Database configuration - use DATABASE_URL if provided (for CI), otherwise SQLite

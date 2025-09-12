@@ -10,7 +10,7 @@ import requests
 
 
 
-Translation services for auto-suggestions and machine translation.
+"""Translation services for auto-suggestions and machine translation."""
 
 
 
@@ -22,11 +22,11 @@ class DeepLTranslationService:
 
 
 
-    DeepL API integration for machine translation suggestions.
+    """DeepL API integration for machine translation suggestions."""
 
 
 
-    Provides simple, high-quality translation suggestions using DeepL API.
+    """Provides simple, high-quality translation suggestions using DeepL API."""
 
 
 
@@ -62,23 +62,16 @@ class DeepLTranslationService:
 
 
 
-        Translate text from source language to target language.
-
-
+        """Translate text from source language to target language.
 
         Args:
-
             text (str): Text to translate
-
             source_lang (str): Source language code (e.g., 'en', 'es')
-
             target_lang (str): Target language code (e.g., 'es', 'fr')
 
-
-
         Returns:
-
             str: Translated text or None if translation failed
+        """
 
 
 
@@ -260,13 +253,11 @@ class DeepLTranslationService:
 
 
 
-        Get list of supported languages from DeepL API.
-
-
+        """Get list of supported languages from DeepL API.
 
         Returns:
-
             dict: Dictionary with 'source' and 'target' language lists
+        """
 
 
 
@@ -332,9 +323,9 @@ class DeepLTranslationService:
 
 
 
-        Simple fallback translation when DeepL is not available.
+        """Simple fallback translation when DeepL is not available."""
 
-        Provides basic translations for common UI terms.
+        """Provides basic translations for common UI terms."""
 
 
 
@@ -502,13 +493,11 @@ class DeepLTranslationService:
 
 
 
-        Check current API usage and limits.
-
-
+        """Check current API usage and limits.
 
         Returns:
-
             dict: Usage information or None if failed
+        """
 
 
 

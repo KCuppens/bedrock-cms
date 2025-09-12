@@ -62,4 +62,4 @@ class Command(BaseCommand):
 
         except Exception as e:
 
-            self.stdout.write(self.style.ERROR(f"Command failed: {str(e)}"))
+            """self.stdout.write(self.style.ERROR(f"Command failed: {str(e)}"))"""

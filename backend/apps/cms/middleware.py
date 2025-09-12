@@ -15,9 +15,7 @@ from .models import Redirect
 
 
 class RedirectMiddleware(MiddlewareMixin):
-
-
-
+    """
     Middleware to handle SEO redirects defined in the Redirect model.
 
 
@@ -27,12 +25,11 @@ class RedirectMiddleware(MiddlewareMixin):
     1. Checks for matching redirects based on the requested path
 
     2. Supports both exact matches and regex patterns
-
     3. Returns appropriate HTTP redirect responses
-
     4. Tracks hit counts for redirect analytics
 
     5. Uses caching for performance
+    """
 
 
 
@@ -233,12 +230,12 @@ class RedirectMiddleware(MiddlewareMixin):
 
 
         except Redirect.DoesNotExist:
-
             # Redirect was deleted between finding it and tracking the hit
+            pass
 
 
 
         except Exception:
-
             # Don't fail the request if hit tracking fails
+            pass
 

@@ -6,7 +6,7 @@ from apps.i18n.models import Locale
 
 
 
-Management command to initialize default locales.
+"""Management command to initialize default locales."""
 
 
 

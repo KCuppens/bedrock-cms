@@ -1,6 +1,6 @@
 
 
-Comprehensive test data fixtures for consistent testing across modules.
+"""Comprehensive test data fixtures for consistent testing across modules."""
 
 
 
@@ -58,7 +58,7 @@ fake = Faker()
 
 
 
-@pytest.fixture
+"""@pytest.fixture"""
 
 def sample_users():
 
@@ -80,7 +80,7 @@ def sample_users():
 
 
 
-@pytest.fixture
+"""@pytest.fixture"""
 
 def sample_locales():
 
@@ -100,7 +100,7 @@ def sample_locales():
 
 
 
-@pytest.fixture
+"""@pytest.fixture"""
 
 def sample_cms_data(sample_locales, sample_users):
 
@@ -160,7 +160,7 @@ def sample_cms_data(sample_locales, sample_users):
 
 
 
-@pytest.fixture
+"""@pytest.fixture"""
 
 def sample_media_data():
 
@@ -178,7 +178,7 @@ def sample_media_data():
 
 
 
-@pytest.fixture
+"""@pytest.fixture"""
 
 def sample_translation_data(sample_cms_data, sample_locales, sample_users):
 
@@ -206,7 +206,7 @@ def sample_translation_data(sample_cms_data, sample_locales, sample_users):
 
             )
 
-            translation_units.append(unit)
+            """translation_units.append(unit)"""
 
 
 
@@ -214,7 +214,7 @@ def sample_translation_data(sample_cms_data, sample_locales, sample_users):
 
 
 
-@pytest.fixture
+"""@pytest.fixture"""
 
 def sample_analytics_data():
 
@@ -244,7 +244,7 @@ def sample_analytics_data():
 
 
 
-@pytest.fixture
+"""@pytest.fixture"""
 
 def mock_external_services():
 
@@ -256,7 +256,7 @@ def mock_external_services():
 
     # Email service mock
 
-    with patch("apps.emails.services.EmailService") as email_mock:
+    """with patch("apps.emails.services.EmailService") as email_mock:"""
 
         email_mock.send.return_value = {"status": "sent", "message_id": "test-123"}
 
@@ -266,7 +266,7 @@ def mock_external_services():
 
         # File storage mock
 
-        with patch("apps.media.services.StorageService") as storage_mock:
+        """with patch("apps.media.services.StorageService") as storage_mock:"""
 
             storage_mock.upload.return_value = {"url": "https://test.com/file.jpg"}
 
@@ -276,7 +276,7 @@ def mock_external_services():
 
             # Analytics service mock
 
-            with patch("apps.analytics.services.AnalyticsService") as analytics_mock:
+            """with patch("apps.analytics.services.AnalyticsService") as analytics_mock:"""
 
                 analytics_mock.track.return_value = True
 
@@ -288,7 +288,7 @@ def mock_external_services():
 
 
 
-@pytest.fixture
+"""@pytest.fixture"""
 
 def api_client():
 
@@ -302,7 +302,7 @@ def api_client():
 
 
 
-@pytest.fixture
+"""@pytest.fixture"""
 
 def authenticated_client(api_client, sample_users):
 
@@ -314,7 +314,7 @@ def authenticated_client(api_client, sample_users):
 
 
 
-@pytest.fixture
+"""@pytest.fixture"""
 
 def admin_client(api_client, sample_users):
 
@@ -326,7 +326,7 @@ def admin_client(api_client, sample_users):
 
 
 
-@pytest.fixture
+"""@pytest.fixture"""
 
 def editor_client(api_client, sample_users):
 

@@ -22,13 +22,11 @@ from .models import Locale
 
 
 
-Django settings synchronization utilities for i18n locales.
-
-
+"""Django settings synchronization utilities for i18n locales.
 
 This module provides utilities to keep Django's LANGUAGE_CODE and LANGUAGES
-
 settings in sync with the database Locale model.
+"""
 
 
 
@@ -54,13 +52,11 @@ class DjangoSettingsSync:
 
 
 
-        Generate LANGUAGES tuple from active database locales.
-
-
+        """Generate LANGUAGES tuple from active database locales.
 
         Returns:
-
             List of tuples (code, name) for active locales, ordered by sort_order.
+        """
 
 
 
@@ -130,13 +126,11 @@ class DjangoSettingsSync:
 
 
 
-        Get LANGUAGE_CODE from default database locale.
-
-
+        """Get LANGUAGE_CODE from default database locale.
 
         Returns:
-
             Language code of the default locale, or 'en' as fallback.
+        """
 
 
 
@@ -194,13 +188,11 @@ class DjangoSettingsSync:
 
 
 
-        Get all locale-related settings from database.
-
-
+        """Get all locale-related settings from database.
 
         Returns:
-
             Dictionary with LANGUAGE_CODE, LANGUAGES, and additional locale info.
+        """
 
 
 
@@ -340,25 +332,17 @@ class DjangoSettingsSync:
 
 
 
-        Update the Django settings file with current database locale settings.
-
-
+        """Update the Django settings file with current database locale settings.
 
         This is an advanced feature that dynamically writes to the settings file.
-
         Use with caution in production.
 
-
-
         Args:
-
             settings_path: Path to settings file. If None, attempts to detect current settings.
 
-
-
         Returns:
-
             True if successful, False otherwise.
+        """
 
 
 
@@ -389,16 +373,7 @@ class DjangoSettingsSync:
                 # Look for the settings file in common locations
 
                 possible_paths = [
-
-                    Path(settings.BASE_DIR)
-
-                    / "apps"
-
-                    / "config"
-
-                    / "settings"
-
-                    / settings_file,
+                    Path(settings.BASE_DIR) / "config" / "settings" / settings_file,
 
                     Path(settings.BASE_DIR) / "config" / "settings" / settings_file,
 
@@ -526,13 +501,11 @@ class DjangoSettingsSync:
 
 
 
-        Validate consistency between database locales and Django settings.
-
-
+        """Validate consistency between database locales and Django settings.
 
         Returns:
-
             Dictionary with validation results and recommendations.
+        """
 
 
 
@@ -583,15 +556,11 @@ class DjangoSettingsSync:
                 validation_result["is_consistent"] = False
 
                 validation_result["issues"].append(
-
                     f"LANGUAGE_CODE mismatch: Django='{django_settings['LANGUAGE_CODE']}', "
-
                     f"Database='{db_settings['LANGUAGE_CODE']}'"
-
                 )
 
                 validation_result["recommendations"].append(
-
                     "Run 'python manage.py sync_locales' to synchronize settings"
 
                 )
@@ -621,9 +590,7 @@ class DjangoSettingsSync:
                     if missing_in_django:
 
                         validation_result["issues"].append(
-
                             f"Languages in database but not in Django settings: {missing_in_django}"
-
                         )
 
 
@@ -631,17 +598,13 @@ class DjangoSettingsSync:
                     if missing_in_db:
 
                         validation_result["issues"].append(
-
                             f"Languages in Django settings but not in database: {missing_in_db}"
-
                         )
 
 
 
                     validation_result["recommendations"].append(
-
                         "Run 'python manage.py sync_locales' to synchronize settings"
-
                     )
 
 
@@ -654,7 +617,7 @@ class DjangoSettingsSync:
 
             validation_result["is_consistent"] = False
 
-            validation_result["issues"].append(f"Validation failed: {e}")
+            """validation_result["issues"].append(f"Validation failed: {e}")"""
 
             return validation_result
 
@@ -666,13 +629,11 @@ class DjangoSettingsSync:
 
 
 
-        Check if database is available and i18n tables exist.
-
-
+        """Check if database is available and i18n tables exist.
 
         Returns:
-
             True if database and tables are ready, False otherwise.
+        """
 
 
 

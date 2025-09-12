@@ -1,4 +1,4 @@
-from typing import TYPE_CHECKING, cast
+from typing import TYPE_CHECKING, Optional, cast
 
 
 
@@ -267,14 +267,10 @@ else:
 
 
 class TranslationUnit(models.Model):
-
-
-
-    Track translatable content for any model field.
-
-
-
+    """Track translatable content for any model field.
+    
     Supports content translation workflow with status tracking and fallback resolution.
+    """
 
 
 
@@ -464,35 +460,25 @@ class TranslationUnit(models.Model):
 
         source_text: str,
 
-        user: User | None = None,
+        user: Optional[User] = None,
 
     ) -> "TranslationUnit":
 
 
 
-        Create or update a translation unit.
-
-
+        """Create or update a translation unit.
 
         Args:
-
             obj: The object being translated
-
             field: Field name being translated
-
             source_locale: Source locale
-
             target_locale: Target locale
-
             source_text: Current source text
-
             user: User making the update
 
-
-
         Returns:
-
             TranslationUnit instance
+        """
 
 
 
@@ -575,10 +561,7 @@ class TranslationUnit(models.Model):
 
 
 class UiMessage(models.Model):
-
-
-
-    UI messages that need to be translated for the frontend.
+    """UI messages that need to be translated for the frontend."""
 
 
 
@@ -641,10 +624,7 @@ class UiMessage(models.Model):
 
 
 class UiMessageTranslation(models.Model):
-
-
-
-    Translations for UI messages.
+    """Translations for UI messages."""
 
 
 
@@ -729,10 +709,7 @@ class UiMessageTranslation(models.Model):
 
 
 class TranslationGlossary(models.Model):
-
-
-
-    Translation glossary for consistent terminology across translations.
+    """Translation glossary for consistent terminology across translations."""
 
 
 
@@ -859,10 +836,7 @@ class TranslationGlossary(models.Model):
 
 
 class TranslationQueue(models.Model):
-
-
-
-    Queue system for managing translation workflow and assignments.
+    """Queue system for managing translation workflow and assignments."""
 
 
 
@@ -1087,10 +1061,7 @@ class TranslationQueue(models.Model):
 
 
 class TranslationHistory(models.Model):
-
-
-
-    History tracking for translation changes and status updates.
+    """History tracking for translation changes and status updates."""
 
 
 
