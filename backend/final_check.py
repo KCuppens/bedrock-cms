@@ -2,6 +2,7 @@
 import os
 import py_compile
 
+
 def main():
     errors = 0
     total = 0

@@ -1,27 +1,50 @@
 from django.urls import include, path
+
+
 from rest_framework.routers import DefaultRouter
 
+
 from .versioning_views import AuditEntryViewSet, PageRevisionViewSet
+
 from .views import sitemap_view
+
 from .views.block_types import BlockTypeViewSet
+
 from .views.blocks import BlockSchemaView, BlockTypesView
+
 from .views.category import CategoryViewSet, CollectionViewSet, TagViewSet
+
 from .views.mock_revisions import MockRevisionsView
+
 from .views.navigation import FooterView, NavigationView, SiteSettingsView
+
 from .views.pages import PagesViewSet
+
 from .views.redirect import RedirectViewSet
+
 from .views.seo import SeoSettingsViewSet
 
+
 router = DefaultRouter()
+
 router.register(r"pages", PagesViewSet, basename="pages")
+
 router.register(r"revisions", PageRevisionViewSet, basename="revisions")
+
 router.register(r"audit", AuditEntryViewSet, basename="audit")
+
 router.register(r"categories", CategoryViewSet, basename="categories")
+
 router.register(r"tags", TagViewSet, basename="tags")
+
 router.register(r"collections", CollectionViewSet, basename="collections")
+
 router.register(r"redirects", RedirectViewSet, basename="redirects")
+
 router.register(r"seo-settings", SeoSettingsViewSet, basename="seo-settings")
+
 router.register(r"block-types", BlockTypeViewSet, basename="block-types")
+
 
 urlpatterns = [
     path("", include(router.urls)),

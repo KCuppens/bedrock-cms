@@ -5,6 +5,7 @@ Fixes E722, F401, F821, F405, E402, E999, and adds noqa for C901."""
 import re
 from pathlib import Path
 
+
 def fix_bare_except(content):
     """Replace bare except with except Exception."""
     # Match bare except: at any indentation

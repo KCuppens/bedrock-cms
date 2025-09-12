@@ -3,6 +3,7 @@
 
 import os
 
+
 def fix_line_length(content):
     """Fix lines that are too long."""
     lines = content.split("\n")

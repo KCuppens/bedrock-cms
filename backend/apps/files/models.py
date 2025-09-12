@@ -1,7 +1,10 @@
 import uuid
 
+
 from django.contrib.auth import get_user_model
+
 from django.db import models
+
 from django.db.models import (
     BooleanField,
     CharField,
@@ -11,57 +14,81 @@ from django.db.models import (
     TextField,
     UUIDField,
 )
+
 from django.utils import timezone
 
+
 from apps.core.enums import FileType
+
 from apps.core.mixins import TimestampMixin, UserTrackingMixin
+
 from apps.core.utils import format_file_size
+
 from apps.files.services import FileService
 
+
 User = get_user_model()
+
 
 class FileUpload(TimestampMixin, UserTrackingMixin):
     """File upload model with S3/MinIO storage"""
 
     # File identification
+
     id: UUIDField = models.UUIDField(
         primary_key=True, default=uuid.uuid4, editable=False
     )
+
     original_filename: CharField = models.CharField("Original filename", max_length=255)
+
     filename: CharField = models.CharField(
         "Stored filename", max_length=255, unique=True
     )
 
     # File metadata
+
     file_type: CharField = models.CharField(
         "File type", max_length=20, choices=FileType.choices, default=FileType.OTHER
     )
+
     mime_type: CharField = models.CharField("MIME type", max_length=100)
+
     file_size: PositiveIntegerField = models.PositiveIntegerField("File size (bytes)")
+
     checksum: CharField = models.CharField(
         "File checksum", max_length=64, blank=True, db_index=True
     )
 
     # Storage info
+
     storage_path: TextField = models.TextField("Storage path")
+
     is_public: BooleanField = models.BooleanField("Public access", default=False)
 
     # File details
+
     description: TextField = models.TextField("Description", blank=True)
+
     tags: CharField = models.CharField("Tags", max_length=500, blank=True)
 
     # Access control
+
     expires_at: DateTimeField = models.DateTimeField(
         "Expires at", null=True, blank=True
     )
+
     download_count: PositiveIntegerField = models.PositiveIntegerField(
         "Download count", default=0
     )
 
     class Meta:
+
         verbose_name = "File Upload"
+
         verbose_name_plural = "File Uploads"
+
         ordering = ["-created_at"]
+
         indexes = [
             models.Index(fields=["created_by", "-created_at"]),
             models.Index(fields=["file_type", "-created_at"]),
@@ -71,6 +98,7 @@ class FileUpload(TimestampMixin, UserTrackingMixin):
         ]
 
     def __str__(self):  # noqa: C901
+
         return self.original_filename
 
     @property
@@ -82,7 +110,9 @@ class FileUpload(TimestampMixin, UserTrackingMixin):
     @property
     def is_expired(self):  # noqa: C901
         """Check if file has expired"""
+
         if not self.expires_at:
+
             return False
 
         return timezone.now() > self.expires_at
@@ -90,35 +120,47 @@ class FileUpload(TimestampMixin, UserTrackingMixin):
     @property
     def is_image(self):  # noqa: C901
         """Check if file is an image"""
+
         return self.file_type == FileType.IMAGE
 
     @property
     def is_document(self):  # noqa: C901
         """Check if file is a document"""
+
         return self.file_type == FileType.DOCUMENT
 
     def can_access(self, user=None):  # noqa: C901
         """Check if user can access this file"""
+
         # Public files are accessible to all
+
         if self.is_public and not self.is_expired:
+
             return True
 
         # Anonymous users can only access public files
+
         if not user or not user.is_authenticated:
+
             return False
 
         # Owners can always access their files
+
         if self.created_by == user:
+
             return True
 
         # Admins can access all files
+
         if user.is_admin():
+
             return True
 
         return False
 
     def increment_download_count(self):  # noqa: C901
         """Increment download counter atomically using F expression"""
+
         FileUpload.objects.filter(pk=self.pk).update(
             download_count=F("download_count") + 1
         )

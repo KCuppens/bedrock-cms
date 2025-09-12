@@ -1,12 +1,17 @@
 from django.core.management.base import BaseCommand
+
 from django.db import transaction
+
 
 from apps.cms.models import BlockType, BlockTypeCategory
 
+
 class Command(BaseCommand):
+
     help = "Seed the database with default block types from existing configurations"
 
     def add_arguments(self, parser):
+
         parser.add_argument(
             "--overwrite",
             action="store_true",
@@ -17,6 +22,7 @@ class Command(BaseCommand):
         """Seed block types from existing hardcoded configurations."""
 
         # Define the default block types based on current system
+
         default_block_types = [
             {
                 "type": "hero",
@@ -273,29 +279,43 @@ class Command(BaseCommand):
         ]
 
         created_count = 0
+
         updated_count = 0
 
         with transaction.atomic():
+
             for block_data in default_block_types:
+
                 block_type, created = BlockType.objects.get_or_create(
                     type=block_data["type"], defaults=block_data
                 )
 
                 if created:
+
                     created_count += 1
+
                     self.stdout.write(
                         self.style.SUCCESS(f"Created block type: {block_type.label}")
                     )
+
                 elif options["overwrite"]:
+
                     # Update existing block type
+
                     for key, value in block_data.items():
+
                         setattr(block_type, key, value)
+
                     block_type.save()
+
                     updated_count += 1
+
                     self.stdout.write(
                         self.style.WARNING(f"Updated block type: {block_type.label}")
                     )
+
                 else:
+
                     self.stdout.write(
                         self.style.WARNING(
                             f"Block type already exists: {block_type.label}"
@@ -303,6 +323,7 @@ class Command(BaseCommand):
                     )
 
         self.stdout.write("")
+
         self.stdout.write(
             self.style.SUCCESS(
                 f"Seeding complete! Created: {created_count}, Updated: {updated_count}"
@@ -310,6 +331,7 @@ class Command(BaseCommand):
         )
 
         if not options["overwrite"] and BlockType.objects.count() > created_count:
+
             self.stdout.write(
                 self.style.WARNING(
                     "Some block types already existed. Use --overwrite to update them."

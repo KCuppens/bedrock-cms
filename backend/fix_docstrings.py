@@ -2,6 +2,7 @@
 import os
 import re
 
+
 def fix_docstring_issues(filepath):
     """Fix common docstring-related syntax errors"""
     with open(filepath, 'r', encoding='utf-8') as f:

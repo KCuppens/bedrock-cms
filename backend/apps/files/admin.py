@@ -1,6 +1,8 @@
 from django.contrib import admin
 
+
 from .models import FileUpload
+
 
 @admin.register(FileUpload)
 class FileUploadAdmin(admin.ModelAdmin):
@@ -15,9 +17,13 @@ class FileUploadAdmin(admin.ModelAdmin):
         "created_by",
         "created_at",
     ]
+
     list_filter = ["file_type", "is_public", "created_at", "expires_at"]
+
     search_fields = ["original_filename", "description", "tags"]
+
     ordering = ["-created_at"]
+
     readonly_fields = [
         "id",
         "filename",
@@ -53,6 +59,7 @@ class FileUploadAdmin(admin.ModelAdmin):
 
     def file_size_human(self, obj):  # noqa: C901
         """Display human-readable file size"""
+
         return obj.file_size_human
 
     file_size_human.short_description = "File Size"

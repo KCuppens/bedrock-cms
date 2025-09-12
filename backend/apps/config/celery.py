@@ -1,19 +1,30 @@
 import os
 
+
 from celery import Celery
+
 from celery.schedules import crontab
+
 from kombu import Exchange, Queue
 
+
 # Set the default Django settings module for the 'celery' program.
+
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "apps.config.settings.local")
+
 
 app = Celery("django-saas-boilerplate")
 
+
 # Using a string here means the worker doesn't have to serialize
+
 # the configuration object to child processes.
+
 app.config_from_object("django.conf:settings", namespace="CELERY")
 
+
 # Configure task queues with priorities
+
 app.conf.task_routes = {
     "apps.emails.tasks.send_email_task": {"queue": "high_priority"},
     "apps.emails.tasks.send_bulk_email_task": {"queue": "low_priority"},
@@ -22,11 +33,17 @@ app.conf.task_routes = {
     "apps.ops.tasks.backup_database": {"queue": "maintenance"},
 }
 
+
 # Define queues with different priorities
+
 default_exchange = Exchange("default", type="direct")
+
 high_priority_exchange = Exchange("high_priority", type="direct")
+
 low_priority_exchange = Exchange("low_priority", type="direct")
+
 maintenance_exchange = Exchange("maintenance", type="direct")
+
 
 app.conf.task_queues = (
     Queue("default", default_exchange, routing_key="default"),
@@ -35,28 +52,45 @@ app.conf.task_queues = (
     Queue("maintenance", maintenance_exchange, routing_key="maintenance"),
 )
 
+
 # Set default queue
+
 app.conf.task_default_queue = "default"
+
 app.conf.task_default_exchange = "default"
+
 app.conf.task_default_routing_key = "default"
 
+
 # Performance optimizations
+
 app.conf.worker_prefetch_multiplier = 4  # Prefetch 4 tasks per worker
+
 app.conf.task_acks_late = True  # Acknowledge tasks after completion
+
 app.conf.worker_max_tasks_per_child = (
     1000  # Restart worker after 1000 tasks to prevent memory leaks
 )
+
 app.conf.task_soft_time_limit = 300  # 5 minutes soft time limit
+
 app.conf.task_time_limit = 600  # 10 minutes hard time limit
 
+
 # Result backend configuration
+
 app.conf.result_expires = 3600  # Results expire after 1 hour
+
 app.conf.result_compression = "gzip"  # Compress results
 
+
 # Load task modules from all registered Django apps.
+
 app.autodiscover_tasks()
 
+
 # Celery Beat Schedule with optimized timing
+
 
 app.conf.beat_schedule = {
     "process-scheduled-publishing": {
@@ -101,6 +135,7 @@ app.conf.beat_schedule = {
     },
 }
 
+
 @app.task(bind=True)
 def debug_task(self):
-    print(f"Request: {self.request!r}")
+    pass

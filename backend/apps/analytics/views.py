@@ -1,15 +1,25 @@
 from datetime import timedelta
 
+
 from django.contrib.auth import get_user_model
+
 from django.db.models import Avg, Count
+
 from django.db.models.functions import TruncDate, TruncMonth, TruncWeek
+
 from django.utils import timezone
 
+
 from drf_spectacular.utils import OpenApiParameter, extend_schema, extend_schema_view
+
 from rest_framework import permissions, viewsets
+
 from rest_framework.decorators import action
+
 from rest_framework.response import Response
+
 from rest_framework.throttling import UserRateThrottle
+
 
 from .models import (
     AnalyticsSummary,
@@ -20,8 +30,8 @@ from .models import (
     Threat,
     UserActivity,
 )
-from .serializers import (
 
+from .serializers import (
     AnalyticsSummarySerializer,
     AssessmentCreateSerializer,
     AssessmentSerializer,
@@ -40,21 +50,29 @@ from .serializers import (
     UserActivitySerializer,
 )
 
+
 User = get_user_model()
+
 
 class AnalyticsPermission(permissions.BasePermission):
     """Custom permission for analytics endpoints"""
 
     def has_permission(self, request, view):  # noqa: C901
+
         if not request.user.is_authenticated:
+
             return False
 
         # Allow read access to managers and admins
+
         if request.method in permissions.SAFE_METHODS:
+
             return request.user.is_manager() or request.user.is_admin()
 
         # Allow write access only to admins
+
         return request.user.is_admin()
+
 
 @extend_schema_view(
     list=extend_schema(
@@ -78,36 +96,53 @@ class PageViewViewSet(viewsets.ModelViewSet):
     """ViewSet for PageView analytics"""
 
     queryset = PageView.objects.all()
+
     permission_classes = [AnalyticsPermission]
+
     throttle_classes = [UserRateThrottle]
 
     def get_serializer_class(self):  # noqa: C901
+
         if self.action == "create":
+
             return PageViewCreateSerializer
+
         return PageViewSerializer
 
     def get_queryset(self):  # noqa: C901
+
         queryset = PageView.objects.select_related("page", "user")
 
         # Date filtering
+
         date_from = self.request.query_params.get("date_from")
+
         date_to = self.request.query_params.get("date_to")
 
         if date_from:
+
             queryset = queryset.filter(viewed_at__date__gte=date_from)
+
         if date_to:
+
             queryset = queryset.filter(viewed_at__date__lte=date_to)
 
         # Additional filters
+
         page_id = self.request.query_params.get("page")
+
         if page_id:
+
             queryset = queryset.filter(page_id=page_id)
 
         user_id = self.request.query_params.get("user")
+
         if user_id:
+
             queryset = queryset.filter(user_id=user_id)
 
         return queryset
+
 
 @extend_schema_view(
     list=extend_schema(
@@ -133,37 +168,55 @@ class UserActivityViewSet(viewsets.ModelViewSet):
     """ViewSet for UserActivity analytics"""
 
     queryset = UserActivity.objects.all()
+
     permission_classes = [AnalyticsPermission]
+
     throttle_classes = [UserRateThrottle]
 
     def get_serializer_class(self):  # noqa: C901
+
         if self.action == "create":
+
             return UserActivityCreateSerializer
+
         return UserActivitySerializer
 
     def get_queryset(self):  # noqa: C901
+
         queryset = UserActivity.objects.select_related("user", "content_type")
 
         # Action filtering
+
         action = self.request.query_params.get("action")
+
         if action:
+
             queryset = queryset.filter(action=action)
 
         # User filtering
+
         user_id = self.request.query_params.get("user")
+
         if user_id:
+
             queryset = queryset.filter(user_id=user_id)
 
         # Date filtering
+
         date_from = self.request.query_params.get("date_from")
+
         date_to = self.request.query_params.get("date_to")
 
         if date_from:
+
             queryset = queryset.filter(created_at__date__gte=date_from)
+
         if date_to:
+
             queryset = queryset.filter(created_at__date__lte=date_to)
 
         return queryset
+
 
 @extend_schema_view(
     list=extend_schema(
@@ -186,28 +239,41 @@ class ContentMetricsViewSet(viewsets.ReadOnlyModelViewSet):
     """ViewSet for ContentMetrics analytics"""
 
     queryset = ContentMetrics.objects.all()
+
     serializer_class = ContentMetricsSerializer
+
     permission_classes = [AnalyticsPermission]
+
     throttle_classes = [UserRateThrottle]
 
     def get_queryset(self):  # noqa: C901
+
         queryset = ContentMetrics.objects.select_related("content_type")
 
         # Date filtering
+
         date_from = self.request.query_params.get("date_from")
+
         date_to = self.request.query_params.get("date_to")
 
         if date_from:
+
             queryset = queryset.filter(date__gte=date_from)
+
         if date_to:
+
             queryset = queryset.filter(date__lte=date_to)
 
         # Category filtering
+
         category = self.request.query_params.get("content_category")
+
         if category:
+
             queryset = queryset.filter(content_category=category)
 
         return queryset
+
 
 @extend_schema_view(
     list=extend_schema(
@@ -232,33 +298,49 @@ class AssessmentViewSet(viewsets.ModelViewSet):
     """ViewSet for Assessment management"""
 
     queryset = Assessment.objects.all()
+
     permission_classes = [AnalyticsPermission]
+
     throttle_classes = [UserRateThrottle]
 
     def get_serializer_class(self):  # noqa: C901
+
         if self.action == "create":
+
             return AssessmentCreateSerializer
+
         return AssessmentSerializer
 
     def get_queryset(self):  # noqa: C901
+
         queryset = Assessment.objects.select_related("assigned_to", "created_by")
 
         # Type filtering
+
         assessment_type = self.request.query_params.get("assessment_type")
+
         if assessment_type:
+
             queryset = queryset.filter(assessment_type=assessment_type)
 
         # Status filtering
+
         status_filter = self.request.query_params.get("status")
+
         if status_filter:
+
             queryset = queryset.filter(status=status_filter)
 
         # Assignment filtering
+
         assigned_to = self.request.query_params.get("assigned_to")
+
         if assigned_to:
+
             queryset = queryset.filter(assigned_to_id=assigned_to)
 
         return queryset
+
 
 @extend_schema_view(
     list=extend_schema(
@@ -279,29 +361,43 @@ class RiskViewSet(viewsets.ModelViewSet):
     """ViewSet for Risk management"""
 
     queryset = Risk.objects.all()
+
     serializer_class = RiskSerializer
+
     permission_classes = [AnalyticsPermission]
+
     throttle_classes = [UserRateThrottle]
 
     def get_queryset(self):  # noqa: C901
+
         queryset = Risk.objects.select_related("owner", "assigned_to", "assessment")
 
         # Category filtering
+
         category = self.request.query_params.get("category")
+
         if category:
+
             queryset = queryset.filter(category=category)
 
         # Status filtering
+
         status_filter = self.request.query_params.get("status")
+
         if status_filter:
+
             queryset = queryset.filter(status=status_filter)
 
         # Severity filtering
+
         severity = self.request.query_params.get("severity")
+
         if severity:
+
             queryset = queryset.filter(severity=severity)
 
         return queryset
+
 
 @extend_schema_view(
     list=extend_schema(
@@ -325,33 +421,49 @@ class ThreatViewSet(viewsets.ModelViewSet):
     """ViewSet for Threat management"""
 
     queryset = Threat.objects.all()
+
     permission_classes = [AnalyticsPermission]
+
     throttle_classes = [UserRateThrottle]
 
     def get_serializer_class(self):  # noqa: C901
+
         if self.action == "create":
+
             return ThreatCreateSerializer
+
         return ThreatSerializer
 
     def get_queryset(self):  # noqa: C901
+
         queryset = Threat.objects.select_related("assigned_to", "reported_by")
 
         # Type filtering
+
         threat_type = self.request.query_params.get("threat_type")
+
         if threat_type:
+
             queryset = queryset.filter(threat_type=threat_type)
 
         # Status filtering
+
         status_filter = self.request.query_params.get("status")
+
         if status_filter:
+
             queryset = queryset.filter(status=status_filter)
 
         # Severity filtering
+
         severity = self.request.query_params.get("severity")
+
         if severity:
+
             queryset = queryset.filter(severity=severity)
 
         return queryset
+
 
 @extend_schema_view(
     list=extend_schema(
@@ -363,16 +475,22 @@ class AnalyticsSummaryViewSet(viewsets.ReadOnlyModelViewSet):
     """ViewSet for AnalyticsSummary data"""
 
     queryset = AnalyticsSummary.objects.all()
+
     serializer_class = AnalyticsSummarySerializer
+
     permission_classes = [AnalyticsPermission]
+
     throttle_classes = [UserRateThrottle]
 
+
 # Custom analytics API views
+
 
 class AnalyticsAPIViewSet(viewsets.GenericViewSet):
     """Custom analytics endpoints for dashboard and reporting"""
 
     permission_classes = [AnalyticsPermission]
+
     throttle_classes = [UserRateThrottle]
 
     @extend_schema(
@@ -393,21 +511,31 @@ class AnalyticsAPIViewSet(viewsets.GenericViewSet):
     @action(detail=False, methods=["get"], url_path="traffic")
     def traffic_analytics(self, request):  # noqa: C901
         """Get traffic analytics data"""
+
         days = int(request.query_params.get("days", 30))
+
         period = request.query_params.get("period", "daily")
 
         end_date = timezone.now().date()
+
         start_date = end_date - timedelta(days=days)
 
         # Choose truncation function based on period
+
         if period == "weekly":
+
             trunc_func = TruncWeek
+
         elif period == "monthly":
+
             trunc_func = TruncMonth
+
         else:
+
             trunc_func = TruncDate
 
         # Aggregate page view data
+
         queryset = (
             PageView.objects.filter(viewed_at__date__range=[start_date, end_date])
             .annotate(period_date=trunc_func("viewed_at"))
@@ -421,9 +549,13 @@ class AnalyticsAPIViewSet(viewsets.GenericViewSet):
         )
 
         # Calculate bounce rate for each period
+
         data = []
+
         for item in queryset:
+
             # Get sessions with only one page view (bounced sessions)
+
             bounced_sessions = PageView.objects.filter(
                 viewed_at__date=item["period_date"],
                 session_id__in=PageView.objects.filter(
@@ -436,6 +568,7 @@ class AnalyticsAPIViewSet(viewsets.GenericViewSet):
             ).count()
 
             total_sessions = item["unique_visitors"]
+
             bounce_rate = (
                 (bounced_sessions / total_sessions * 100) if total_sessions > 0 else 0
             )
@@ -451,6 +584,7 @@ class AnalyticsAPIViewSet(viewsets.GenericViewSet):
             )
 
         serializer = TrafficStatsSerializer(data, many=True)
+
         return Response(serializer.data)
 
     @extend_schema(
@@ -469,13 +603,17 @@ class AnalyticsAPIViewSet(viewsets.GenericViewSet):
     @action(detail=False, methods=["get"], url_path="views")
     def page_views_analytics(self, request):  # noqa: C901
         """Get page view analytics"""
+
         days = int(request.query_params.get("days", 30))
+
         limit = int(request.query_params.get("limit", 20))
 
         end_date = timezone.now().date()
+
         start_date = end_date - timedelta(days=days)
 
         # Get top performing content
+
         top_pages = (
             PageView.objects.filter(
                 viewed_at__date__range=[start_date, end_date], page__isnull=False
@@ -490,7 +628,9 @@ class AnalyticsAPIViewSet(viewsets.GenericViewSet):
         )
 
         data = []
+
         for page in top_pages:
+
             data.append(
                 {
                     "title": page["page__title"],
@@ -502,6 +642,7 @@ class AnalyticsAPIViewSet(viewsets.GenericViewSet):
             )
 
         serializer = TopContentSerializer(data, many=True)
+
         return Response(serializer.data)
 
     @extend_schema(
@@ -512,11 +653,15 @@ class AnalyticsAPIViewSet(viewsets.GenericViewSet):
     @action(detail=False, methods=["get"], url_path="dashboard")
     def dashboard_summary(self, request):  # noqa: C901
         """Get dashboard summary statistics"""
+
         today = timezone.now().date()
+
         thirty_days_ago = today - timedelta(days=30)
 
         # Today's stats
+
         today_views = PageView.objects.filter(viewed_at__date=today).count()
+
         today_visitors = (
             PageView.objects.filter(viewed_at__date=today)
             .values("session_id")
@@ -525,6 +670,7 @@ class AnalyticsAPIViewSet(viewsets.GenericViewSet):
         )
 
         # Security stats
+
         active_threats = Threat.objects.filter(
             status__in=["detected", "investigating", "contained"]
         ).count()
@@ -536,6 +682,7 @@ class AnalyticsAPIViewSet(viewsets.GenericViewSet):
         ).count()
 
         # Performance stats
+
         avg_load_time = (
             PageView.objects.filter(
                 viewed_at__date__gte=thirty_days_ago, load_time__isnull=False
@@ -544,24 +691,34 @@ class AnalyticsAPIViewSet(viewsets.GenericViewSet):
         )
 
         # Get trend data (last 7 days)
+
         trend_start = today - timedelta(days=7)
+
         daily_views = []
+
         daily_visitors = []
+
         daily_threats = []
 
         for i in range(7):
+
             date = trend_start + timedelta(days=i)
+
             views = PageView.objects.filter(viewed_at__date=date).count()
+
             visitors = (
                 PageView.objects.filter(viewed_at__date=date)
                 .values("session_id")
                 .distinct()
                 .count()
             )
+
             threats = Threat.objects.filter(detected_at__date=date).count()
 
             daily_views.append(views)
+
             daily_visitors.append(visitors)
+
             daily_threats.append(threats)
 
         data = {
@@ -578,6 +735,7 @@ class AnalyticsAPIViewSet(viewsets.GenericViewSet):
         }
 
         serializer = DashboardStatsSerializer(data)
+
         return Response(serializer.data)
 
     @extend_schema(
@@ -593,15 +751,19 @@ class AnalyticsAPIViewSet(viewsets.GenericViewSet):
     @action(detail=False, methods=["get"], url_path="risk-timeline")
     def risk_timeline(self, request):  # noqa: C901
         """Get risk timeline data"""
+
         days = int(request.query_params.get("days", 30))
 
         end_date = timezone.now().date()
+
         start_date = end_date - timedelta(days=days)
 
         # Aggregate risk data by date
+
         timeline_data = []
 
         for i in range(days + 1):
+
             date = start_date + timedelta(days=i)
 
             risks_identified = Risk.objects.filter(identified_at__date=date).count()
@@ -627,6 +789,7 @@ class AnalyticsAPIViewSet(viewsets.GenericViewSet):
             )
 
         serializer = RiskTimelineSerializer(timeline_data, many=True)
+
         return Response(serializer.data)
 
     @extend_schema(
@@ -642,12 +805,15 @@ class AnalyticsAPIViewSet(viewsets.GenericViewSet):
     @action(detail=False, methods=["get"], url_path="threat-stats")
     def threat_statistics(self, request):  # noqa: C901
         """Get threat statistics"""
+
         days = int(request.query_params.get("days", 30))
 
         end_date = timezone.now().date()
+
         start_date = end_date - timedelta(days=days)
 
         # Get threat statistics by type
+
         threat_stats = (
             Threat.objects.filter(detected_at__date__range=[start_date, end_date])
             .values("threat_type")
@@ -656,8 +822,11 @@ class AnalyticsAPIViewSet(viewsets.GenericViewSet):
         )
 
         data = []
+
         for stat in threat_stats:
+
             # Get severity breakdown for this threat type
+
             severity_breakdown = (
                 Threat.objects.filter(
                     threat_type=stat["threat_type"],
@@ -672,13 +841,19 @@ class AnalyticsAPIViewSet(viewsets.GenericViewSet):
             }
 
             # Get daily trend for last 7 days
+
             trend_start = end_date - timedelta(days=7)
+
             trend = []
+
             for i in range(7):
+
                 date = trend_start + timedelta(days=i)
+
                 count = Threat.objects.filter(
                     threat_type=stat["threat_type"], detected_at__date=date
                 ).count()
+
                 trend.append(count)
 
             data.append(
@@ -691,6 +866,7 @@ class AnalyticsAPIViewSet(viewsets.GenericViewSet):
             )
 
         serializer = ThreatStatsSerializer(data, many=True)
+
         return Response(serializer.data)
 
     @extend_schema(
@@ -711,8 +887,11 @@ class AnalyticsAPIViewSet(viewsets.GenericViewSet):
     @action(detail=False, methods=["get"], url_path="export")
     def export_data(self, request):  # noqa: C901
         """Export analytics data"""
+
         # This would implement data export functionality
+
         # For now, return a placeholder response
+
         return Response(
             {
                 "message": "Export functionality would be implemented here",

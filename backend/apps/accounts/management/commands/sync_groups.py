@@ -1,5 +1,7 @@
 from django.contrib.auth.models import Group, Permission
+
 from django.core.management.base import BaseCommand
+
 
 class Command(BaseCommand):
     """Management command to sync user groups and their permissions"""
@@ -7,6 +9,7 @@ class Command(BaseCommand):
     help = "Sync user groups and their permissions"
 
     # Define group permissions mapping
+
     GROUP_PERMISSIONS = {
         "Admin": {
             "description": "Full system access",
@@ -90,11 +93,13 @@ class Command(BaseCommand):
     }
 
     def add_arguments(self, parser):
+
         parser.add_argument(
             "--dry-run",
             action="store_true",
             help="Show what would be changed without making changes",
         )
+
         parser.add_argument(
             "--force",
             action="store_true",
@@ -102,27 +107,39 @@ class Command(BaseCommand):
         )
 
     def handle(self, *args, **options):
+
         dry_run = options["dry_run"]
+
         force = options["force"]
 
         if dry_run:
+
             self.stdout.write(
                 self.style.WARNING("DRY RUN MODE - No changes will be made")
             )
 
         created_groups = 0
+
         updated_groups = 0
 
         for group_name, group_config in self.GROUP_PERMISSIONS.items():
+
             group, created = Group.objects.get_or_create(name=group_name)
 
             if created:
+
                 created_groups += 1
+
                 self.stdout.write(self.style.SUCCESS(f"Created group: {group_name}"))
+
             elif force:
+
                 updated_groups += 1
+
                 self.stdout.write(self.style.WARNING(f"Updating group: {group_name}"))
+
             else:
+
                 self.stdout.write(
                     self.style.NOTICE(
                         f"Group {group_name} already exists (use --force to update permissions)"
@@ -130,27 +147,41 @@ class Command(BaseCommand):
                 )
 
             if not dry_run:
+
                 # Clear existing permissions if updating
+
                 if not created or force:
+
                     group.permissions.clear()
 
                 # Add permissions
+
                 permissions_added = 0
+
                 for permission_codename in group_config["permissions"]:
+
                     try:
+
                         app_label, codename = permission_codename.split(".", 1)
+
                         permission = Permission.objects.get(
                             codename=codename, content_type__app_label=app_label
                         )
+
                         group.permissions.add(permission)
+
                         permissions_added += 1
+
                     except Permission.DoesNotExist:
+
                         self.stdout.write(
                             self.style.ERROR(
                                 f"Permission {permission_codename} not found"
                             )
                         )
+
                     except ValueError:
+
                         self.stdout.write(
                             self.style.ERROR(
                                 f"Invalid permission format: {permission_codename}"
@@ -160,23 +191,32 @@ class Command(BaseCommand):
                 self.stdout.write(
                     f"  Added {permissions_added} permissions to {group_name}"
                 )
+
             else:
+
                 # Dry run - just show what would be added
+
                 self.stdout.write(
                     f"  Would add {len(group_config['permissions'])} permissions to {group_name}"
                 )
+
                 for permission in group_config["permissions"]:
+
                     self.stdout.write(f"    - {permission}")
 
         # Summary
+
         if not dry_run:
+
             self.stdout.write(
                 self.style.SUCCESS(
                     f"\nSync completed: {created_groups} groups created, "
                     f"{updated_groups} groups updated"
                 )
             )
+
         else:
+
             self.stdout.write(
                 self.style.NOTICE(
                     f"\nDry run completed: would create {created_groups} groups, "
@@ -185,6 +225,9 @@ class Command(BaseCommand):
             )
 
         # Show group summary
+
         self.stdout.write("\nGroup Summary:")
+
         for group_name, group_config in self.GROUP_PERMISSIONS.items():
+
             self.stdout.write(f"  {group_name}: {group_config['description']}")

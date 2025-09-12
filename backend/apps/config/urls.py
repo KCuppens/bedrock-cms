@@ -1,14 +1,21 @@
 from django.conf import settings
+
 from django.conf.urls.static import static
+
 from django.contrib import admin
+
 from django.urls import include, path
+
 
 from drf_spectacular.views import (
     SpectacularAPIView,
     SpectacularRedocView,
     SpectacularSwaggerView,
 )
+
+
 from apps.cms.views import default_sitemap_view, sitemap_view
+
 
 urlpatterns = [
     # Admin
@@ -57,11 +64,15 @@ urlpatterns = [
     path("", include("apps.ops.urls")),
 ]
 
+
 # Serve media files in development
+
 if settings.DEBUG:
+
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
     # Add development-only email preview URLs
+
     urlpatterns += [
         path("dev/", include("apps.emails.urls")),
     ]

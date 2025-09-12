@@ -1,6 +1,9 @@
 from django.contrib import admin
+
 from django.db import transaction
+
 from django.utils.html import format_html
+
 
 from .models import (
     Locale,
@@ -11,6 +14,7 @@ from .models import (
     UiMessage,
     UiMessageTranslation,
 )
+
 
 @admin.register(Locale)
 class LocaleAdmin(admin.ModelAdmin):
@@ -26,9 +30,13 @@ class LocaleAdmin(admin.ModelAdmin):
         "fallback",
         "sort_order",
     ]
+
     list_filter = ["is_active", "is_default", "rtl"]
+
     search_fields = ["code", "name", "native_name"]
+
     ordering = ["sort_order", "name"]
+
     readonly_fields = ["created_at", "updated_at"]
 
     fieldsets = [
@@ -45,27 +53,37 @@ class LocaleAdmin(admin.ModelAdmin):
 
     def is_default_display(self, obj):  # noqa: C901
         """Display default status with styling."""
+
         if obj.is_default:
+
             return format_html(
                 '<span style="color: green; font-weight: bold;">✓ Default</span>'
             )
+
         return "–"
 
     is_default_display.short_description = "Default"
+
     is_default_display.admin_order_field = "is_default"
 
     def rtl_display(self, obj):  # noqa: C901
         """Display RTL status."""
+
         if obj.rtl:
+
             return format_html('<span style="color: blue;">RTL</span>')
+
         return "–"
 
     rtl_display.short_description = "RTL"
+
     rtl_display.admin_order_field = "rtl"
 
     def make_default(self, request, queryset):  # noqa: C901
         """Action to set a locale as default."""
+
         if queryset.count() != 1:
+
             self.message_user(
                 request,
                 "Please select exactly one locale to make default.",
@@ -75,11 +93,17 @@ class LocaleAdmin(admin.ModelAdmin):
         locale = queryset.first()
 
         with transaction.atomic():
+
             # Remove default from all other locales
+
             Locale.objects.exclude(id=locale.id).update(is_default=False)
+
             # Set this locale as default and active
+
             locale.is_default = True
+
             locale.is_active = True
+
             locale.save()
 
         self.message_user(request, f'"{locale.name}" is now the default locale.')
@@ -88,16 +112,22 @@ class LocaleAdmin(admin.ModelAdmin):
 
     def activate_locales(self, request, queryset):  # noqa: C901
         """Action to activate selected locales."""
+
         count = queryset.update(is_active=True)
+
         self.message_user(request, f"Activated {count} locale(s).")
 
     activate_locales.short_description = "Activate selected locales"
 
     def deactivate_locales(self, request, queryset):  # noqa: C901
         """Action to deactivate selected locales."""
+
         # Prevent deactivating the default locale
+
         default_in_selection = queryset.filter(is_default=True).exists()
+
         if default_in_selection:
+
             self.message_user(
                 request,
                 "Cannot deactivate the default locale. Please set another locale as default first.",
@@ -105,25 +135,35 @@ class LocaleAdmin(admin.ModelAdmin):
             )
 
         count = queryset.update(is_active=False)
+
         self.message_user(request, f"Deactivated {count} locale(s).")
 
     deactivate_locales.short_description = "Deactivate selected locales"
 
     def get_queryset(self, request):  # noqa: C901
         """Optimize queryset with select_related."""
+
         return super().get_queryset(request).select_related("fallback")
 
     def save_model(self, request, obj, form, change):  # noqa: C901
         """Custom save to handle validation."""
+
         try:
+
             obj.save()
+
         except Exception as e:
+
             self.message_user(request, f"Error saving locale: {e}", level="error")
 
         if change:
+
             self.message_user(request, f'Locale "{obj.name}" updated successfully.')
+
         else:
+
             self.message_user(request, f'Locale "{obj.name}" created successfully.')
+
 
 @admin.register(TranslationGlossary)
 class TranslationGlossaryAdmin(admin.ModelAdmin):
@@ -138,9 +178,13 @@ class TranslationGlossaryAdmin(admin.ModelAdmin):
         "is_verified",
         "created_at",
     ]
+
     list_filter = ["source_locale", "target_locale", "category", "is_verified"]
+
     search_fields = ["term", "translation", "context"]
+
     ordering = ["term"]
+
     readonly_fields = ["created_at", "updated_at"]
 
     fieldsets = [
@@ -158,10 +202,15 @@ class TranslationGlossaryAdmin(admin.ModelAdmin):
 
     def save_model(self, request, obj, form, change):  # noqa: C901
         """Set created_by and updated_by fields."""
+
         if not change:
+
             obj.created_by = request.user
+
         obj.updated_by = request.user
+
         super().save_model(request, obj, form, change)
+
 
 @admin.register(TranslationQueue)
 class TranslationQueueAdmin(admin.ModelAdmin):
@@ -177,13 +226,17 @@ class TranslationQueueAdmin(admin.ModelAdmin):
         "is_overdue",
         "created_at",
     ]
+
     list_filter = ["status", "priority", "assigned_to", "deadline"]
+
     search_fields = [
         "translation_unit__source_text",
         "translation_unit__target_text",
         "notes",
     ]
+
     ordering = ["-priority", "deadline"]
+
     readonly_fields = ["created_at", "updated_at", "word_count", "is_overdue"]
 
     fieldsets = [
@@ -214,29 +267,42 @@ class TranslationQueueAdmin(admin.ModelAdmin):
 
     def save_model(self, request, obj, form, change):  # noqa: C901
         """Set created_by field."""
+
         if not change:
+
             obj.created_by = request.user
+
         super().save_model(request, obj, form, change)
+
 
 @admin.register(TranslationHistory)
 class TranslationHistoryAdmin(admin.ModelAdmin):
     """Admin interface for TranslationHistory model."""
 
     list_display = ["translation_unit", "action", "performed_by", "created_at"]
+
     list_filter = ["action", "performed_by", "created_at"]
+
     search_fields = ["translation_unit__source_text", "comment"]
+
     ordering = ["-created_at"]
+
     readonly_fields = ["created_at"]
 
     def has_add_permission(self, request):  # noqa: C901
         """Disable adding history entries manually."""
+
         return False
 
     def has_change_permission(self, request, obj=None):  # noqa: C901
         """Disable editing history entries."""
+
         return False
 
+
 # Register existing models if not already registered
+
+
 @admin.register(TranslationUnit)
 class TranslationUnitAdmin(admin.ModelAdmin):
     """Admin interface for TranslationUnit model."""
@@ -251,32 +317,48 @@ class TranslationUnitAdmin(admin.ModelAdmin):
         "updated_by",
         "updated_at",
     ]
+
     list_filter = ["source_locale", "target_locale", "status", "content_type"]
+
     search_fields = ["source_text", "target_text"]
+
     ordering = ["-updated_at"]
+
     readonly_fields = ["created_at", "updated_at", "model_label"]
+
 
 @admin.register(UiMessage)
 class UiMessageAdmin(admin.ModelAdmin):
     """Admin interface for UiMessage model."""
 
     list_display = ["key", "namespace", "default_value", "created_at"]
+
     list_filter = ["namespace"]
+
     search_fields = ["key", "namespace", "description", "default_value"]
+
     ordering = ["namespace", "key"]
+
     readonly_fields = ["created_at", "updated_at"]
+
 
 @admin.register(UiMessageTranslation)
 class UiMessageTranslationAdmin(admin.ModelAdmin):
     """Admin interface for UiMessageTranslation model."""
 
     list_display = ["message", "locale", "status", "updated_by", "updated_at"]
+
     list_filter = ["locale", "status", "message__namespace"]
+
     search_fields = ["message__key", "value"]
+
     ordering = ["-updated_at"]
+
     readonly_fields = ["created_at", "updated_at"]
 
     def save_model(self, request, obj, form, change):  # noqa: C901
         """Set updated_by field."""
+
         obj.updated_by = request.user
+
         super().save_model(request, obj, form, change)

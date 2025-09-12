@@ -1,16 +1,35 @@
-from django.db.models import Q
+# Additional imports for health check functionality
+
+import time
+
+
+from django.core.cache import cache
+
+from django.db import connection
+
+from django.db.models import Count, Q
+
 from django.utils import timezone
 
+
 from drf_spectacular.types import OpenApiTypes
+
 from drf_spectacular.utils import OpenApiParameter, extend_schema, extend_schema_view
+
 from rest_framework import permissions, status, viewsets
+
 from rest_framework.decorators import action
+
 from rest_framework.response import Response
 
+
 from apps.core.decorators import cache_method_response
+
 from apps.core.permissions import IsOwnerOrAdmin
 
+
 from .models import Note
+
 from .serializers import (
     HealthCheckSerializer,
     NoteCreateUpdateSerializer,
@@ -19,21 +38,24 @@ from .serializers import (
     NoteSerializer,
 )
 
-# Additional imports for health check functionality
-import time
-from django.db.models import Count
-from django.db import connection
-from django.core.cache import cache
 
 try:
+
     from celery import current_app
+
 except ImportError:
+
     current_app = None
 
+
 try:
+
     import psutil
+
 except ImportError:
+
     psutil = None
+
 
 @extend_schema_view(
     list=extend_schema(
@@ -82,73 +104,105 @@ class NoteViewSet(viewsets.ModelViewSet):
     """ViewSet for managing notes"""
 
     serializer_class = NoteSerializer
+
     permission_classes = [permissions.IsAuthenticated, IsOwnerOrAdmin]
 
     @cache_method_response(timeout=300)  # Cache for 5 minutes
     def list(self, request, *args, **kwargs):  # noqa: C901
         """List notes with caching"""
+
         return super().list(request, *args, **kwargs)
 
     @cache_method_response(timeout=600)  # Cache for 10 minutes
     def retrieve(self, request, *args, **kwargs):  # noqa: C901
         """Retrieve note with caching"""
+
         return super().retrieve(request, *args, **kwargs)
 
     def get_queryset(self):  # noqa: C901
         """Get notes based on user permissions"""
+
         queryset = Note.objects.select_related("created_by", "updated_by")
 
         # Only prefetch tags for detail views
+
         if self.action == "retrieve":
+
             queryset = queryset.prefetch_related("tags")
+
         # For list views, annotate with count
+
         elif self.action == "list":
+
             queryset = queryset.annotate(tags_count=Count("tags"))
 
         # Users can see their own notes and public notes
+
         if not self.request.user.is_admin():
+
             queryset = queryset.filter(
                 Q(created_by=self.request.user) | Q(is_public=True)
             )
 
         # Apply filters
+
         search = self.request.query_params.get("search")
+
         if search:
+
             queryset = queryset.filter(
                 Q(title__icontains=search) | Q(content__icontains=search)
             )
 
         tags = self.request.query_params.get("tags")
+
         if tags:
+
             tag_list = [tag.strip() for tag in tags.split(",")]
+
             # Use Q objects for efficient OR filtering
+
             tag_query = Q()
+
             for tag in tag_list:
+
                 tag_query |= Q(tags__icontains=tag)
+
             queryset = queryset.filter(tag_query)
 
         is_public = self.request.query_params.get("is_public")
+
         if is_public is not None:
+
             queryset = queryset.filter(is_public=is_public.lower() == "true")
 
         return queryset
 
     def get_serializer_class(self):  # noqa: C901
         """Return appropriate serializer class"""
+
         if self.action in ["create", "update", "partial_update"]:
+
             return NoteCreateUpdateSerializer
+
         elif self.action == "list":
+
             return NoteListSerializer
+
         elif self.action == "retrieve":
+
             return NoteDetailSerializer
+
         return NoteSerializer
 
     def perform_create(self, serializer):  # noqa: C901
         """Set the creator when creating a note"""
+
         serializer.save(created_by=self.request.user, updated_by=self.request.user)
 
     def perform_update(self, serializer):  # noqa: C901
         """Set the updater when updating a note"""
+
         serializer.save(updated_by=self.request.user)
 
     @extend_schema(
@@ -157,28 +211,38 @@ class NoteViewSet(viewsets.ModelViewSet):
     @action(detail=False, methods=["get"])
     def my_notes(self, request):  # noqa: C901
         """Get notes created by the current user"""
+
         queryset = self.get_queryset().filter(created_by=request.user)
 
         page = self.paginate_queryset(queryset)
+
         if page is not None:
+
             serializer = self.get_serializer(page, many=True)
+
             return self.get_paginated_response(serializer.data)
 
         serializer = self.get_serializer(queryset, many=True)
+
         return Response(serializer.data)
 
     @extend_schema(summary="Get public notes", description="Get all public notes.")
     @action(detail=False, methods=["get"])
     def public(self, request):  # noqa: C901
         """Get public notes"""
+
         queryset = self.get_queryset().filter(is_public=True)
 
         page = self.paginate_queryset(queryset)
+
         if page is not None:
+
             serializer = self.get_serializer(page, many=True)
+
             return self.get_paginated_response(serializer.data)
 
         serializer = self.get_serializer(queryset, many=True)
+
         return Response(serializer.data)
 
     @extend_schema(
@@ -188,13 +252,19 @@ class NoteViewSet(viewsets.ModelViewSet):
     @action(detail=True, methods=["post"])
     def toggle_visibility(self, request, pk=None):  # noqa: C901
         """Toggle note visibility between public and private"""
+
         note = self.get_object()
+
         note.is_public = not note.is_public
+
         note.updated_by = request.user
+
         note.save(update_fields=["is_public", "updated_by", "updated_at"])
 
         serializer = self.get_serializer(note)
+
         return Response(serializer.data)
+
 
 @extend_schema_view(
     list=extend_schema(
@@ -210,6 +280,7 @@ class HealthCheckViewSet(viewsets.ViewSet):
     @extend_schema(responses={200: HealthCheckSerializer})
     def list(self, request):  # noqa: C901
         """Comprehensive health check"""
+
         health_data = {
             "status": "healthy",
             "timestamp": timezone.now(),
@@ -220,71 +291,112 @@ class HealthCheckViewSet(viewsets.ViewSet):
         }
 
         # Check Celery (if available)
+
         celery_status = self._check_celery()
+
         if celery_status is not None:
+
             health_data["celery"] = celery_status
 
         # Add version info
+
         health_data["version"] = self._get_version()
 
         # Add system metrics (optional)
+
         if request.user.is_authenticated and request.user.is_staff:
+
             health_data.update(self._get_system_metrics())
 
         # Determine overall status
+
         checks = [health_data["database"], health_data["cache"]]
+
         if "celery" in health_data:
+
             checks.append(health_data["celery"])
 
         if not all(checks):
+
             health_data["status"] = "unhealthy"
+
             return Response(health_data, status=status.HTTP_503_SERVICE_UNAVAILABLE)
 
         serializer = HealthCheckSerializer(health_data)
+
         return Response(serializer.data)
 
     def _check_database(self):  # noqa: C901
         """Check database connectivity"""
+
         try:
+
             with connection.cursor() as cursor:
+
                 cursor.execute("SELECT 1")
+
             return True
+
         except Exception:
+
             return False
 
     def _check_cache(self):  # noqa: C901
         """Check cache connectivity"""
+
         try:
+
             test_key = "health_check_test"
+
             cache.set(test_key, "ok", 10)
+
             return cache.get(test_key) == "ok"
+
         except Exception:
+
             return False
 
     def _check_celery(self):  # noqa: C901
         """Check Celery worker availability"""
+
         try:
+
             inspect = current_app.control.inspect()
+
             stats = inspect.stats()
+
             return stats is not None and len(stats) > 0
+
         except Exception:
+
             return None  # Celery not available or configured
 
     def _get_version(self):  # noqa: C901
         """Get application version"""
+
         try:
+
             # You can implement version detection here
+
             # For example, read from a VERSION file or git tag
+
             return "1.0.0"
+
         except Exception:
+
             return "unknown"
 
     def _get_system_metrics(self):  # noqa: C901
         """Get system metrics (for staff users only)"""
+
         try:
+
             # Get uptime (approximate)
+
             boot_time = psutil.boot_time()
+
             uptime_seconds = time.time() - boot_time
+
             uptime_hours = uptime_seconds / 3600
 
             return {
@@ -292,10 +404,15 @@ class HealthCheckViewSet(viewsets.ViewSet):
                 "memory_usage": psutil.virtual_memory().percent,
                 "cpu_usage": psutil.cpu_percent(),
             }
+
         except ImportError:
+
             # psutil not available
+
             return {}
+
         except Exception:
+
             return {}
 
     @extend_schema(
@@ -305,14 +422,18 @@ class HealthCheckViewSet(viewsets.ViewSet):
     @action(detail=False, methods=["get"])
     def ready(self, request):  # noqa: C901
         """Readiness check (for Kubernetes probes)"""
+
         # Check essential services
+
         if not self._check_database():
+
             return Response(
                 {"status": "not ready", "reason": "database unavailable"},
                 status=status.HTTP_503_SERVICE_UNAVAILABLE,
             )
 
         if not self._check_cache():
+
             return Response(
                 {"status": "not ready", "reason": "cache unavailable"},
                 status=status.HTTP_503_SERVICE_UNAVAILABLE,
@@ -326,4 +447,5 @@ class HealthCheckViewSet(viewsets.ViewSet):
     @action(detail=False, methods=["get"])
     def live(self, request):  # noqa: C901
         """Liveness check (for Kubernetes probes)"""
+
         return Response({"status": "alive", "timestamp": timezone.now()})

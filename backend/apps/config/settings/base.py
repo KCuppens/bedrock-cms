@@ -1,26 +1,41 @@
 from pathlib import Path
 
+
 import environ
+
 
 env = environ.Env()
 
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
+
 BASE_DIR = Path(__file__).resolve().parent.parent.parent.parent
 
+
 # Read .env file
+
 env_file = BASE_DIR / ".env"
+
 if env_file.exists():
+
     env.read_env(env_file)
 
+
 # SECURITY WARNING: keep the secret key used in production secret!
+
 SECRET_KEY = env("DJANGO_SECRET_KEY", default="django-insecure-change-me-in-production")
 
+
 # SECURITY WARNING: don't run with debug turned on in production!
+
 DEBUG = env.bool("DEBUG", default=False)
+
 
 ALLOWED_HOSTS = env.list("ALLOWED_HOSTS", default=[])
 
+
 # Application definition
+
 DJANGO_APPS = [
     "django.contrib.admin",
     "django.contrib.auth",
@@ -29,6 +44,7 @@ DJANGO_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
 ]
+
 
 THIRD_PARTY_APPS = [
     "rest_framework",
@@ -39,6 +55,7 @@ THIRD_PARTY_APPS = [
     "allauth.socialaccount",
     "waffle",
 ]
+
 
 LOCAL_APPS = [
     "apps.accounts",
@@ -58,7 +75,9 @@ LOCAL_APPS = [
     "apps.search",
 ]
 
+
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
+
 
 MIDDLEWARE = [
     # Performance monitoring (first to track everything)
@@ -106,7 +125,9 @@ MIDDLEWARE = [
     "apps.core.middleware.DemoModeMiddleware",
 ]
 
+
 ROOT_URLCONF = "apps.config.urls"
+
 
 TEMPLATES = [
     {
@@ -124,24 +145,33 @@ TEMPLATES = [
     },
 ]
 
+
 WSGI_APPLICATION = "apps.config.wsgi.application"
 
+
 # Database
+
 # Default to SQLite for easy development, configurable via DATABASE_URL
+
 DATABASES = {
     "default": env.db("DATABASE_URL", default=f"sqlite:///{BASE_DIR}/db.sqlite3")
 }
 
+
 # Database connection pooling
+
 DATABASES["default"]["CONN_MAX_AGE"] = env.int(
     "DB_CONN_MAX_AGE", 600
 )  # 10 minutes default
 
+
 # PostgreSQL-specific optimizations
+
 if (
     "postgresql" in DATABASES["default"]["ENGINE"]
     or "postgis" in DATABASES["default"]["ENGINE"]
 ):
+
     DATABASES["default"]["OPTIONS"] = {
         "connect_timeout": 10,
         "options": "-c statement_timeout=30000",  # 30 seconds
@@ -151,24 +181,37 @@ if (
         "keepalives_count": 5,
     }
 
+
 # Enable persistent connections
+
 DATABASES["default"]["CONN_HEALTH_CHECKS"] = True
 
+
 # Cache Configuration
+
 CACHES = {
     "default": env.cache("REDIS_URL", default="redis://localhost:6379/0"),
 }
 
+
 # Cache key settings
+
 CACHE_MIDDLEWARE_ALIAS = "default"
+
 CACHE_MIDDLEWARE_SECONDS = 600  # 10 minutes
+
 CACHE_MIDDLEWARE_KEY_PREFIX = "bedrock"
 
+
 # Session cache
+
 SESSION_ENGINE = "django.contrib.sessions.backends.cache"
+
 SESSION_CACHE_ALIAS = "default"
 
+
 # Password validation
+
 AUTH_PASSWORD_VALIDATORS = [
     {
         "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator",
@@ -184,54 +227,84 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+
 # Internationalization
+
 # Default locale settings - will be dynamically updated from database after Django initializes
+
 # These are fallback values used during initial setup and migrations
+
 LANGUAGE_CODE = "en"
+
 LANGUAGES = [
     ("en", "English"),
     # Additional languages will be loaded dynamically from the database
     # via the I18nConfig.ready() method and DynamicLanguageMiddleware
 ]
+
 RTL_LANGUAGES: list[str] = []
 
+
 # The i18n app will load actual languages from the database once Django is ready
+
 # This avoids circular dependency issues while still providing dynamic language support
 
+
 TIME_ZONE = "UTC"
+
 USE_I18N = True
+
 USE_TZ = True
 
+
 # Additional i18n settings
+
 LOCALE_PATHS = [
     BASE_DIR / "locale",
 ]
 
+
 # Custom setting to track if we're using dynamic locales
+
 USE_DYNAMIC_LOCALES = True
 
+
 # Static files (CSS, JavaScript, Images)
+
 STATIC_URL = "/static/"
+
 STATIC_ROOT = BASE_DIR / "staticfiles"
+
 STATICFILES_DIRS = [BASE_DIR / "static"]
 
+
 # Media files
+
 MEDIA_URL = "/media/"
+
 MEDIA_ROOT = BASE_DIR / "media"
 
+
 # Default primary key field type
+
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
+
 # Custom User Model
+
 AUTH_USER_MODEL = "accounts.User"
 
+
 # Authentication backends (include RBAC backend)
+
 AUTHENTICATION_BACKENDS = [
     "apps.accounts.auth_backends.ScopedPermissionBackend",
     "django.contrib.auth.backends.ModelBackend",
 ]
 
+
 # Django REST Framework
+
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": [
         "rest_framework.authentication.SessionAuthentication",
@@ -265,7 +338,9 @@ REST_FRAMEWORK = {
     },
 }
 
+
 # Spectacular settings
+
 SPECTACULAR_SETTINGS = {
     "TITLE": "Bedrock CMS API",
     "DESCRIPTION": "A comprehensive Content Management System with multi-locale support, search, caching, and more",
@@ -352,43 +427,73 @@ SPECTACULAR_SETTINGS = {
     },
 }
 
+
 # Django Allauth
+
 # Django Allauth configuration
+
 ACCOUNT_EMAIL_VERIFICATION = "none"  # Email verification is not required
+
 ACCOUNT_LOGIN_METHODS = {"email"}
+
 ACCOUNT_SIGNUP_FIELDS = ["email*", "password1*", "password2*"]
+
 ACCOUNT_USER_MODEL_USERNAME_FIELD = None
+
 ACCOUNT_USER_MODEL_EMAIL_FIELD = "email"
 
+
 # Email settings
+
 EMAIL_BACKEND = env(
     "EMAIL_BACKEND", default="django.core.mail.backends.console.EmailBackend"
 )
+
 EMAIL_HOST = env("EMAIL_HOST", default="localhost")
+
 EMAIL_PORT = env.int("EMAIL_PORT", default=1025)
+
 EMAIL_HOST_USER = env("EMAIL_HOST_USER", default="")
+
 EMAIL_HOST_PASSWORD = env("EMAIL_HOST_PASSWORD", default="")
+
 EMAIL_USE_TLS = env.bool("EMAIL_USE_TLS", default=False)
+
 EMAIL_USE_SSL = env.bool("EMAIL_USE_SSL", default=False)
+
 DEFAULT_FROM_EMAIL = env(
     "DEFAULT_FROM_EMAIL", default="Django SaaS <noreply@example.com>"
 )
 
+
 # Site Configuration
+
 SITE_NAME = env("SITE_NAME", default="Bedrock CMS")
+
 SITE_URL = env("SITE_URL", default="http://localhost:3000")
+
 FRONTEND_URL = env("FRONTEND_URL", default="http://localhost:3000")
 
+
 # Celery Configuration
+
 CELERY_BROKER_URL = env("CELERY_BROKER_URL", default="redis://localhost:6379/1")
+
 CELERY_RESULT_BACKEND = env("CELERY_RESULT_BACKEND", default="redis://localhost:6379/1")
+
 CELERY_TASK_SERIALIZER = "json"
+
 CELERY_RESULT_SERIALIZER = "json"
+
 CELERY_ACCEPT_CONTENT = ["json"]
+
 CELERY_TIMEZONE = TIME_ZONE
+
 CELERY_ENABLE_UTC = True
 
+
 # Celery Beat Schedule (Periodic Tasks)
+
 CELERY_BEAT_SCHEDULE = {
     "publish-scheduled-content": {
         "task": "apps.cms.tasks.publish_scheduled_content",
@@ -407,7 +512,9 @@ CELERY_BEAT_SCHEDULE = {
     },
 }
 
+
 # Celery Task Routes
+
 CELERY_TASK_ROUTES = {
     "apps.cms.tasks.publish_scheduled_content": {"queue": "publishing"},
     "apps.cms.tasks.unpublish_expired_content": {"queue": "publishing"},
@@ -415,7 +522,9 @@ CELERY_TASK_ROUTES = {
     "apps.i18n.tasks.*": {"queue": "translations"},
 }
 
+
 # Logging
+
 LOGGING = {
     "version": 1,
     "disable_existing_loggers": False,
@@ -441,16 +550,25 @@ LOGGING = {
     },
 }
 
+
 # Security
+
 SECURE_BROWSER_XSS_FILTER = True
+
 SECURE_CONTENT_TYPE_NOSNIFF = True
+
 X_FRAME_OPTIONS = "DENY"
 
+
 # CORS
+
 CORS_ALLOW_ALL_ORIGINS = env.bool("CORS_ALLOW_ALL_ORIGINS", default=False)
+
 CORS_ALLOWED_ORIGINS = env.list("CORS_ALLOWED_ORIGINS", default=[])
 
+
 # Default CORS allowed headers - can be overridden in environment-specific settings
+
 CORS_ALLOW_HEADERS = [
     # Standard headers
     "authorization",
@@ -463,24 +581,38 @@ CORS_ALLOW_HEADERS = [
     "x-user-role",
 ]
 
+
 # File Upload
+
 FILE_UPLOAD_MAX_MEMORY_SIZE = 5 * 1024 * 1024  # 5MB
+
 DATA_UPLOAD_MAX_MEMORY_SIZE = FILE_UPLOAD_MAX_MEMORY_SIZE
 
+
 # Demo mode
+
 DEMO_MODE = env.bool("DEMO_MODE", default=False)
 
+
 # DeepL Translation API
+
 DEEPL_API_KEY = env("DEEPL_API_KEY", default="")
 
+
 # Admin settings
+
 ADMIN_URL_PATH = env("ADMIN_URL_PATH", default="admin/")
+
 ADMIN_IP_ALLOWLIST = env.list("ADMIN_IP_ALLOWLIST", default=[])
 
+
 # CMS settings
+
 CMS_SITEMAP_BASE_URL = env("CMS_SITEMAP_BASE_URL", default="http://localhost:8000")
 
+
 # HTML Sanitization settings
+
 HTML_SANITIZER_ALLOWED_TAGS = [
     "p",
     "div",
@@ -519,6 +651,7 @@ HTML_SANITIZER_ALLOWED_TAGS = [
     "figcaption",
 ]
 
+
 HTML_SANITIZER_ALLOWED_ATTRIBUTES = {
     "*": ["class", "id"],
     "a": ["href", "title", "target", "rel"],
@@ -529,26 +662,43 @@ HTML_SANITIZER_ALLOWED_ATTRIBUTES = {
     "td": ["rowspan", "colspan"],
 }
 
+
 HTML_SANITIZER_ALLOWED_PROTOCOLS = ["http", "https", "mailto", "tel"]
 
+
 # Media storage settings
+
 USE_S3_STORAGE = env.bool("USE_S3_STORAGE", default=False)
 
+
 if USE_S3_STORAGE:
+
     # AWS S3 settings
+
     AWS_ACCESS_KEY_ID = env("AWS_ACCESS_KEY_ID")
+
     AWS_SECRET_ACCESS_KEY = env("AWS_SECRET_ACCESS_KEY")
+
     AWS_STORAGE_BUCKET_NAME = env("AWS_STORAGE_BUCKET_NAME")
+
     AWS_S3_REGION_NAME = env("AWS_S3_REGION_NAME", default="us-east-1")
+
     AWS_S3_CUSTOM_DOMAIN = env("AWS_S3_CUSTOM_DOMAIN", default=None)
+
     AWS_DEFAULT_ACL = env("AWS_DEFAULT_ACL", default="public-read")
+
     AWS_S3_OBJECT_PARAMETERS = {
         "CacheControl": "max-age=86400",
     }
 
     # Use different storage for static vs media files
+
     DEFAULT_FILE_STORAGE = "apps.core.storage.S3MediaStorage"
+
     STATICFILES_STORAGE = "apps.core.storage.S3StaticStorage"
+
 else:
+
     # Local file storage (default)
+
     DEFAULT_FILE_STORAGE = "django.core.files.storage.FileSystemStorage"

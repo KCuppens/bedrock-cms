@@ -3,6 +3,7 @@
 """Fix F401 unused import warnings by adding noqa comments."""
 from pathlib import Path
 
+
 def fix_f401_issues(content, file_path):
     """Add noqa comments for F401 unused imports in specific contexts."""
     lines = content.split("\n")

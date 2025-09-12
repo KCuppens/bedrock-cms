@@ -3,6 +3,7 @@
 
 import os
 
+
 def split_long_line(line, max_length=79):
     """Split a line that's too long."""
     if len(line) <= max_length:

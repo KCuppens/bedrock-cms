@@ -1,5 +1,6 @@
 from django.urls import path
 
+
 from .views import (
     EmailLogListView,
     EmailTemplateListView,
@@ -10,7 +11,9 @@ from .views import (
     send_test_email,
 )
 
+
 # Development URLs for email templates
+
 urlpatterns = [
     # Email template management (development only)
     path("emails/", EmailTemplateListView.as_view(), name="email_template_list"),

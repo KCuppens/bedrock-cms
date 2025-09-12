@@ -1,6 +1,9 @@
 from django.contrib import admin
+
 from django.urls import reverse
+
 from django.utils.html import format_html
+
 
 from .models import (
     AnalyticsSummary,
@@ -11,6 +14,7 @@ from .models import (
     Threat,
     UserActivity,
 )
+
 
 @admin.register(PageView)
 class PageViewAdmin(admin.ModelAdmin):
@@ -25,6 +29,7 @@ class PageViewAdmin(admin.ModelAdmin):
         "viewed_at",
         "time_on_page",
     ]
+
     list_filter = [
         "device_type",
         "viewed_at",
@@ -33,6 +38,7 @@ class PageViewAdmin(admin.ModelAdmin):
         "page__status",
         "country",
     ]
+
     search_fields = [
         "url",
         "title",
@@ -41,6 +47,7 @@ class PageViewAdmin(admin.ModelAdmin):
         "ip_address",
         "session_id",
     ]
+
     readonly_fields = [
         "id",
         "viewed_at",
@@ -50,8 +57,11 @@ class PageViewAdmin(admin.ModelAdmin):
         "browser",
         "os",
     ]
+
     date_hierarchy = "viewed_at"
+
     ordering = ["-viewed_at"]
+
     list_per_page = 50
 
     fieldsets = (
@@ -66,26 +76,38 @@ class PageViewAdmin(admin.ModelAdmin):
 
     def page_title_link(self, obj):  # noqa: C901
         """Display page title as link to page admin"""
+
         if obj.page:
+
             url = reverse("admin:cms_page_change", args=[obj.page.pk])
+
             return format_html('<a href="{}">{}</a>', url, obj.page.title)
+
         return obj.title or obj.url
 
     page_title_link.short_description = "Page"
+
     page_title_link.admin_order_field = "page__title"
 
     def user_link(self, obj):  # noqa: C901
         """Display user as link to user admin"""
+
         if obj.user:
+
             url = reverse("admin:accounts_user_change", args=[obj.user.pk])
+
             return format_html('<a href="{}">{}</a>', url, obj.user.email)
+
         return "Anonymous"
 
     user_link.short_description = "User"
+
     user_link.admin_order_field = "user__email"
 
     def get_queryset(self, request):  # noqa: C901
+
         return super().get_queryset(request).select_related("page", "user")
+
 
 @admin.register(UserActivity)
 class UserActivityAdmin(admin.ModelAdmin):
@@ -99,11 +121,17 @@ class UserActivityAdmin(admin.ModelAdmin):
         "ip_address",
         "created_at",
     ]
+
     list_filter = ["action", "created_at", "content_type"]
+
     search_fields = ["user__email", "description", "ip_address", "session_id"]
+
     readonly_fields = ["id", "created_at", "session_id", "ip_address", "user_agent"]
+
     date_hierarchy = "created_at"
+
     ordering = ["-created_at"]
+
     list_per_page = 50
 
     fieldsets = (
@@ -115,34 +143,46 @@ class UserActivityAdmin(admin.ModelAdmin):
 
     def user_link(self, obj):  # noqa: C901
         """Display user as link to user admin"""
+
         url = reverse("admin:accounts_user_change", args=[obj.user.pk])
+
         return format_html('<a href="{}">{}</a>', url, obj.user.email)
 
     user_link.short_description = "User"
+
     user_link.admin_order_field = "user__email"
 
     def content_object_link(self, obj):  # noqa: C901
         """Display content object as link if possible"""
+
         if obj.content_object:
+
             try:
+
                 url = reverse(
                     f"admin:{obj.content_type.app_label}_{obj.content_type.model}_change",
                     args=[obj.object_id],
                 )
+
                 return format_html('<a href="{}">{}</a>', url, str(obj.content_object))
+
             except Exception:
+
                 return str(obj.content_object)
+
         return "-"
 
     content_object_link.short_description = "Related Object"
 
     def get_queryset(self, request):  # noqa: C901
+
         return (
             super()
             .get_queryset(request)
             .select_related("user", "content_type")
             .prefetch_related("content_object")
         )
+
 
 @admin.register(ContentMetrics)
 class ContentMetricsAdmin(admin.ModelAdmin):
@@ -157,11 +197,17 @@ class ContentMetricsAdmin(admin.ModelAdmin):
         "bounce_rate",
         "updated_at",
     ]
+
     list_filter = ["content_category", "date", "content_type"]
+
     search_fields = ["content_type__model", "object_id"]
+
     readonly_fields = ["updated_at"]
+
     date_hierarchy = "date"
+
     ordering = ["-date", "-views"]
+
     list_per_page = 50
 
     fieldsets = (
@@ -183,21 +229,30 @@ class ContentMetricsAdmin(admin.ModelAdmin):
 
     def content_object_link(self, obj):  # noqa: C901
         """Display content object as link"""
+
         if obj.content_object:
+
             try:
+
                 url = reverse(
                     f"admin:{obj.content_type.app_label}_{obj.content_type.model}_change",
                     args=[obj.object_id],
                 )
+
                 return format_html('<a href="{}">{}</a>', url, str(obj.content_object))
+
             except Exception:
+
                 return str(obj.content_object)
+
         return f"{obj.content_type.model} #{obj.object_id}"
 
     content_object_link.short_description = "Content"
 
     def get_queryset(self, request):  # noqa: C901
+
         return super().get_queryset(request).select_related("content_type")
+
 
 @admin.register(Assessment)
 class AssessmentAdmin(admin.ModelAdmin):
@@ -212,6 +267,7 @@ class AssessmentAdmin(admin.ModelAdmin):
         "assigned_to_link",
         "created_at",
     ]
+
     list_filter = [
         "assessment_type",
         "status",
@@ -220,6 +276,7 @@ class AssessmentAdmin(admin.ModelAdmin):
         "scheduled_for",
         "completed_at",
     ]
+
     search_fields = [
         "title",
         "description",
@@ -227,9 +284,13 @@ class AssessmentAdmin(admin.ModelAdmin):
         "assigned_to__email",
         "created_by__email",
     ]
+
     readonly_fields = ["id", "created_at", "updated_at"]
+
     date_hierarchy = "created_at"
+
     ordering = ["-created_at"]
+
     list_per_page = 50
 
     fieldsets = (
@@ -249,18 +310,25 @@ class AssessmentAdmin(admin.ModelAdmin):
 
     def assigned_to_link(self, obj):  # noqa: C901
         """Display assigned user as link"""
+
         if obj.assigned_to:
+
             url = reverse("admin:accounts_user_change", args=[obj.assigned_to.pk])
+
             return format_html(
                 '<a href="{}">{}</a>', url, obj.assigned_to.get_full_name()
             )
+
         return "Unassigned"
 
     assigned_to_link.short_description = "Assigned To"
+
     assigned_to_link.admin_order_field = "assigned_to__name"
 
     def get_queryset(self, request):  # noqa: C901
+
         return super().get_queryset(request).select_related("assigned_to", "created_by")
+
 
 @admin.register(Risk)
 class RiskAdmin(admin.ModelAdmin):
@@ -275,6 +343,7 @@ class RiskAdmin(admin.ModelAdmin):
         "owner_link",
         "identified_at",
     ]
+
     list_filter = [
         "category",
         "status",
@@ -282,6 +351,7 @@ class RiskAdmin(admin.ModelAdmin):
         "identified_at",
         "mitigation_deadline",
     ]
+
     search_fields = [
         "title",
         "description",
@@ -289,9 +359,13 @@ class RiskAdmin(admin.ModelAdmin):
         "owner__email",
         "assigned_to__email",
     ]
+
     readonly_fields = ["id", "risk_score", "severity", "identified_at", "last_reviewed"]
+
     date_hierarchy = "identified_at"
+
     ordering = ["-risk_score", "-identified_at"]
+
     list_per_page = 50
 
     fieldsets = (
@@ -313,20 +387,27 @@ class RiskAdmin(admin.ModelAdmin):
 
     def owner_link(self, obj):  # noqa: C901
         """Display owner as link"""
+
         if obj.owner:
+
             url = reverse("admin:accounts_user_change", args=[obj.owner.pk])
+
             return format_html('<a href="{}">{}</a>', url, obj.owner.get_full_name())
+
         return "Unassigned"
 
     owner_link.short_description = "Owner"
+
     owner_link.admin_order_field = "owner__name"
 
     def get_queryset(self, request):  # noqa: C901
+
         return (
             super()
             .get_queryset(request)
             .select_related("owner", "assigned_to", "assessment")
         )
+
 
 @admin.register(Threat)
 class ThreatAdmin(admin.ModelAdmin):
@@ -341,6 +422,7 @@ class ThreatAdmin(admin.ModelAdmin):
         "assigned_to_link",
         "detected_at",
     ]
+
     list_filter = [
         "threat_type",
         "status",
@@ -349,6 +431,7 @@ class ThreatAdmin(admin.ModelAdmin):
         "data_compromised",
         "service_disrupted",
     ]
+
     search_fields = [
         "title",
         "description",
@@ -358,9 +441,13 @@ class ThreatAdmin(admin.ModelAdmin):
         "assigned_to__email",
         "reported_by__email",
     ]
+
     readonly_fields = ["id", "detected_at", "updated_at"]
+
     date_hierarchy = "detected_at"
+
     ordering = ["-detected_at"]
+
     list_per_page = 50
 
     fieldsets = (
@@ -390,20 +477,27 @@ class ThreatAdmin(admin.ModelAdmin):
 
     def assigned_to_link(self, obj):  # noqa: C901
         """Display assigned user as link"""
+
         if obj.assigned_to:
+
             url = reverse("admin:accounts_user_change", args=[obj.assigned_to.pk])
+
             return format_html(
                 '<a href="{}">{}</a>', url, obj.assigned_to.get_full_name()
             )
+
         return "Unassigned"
 
     assigned_to_link.short_description = "Assigned To"
+
     assigned_to_link.admin_order_field = "assigned_to__name"
 
     def get_queryset(self, request):  # noqa: C901
+
         return (
             super().get_queryset(request).select_related("assigned_to", "reported_by")
         )
+
 
 @admin.register(AnalyticsSummary)
 class AnalyticsSummaryAdmin(admin.ModelAdmin):
@@ -418,11 +512,17 @@ class AnalyticsSummaryAdmin(admin.ModelAdmin):
         "threats_detected",
         "uptime_percentage",
     ]
+
     list_filter = ["period_type", "date"]
+
     search_fields = ["date"]
+
     readonly_fields = ["created_at", "updated_at"]
+
     date_hierarchy = "date"
+
     ordering = ["-date"]
+
     list_per_page = 50
 
     fieldsets = (
@@ -458,7 +558,11 @@ class AnalyticsSummaryAdmin(admin.ModelAdmin):
         ("Metadata", {"fields": ("created_at", "updated_at")}),
     )
 
+
 # Custom admin site configuration
+
 admin.site.site_header = "Bedrock CMS Analytics"
+
 admin.site.site_title = "Analytics Admin"
+
 admin.site.index_title = "Analytics Administration"

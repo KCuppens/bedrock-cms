@@ -1,16 +1,25 @@
 import logging
+
 import subprocess  # nosec B404
 
+
 from django.conf import settings
+
 from django.core.cache import cache
+
 from django.db import connection
+
 from django.http import JsonResponse
+
 from django.utils import timezone
+
 
 logger = logging.getLogger(__name__)
 
+
 def health_check(request):  # noqa: C901
     """Simple health check endpoint"""
+
     return JsonResponse(
         {
             "status": "ok",
@@ -19,20 +28,26 @@ def health_check(request):  # noqa: C901
         }
     )
 
+
 def readiness_check(request):  # noqa: C901
     """Readiness check for container orchestration"""
+
     try:
+
         # Check database
 
         with connection.cursor() as cursor:
+
             cursor.execute("SELECT 1")
 
         # Check cache
 
         cache.set("readiness_check", "ok", 10)
+
         cache_ok = cache.get("readiness_check") == "ok"
 
         if cache_ok:
+
             return JsonResponse(
                 {
                     "status": "ready",
@@ -40,7 +55,9 @@ def readiness_check(request):  # noqa: C901
                     "checks": {"database": True, "cache": True},
                 }
             )
+
         else:
+
             return JsonResponse(
                 {
                     "status": "not_ready",
@@ -51,6 +68,7 @@ def readiness_check(request):  # noqa: C901
             )
 
     except Exception as e:
+
         return JsonResponse(
             {
                 "status": "not_ready",
@@ -61,8 +79,10 @@ def readiness_check(request):  # noqa: C901
             status=503,
         )
 
+
 def liveness_check(request):  # noqa: C901
     """Liveness check for container orchestration"""
+
     return JsonResponse(
         {
             "status": "alive",
@@ -70,8 +90,10 @@ def liveness_check(request):  # noqa: C901
         }
     )
 
+
 def version_info(request):  # noqa: C901
     """Version and build information"""
+
     version_data = {
         "version": "1.0.0",
         "build_time": timezone.now().isoformat(),
@@ -80,6 +102,7 @@ def version_info(request):  # noqa: C901
     }
 
     # Add git info if available
+
     try:
 
         git_hash = (
@@ -89,6 +112,7 @@ def version_info(request):  # noqa: C901
             .decode("ascii")
             .strip()
         )
+
         git_branch = (
             subprocess.check_output(  # nosec B603
                 ["/usr/bin/git", "rev-parse", "--abbrev-ref", "HEAD"], timeout=10
@@ -96,13 +120,16 @@ def version_info(request):  # noqa: C901
             .decode("ascii")
             .strip()
         )
+
         version_data.update(
             {
                 "git_hash": git_hash,
                 "git_branch": git_branch,
             }
         )
+
     except Exception as e:
+
         logger.warning("Failed to get git info: %s", e)
 
     return JsonResponse(version_data)

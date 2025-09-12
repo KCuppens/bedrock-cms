@@ -3,6 +3,7 @@ import os
 import py_compile
 import sys
 
+
 def check_file(filepath):
     try:
         py_compile.compile(filepath, doraise=True)

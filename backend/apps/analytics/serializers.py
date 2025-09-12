@@ -1,5 +1,8 @@
 from django.contrib.auth import get_user_model
+
+
 from rest_framework import serializers
+
 
 from .models import (
     AnalyticsSummary,
@@ -11,16 +14,21 @@ from .models import (
     UserActivity,
 )
 
+
 User = get_user_model()
+
 
 class PageViewSerializer(serializers.ModelSerializer):
     """Serializer for PageView model"""
 
     page_title = serializers.CharField(source="page.title", read_only=True)
+
     user_email = serializers.CharField(source="user.email", read_only=True)
 
     class Meta:
+
         model = PageView
+
         fields = [
             "id",
             "page",
@@ -42,13 +50,17 @@ class PageViewSerializer(serializers.ModelSerializer):
             "os",
             "viewed_at",
         ]
+
         read_only_fields = ["id", "viewed_at", "page_title", "user_email"]
+
 
 class PageViewCreateSerializer(serializers.ModelSerializer):
     """Serializer for creating PageView records (minimal data)"""
 
     class Meta:
+
         model = PageView
+
         fields = [
             "page",
             "url",
@@ -61,34 +73,54 @@ class PageViewCreateSerializer(serializers.ModelSerializer):
         ]
 
     def create(self, validated_data):  # noqa: C901
+
         # Extract additional data from request context
+
         request = self.context.get("request")
+
         if request:
+
             validated_data["ip_address"] = self.get_client_ip(request)
+
             validated_data["user_agent"] = request.META.get("HTTP_USER_AGENT", "")
+
             validated_data["session_id"] = request.session.session_key or ""
+
             if request.user.is_authenticated:
+
                 validated_data["user"] = request.user
+
         return super().create(validated_data)
 
     def get_client_ip(self, request):  # noqa: C901
         """Get client IP address from request"""
+
         x_forwarded_for = request.META.get("HTTP_X_FORWARDED_FOR")
+
         if x_forwarded_for:
+
             ip = x_forwarded_for.split(",")[0]
+
         else:
+
             ip = request.META.get("REMOTE_ADDR")
+
         return ip or "127.0.0.1"
+
 
 class UserActivitySerializer(serializers.ModelSerializer):
     """Serializer for UserActivity model"""
 
     user_email = serializers.CharField(source="user.email", read_only=True)
+
     action_display = serializers.CharField(source="get_action_display", read_only=True)
+
     content_object_name = serializers.SerializerMethodField()
 
     class Meta:
+
         model = UserActivity
+
         fields = [
             "id",
             "user",
@@ -105,6 +137,7 @@ class UserActivitySerializer(serializers.ModelSerializer):
             "session_id",
             "created_at",
         ]
+
         read_only_fields = [
             "id",
             "created_at",
@@ -115,44 +148,67 @@ class UserActivitySerializer(serializers.ModelSerializer):
 
     def get_content_object_name(self, obj):  # noqa: C901
         """Get string representation of related object"""
+
         if obj.content_object:
+
             return str(obj.content_object)
+
         return None
+
 
 class UserActivityCreateSerializer(serializers.ModelSerializer):
     """Serializer for creating UserActivity records"""
 
     class Meta:
+
         model = UserActivity
+
         fields = ["action", "description", "content_type", "object_id", "metadata"]
 
     def create(self, validated_data):  # noqa: C901
+
         request = self.context.get("request")
+
         if request:
+
             validated_data["user"] = request.user
+
             validated_data["ip_address"] = self.get_client_ip(request)
+
             validated_data["user_agent"] = request.META.get("HTTP_USER_AGENT", "")
+
             validated_data["session_id"] = request.session.session_key or ""
+
         return super().create(validated_data)
 
     def get_client_ip(self, request):  # noqa: C901
+
         x_forwarded_for = request.META.get("HTTP_X_FORWARDED_FOR")
+
         if x_forwarded_for:
+
             ip = x_forwarded_for.split(",")[0]
+
         else:
+
             ip = request.META.get("REMOTE_ADDR")
+
         return ip or "127.0.0.1"
+
 
 class ContentMetricsSerializer(serializers.ModelSerializer):
     """Serializer for ContentMetrics model"""
 
     content_object_name = serializers.SerializerMethodField()
+
     content_type_name = serializers.CharField(
         source="content_type.name", read_only=True
     )
 
     class Meta:
+
         model = ContentMetrics
+
         fields = [
             "content_type",
             "content_type_name",
@@ -172,12 +228,17 @@ class ContentMetricsSerializer(serializers.ModelSerializer):
             "avg_position",
             "updated_at",
         ]
+
         read_only_fields = ["updated_at", "content_type_name", "content_object_name"]
 
     def get_content_object_name(self, obj):  # noqa: C901
+
         if obj.content_object:
+
             return str(obj.content_object)
+
         return None
+
 
 class AssessmentSerializer(serializers.ModelSerializer):
     """Serializer for Assessment model"""
@@ -185,19 +246,25 @@ class AssessmentSerializer(serializers.ModelSerializer):
     assigned_to_name = serializers.CharField(
         source="assigned_to.get_full_name", read_only=True
     )
+
     created_by_name = serializers.CharField(
         source="created_by.get_full_name", read_only=True
     )
+
     assessment_type_display = serializers.CharField(
         source="get_assessment_type_display", read_only=True
     )
+
     status_display = serializers.CharField(source="get_status_display", read_only=True)
+
     severity_display = serializers.CharField(
         source="get_severity_display", read_only=True
     )
 
     class Meta:
+
         model = Assessment
+
         fields = [
             "id",
             "title",
@@ -223,6 +290,7 @@ class AssessmentSerializer(serializers.ModelSerializer):
             "created_at",
             "updated_at",
         ]
+
         read_only_fields = [
             "id",
             "created_at",
@@ -234,11 +302,14 @@ class AssessmentSerializer(serializers.ModelSerializer):
             "severity_display",
         ]
 
+
 class AssessmentCreateSerializer(serializers.ModelSerializer):
     """Serializer for creating Assessment records"""
 
     class Meta:
+
         model = Assessment
+
         fields = [
             "title",
             "description",
@@ -250,29 +321,41 @@ class AssessmentCreateSerializer(serializers.ModelSerializer):
         ]
 
     def create(self, validated_data):  # noqa: C901
+
         request = self.context.get("request")
+
         if request and request.user:
+
             validated_data["created_by"] = request.user
+
         return super().create(validated_data)
+
 
 class RiskSerializer(serializers.ModelSerializer):
     """Serializer for Risk model"""
 
     owner_name = serializers.CharField(source="owner.get_full_name", read_only=True)
+
     assigned_to_name = serializers.CharField(
         source="assigned_to.get_full_name", read_only=True
     )
+
     assessment_title = serializers.CharField(source="assessment.title", read_only=True)
+
     category_display = serializers.CharField(
         source="get_category_display", read_only=True
     )
+
     status_display = serializers.CharField(source="get_status_display", read_only=True)
+
     severity_display = serializers.CharField(
         source="get_severity_display", read_only=True
     )
 
     class Meta:
+
         model = Risk
+
         fields = [
             "id",
             "title",
@@ -298,6 +381,7 @@ class RiskSerializer(serializers.ModelSerializer):
             "identified_at",
             "last_reviewed",
         ]
+
         read_only_fields = [
             "id",
             "risk_score",
@@ -312,25 +396,32 @@ class RiskSerializer(serializers.ModelSerializer):
             "severity_display",
         ]
 
+
 class ThreatSerializer(serializers.ModelSerializer):
     """Serializer for Threat model"""
 
     assigned_to_name = serializers.CharField(
         source="assigned_to.get_full_name", read_only=True
     )
+
     reported_by_name = serializers.CharField(
         source="reported_by.get_full_name", read_only=True
     )
+
     threat_type_display = serializers.CharField(
         source="get_threat_type_display", read_only=True
     )
+
     status_display = serializers.CharField(source="get_status_display", read_only=True)
+
     severity_display = serializers.CharField(
         source="get_severity_display", read_only=True
     )
 
     class Meta:
+
         model = Threat
+
         fields = [
             "id",
             "title",
@@ -359,6 +450,7 @@ class ThreatSerializer(serializers.ModelSerializer):
             "resolved_at",
             "updated_at",
         ]
+
         read_only_fields = [
             "id",
             "detected_at",
@@ -370,11 +462,14 @@ class ThreatSerializer(serializers.ModelSerializer):
             "severity_display",
         ]
 
+
 class ThreatCreateSerializer(serializers.ModelSerializer):
     """Serializer for creating Threat records"""
 
     class Meta:
+
         model = Threat
+
         fields = [
             "title",
             "description",
@@ -392,10 +487,15 @@ class ThreatCreateSerializer(serializers.ModelSerializer):
         ]
 
     def create(self, validated_data):  # noqa: C901
+
         request = self.context.get("request")
+
         if request and request.user:
+
             validated_data["reported_by"] = request.user
+
         return super().create(validated_data)
+
 
 class AnalyticsSummarySerializer(serializers.ModelSerializer):
     """Serializer for AnalyticsSummary model"""
@@ -405,7 +505,9 @@ class AnalyticsSummarySerializer(serializers.ModelSerializer):
     )
 
     class Meta:
+
         model = AnalyticsSummary
+
         fields = [
             "date",
             "period_type",
@@ -429,56 +531,86 @@ class AnalyticsSummarySerializer(serializers.ModelSerializer):
             "created_at",
             "updated_at",
         ]
+
         read_only_fields = ["created_at", "updated_at", "period_type_display"]
 
+
 # Specialized serializers for analytics endpoints
+
 
 class TrafficStatsSerializer(serializers.Serializer):
     """Serializer for traffic statistics"""
 
     date = serializers.DateField()
+
     views = serializers.IntegerField()
+
     unique_visitors = serializers.IntegerField()
+
     bounce_rate = serializers.DecimalField(max_digits=5, decimal_places=2)
+
     avg_session_duration = serializers.IntegerField()
+
 
 class TopContentSerializer(serializers.Serializer):
     """Serializer for top performing content"""
 
     title = serializers.CharField()
+
     url = serializers.CharField()
+
     views = serializers.IntegerField()
+
     unique_views = serializers.IntegerField()
+
     avg_time_on_page = serializers.IntegerField()
+
 
 class DashboardStatsSerializer(serializers.Serializer):
     """Serializer for dashboard summary statistics"""
 
     today_views = serializers.IntegerField()
+
     today_visitors = serializers.IntegerField()
+
     active_threats = serializers.IntegerField()
+
     open_risks = serializers.IntegerField()
+
     pending_assessments = serializers.IntegerField()
+
     avg_load_time = serializers.IntegerField()
+
     uptime_percentage = serializers.DecimalField(max_digits=5, decimal_places=2)
 
     # Trend data
+
     views_trend = serializers.ListField(child=serializers.IntegerField())
+
     visitors_trend = serializers.ListField(child=serializers.IntegerField())
+
     threat_trend = serializers.ListField(child=serializers.IntegerField())
+
 
 class RiskTimelineSerializer(serializers.Serializer):
     """Serializer for risk timeline data"""
 
     date = serializers.DateField()
+
     risks_identified = serializers.IntegerField()
+
     risks_mitigated = serializers.IntegerField()
+
     risk_score_avg = serializers.DecimalField(max_digits=5, decimal_places=2)
+
 
 class ThreatStatsSerializer(serializers.Serializer):
     """Serializer for threat statistics"""
 
     threat_type = serializers.CharField()
+
     count = serializers.IntegerField()
+
     severity_breakdown = serializers.DictField()
+
     trend = serializers.ListField(child=serializers.IntegerField())

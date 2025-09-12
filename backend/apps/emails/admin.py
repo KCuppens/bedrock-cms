@@ -1,8 +1,12 @@
 from django.contrib import admin
+
 from django.utils.html import format_html
+
 from django.utils.translation import gettext_lazy as _
 
+
 from .models import EmailMessageLog, EmailTemplate
+
 
 @admin.register(EmailTemplate)
 class EmailTemplateAdmin(admin.ModelAdmin):
@@ -17,13 +21,15 @@ class EmailTemplateAdmin(admin.ModelAdmin):
         "updated_by",
         "updated_at",
     ]
+
     list_filter = ["category", "language", "is_active", "created_at"]
+
     search_fields = ["key", "name", "description", "subject"]
+
     ordering = ["category", "name"]
 
     fieldsets = (
         (
-
             {
                 "fields": (
                     "key",
@@ -48,14 +54,20 @@ class EmailTemplateAdmin(admin.ModelAdmin):
             },
         ),
     )
+
     readonly_fields = ["created_by", "updated_by", "created_at", "updated_at"]
 
     def save_model(self, request, obj, form, change):  # noqa: C901
         """Set user tracking fields"""
+
         if not change:  # Creating new object
+
             obj.created_by = request.user
+
         obj.updated_by = request.user
+
         super().save_model(request, obj, form, change)
+
 
 @admin.register(EmailMessageLog)
 class EmailMessageLogAdmin(admin.ModelAdmin):
@@ -69,9 +81,13 @@ class EmailMessageLogAdmin(admin.ModelAdmin):
         "created_at",
         "sent_at",
     ]
+
     list_filter = ["status", "template_key", "created_at", "sent_at"]
+
     search_fields = ["to_email", "from_email", "subject", "template_key"]
+
     ordering = ["-created_at"]
+
     readonly_fields = [
         "template",
         "template_key",
@@ -128,14 +144,18 @@ class EmailMessageLogAdmin(admin.ModelAdmin):
 
     def subject_truncated(self, obj):  # noqa: C901
         """Show truncated subject"""
+
         if len(obj.subject) > 50:
+
             return f"{obj.subject[:47]}..."
+
         return obj.subject
 
     subject_truncated.short_description = "Subject"
 
     def status_colored(self, obj):  # noqa: C901
         """Show colored status"""
+
         colors = {
             "pending": "#ffc107",  # Yellow
             "sent": "#28a745",  # Green
@@ -145,7 +165,9 @@ class EmailMessageLogAdmin(admin.ModelAdmin):
             "opened": "#6f42c1",  # Purple
             "clicked": "#20c997",  # Teal
         }
+
         color = colors.get(obj.status, "#6c757d")
+
         return format_html(
             '<span style="color: {}; font-weight: bold;">{}</span>',
             color,
@@ -153,16 +175,20 @@ class EmailMessageLogAdmin(admin.ModelAdmin):
         )
 
     status_colored.short_description = "Status"
+
     status_colored.admin_order_field = "status"
 
     def has_add_permission(self, request):  # noqa: C901
         """Disable adding email logs through admin"""
+
         return False
 
     def has_change_permission(self, request, obj=None):  # noqa: C901
         """Disable editing email logs through admin"""
+
         return False
 
     def has_delete_permission(self, request, obj=None):  # noqa: C901
         """Allow deletion for cleanup"""
+
         return request.user.is_superuser

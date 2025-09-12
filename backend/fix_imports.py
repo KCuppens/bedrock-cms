@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
+import glob
 import os
 import re
-import glob
+
 
 def fix_malformed_imports(filepath):
     """Fix common malformed import patterns"""

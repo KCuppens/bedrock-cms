@@ -1,9 +1,13 @@
 # Manual migration to fix file references
 
+
 import django.db.models.deletion
+
 from django.db import migrations, models
 
+
 class Migration(migrations.Migration):
+
     dependencies = [
         ("files", "0001_initial"),
         ("cms", "0014_add_comprehensive_seo_fields"),

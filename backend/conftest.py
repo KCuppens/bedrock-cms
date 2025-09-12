@@ -140,6 +140,7 @@ def sample_image():
     import io
 
     from django.core.files.uploadedfile import SimpleUploadedFile
+
     from PIL import Image
 
     # Create a simple image

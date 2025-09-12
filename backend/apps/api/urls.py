@@ -1,16 +1,27 @@
 from django.urls import include, path
+
+
 from rest_framework.routers import DefaultRouter
+
 
 from apps.cms.views.redirect import RedirectViewSet
 
+
 from .blocks import BlockSchemaAPIView, BlockTypesAPIView
+
 from .views import HealthCheckViewSet, NoteViewSet
 
+
 # Create router and register viewsets
+
 router = DefaultRouter()
+
 router.register(r"notes", NoteViewSet, basename="note")
+
 router.register(r"health", HealthCheckViewSet, basename="health")
+
 router.register(r"redirects", RedirectViewSet, basename="redirects")
+
 
 urlpatterns = [
     # API v1 endpoints
