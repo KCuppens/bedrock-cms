@@ -11,7 +11,7 @@ from rest_framework import status
 from rest_framework.test import APIClient, APITestCase
 
 from apps.accounts.serializers import UserSerializer
-from apps.blog.models import BlogPost, Group, PostVersion, Tag
+from apps.blog.models import BlogPost, Tag
 from apps.blog.serializers import (
     BlogPostListSerializer,
     BlogPostSerializer,

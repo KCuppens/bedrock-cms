@@ -11,7 +11,7 @@ import factory
 import factory.django
 from faker import Faker
 
-from apps.accounts.models import ScopedLocale, ScopedSection, UserProfile
+from apps.accounts.models import UserProfile
 
 from .base import BaseFactory
 
@@ -70,34 +70,6 @@ class UserProfileFactory(BaseFactory):
     language_preference = factory.Iterator(["en", "es", "fr", "de"])
 
 
-class ScopedSectionFactory(BaseFactory):
-    """Factory for scoped sections."""
-
-    class Meta:
-
-        model = ScopedSection
-
-    user = factory.SubFactory(lambda: None)
-
-    section = factory.Iterator(["cms", "blog", "media", "analytics"])
-
-    permission_level = factory.Iterator(["view", "edit", "admin"])
-
-
-class ScopedLocaleFactory(BaseFactory):
-    """Factory for scoped locales."""
-
-    class Meta:
-
-        model = ScopedLocale
-
-    user = factory.SubFactory(lambda: None)
-
-    locale = factory.SubFactory(lambda: None)
-
-    permission_level = factory.Iterator(["view", "edit", "admin"])
-
-
 # Specialized user factories with specific roles
 
 
@@ -120,9 +92,7 @@ class EditorUserFactory(UserFactory):
 
         UserProfileFactory(user=self)
 
-        # Add CMS section access
-
-        ScopedSectionFactory(user=self, section="cms", permission_level="edit")
+        # Note: ScopedSection model not available in current schema
 
 
 class TranslatorUserFactory(UserFactory):
@@ -144,8 +114,5 @@ class TranslatorUserFactory(UserFactory):
 
         UserProfileFactory(user=self)
 
-        # Add locale access for Spanish
-
+        # Note: ScopedLocale model not available in current schema
         locale_es = LocaleFactory(code="es")
-
-        ScopedLocaleFactory(user=self, locale=locale_es, permission_level="edit")

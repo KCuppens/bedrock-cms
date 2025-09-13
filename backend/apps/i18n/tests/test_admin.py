@@ -3,19 +3,13 @@ from django.contrib.auth import get_user_model
 from django.contrib.contenttypes.models import ContentType
 from django.test import RequestFactory, TestCase
 
-from apps.i18n.admin import (  # interface; Imports that were malformed - commented out; """apps.i18n.models,"""
-    Locale,
+from apps.i18n.admin import (
     LocaleAdmin,
-    TranslationUnit,
     TranslationUnitAdmin,
-    UiMessage,
     UiMessageAdmin,
-    UiMessageTranslation,
     UiMessageTranslationAdmin,
-    admin,
-    cases,
-    i18n,
 )
+from apps.i18n.models import Locale, TranslationUnit, UiMessage, UiMessageTranslation
 
 User = get_user_model()
 

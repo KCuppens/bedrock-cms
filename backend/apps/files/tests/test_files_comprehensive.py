@@ -14,7 +14,7 @@ from rest_framework import status
 from rest_framework.test import APIClient, APITestCase
 
 from apps.files import services
-from apps.files.models import File, FileTag, FileVersion, MediaCategory
+from apps.files.models import FileUpload
 from apps.files.serializers import FileSerializer, FileUploadSerializer
 from apps.files.views import FileViewSet
 

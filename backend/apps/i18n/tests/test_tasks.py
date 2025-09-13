@@ -5,13 +5,10 @@ from django.contrib.contenttypes.models import ContentType
 from django.test import TestCase
 
 from apps.i18n.models import Locale, TranslationQueue, TranslationUnit
-from apps.i18n.tasks import (  # tasks
+from apps.i18n.tasks import (
     auto_translate_content,
-    background,
-    cases,
     cleanup_old_translations,
     generate_translation_report,
-    i18n,
     process_translation_queue,
     sync_locale_fallbacks,
 )

@@ -6,16 +6,8 @@ from django.test import TestCase
 
 from apps.cms.models import Page
 from apps.i18n.models import Locale, TranslationUnit
-from apps.i18n.signals import (  # handlers; Imports that were malformed - commented out; """apps.i18n.translation,"""
-    TranslationManager,
-    cases,
-    create_page_translation_units,
-    create_translation_units_handler,
-    i18n,
-    register_model_for_translation,
-    signal,
-    store_old_page_data,
-)
+from apps.i18n.signals import create_page_translation_units
+from apps.i18n.translation import TranslationManager, signal, store_old_page_data
 
 User = get_user_model()
 

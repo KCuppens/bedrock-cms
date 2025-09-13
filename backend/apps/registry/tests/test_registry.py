@@ -8,11 +8,9 @@ from rest_framework.test import APITestCase
 from apps.cms.models import Page
 from apps.i18n.models import Locale
 from apps.registry.config import ContentConfig
-from apps.registry.registry import (  # functionality; Imports that were malformed - commented out; """apps.registry.registry,"""; """apps.registry.serializers,"""; """apps.registry.viewsets,"""; django.contrib.auth,
+from apps.registry.registry import (
     ContentRegistry,
     ContentRegistryError,
-    ContentSerializerFactory,
-    ContentViewSetFactory,
     content,
     content_registry,
     get_serializer_for_model,

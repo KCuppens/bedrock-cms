@@ -7,9 +7,7 @@ from sentry_sdk.integrations.celery import CeleryIntegration
 from sentry_sdk.integrations.django import DjangoIntegration
 from sentry_sdk.integrations.redis import RedisIntegration
 
-from .base import DATABASES  # noqa: F405
-from .base import LOGGING  # noqa: F405
-from .base import env  # noqa: F403; noqa: F405
+from .base import *  # noqa: F403, F401
 
 # Security
 

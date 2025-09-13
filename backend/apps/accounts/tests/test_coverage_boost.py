@@ -8,15 +8,7 @@ from django.contrib.auth.models import Group, Permission
 from django.test import Client, TestCase
 from django.urls import reverse
 
-from apps.accounts.models import (
-    APIKey,
-    LoginAttempt,
-    PasswordResetToken,
-    Role,
-    Team,
-    TeamMembership,
-    UserProfile,
-)
+from apps.accounts.models import UserProfile
 from apps.accounts.permissions import IsOwnerOrReadOnly, IsTeamMember
 from apps.accounts.serializers import (
     TeamSerializer,

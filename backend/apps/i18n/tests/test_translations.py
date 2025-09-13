@@ -7,13 +7,10 @@ from rest_framework import status
 
 from apps.cms.models import Page
 from apps.i18n.models import Locale, TranslationUnit, UiMessage, UiMessageTranslation
-from apps.i18n.translation import (  # functionality; Imports that were malformed - commented out; django.contrib.auth,
-    APIClient,
+from apps.i18n.translation import (
     TranslationManager,
     TranslationResolver,
     UiMessageResolver,
-    get_user_model,
-    translation,
 )
 
 User = get_user_model()

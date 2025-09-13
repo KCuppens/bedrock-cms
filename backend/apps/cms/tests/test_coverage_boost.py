@@ -8,16 +8,7 @@ from django.test import Client, TestCase
 from django.urls import reverse
 from django.utils.text import slugify
 
-from apps.cms.models import (
-    Block,
-    Media,
-    Menu,
-    MenuItem,
-    Page,
-    SEOMetadata,
-    Site,
-    Template,
-)
+from apps.cms.models import Page
 from apps.cms.seo_utils import (
     generate_meta_tags,
     generate_schema_org,

@@ -13,11 +13,7 @@ from .base import BaseFactory, UserFactory
 
 try:
 
-    from .accounts import (  # noqa: F401
-        ScopedLocaleFactory,
-        ScopedSectionFactory,
-        UserProfileFactory,
-    )
+    from .accounts import UserProfileFactory  # noqa: F401
 
 except ImportError:
     pass

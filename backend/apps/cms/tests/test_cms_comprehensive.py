@@ -10,7 +10,7 @@ from rest_framework.test import APIClient, APITestCase
 
 from apps.cms import tasks
 from apps.cms.models import Page
-from apps.cms.serializers.pages import PageDetailSerializer, PageSerializer
+from apps.cms.serializers.pages import PageReadSerializer, PageWriteSerializer
 from apps.cms.versioning import create_page_version, revert_page_to_version
 from apps.i18n.models import Locale
 
