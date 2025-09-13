@@ -1,7 +1,7 @@
 import logging
 import re
 from pathlib import Path
-from typing import Any
+from typing import Any, Dict, List, Optional
 
 from django.conf import settings
 from django.core.cache import cache
@@ -210,7 +210,7 @@ class DjangoSettingsSync:
             # This is not a critical failure - the system will work without cache
 
     @classmethod
-    def update_settings_file(cls, settings_path: str | None = None) -> bool:
+    def update_settings_file(cls, settings_path: Optional[str] = None) -> bool:
         """Update the Django settings file with current database locale settings.
 
         This is an advanced feature that dynamically writes to the settings file.
@@ -337,7 +337,7 @@ class DjangoSettingsSync:
             Dictionary with validation results and recommendations.
         """
 
-        validation_result = {
+        validation_result: Dict[str, Any] = {
             "is_consistent": True,
             "issues": [],
             "recommendations": [],
@@ -415,7 +415,7 @@ class DjangoSettingsSync:
 
             validation_result["is_consistent"] = False
 
-            """validation_result["issues"].append(f"Validation failed: {e}")"""
+            validation_result["issues"].append(f"Validation failed: {e}")
 
             return validation_result
 

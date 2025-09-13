@@ -4,12 +4,16 @@ Signals for automatic search indexing.
 Automatically indexes content when it's created, updated, or deleted.
 """
 
+import logging
+
 from django.db.models.signals import post_delete, post_save
 from django.dispatch import receiver
 
 from apps.registry.registry import content_registry
 
-from .services import search_service
+from .services import get_search_service
+
+logger = logging.getLogger(__name__)
 
 
 @receiver(post_save)
@@ -40,10 +44,10 @@ def auto_index_content(sender, instance, created, **kwargs):
 
     try:
         # Index the object
-        search_service.index_object(instance)
-    except Exception:
+        get_search_service().index_object(instance)
+    except Exception as e:
         # Log error but don't break the save operation
-        pass
+        logger.error(f"Failed to index {sender.__name__} instance {instance.pk}: {e}")
 
 
 @receiver(post_delete)
@@ -59,7 +63,9 @@ def auto_remove_from_index(sender, instance, **kwargs):
 
     try:
         # Remove from search index
-        search_service.remove_from_index(instance)
-    except Exception:
+        get_search_service().remove_from_index(instance)
+    except Exception as e:
         # Log error but don't break the delete operation
-        pass
+        logger.error(
+            f"Failed to remove {sender.__name__} instance {instance.pk} from index: {e}"
+        )

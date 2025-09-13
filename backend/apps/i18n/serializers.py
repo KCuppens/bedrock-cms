@@ -226,7 +226,7 @@ class ObjectTranslationStatusSerializer(serializers.Serializer):
 
     model_label = serializers.CharField()
 
-    fields = serializers.DictField(child=TranslationStatusSerializer())
+    translation_fields = serializers.DictField(child=TranslationStatusSerializer())
 
 
 class BulkTranslationUpdateSerializer(serializers.Serializer):
@@ -354,7 +354,7 @@ class TranslationQueueSerializer(serializers.ModelSerializer):
         source="translation_unit.model_label", read_only=True
     )
 
-    field_name = serializers.CharField(source="translation_unit.field", read_only=True)
+    field = serializers.CharField(source="translation_unit.field", read_only=True)
 
     assigned_to_email = serializers.EmailField(
         source="assigned_to.email", read_only=True
@@ -377,7 +377,7 @@ class TranslationQueueSerializer(serializers.ModelSerializer):
             "source_locale_code",
             "target_locale_code",
             "model_label",
-            "field_name",
+            "field",
             "status",
             "priority",
             "assigned_to",

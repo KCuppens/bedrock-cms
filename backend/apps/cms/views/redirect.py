@@ -269,8 +269,7 @@ class RedirectViewSet(viewsets.ModelViewSet):
         for redirect in redirects:
 
             if redirect.source_path in source_paths:
-
-                """issues.append("""
+                issues.append(
                     {
                         "type": "duplicate_source",
                         "message": f"Duplicate source path: {redirect.source_path}",
@@ -287,8 +286,7 @@ class RedirectViewSet(viewsets.ModelViewSet):
         for redirect in redirects:
 
             if redirect.source_path == redirect.destination_url:
-
-                """issues.append("""
+                issues.append(
                     {
                         "type": "self_loop",
                         "message": f"Redirect loops to itself: {redirect.source_path}",

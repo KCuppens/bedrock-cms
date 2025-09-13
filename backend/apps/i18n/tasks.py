@@ -1,6 +1,6 @@
 import logging
 from datetime import datetime, timedelta
-from typing import Any
+from typing import Any, Dict, List, Optional
 
 from django.contrib.contenttypes.models import ContentType
 from django.db import transaction
@@ -36,9 +36,8 @@ class TranslationService:
         return f"Translated: {text}"
 
 
-def get_translation_service(service_name: str = None):  # noqa: C901
+def get_translation_service(service_name: Optional[str] = None):  # noqa: C901
     """Get translation service instance."""
-
     return TranslationService()
 
 
@@ -75,7 +74,7 @@ def seed_locale_translation_units(
 
             raise ValueError(f"Locale '{locale_code}' is not active")
 
-        results = {
+        results: Dict[str, Any] = {
             "locale_code": locale_code,
             "total_units_created": 0,
             "total_units_skipped": 0,
@@ -100,7 +99,7 @@ def seed_locale_translation_units(
 
         progress_step = 50 / (len(registry._configs) + 1)  # +1 for pages
 
-        current_progress = 0
+        current_progress: float = 0
 
         # Process Pages first
 
@@ -168,7 +167,7 @@ def seed_locale_translation_units(
 
                 logger.warning(error_msg)
 
-                """results["errors"].append(error_msg)"""
+                results["errors"].append(error_msg)
 
         # Final progress update
 
@@ -195,6 +194,7 @@ def seed_locale_translation_units(
         logger.error(error_msg)
 
         self.update_state(state="FAILURE", meta={"error": error_msg})
+        raise
 
 
 def _seed_page_translation_units(
@@ -239,7 +239,7 @@ def _seed_page_translation_units(
                     target_locale=locale,
                     defaults={
                         "source_locale": source_page.locale,
-                        "source_object_id": source_page.id,
+                        "object_id": source_page.id,
                         "status": "missing",
                     },
                 )
@@ -252,7 +252,7 @@ def _seed_page_translation_units(
 
                         unit.source_locale = source_page.locale
 
-                        unit.source_object_id = source_page.id
+                        unit.object_id = source_page.id
 
                         unit.status = "missing"
 
@@ -323,7 +323,7 @@ def _seed_model_translation_units(
                     target_locale=locale,
                     defaults={
                         "source_locale": source_obj.locale,
-                        "source_object_id": source_obj.id,
+                        "object_id": source_obj.id,
                         "status": "missing",
                     },
                 )
@@ -336,7 +336,7 @@ def _seed_model_translation_units(
 
                         unit.source_locale = source_obj.locale
 
-                        unit.source_object_id = source_obj.id
+                        unit.object_id = source_obj.id
 
                         unit.status = "missing"
 
@@ -360,7 +360,7 @@ def cleanup_orphaned_translation_units(self) -> dict[str, Any]:  # noqa: C901
 
     try:
 
-        results = {"total_cleaned": 0, "models_processed": []}
+        results: Dict[str, Any] = {"total_cleaned": 0, "models_processed": []}
 
         # Get all content types that have translation units
 
@@ -379,7 +379,7 @@ def cleanup_orphaned_translation_units(self) -> dict[str, Any]:  # noqa: C901
 
             # Find orphaned units for this model
 
-            orphaned_units = []
+            orphaned_units: List[int] = []
 
             units = TranslationUnit.objects.filter(content_type=content_type)
 
@@ -393,19 +393,19 @@ def cleanup_orphaned_translation_units(self) -> dict[str, Any]:  # noqa: C901
 
                 except model_class.DoesNotExist:
 
-                    """orphaned_units.append(unit.id)"""
+                    orphaned_units.append(unit.pk)
 
                 # Check if source object exists
 
-                if unit.source_object_id:
+                if unit.object_id:
 
                     try:
 
-                        model_class.objects.get(id=unit.source_object_id)
+                        model_class.objects.get(id=unit.object_id)
 
                     except model_class.DoesNotExist:
 
-                        """orphaned_units.append(unit.id)"""
+                        orphaned_units.append(unit.pk)
 
             # Delete orphaned units
 
@@ -437,6 +437,7 @@ def cleanup_orphaned_translation_units(self) -> dict[str, Any]:  # noqa: C901
         logger.error(error_msg)
 
         self.update_state(state="FAILURE", meta={"error": error_msg})
+        raise
 
 
 @shared_task
@@ -484,7 +485,7 @@ def process_translation_queue() -> dict[str, Any]:  # noqa: C901
 
             except Exception as e:
 
-                logger.error(f"Failed to process queue item {item.id}: {str(e)}")
+                logger.error(f"Failed to process queue item {item.pk}: {str(e)}")
 
                 item.status = "failed"
 
@@ -506,6 +507,7 @@ def process_translation_queue() -> dict[str, Any]:  # noqa: C901
         error_msg = f"Failed to process translation queue: {str(e)}"
 
         logger.error(error_msg)
+        return {"status": "error", "error": error_msg}
 
 
 @shared_task
@@ -514,7 +516,7 @@ def auto_translate_content(
     object_id: int,
     field: str,
     target_locale_code: str,
-    service: str = None,
+    service: Optional[str] = None,
 ) -> dict[str, Any]:
     """Auto translate content using machine translation service."""
 
@@ -574,14 +576,15 @@ def auto_translate_content(
         error_msg = f"Failed to auto translate content: {str(e)}"
 
         logger.error(error_msg)
+        return {"status": "error", "error": error_msg}
 
 
 @shared_task
 def generate_translation_report(
-    locale_code: str = None,
-    locale_codes: list = None,
-    date_from: str = None,
-    date_to: str = None,
+    locale_code: Optional[str] = None,
+    locale_codes: Optional[List[Any]] = None,
+    date_from: Optional[str] = None,
+    date_to: Optional[str] = None,
 ) -> dict[str, Any]:
     """Generate translation completion report."""
 
@@ -627,10 +630,13 @@ def generate_translation_report(
         error_msg = f"Failed to generate translation report: {str(e)}"
 
         logger.error(error_msg)
+        return {"status": "error", "error": error_msg}
 
 
 @shared_task
-def sync_locale_fallbacks(locale_code: str = None) -> dict[str, Any]:  # noqa: C901
+def sync_locale_fallbacks(
+    locale_code: Optional[str] = None,
+) -> dict[str, Any]:  # noqa: C901
     """Sync locale fallback configurations."""
 
     try:
@@ -658,11 +664,12 @@ def sync_locale_fallbacks(locale_code: str = None) -> dict[str, Any]:  # noqa: C
         error_msg = f"Failed to sync locale fallbacks: {str(e)}"
 
         logger.error(error_msg)
+        return {"status": "error", "error": error_msg}
 
 
 @shared_task
 def cleanup_old_translations(
-    days_old: int = 90, days: int = None
+    days_old: int = 90, days: Optional[int] = None
 ) -> dict[str, Any]:  # noqa: C901
     """Cleanup old translation records."""
 
@@ -704,15 +711,16 @@ def cleanup_old_translations(
         error_msg = f"Failed to cleanup old translations: {str(e)}"
 
         logger.error(error_msg)
+        return {"status": "error", "error": error_msg}
 
 
 @shared_task(bind=True)
 def bulk_auto_translate_ui_messages(
     self=None,
-    locale_code: str = None,
+    locale_code: Optional[str] = None,
     source_locale_code: str = "en",
-    namespace: str = None,
-    max_translations: int = None,
+    namespace: Optional[str] = None,
+    max_translations: Optional[int] = None,
 ) -> dict[str, Any]:
     """Auto-translate all missing UI messages for a locale using DeepL.
     This task runs in the background to avoid timeout issues when translating
@@ -824,7 +832,7 @@ def bulk_auto_translate_ui_messages(
 
         skipped_count = 0
 
-        errors = []
+        errors: List[Dict[str, Any]] = []
 
         # Process messages in batches for better memory management
 
@@ -878,7 +886,12 @@ def bulk_auto_translate_ui_messages(
 
                         skipped_count += 1
 
-                        """errors.append(f"No translation returned for: {message.key}")"""
+                        errors.append(
+                            {
+                                "message": f"No translation returned for: {message.key}",
+                                "key": message.key,
+                            }
+                        )
 
                         logger.warning(
                             f"Skipped {message.key}: no translation returned"
@@ -890,7 +903,7 @@ def bulk_auto_translate_ui_messages(
 
                     error_msg = f"Error translating {message.key}: {str(e)}"
 
-                    """errors.append(error_msg)"""
+                    errors.append({"message": error_msg, "key": message.key})
 
                     logger.error(f"Auto-translation error for {message.key}: {str(e)}")
 
@@ -961,3 +974,5 @@ def bulk_auto_translate_ui_messages(
         if self:
 
             self.update_state(state="FAILURE", meta={"error": error_msg})
+
+        return {"status": "error", "error": error_msg}

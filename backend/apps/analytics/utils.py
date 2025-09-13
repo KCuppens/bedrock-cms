@@ -2,6 +2,7 @@
 
 import re
 from datetime import date, datetime, timedelta
+from typing import Dict, Optional, Tuple
 from urllib.parse import parse_qs, urlencode, urlparse, urlunparse
 
 from django.contrib.contenttypes.models import ContentType
@@ -13,7 +14,7 @@ from user_agents import parse
 from .models import PageView
 
 
-def parse_user_agent(user_agent_string: str) -> dict[str, str]:
+def parse_user_agent(user_agent_string: str) -> Dict[str, str]:
     """Parse user agent string to extract browser and OS information.
 
     Args:
@@ -71,7 +72,7 @@ def get_client_ip(request) -> str:
     return ip
 
 
-def get_geo_data(ip_address: str) -> dict[str, str | None]:
+def get_geo_data(ip_address: str) -> Dict[str, Optional[str]]:
     """Get geographic data from IP address.
 
     Args:
@@ -167,7 +168,9 @@ def sanitize_url(url: str, max_length: int = 1024) -> str:
         return url[:max_length]
 
 
-def calculate_session_duration(session_id: str, end_time: datetime = None) -> int:
+def calculate_session_duration(
+    session_id: str, end_time: Optional[datetime] = None
+) -> int:
     """Calculate session duration in seconds.
 
     Args:
@@ -192,9 +195,14 @@ def calculate_session_duration(session_id: str, end_time: datetime = None) -> in
 
             return 0
 
-        first_view = session_views.first().viewed_at
+        first_view_obj = session_views.first()
+        last_view_obj = session_views.last()
 
-        last_view = session_views.last().viewed_at
+        if not first_view_obj or not last_view_obj:
+            return 0
+
+        first_view = first_view_obj.viewed_at
+        last_view = last_view_obj.viewed_at
 
         return int((last_view - first_view).total_seconds())
 
@@ -203,7 +211,7 @@ def calculate_session_duration(session_id: str, end_time: datetime = None) -> in
         return 0
 
 
-def get_content_type_and_id(obj) -> tuple[int, int]:
+def get_content_type_and_id(obj) -> Tuple[int, int]:
     """Get ContentType ID and object ID for any Django model instance.
 
     Args:
@@ -249,7 +257,7 @@ def format_duration(seconds: int) -> str:
         return f"{hours}h {remaining_minutes}m"
 
 
-def get_date_range(period: str, date_param: str = None) -> tuple[date, date]:
+def get_date_range(period: str, date_param: Optional[str] = None) -> Tuple[date, date]:
     """Get date range for analytics queries.
 
     Args:

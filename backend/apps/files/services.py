@@ -2,7 +2,7 @@ import hashlib
 import logging
 import os
 import uuid
-from typing import Any
+from typing import Any, Dict, List, Optional
 
 from django.conf import settings
 from django.core.files.base import ContentFile
@@ -19,82 +19,44 @@ from .models import FileUpload
 logger = logging.getLogger(__name__)
 
 
-
 class FileService:
-
     """Service for handling file operations"""
-
-
 
     # File type mappings
 
     FILE_TYPE_MAP = {
-
         "image/jpeg": FileType.IMAGE,
-
         "image/png": FileType.IMAGE,
-
         "image/gif": FileType.IMAGE,
-
         "image/webp": FileType.IMAGE,
-
         "image/svg+xml": FileType.IMAGE,
-
         "application/pdf": FileType.DOCUMENT,
-
         "application/msword": FileType.DOCUMENT,
-
         "application/vnd.openxmlformats-officedocument.wordprocessingml.document": FileType.DOCUMENT,
-
         "text/plain": FileType.DOCUMENT,
-
         "text/csv": FileType.DOCUMENT,
-
         "video/mp4": FileType.VIDEO,
-
         "video/webm": FileType.VIDEO,
-
         "video/quicktime": FileType.VIDEO,
-
         "audio/mpeg": FileType.AUDIO,
-
         "audio/wav": FileType.AUDIO,
-
         "audio/ogg": FileType.AUDIO,
-
         "application/zip": FileType.ARCHIVE,
-
         "application/x-tar": FileType.ARCHIVE,
-
         "application/gzip": FileType.ARCHIVE,
-
     }
 
-
-
     @classmethod
-
     def upload_file(
-
         cls,
-
         file,
-
         user,
-
         description: str = "",
-
         tags: str = "",
-
         is_public: bool = False,
-
         expires_at=None,
-
     ) -> FileUpload:
-
         """Upload a file and create a FileUpload record"""
-
-
 
         # Generate unique filename
 
@@ -104,8 +66,6 @@ class FileService:
 
         storage_path = f"uploads/{user.id}/{unique_filename}"
 
-
-
         # Calculate file checksum using streaming to avoid memory issues
 
         file.seek(0)
@@ -113,8 +73,6 @@ class FileService:
         hasher = hashlib.sha256()
 
         chunk_size = 65536  # 64KB chunks
-
-
 
         # Stream file in chunks for checksum calculation
 
@@ -127,20 +85,14 @@ class FileService:
 
             hasher.update(chunk)
 
-
-
         checksum = hasher.hexdigest()
 
         file.seek(0)  # Reset file pointer
 
-
-
         # Read file content for storage (with size limit check)
 
         max_size = getattr(
-
             settings, "FILE_UPLOAD_MAX_MEMORY_SIZE", 10485760
-
         )  # 10MB default
 
         if file.size > max_size:
@@ -155,79 +107,46 @@ class FileService:
 
             file.seek(0)
 
-
-
         # Determine file type
 
         mime_type = getattr(file, "content_type", "application/octet-stream")
 
         file_type = cls.FILE_TYPE_MAP.get(mime_type, FileType.OTHER)
 
-
-
         # Store file with circuit breaker protection
 
         @storage_circuit_breaker()
-
         def store_file():
 
             return default_storage.save(storage_path, ContentFile(file_content))
 
-
-
         stored_path = store_file()
-
-
 
         # Create FileUpload record
 
         file_upload = FileUpload.objects.create(
-
             original_filename=file.name,
-
             filename=unique_filename,
-
             file_type=file_type,
-
             mime_type=mime_type,
-
             file_size=file.size,
-
             checksum=checksum,
-
             storage_path=stored_path,
-
             is_public=is_public,
-
             description=description,
-
             tags=tags,
-
             expires_at=expires_at,
-
             created_by=user,
-
             updated_by=user,
-
         )
-
-
 
         logger.info("File uploaded: %s -> {stored_path} by user {user.id}", file.name)
 
-
-
         return file_upload
 
-
-
     @classmethod
-
     def get_download_url(cls, file_upload: FileUpload, expires_in: int = 3600) -> str:
-
         """Get signed download URL for file"""
-
-
 
         # For public files, return direct URL
 
@@ -240,12 +159,8 @@ class FileService:
             except Exception as e:
 
                 logger.warning(
-
                     f"Failed to generate direct URL for file {file_upload.id}: {e}"
-
                 )
-
-
 
         # For private files or S3, generate signed URL
 
@@ -254,44 +169,26 @@ class FileService:
             try:
 
                 return default_storage.generate_presigned_url(
-
                     file_upload.storage_path, expires_in=expires_in, method="GET"
-
                 )
 
             except Exception as e:
 
                 logger.error("Failed to generate presigned URL: %s", str(e))
 
-
-
         # Fallback to local file serving (development)
-
-
 
         return reverse("file_download", kwargs={"file_id": file_upload.id})
 
-
-
     @classmethod
-
     def get_upload_url(
-
         cls,
-
         storage_path: str,
-
         expires_in: int = 3600,
-
-        content_type: str | None = None,
-
-        max_size: int | None = None,
-
-    ) -> dict[str, Any]:
-
+        content_type: Optional[str] = None,
+        max_size: Optional[int] = None,
+    ) -> Dict[str, Any]:
         """Get signed upload URL and required fields"""
-
-
 
         if hasattr(default_storage, "generate_presigned_post"):
 
@@ -301,71 +198,48 @@ class FileService:
 
                 if content_type:
 
-                    """conditions.append(["eq", "$Content-Type", content_type])"""
+                    conditions.append(["eq", "$Content-Type", content_type])
 
                 if max_size:
 
-                    """conditions.append(["content-length-range", "0", str(max_size)])"""
-
-
+                    conditions.append(["content-length-range", "0", str(max_size)])
 
                 return default_storage.generate_presigned_post(
-
                     storage_path, expires_in=expires_in, conditions=conditions
-
                 )
 
             except Exception as e:
 
                 logger.error("Failed to generate presigned upload URL: %s", str(e))
 
-
-
         # Fallback for local development
-
-
 
         return {"url": reverse("file_upload"), "fields": {}}
 
-
-
     @classmethod
-
     def delete_file(cls, file_upload: FileUpload) -> bool:
-
         """Delete file from storage and database with circuit breaker protection"""
-
-
 
         try:
 
             # Delete from storage with circuit breaker
 
             @storage_circuit_breaker()
-
             def delete_from_storage():
 
                 if default_storage.exists(file_upload.storage_path):
 
                     default_storage.delete(file_upload.storage_path)
 
-
-
             delete_from_storage()
-
-
 
             # Delete database record
 
             file_upload.delete()
 
-
-
             logger.info("File deleted: %s", file_upload.storage_path)
 
             return True
-
-
 
         except Exception:
 
@@ -373,21 +247,13 @@ class FileService:
 
             return False
 
-
-
     @classmethod
-
-    def validate_file(cls, file, max_size_mb: int = 10) -> dict[str, Any]:
-
+    def validate_file(cls, file, max_size_mb: int = 10) -> Dict[str, Any]:
         """Validate uploaded file"""
-
-
 
         errors = []
 
         warnings = []
-
-
 
         # Check file size
 
@@ -399,129 +265,75 @@ class FileService:
                 f"File size ({file.size} bytes) exceeds maximum allowed ({max_size_bytes} bytes)"
             )
 
-
-
         # Check file extension
 
         allowed_extensions = getattr(
-
             settings,
-
             "ALLOWED_FILE_EXTENSIONS",
-
             [
-
                 ".jpg",
-
                 ".jpeg",
-
                 ".png",
-
                 ".gif",
-
                 ".webp",
-
                 ".pdf",
-
                 ".doc",
-
                 ".docx",
-
                 ".txt",
-
                 ".csv",
-
             ],
-
         )
-
-
 
         file_extension = os.path.splitext(file.name)[1].lower()
 
         if file_extension not in allowed_extensions:
 
-            """errors.append(f"File extension '{file_extension}' not allowed")"""
-
-
+            errors.append(f"File extension '{file_extension}' not allowed")
 
         # Check MIME type
 
         mime_type = getattr(file, "content_type", "application/octet-stream")
 
         allowed_mime_types = getattr(
-
             settings, "ALLOWED_MIME_TYPES", list(cls.FILE_TYPE_MAP.keys())
-
         )
-
-
 
         if mime_type not in allowed_mime_types:
 
-            """warnings.append(f"MIME type '{mime_type}' may not be supported")"""
-
-
+            warnings.append(f"MIME type '{mime_type}' may not be supported")
 
         # Check for potential security issues
 
         dangerous_extensions = [
-
             ".exe",
-
             ".bat",
-
             ".cmd",
-
             ".com",
-
             ".pif",
-
             ".scr",
-
             ".vbs",
-
             ".js",
-
         ]
 
         if file_extension in dangerous_extensions:
 
-            """errors.append("""
-
+            errors.append(
                 f"File type '{file_extension}' is not allowed for security reasons"
-
             )
 
-
-
         return {
-
             "valid": len(errors) == 0,
-
             "errors": errors,
-
             "warnings": warnings,
-
             "file_type": cls.FILE_TYPE_MAP.get(mime_type, FileType.OTHER),
-
             "mime_type": mime_type,
-
         }
 
-
-
     @classmethod
-
-    def cleanup_expired_files(cls) -> dict[str, int]:
-
+    def cleanup_expired_files(cls) -> Dict[str, int]:
         """Clean up expired files with batch processing"""
 
-
-
         expired_files = FileUpload.objects.filter(expires_at__lt=timezone.now())
-
-
 
         # Get file paths for batch deletion
 
@@ -529,15 +341,11 @@ class FileService:
 
         file_ids = list(expired_files.values_list("id", flat=True))
 
-
-
         deleted_count = 0
 
         error_count = 0
 
         batch_size = 100
-
-
 
         # Process in batches for better performance
 
@@ -547,11 +355,9 @@ class FileService:
 
             batch_ids = file_ids[i : i + batch_size]
 
-
-
             # Collect paths that exist for batch deletion
 
-            existing_paths = []
+            existing_paths: List[str] = []
 
             for path in batch_paths:
 
@@ -566,8 +372,6 @@ class FileService:
                     logger.error("Failed to check file %s: %s", path, str(e))
 
                     error_count += 1
-
-
 
             # Batch delete files if storage backend supports it
 
@@ -617,15 +421,11 @@ class FileService:
 
                         error_count += 1
 
-
-
             # Bulk delete database records
 
             with transaction.atomic():
 
                 FileUpload.objects.filter(id__in=batch_ids).delete()
-
-
 
         logger.info("Cleaned up %s expired files, {error_count} errors", deleted_count)
 

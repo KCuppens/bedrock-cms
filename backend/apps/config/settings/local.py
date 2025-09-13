@@ -1,11 +1,6 @@
-from typing import Any
+from typing import Any, Dict
 
-from .base import BASE_DIR  # noqa: F405
-from .base import DATABASES  # noqa: F405
-from .base import INSTALLED_APPS  # noqa: F405
-from .base import LOGGING  # noqa: F405
-from .base import REST_FRAMEWORK  # noqa: F405
-from .base import env  # noqa: F403; noqa: F405
+from .base import *  # noqa: F403,F401
 
 # SECURITY WARNING: don't run with debug turned on in production!
 
@@ -121,14 +116,14 @@ CELERY_RESULT_BACKEND = "cache+memory://"
 
 # Django Extensions (if you want to add it later)
 
-"""if "django_extensions" in INSTALLED_APPS:  # noqa: F405"""
-
-    INSTALLED_APPS += ["django_extensions"]  # noqa: F405
+# Commented out django_extensions for now
+# if "django_extensions" in INSTALLED_APPS:  # noqa: F405
+#     INSTALLED_APPS += ["django_extensions"]  # noqa: F405
 
 
 # Development logging
 
-LOGGING_DICT: dict[str, Any] = LOGGING  # noqa: F405
+LOGGING_DICT: Dict[str, Any] = LOGGING  # noqa: F405
 
 LOGGING_DICT["handlers"]["console"]["formatter"] = "simple"
 

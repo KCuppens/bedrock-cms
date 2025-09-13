@@ -193,7 +193,7 @@ class BlockMetadataSerializer(serializers.Serializer):
 
     component = serializers.CharField()
 
-    label = serializers.CharField()
+    label = serializers.CharField()  # type: ignore[assignment]
 
     description = serializers.CharField()
 

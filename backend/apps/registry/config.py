@@ -1,7 +1,7 @@
 """Content configuration and registry for CMS content types."""
 
 from dataclasses import dataclass, field
-from typing import Any, Optional, Union
+from typing import Any, Dict, List, Optional, Union
 
 # ContentType will be imported lazily when needed to avoid circular imports
 from django.core.exceptions import ValidationError
@@ -33,11 +33,11 @@ class ContentConfig:
 
     locale_field: Optional[str] = "locale"
 
-    translatable_fields: list[str] = field(default_factory=list)
+    translatable_fields: List[str] = field(default_factory=list)
 
-    searchable_fields: list[str] = field(default_factory=list)
+    searchable_fields: List[str] = field(default_factory=list)
 
-    seo_fields: list[str] = field(default_factory=lambda: ["title", "seo"])
+    seo_fields: List[str] = field(default_factory=lambda: ["title", "seo"])
 
     route_pattern: Optional[str] = None
 
@@ -47,7 +47,7 @@ class ContentConfig:
 
     form_fields: Optional[list[str]] = None
 
-    ordering: list[str] = field(default_factory=lambda: ["-created_at"])
+    ordering: List[str] = field(default_factory=lambda: ["-created_at"])
 
     def __post_init__(self):
         """Validate configuration after initialization."""
@@ -180,7 +180,7 @@ class ContentConfig:
                 f"Invalid ContentConfig for {self.model}: " + "; ".join(errors)
             )
 
-    def get_effective_form_fields(self) -> list[str]:
+    def get_effective_form_fields(self) -> List[str]:
         """Get the effective form fields to use for serialization.
 
         Returns form_fields if specified, otherwise all model fields.
@@ -227,7 +227,7 @@ class ContentConfig:
 
         return None
 
-    def to_dict(self) -> dict[str, Any]:
+    def to_dict(self) -> Dict[str, Any]:
         """Convert config to dictionary for serialization."""
 
         return {

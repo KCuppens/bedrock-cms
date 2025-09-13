@@ -56,7 +56,7 @@ def cache_response(
 
             return result
 
-        """return wrapper"""
+        return wrapper
 
     return decorator
 
@@ -88,7 +88,7 @@ def cache_method_response(timeout=300, vary_on_user=True, vary_on_headers=None):
 
             if vary_on_user and request.user.is_authenticated:
 
-                """cache_key_parts.append(f"user:{request.user.id}")"""
+                cache_key_parts.append(f"user:{request.user.id}")
 
             # Include query parameters
 
@@ -98,7 +98,7 @@ def cache_method_response(timeout=300, vary_on_user=True, vary_on_headers=None):
 
                 params_str = "&".join(f"{k}={v}" for k, v in params)
 
-                """cache_key_parts.append("""
+                cache_key_parts.append(
                     f"params:{hashlib.md5(params_str.encode(), usedforsecurity=False).hexdigest()[:8]}"
                 )
 
@@ -114,7 +114,7 @@ def cache_method_response(timeout=300, vary_on_user=True, vary_on_headers=None):
 
                     if header_value:
 
-                        """cache_key_parts.append(f"{header}:{header_value}")"""
+                        cache_key_parts.append(f"{header}:{header_value}")
 
             cache_key = ":".join(cache_key_parts)
 
@@ -146,7 +146,7 @@ def cache_method_response(timeout=300, vary_on_user=True, vary_on_headers=None):
 
             return response
 
-        """return wrapper"""
+        return wrapper
 
     return decorator
 
@@ -198,7 +198,7 @@ def cache_page_response(timeout=600, cache_anonymous_only=True):
 
             return response
 
-        """return wrapper"""
+        return wrapper
 
     return decorator
 
@@ -232,7 +232,7 @@ def invalidate_cache(pattern=None, exact_key=None):
 
             return result
 
-        """return wrapper"""
+        return wrapper
 
     return decorator
 
@@ -284,7 +284,7 @@ def conditional_cache(condition_func, timeout=300):
 
             return result
 
-        """return wrapper"""
+        return wrapper
 
     return decorator
 
@@ -308,7 +308,7 @@ def _generate_cache_key(prefix, args=None, kwargs=None, headers=None):
             [str(arg) for arg in args if not isinstance(arg, HttpRequest)]
         )
 
-        """key_parts.append("""
+        key_parts.append(
             hashlib.md5(args_str.encode(), usedforsecurity=False).hexdigest()[:8]
         )
 
@@ -318,7 +318,7 @@ def _generate_cache_key(prefix, args=None, kwargs=None, headers=None):
 
         kwargs_str = json.dumps(sorted(kwargs.items()))
 
-        """key_parts.append("""
+        key_parts.append(
             hashlib.md5(kwargs_str.encode(), usedforsecurity=False).hexdigest()[:8]
         )
 
@@ -328,7 +328,7 @@ def _generate_cache_key(prefix, args=None, kwargs=None, headers=None):
 
         for header in headers:
 
-            """key_parts.append(f"{header}:{kwargs.get(header, '')}")"""
+            key_parts.append(f"{header}:{kwargs.get(header, '')}")
 
     return ":".join(key_parts)
 

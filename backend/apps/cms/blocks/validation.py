@@ -1,6 +1,6 @@
 # mypy: ignore-errors
 
-from typing import Any, Literal
+from typing import Any, Dict, List, Literal, Optional
 
 from django.core.exceptions import ValidationError
 from django.db import connection
@@ -8,7 +8,6 @@ from django.db import connection
 from pydantic import BaseModel, Field, ValidationError
 from rest_framework.exceptions import ValidationError as DRFValidationError
 
-from ..models import BlockType
 from ..security import sanitize_blocks
 
 
@@ -25,7 +24,7 @@ class HeroBlockModel(BaseBlockModel):
 
     type: Literal["hero"]
 
-    props: dict[str, Any] = Field(default_factory=dict)
+    props: Dict[str, Any] = Field(default_factory=dict)
 
     class Config:
 
@@ -37,7 +36,7 @@ class RichTextBlockModel(BaseBlockModel):
 
     type: Literal["richtext", "rich_text"]  # Accept both
 
-    props: dict[str, Any] = Field(default_factory=lambda: {"content": ""})
+    props: Dict[str, Any] = Field(default_factory=lambda: {"content": ""})
 
 
 class ImageBlockModel(BaseBlockModel):
@@ -45,7 +44,7 @@ class ImageBlockModel(BaseBlockModel):
 
     type: Literal["image"]
 
-    props: dict[str, Any] = Field(
+    props: Dict[str, Any] = Field(
         default_factory=lambda: {"src": "", "alt": "", "caption": ""}
     )
 
@@ -55,7 +54,7 @@ class GalleryBlockModel(BaseBlockModel):
 
     type: Literal["gallery"]
 
-    props: dict[str, Any] = Field(default_factory=lambda: {"images": []})
+    props: Dict[str, Any] = Field(default_factory=lambda: {"images": []})
 
 
 class ColumnsBlockModel(BaseBlockModel):
@@ -63,9 +62,9 @@ class ColumnsBlockModel(BaseBlockModel):
 
     type: Literal["columns"]
 
-    props: dict[str, Any] = Field(default_factory=lambda: {"columns": [], "gap": "md"})
+    props: Dict[str, Any] = Field(default_factory=lambda: {"columns": [], "gap": "md"})
 
-    blocks: list[dict[str, Any]] = Field(default_factory=list)
+    blocks: List[Dict[str, Any]] = Field(default_factory=list)
 
 
 class CTABandBlockModel(BaseBlockModel):
@@ -73,7 +72,7 @@ class CTABandBlockModel(BaseBlockModel):
 
     type: Literal["cta", "cta_band"]  # Accept both
 
-    props: dict[str, Any] = Field(
+    props: Dict[str, Any] = Field(
         default_factory=lambda: {
             "title": "",
             "subtitle": "",
@@ -89,13 +88,13 @@ class FAQBlockModel(BaseBlockModel):
 
     type: Literal["faq"]
 
-    props: dict[str, Any] = Field(default_factory=lambda: {"items": []})
+    props: Dict[str, Any] = Field(default_factory=lambda: {"items": []})
 
 
 class ContentDetailSource(BaseModel):
     """Source configuration for content_detail block."""
 
-    id: int | None = None
+    id: Optional[int] = None
 
 
 class ContentDetailOptions(BaseModel):
@@ -117,7 +116,7 @@ class ContentDetailBlockModel(BaseBlockModel):
 
     type: Literal["content_detail"]
 
-    props: dict[str, Any] = Field(
+    props: Dict[str, Any] = Field(
         default_factory=lambda: {
             "label": "",  # e.g., "blog.blogpost"
             "source": "route",  # "route" or {"id": int}
@@ -137,7 +136,7 @@ class CollectionListBlockModel(BaseBlockModel):
 
     type: Literal["collection_list"]
 
-    props: dict[str, Any] = Field(
+    props: Dict[str, Any] = Field(
         default_factory=lambda: {
             "source": "blog.blogpost",
             "mode": "query",
@@ -151,7 +150,7 @@ class CollectionListBlockModel(BaseBlockModel):
 
 # Registry of all block models
 
-BLOCK_MODELS: dict[str, type[BaseBlockModel]] = {
+BLOCK_MODELS: Dict[str, type[BaseBlockModel]] = {
     "hero": HeroBlockModel,
     "richtext": RichTextBlockModel,  # Match API response
     "rich_text": RichTextBlockModel,  # Keep for backwards compatibility
@@ -166,7 +165,7 @@ BLOCK_MODELS: dict[str, type[BaseBlockModel]] = {
 }
 
 
-def validate_blocks(blocks: list[dict[str, Any]]) -> list[dict[str, Any]]:
+def validate_blocks(blocks: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
     """
     Validate a list of blocks using database-driven block types and Pydantic models.
 
@@ -179,26 +178,25 @@ def validate_blocks(blocks: list[dict[str, Any]]) -> list[dict[str, Any]]:
         )
 
     # Import here to avoid circular imports
-
     # Check if database is available and BlockType table exists
-
     db_block_types = {}
 
     try:
-
         if (
             connection.introspection.table_names()
             and "cms_blocktype" in connection.introspection.table_names()
         ):
+            # Import BlockType here to avoid circular import
+            from ..models import BlockType
 
             # Get active block types from database
-
             db_block_types = {
                 bt.type: bt for bt in BlockType.objects.filter(is_active=True)
             }
 
-    except Exception:
+    except Exception:  # nosec B110
         # Database not ready or table doesn't exist, continue with static validation
+        # This is intentional - we fall back to static validation when DB is unavailable
         pass
 
     # First pass: Sanitize HTML content in blocks

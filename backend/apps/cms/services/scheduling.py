@@ -1,3 +1,5 @@
+from typing import Optional, Tuple
+
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ValidationError
 from django.db import transaction
@@ -21,7 +23,7 @@ class SchedulingService:
     @staticmethod
     def schedule_publish(
         content_object, publish_at, unpublish_at=None, user=None
-    ) -> tuple[ScheduledTask, ScheduledTask | None]:
+    ) -> Tuple[ScheduledTask, Optional[ScheduledTask]]:
         """
         Schedule content for publishing.
 

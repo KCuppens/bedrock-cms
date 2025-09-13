@@ -222,7 +222,7 @@ class BlockTypeCategorySerializer(serializers.Serializer):
 
     value = serializers.CharField()
 
-    label = serializers.CharField()
+    label = serializers.CharField()  # type: ignore[assignment]
 
     @classmethod
     def get_categories(cls):

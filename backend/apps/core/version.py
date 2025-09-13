@@ -5,7 +5,7 @@ import sys
 from datetime import datetime
 from functools import lru_cache
 from pathlib import Path
-from typing import Any
+from typing import Any, Dict
 
 from git import Repo
 
@@ -14,10 +14,7 @@ Version tracking service using GitPython
 """
 
 
-
 try:
-
-
 
     GIT_AVAILABLE = True
 
@@ -26,54 +23,31 @@ except ImportError:
     GIT_AVAILABLE = False
 
 
-
 class VersionService:
-
     """Service for tracking application version and build information"""
 
-
-
     @staticmethod
-
     @lru_cache(maxsize=1)
-
-    def get_version_info() -> dict[str, Any]:
-
-
-
+    def get_version_info() -> Dict[str, Any]:
+        """
         Get comprehensive version information from git and environment.
 
         Cached to avoid repeated git operations.
-
-
+        """
 
         info = {
-
             "version": "unknown",
-
             "commit": "unknown",
-
             "branch": "unknown",
-
             "environment": os.getenv("ENVIRONMENT", "development"),
-
             "dirty": False,
-
             "ahead": 0,
-
             "build_date": datetime.now().isoformat(),
-
             "build_number": os.getenv("BUILD_NUMBER", "0"),
-
             "frontend_version": None,
-
             "backend_version": None,
-
             "python_version": None,
-
         }
-
-
 
         # Get Git information
 
@@ -83,27 +57,17 @@ class VersionService:
 
             info.update(git_info)
 
-
-
         # Get package versions
 
         package_info = VersionService._get_package_info()
 
         info.update(package_info)
 
-
-
         # Get Python version
 
-
-
         info["python_version"] = (
-
             f"{sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}"
-
         )
-
-
 
         # Determine environment from branch if not set
 
@@ -125,16 +89,10 @@ class VersionService:
 
                     info["environment"] = "development"
 
-
-
         return info
 
-
-
     @staticmethod
-
-    def _get_git_info() -> dict[str, Any]:
-
+    def _get_git_info() -> Dict[str, Any]:
         """Get information from git repository"""
 
         try:
@@ -148,12 +106,8 @@ class VersionService:
             while repo_path.parent != repo_path:
 
                 if (repo_path / ".git").exists():
-
-
-
+                    break
                 repo_path = repo_path.parent
-
-
 
             if not (repo_path / ".git").exists():
 
@@ -164,44 +118,28 @@ class VersionService:
                 while repo_path.parent != repo_path:
 
                     if (repo_path / ".git").exists():
-
-
-
+                        break
                     repo_path = repo_path.parent
 
-
-
             repo = Repo(repo_path)
-
-
 
             # Get latest tag for version
 
             tags = (
-
                 sorted(repo.tags, key=lambda t: t.commit.committed_datetime)
-
                 if repo.tags
-
                 else []
-
             )
 
             latest_tag = tags[-1].name if tags else "v0.0.0"
-
-
 
             # Remove 'v' prefix if present
 
             version = latest_tag.lstrip("v") if latest_tag else "0.0.0"
 
-
-
             # Get current commit (short hash)
 
             commit = repo.head.commit.hexsha[:7]
-
-
 
             # Get branch name
 
@@ -215,13 +153,9 @@ class VersionService:
 
                 branch = "detached"
 
-
-
             # Check if working directory is dirty (has uncommitted changes)
 
             is_dirty = repo.is_dirty()
-
-
 
             # Count commits ahead of latest tag
 
@@ -237,57 +171,34 @@ class VersionService:
 
                     ahead = 0
 
-
-
             # Get last commit date
 
             last_commit_date = repo.head.commit.committed_datetime.isoformat()
 
-
-
             return {
-
                 "version": version,
-
                 "commit": commit,
-
                 "branch": branch,
-
                 "dirty": is_dirty,
-
                 "ahead": ahead,
-
                 "last_commit_date": last_commit_date,
-
-                """"tag": latest_tag,"""
-
+                "tag": latest_tag,
             }
 
         except Exception as e:
 
             return {
-
                 "version": "0.0.0",
-
                 "commit": "unknown",
-
                 "branch": "unknown",
-
                 "error": str(e),
-
             }
 
-
-
     @staticmethod
-
-    def _get_package_info() -> dict[str, Any]:
-
+    def _get_package_info() -> Dict[str, Any]:
         """Get version information from package.json files"""
 
         info = {}
-
-
 
         # Try to get frontend version from package.json
 
@@ -298,8 +209,6 @@ class VersionService:
             if not frontend_package.exists():
 
                 frontend_package = Path.cwd().parent / "frontend" / "package.json"
-
-
 
             if frontend_package.exists():
 
@@ -313,8 +222,6 @@ class VersionService:
 
             info["frontend_version"] = "unknown"
 
-
-
         # Try to get backend version from setup.py or pyproject.toml
 
         try:
@@ -324,8 +231,6 @@ class VersionService:
             if not pyproject.exists():
 
                 pyproject = Path.cwd().parent / "pyproject.toml"
-
-
 
             if pyproject.exists():
 
@@ -337,8 +242,6 @@ class VersionService:
 
                     if "version = " in content:
 
-
-
                         match = re.search(r'version\s*=\s*"([^"]+)"', content)
 
                         if match:
@@ -349,23 +252,15 @@ class VersionService:
 
             info["backend_version"] = "unknown"
 
-
-
         return info
 
-
-
     @staticmethod
-
     def get_simple_version() -> str:
-
         """Get a simple version string for display"""
 
         info = VersionService.get_version_info()
 
         version = info.get("version", "0.0.0")
-
-
 
         # Add commit hash if ahead of tag
 
@@ -373,34 +268,25 @@ class VersionService:
 
             version = f"{version}+{info.get('commit', 'unknown')}"
 
-
-
         # Add dirty flag if uncommitted changes
 
         if info.get("dirty", False):
 
             version = f"{version}-dirty"
 
-
-
         return version
 
-
-
     @staticmethod
-
     def clear_cache():
-
         """Clear the version cache (useful for development)"""
 
         VersionService.get_version_info.cache_clear()
 
 
-
 # Convenience function
 
-def get_version() -> str:
 
+def get_version() -> str:
     """Get the current application version"""
 
-    """return VersionService.get_simple_version()"""
+    return VersionService.get_simple_version()

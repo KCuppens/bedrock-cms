@@ -16,7 +16,6 @@ from django.utils import timezone
 from apps.core.enums import FileType
 from apps.core.mixins import TimestampMixin, UserTrackingMixin
 from apps.core.utils import format_file_size
-from apps.files.services import FileService
 
 User = get_user_model()
 
@@ -158,10 +157,12 @@ class FileUpload(TimestampMixin, UserTrackingMixin):
 
     def get_download_url(self, expires_in=3600):  # noqa: C901
         """Get signed download URL"""
+        from apps.files.services import FileService
 
         return FileService.get_download_url(self, expires_in)
 
     def get_upload_url(self, expires_in=3600):  # noqa: C901
         """Get signed upload URL"""
+        from apps.files.services import FileService
 
         return FileService.get_upload_url(self.storage_path, expires_in)

@@ -1,4 +1,4 @@
-from typing import Any
+from typing import Any, Dict, List, Optional
 
 from django.conf import settings
 
@@ -9,8 +9,8 @@ from .seo import SeoSettings
 
 
 def deep_merge_dicts(
-    base: dict[str, Any], *overrides: dict[str, Any]
-) -> dict[str, Any]:
+    base: Dict[str, Any], *overrides: Dict[str, Any]
+) -> Dict[str, Any]:
     """Deep merge multiple dictionaries with later ones taking precedence."""
 
     result = base.copy()
@@ -37,7 +37,9 @@ def deep_merge_dicts(
     return result
 
 
-def get_best_matching_seo_default(path: str, locale: Locale) -> dict | None:
+def get_best_matching_seo_default(
+    path: str, locale: Locale
+) -> Optional[Dict[str, Any]]:
     """Find the best matching SEO default for a path. Now returns None since section-based defaults were removed."""
 
     # Section-based SEO defaults were removed for simplicity
@@ -47,7 +49,7 @@ def get_best_matching_seo_default(path: str, locale: Locale) -> dict | None:
     return None
 
 
-def resolve_seo(page: Page) -> dict[str, Any]:
+def resolve_seo(page: Page) -> Dict[str, Any]:
     """
     Resolve final SEO for a page by merging: Global → Section → Page
 
@@ -121,7 +123,7 @@ def resolve_seo(page: Page) -> dict[str, Any]:
     return resolved_seo
 
 
-def generate_canonical_url(page: Page, base_url: str | None = None) -> str:
+def generate_canonical_url(page: Page, base_url: Optional[str] = None) -> str:
     """Generate canonical URL for a page."""
 
     if not base_url:
@@ -132,8 +134,8 @@ def generate_canonical_url(page: Page, base_url: str | None = None) -> str:
 
 
 def generate_hreflang_alternates(
-    page: Page, base_url: str | None = None
-) -> list[dict[str, str]]:
+    page: Page, base_url: Optional[str] = None
+) -> List[Dict[str, str]]:
     """Generate hreflang alternates for all locales of this page."""
 
     if not base_url:
@@ -166,7 +168,7 @@ def generate_hreflang_alternates(
     return alternates
 
 
-def generate_seo_links(page: Page, base_url: str | None = None) -> dict[str, Any]:
+def generate_seo_links(page: Page, base_url: Optional[str] = None) -> Dict[str, Any]:
     """Generate canonical and hreflang data for a page."""
 
     return {

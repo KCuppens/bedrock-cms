@@ -20,12 +20,7 @@ from django.dispatch import receiver
 from django.utils import timezone
 
 if TYPE_CHECKING:
-
     from apps.blog.models import BlogPost
-
-else:
-
-    BlogPost = "BlogPost"
 
 
 # Define User type properly for mypy
@@ -109,7 +104,7 @@ class BlogPostRevision(models.Model):
         is_published: bool = False,
         is_autosave: bool = False,
         comment: str = "",
-    ) -> "BlogPostRevision":  # type: ignore
+    ) -> "BlogPostRevision":
         """Create a new revision snapshot of a blog post.
 
         Args:
@@ -142,13 +137,13 @@ class BlogPostRevision(models.Model):
                 if blog_post.scheduled_publish_at
                 else None
             ),
-            "category_id": blog_post.category.id if blog_post.category else None,
+            "category_id": blog_post.category.id if blog_post.category else None,  # type: ignore[attr-defined]
             "tag_ids": list(blog_post.tags.values_list("id", flat=True)),
             "social_image_id": (
-                blog_post.social_image.id if blog_post.social_image else None
+                blog_post.social_image.id if blog_post.social_image else None  # type: ignore[attr-defined]
             ),
-            "locale_id": blog_post.locale.id if blog_post.locale else None,
-            "author_id": blog_post.author.id if blog_post.author else None,
+            "locale_id": blog_post.locale.id if blog_post.locale else None,  # type: ignore[attr-defined]
+            "author_id": blog_post.author.id if blog_post.author else None,  # type: ignore[attr-defined]
         }
 
         # Create revision
@@ -212,7 +207,7 @@ class BlogPostRevision(models.Model):
 
     def restore_to_blog_post(
         self, user: Optional["User"] = None, create_backup: bool = True
-    ) -> "BlogPost":  # type: ignore
+    ) -> "BlogPost":
         """Restore this revision's content to the blog post.
 
         Args:
@@ -222,7 +217,11 @@ class BlogPostRevision(models.Model):
         Returns:
             Updated BlogPost instance
         """
-        blog_post = self.blog_post
+        from typing import cast
+
+        from .models import BlogPost
+
+        blog_post = cast(BlogPost, self.blog_post)
 
         snapshot = self.snapshot
 
@@ -237,35 +236,23 @@ class BlogPostRevision(models.Model):
             )
 
         with transaction.atomic():
-
             # Restore basic fields
-
             blog_post.title = snapshot["title"]
-
             blog_post.slug = snapshot["slug"]
-
             blog_post.excerpt = snapshot["excerpt"]
-
             blog_post.content = snapshot["content"]
-
             blog_post.blocks = snapshot["blocks"]
-
             blog_post.seo = snapshot["seo"]
-
             blog_post.status = snapshot["status"]
-
             blog_post.featured = snapshot["featured"]
-
             blog_post.allow_comments = snapshot["allow_comments"]
 
             # Restore timestamps
-
             blog_post.published_at = (
                 datetime.fromisoformat(snapshot["published_at"])
                 if snapshot["published_at"]
                 else None
             )
-
             blog_post.scheduled_publish_at = (
                 datetime.fromisoformat(snapshot["scheduled_publish_at"])
                 if snapshot.get("scheduled_publish_at")
@@ -273,11 +260,29 @@ class BlogPostRevision(models.Model):
             )
 
             # Restore relationships
+            if snapshot.get("category_id"):
+                from .models import Category
 
-            blog_post.category_id = snapshot["category_id"]
+                try:
+                    blog_post.category = Category.objects.get(
+                        id=snapshot["category_id"]
+                    )
+                except Category.DoesNotExist:
+                    blog_post.category = None
+            else:
+                blog_post.category = None
 
-            blog_post.social_image_id = snapshot["social_image_id"]
+            if snapshot.get("social_image_id"):
+                from apps.files.models import FileUpload
 
+                try:
+                    blog_post.social_image = FileUpload.objects.get(
+                        id=snapshot["social_image_id"]
+                    )
+                except FileUpload.DoesNotExist:
+                    blog_post.social_image = None
+            else:
+                blog_post.social_image = None
             blog_post.save()
 
             # Restore tags
@@ -289,7 +294,6 @@ class BlogPostRevision(models.Model):
                 from .models import Tag
 
                 tags = Tag.objects.filter(id__in=tag_ids)
-
                 blog_post.tags.set(tags)
 
         return blog_post

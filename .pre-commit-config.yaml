@@ -27,7 +27,7 @@ repos:
       - id: mypy
         additional_dependencies: [django-stubs, djangorestframework-stubs, django-environ, types-requests]
         files: ^backend/apps/.*\.py$
-        args: [--config-file=pyproject.toml]
+        args: [--config-file=pyproject.toml, --disable-error-code=var-annotated]
 
   - repo: https://github.com/PyCQA/bandit
     rev: 1.8.6

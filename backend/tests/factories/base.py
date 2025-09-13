@@ -1,8 +1,4 @@
-
-
-Base factory classes and utilities for test data generation.
-
-
+"""Base factory classes and utilities for test data generation."""
 
 from django.contrib.auth import get_user_model
 from django.utils import timezone
@@ -14,42 +10,29 @@ from faker import Faker
 fake = Faker()
 
 
-
 User = get_user_model()
 
 
-
 class BaseFactory(factory.django.DjangoModelFactory):
-
     """Base factory with common patterns."""
-
-
 
     class Meta:
 
         abstract = True
-
-
 
     created_at = factory.LazyFunction(timezone.now)
 
     updated_at = factory.LazyFunction(timezone.now)
 
 
-
 class UserFactory(BaseFactory):
-
     """Factory for creating test users."""
-
-
 
     class Meta:
 
         model = User
 
         django_get_or_create = ("email",)
-
-
 
     email = factory.Sequence(lambda n: f"user{n}@example.com")
 
@@ -63,15 +46,11 @@ class UserFactory(BaseFactory):
 
     is_superuser = False
 
-
-
     @factory.post_generation
-
     def password(self, create, extracted, **kwargs):
 
         if not create:
-
-
+            return
 
         password = extracted or "testpass123"
 
@@ -80,12 +59,8 @@ class UserFactory(BaseFactory):
         self.save()
 
 
-
 class AdminUserFactory(UserFactory):
-
     """Factory for admin users."""
-
-
 
     is_staff = True
 
@@ -94,12 +69,8 @@ class AdminUserFactory(UserFactory):
     email = factory.Sequence(lambda n: f"admin{n}@example.com")
 
 
-
 class StaffUserFactory(UserFactory):
-
     """Factory for staff users."""
-
-
 
     is_staff = True
 

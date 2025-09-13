@@ -1,4 +1,5 @@
 from pathlib import Path
+from typing import Any, Dict, List
 
 import environ
 
@@ -252,7 +253,7 @@ LANGUAGES = [
     # via the I18nConfig.ready() method and DynamicLanguageMiddleware
 ]
 
-RTL_LANGUAGES: list[str] = []
+RTL_LANGUAGES: List[str] = []
 
 
 # The i18n app will load actual languages from the database once Django is ready

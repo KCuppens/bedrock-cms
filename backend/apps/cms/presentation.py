@@ -3,7 +3,6 @@ from typing import Any
 from django.core.exceptions import ValidationError
 from django.http import Http404
 
-from apps.blog.models import BlogPost, BlogSettings
 from apps.core.cache import cache_manager
 from apps.registry.registry import get_all_configs
 
@@ -103,9 +102,10 @@ class PresentationPageResolver:
             Dict containing 'content', 'presentation_page', 'display_options'
         """
         if content_label == "blog.blogpost":
+            # Import here to avoid circular imports
+            from apps.blog.models import BlogPost
 
             try:
-
                 post = BlogPost.objects.select_related("category", "locale").get(
                     id=content_id, locale__code=locale_code
                 )
@@ -113,7 +113,6 @@ class PresentationPageResolver:
                 return self._resolve_blog_post_from_instance(post)
 
             except BlogPost.DoesNotExist:
-
                 raise Http404(
                     f"BlogPost {content_id} not found for locale {locale_code}"
                 )
@@ -124,9 +123,10 @@ class PresentationPageResolver:
 
     def _resolve_blog_post(self, slug: str, locale_code: str) -> dict[str, Any]:
         """Resolve blog post by slug."""
+        # Import here to avoid circular imports
+        from apps.blog.models import BlogPost
 
         try:
-
             post = BlogPost.objects.select_related("category", "locale").get(
                 slug=slug, locale__code=locale_code, status="published"
             )
@@ -134,18 +134,17 @@ class PresentationPageResolver:
             return self._resolve_blog_post_from_instance(post)
 
         except BlogPost.DoesNotExist:
-
             raise Http404(
                 f"Published blog post '{slug}' not found for locale {locale_code}"
             )
 
     def _resolve_blog_post_from_instance(self, post) -> dict[str, Any]:
         """Resolve presentation page and options for a blog post instance."""
+        # Import here to avoid circular imports
+        from apps.blog.models import BlogSettings
 
         # Get blog settings for this locale
-
         try:
-
             blog_settings = BlogSettings.objects.select_related(
                 "default_presentation_page"
             ).get(locale=post.locale)

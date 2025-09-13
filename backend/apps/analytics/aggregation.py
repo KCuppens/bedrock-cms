@@ -1,6 +1,7 @@
 """Analytics aggregation functions for calculating metrics and summaries."""
 
 from datetime import date, datetime, timedelta
+from typing import Any, Dict, List, Optional
 
 from django.contrib.auth import get_user_model
 from django.db.models import Avg, Count, Sum
@@ -25,7 +26,7 @@ class AnalyticsAggregator:
     """Main aggregation class for analytics calculations"""
 
     @staticmethod
-    def get_traffic_trends(days: int = 30, period: str = "daily") -> list[dict]:
+    def get_traffic_trends(days: int = 30, period: str = "daily") -> List[dict]:
         """Calculate traffic trends over a specified period.
 
         Args:
@@ -33,7 +34,7 @@ class AnalyticsAggregator:
             period: Aggregation period ('daily', 'weekly', 'monthly', 'hourly')
 
         Returns:
-            list[dict]: List of dictionaries containing trend data
+            List[dict]: List of dictionaries containing trend data
         """
 
         end_date = timezone.now()
@@ -71,7 +72,7 @@ class AnalyticsAggregator:
 
     @staticmethod
     def calculate_bounce_rate(
-        start_date: datetime, end_date: datetime, page_id: int | None = None
+        start_date: datetime, end_date: datetime, page_id: Optional[int] = None
     ) -> float:
         """Calculate bounce rate for a given period.
 
@@ -111,8 +112,8 @@ class AnalyticsAggregator:
 
     @staticmethod
     def get_top_content(
-        days: int = 30, limit: int = 20, content_type: str | None = None
-    ) -> list[dict]:
+        days: int = 30, limit: int = 20, content_type: Optional[str] = None
+    ) -> List[dict]:
         """Get top performing content by views and engagement.
 
         Args:
@@ -121,7 +122,7 @@ class AnalyticsAggregator:
             content_type: Optional content type filter
 
         Returns:
-            list[dict]: List of top performing content with metrics
+            List[dict]: List of top performing content with metrics
         """
 
         end_date = timezone.now().date()
@@ -146,7 +147,9 @@ class AnalyticsAggregator:
         return list(top_content)
 
     @staticmethod
-    def get_user_engagement_metrics(user_id: int | None = None, days: int = 30) -> dict:
+    def get_user_engagement_metrics(
+        user_id: Optional[int] = None, days: int = 30
+    ) -> dict:
         """Calculate user engagement metrics.
 
         Args:

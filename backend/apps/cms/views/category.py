@@ -1,4 +1,7 @@
+from datetime import datetime, timedelta
+
 from django.db.models import Count, Q
+from django.utils import timezone
 
 from drf_spectacular.utils import extend_schema, extend_schema_view
 from rest_framework import viewsets
@@ -12,38 +15,21 @@ from apps.cms.serializers.category import (
     CategorySerializer,
     CollectionSerializer,
     TagSerializer,
-    datetime,
-    django.utils,
-    timedelta,
-    timezone,
 )
 
 
 @extend_schema_view(
-
     list=extend_schema(summary="List categories", tags=["Categories"]),
-
     create=extend_schema(summary="Create category", tags=["Categories"]),
-
     retrieve=extend_schema(summary="Get category details", tags=["Categories"]),
-
     update=extend_schema(summary="Update category", tags=["Categories"]),
-
     partial_update=extend_schema(
-
         summary="Partially update category", tags=["Categories"]
-
     ),
-
     destroy=extend_schema(summary="Delete category", tags=["Categories"]),
-
 )
-
 class CategoryViewSet(viewsets.ModelViewSet):
-
     """ViewSet for managing categories"""
-
-
 
     queryset = Category.objects.all()
 
@@ -53,15 +39,10 @@ class CategoryViewSet(viewsets.ModelViewSet):
 
     lookup_field = "id"
 
-
-
     def get_queryset(self):
-
         """Get categories with post count and filtering"""
 
         queryset = self.queryset
-
-
 
         # Filter by active status
 
@@ -77,8 +58,6 @@ class CategoryViewSet(viewsets.ModelViewSet):
 
             queryset = queryset.filter(is_active=True)
 
-
-
         # Search by name
 
         search = self.request.query_params.get("search")
@@ -87,26 +66,16 @@ class CategoryViewSet(viewsets.ModelViewSet):
 
             queryset = queryset.filter(name__icontains=search)
 
-
-
         return queryset.annotate(post_count=Count("posts")).order_by("name")
 
-
-
     def perform_create(self, serializer):
-
         """Create category (Blog Category model doesn't have created_by field)"""
 
         serializer.save()
 
-
-
     @extend_schema(summary="Get category tree", tags=["Categories"])
-
     @action(detail=False, methods=["get"])
-
     def tree(self, request):
-
         """Get hierarchical category tree"""
 
         # Get root categories (no parent)
@@ -118,28 +87,16 @@ class CategoryViewSet(viewsets.ModelViewSet):
         return Response(serializer.data)
 
 
-
 @extend_schema_view(
-
     list=extend_schema(summary="List tags", tags=["Tags"]),
-
     create=extend_schema(summary="Create tag", tags=["Tags"]),
-
     retrieve=extend_schema(summary="Get tag details", tags=["Tags"]),
-
     update=extend_schema(summary="Update tag", tags=["Tags"]),
-
     partial_update=extend_schema(summary="Partially update tag", tags=["Tags"]),
-
     destroy=extend_schema(summary="Delete tag", tags=["Tags"]),
-
 )
-
 class TagViewSet(viewsets.ModelViewSet):
-
     """ViewSet for managing tags"""
-
-
 
     queryset = Tag.objects.all()
 
@@ -149,15 +106,10 @@ class TagViewSet(viewsets.ModelViewSet):
 
     lookup_field = "slug"
 
-
-
     def get_queryset(self):
-
         """Get tags with post count and filtering"""
 
         queryset = self.queryset
-
-
 
         # Search by name
 
@@ -167,25 +119,17 @@ class TagViewSet(viewsets.ModelViewSet):
 
             queryset = queryset.filter(name__icontains=search)
 
-
-
         # Filter by trending (has posts in last 30 days)
 
         trending = self.request.query_params.get("trending")
 
         if trending and trending.lower() == "true":
 
-
-
             thirty_days_ago = timezone.now() - timedelta(days=30)
 
             queryset = queryset.filter(
-
                 posts__created_at__gte=thirty_days_ago
-
             ).distinct()
-
-
 
         # Filter by popular (minimum post count)
 
@@ -194,33 +138,21 @@ class TagViewSet(viewsets.ModelViewSet):
         if min_count:
 
             queryset = queryset.annotate(post_count=Count("posts")).filter(
-
                 post_count__gte=int(min_count)
-
             )
 
             return queryset.order_by("-post_count")
 
-
-
         return queryset.annotate(post_count=Count("posts")).order_by("name")
 
-
-
     def perform_create(self, serializer):
-
         """Create tag (Blog Tag model doesn't have created_by field)"""
 
         serializer.save()
 
-
-
     @extend_schema(summary="Get popular tags", tags=["Tags"])
-
     @action(detail=False, methods=["get"])
-
     def popular(self, request):
-
         """Get most popular tags"""
 
         limit = int(request.query_params.get("limit", 10))
@@ -231,105 +163,59 @@ class TagViewSet(viewsets.ModelViewSet):
 
         return Response(serializer.data)
 
-
-
     @extend_schema(summary="Get trending tags", tags=["Tags"])
-
     @action(detail=False, methods=["get"])
-
     def trending(self, request):
-
         """Get trending tags (with recent posts)"""
 
-
-
         thirty_days_ago = timezone.now() - timedelta(days=30)
-
-
 
         limit = int(request.query_params.get("limit", 10))
 
         tags = (
-
             self.queryset.filter(posts__created_at__gte=thirty_days_ago)
-
             .annotate(
-
                 post_count=Count("posts"),
-
                 recent_post_count=Count(
-
                     "posts", filter=Q(posts__created_at__gte=thirty_days_ago)
-
                 ),
-
             )
-
             .filter(recent_post_count__gt=0)
-
             .order_by("-recent_post_count")[:limit]
-
         )
-
-
 
         serializer = self.get_serializer(tags, many=True)
 
         return Response(serializer.data)
 
-
-
     @extend_schema(summary="Get unused tags", tags=["Tags"])
-
     @action(detail=False, methods=["get"])
-
     def unused(self, request):
-
         """Get tags that have no posts"""
 
         unused_tags = (
-
             self.queryset.annotate(post_count=Count("posts"))
-
             .filter(post_count=0)
-
             .order_by("name")
-
         )
-
-
 
         serializer = self.get_serializer(unused_tags, many=True)
 
         return Response(serializer.data)
 
 
-
 @extend_schema_view(
-
     list=extend_schema(summary="List collections", tags=["Collections"]),
-
     create=extend_schema(summary="Create collection", tags=["Collections"]),
-
     retrieve=extend_schema(summary="Get collection details", tags=["Collections"]),
-
     update=extend_schema(summary="Update collection", tags=["Collections"]),
-
     partial_update=extend_schema(
-
         summary="Partially update collection", tags=["Collections"]
-
     ),
-
     destroy=extend_schema(summary="Delete collection", tags=["Collections"]),
-
 )
-
 class CollectionViewSet(viewsets.ModelViewSet):
-
     """ViewSet for managing collections"""
-
-
 
     queryset = Collection.objects.all()
 
@@ -339,15 +225,10 @@ class CollectionViewSet(viewsets.ModelViewSet):
 
     lookup_field = "slug"
 
-
-
     def get_queryset(self):
-
         """Get collections with item count"""
 
         queryset = self.queryset
-
-
 
         # Filter by status if provided
 
@@ -357,30 +238,20 @@ class CollectionViewSet(viewsets.ModelViewSet):
 
             queryset = queryset.filter(status=status_filter)
 
-
-
         # Annotate with item count (pages in collection)
 
         return queryset.annotate(item_count=Count("pages"))
 
-
-
     def perform_create(self, serializer):
-
         """Set created_by when creating collection"""
 
         # Collection model does have created_by field
 
         serializer.save(created_by=self.request.user)
 
-
-
     @extend_schema(summary="Publish collection", tags=["Collections"])
-
     @action(detail=True, methods=["post"])
-
     def publish(self, request, slug=None):
-
         """Publish a collection"""
 
         collection = self.get_object()
@@ -388,8 +259,6 @@ class CollectionViewSet(viewsets.ModelViewSet):
         collection.status = "published"
 
         if not collection.published_at:
-
-
 
             collection.published_at = timezone.now()
 
@@ -399,14 +268,9 @@ class CollectionViewSet(viewsets.ModelViewSet):
 
         return Response(serializer.data)
 
-
-
     @extend_schema(summary="Unpublish collection", tags=["Collections"])
-
     @action(detail=True, methods=["post"])
-
     def unpublish(self, request, slug=None):
-
         """Unpublish a collection"""
 
         collection = self.get_object()
@@ -419,14 +283,9 @@ class CollectionViewSet(viewsets.ModelViewSet):
 
         return Response(serializer.data)
 
-
-
     @extend_schema(summary="Get collection items", tags=["Collections"])
-
     @action(detail=True, methods=["get"])
-
     def items(self, request, slug=None):
-
         """Get all items in a collection"""
 
         self.get_object()
@@ -436,13 +295,8 @@ class CollectionViewSet(viewsets.ModelViewSet):
         # Implementation depends on how items are related to collections
 
         return Response(
-
             {
-
                 "pages": [],  # Add page serialization here
-
                 "posts": [],  # Add post serialization here
-
             }
-
         )

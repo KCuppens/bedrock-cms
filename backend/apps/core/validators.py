@@ -6,7 +6,6 @@ from django.utils.translation import gettext_lazy as _
 """Custom validators for the core app."""
 
 
-
 def validate_json_size(value, max_size_mb=1):
     """
     Validate that JSON field size doesn't exceed the limit.
@@ -16,8 +15,7 @@ def validate_json_size(value, max_size_mb=1):
         max_size_mb: Maximum size in megabytes (default 1MB)
     """
     if value is None:
-
-
+        return
 
     # Convert to JSON string to measure size
 
@@ -29,36 +27,23 @@ def validate_json_size(value, max_size_mb=1):
 
         max_bytes = max_size_mb * 1024 * 1024
 
-
-
         if size_bytes > max_bytes:
 
             raise ValidationError(
-
                 _(
-
                     "JSON data size (%(size).2f MB) exceeds maximum allowed size (%(max_size)d MB)."
-
                 ),
-
                 params={"size": size_bytes / (1024 * 1024), "max_size": max_size_mb},
-
                 code="json_too_large",
-
             )
 
     except (TypeError, ValueError) as e:
 
         raise ValidationError(
-
             _("Invalid JSON data: %(error)s"),
-
             params={"error": str(e)},
-
             code="invalid_json",
-
         )
-
 
 
 def validate_json_structure(value, max_depth=10):
@@ -79,16 +64,10 @@ def validate_json_structure(value, max_depth=10):
         if current_depth > max_depth:
 
             raise ValidationError(
-
                 _("JSON nesting depth exceeds maximum allowed depth of %(max_depth)d"),
-
                 params={"max_depth": max_depth},
-
                 code="json_too_deep",
-
             )
-
-
 
         if isinstance(obj, dict):
 
@@ -102,35 +81,21 @@ def validate_json_structure(value, max_depth=10):
 
                 check_depth(item, current_depth + 1)
 
-
-
     if value is not None:
 
         check_depth(value)
 
 
-
 class JSONSizeValidator:
-
-
-
-    Validator class for JSON field size limits.
-
-
+    """Validator class for JSON field size limits."""
 
     def __init__(self, max_size_mb=1):
 
         self.max_size_mb = max_size_mb
 
-
-
     def __call__(self, value):
 
         validate_json_size(value, self.max_size_mb)
 
-
-
     def deconstruct(self):
-
-# Imports that were malformed - commented out
-#         """return ("apps.core.validators.JSONSizeValidator", [self.max_size_mb], {})"""
+        return ("apps.core.validators.JSONSizeValidator", [self.max_size_mb], {})

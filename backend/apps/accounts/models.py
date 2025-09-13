@@ -61,9 +61,30 @@ class CustomUserManager(BaseUserManager["User"]):
 class User(AbstractUser):
     """Custom user model with email as username"""
 
-    username = None  # type: ignore  # Remove username field
+    username = None  # Remove username field
 
     email = models.EmailField(_("Email address"), unique=True)
+
+    # Fix reverse accessor conflicts
+    groups = models.ManyToManyField(
+        "auth.Group",
+        verbose_name=_("groups"),
+        blank=True,
+        help_text=_(
+            "The groups this user belongs to. A user will get all permissions "
+            "granted to each of their groups."
+        ),
+        related_name="custom_user_set",
+        related_query_name="custom_user",
+    )
+    user_permissions = models.ManyToManyField(
+        "auth.Permission",
+        verbose_name=_("user permissions"),
+        blank=True,
+        help_text=_("Specific permissions for this user."),
+        related_name="custom_user_set",
+        related_query_name="custom_user",
+    )
 
     name: CharField = models.CharField(_("Full name"), max_length=150, blank=True)
 

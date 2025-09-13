@@ -1,7 +1,8 @@
 import uuid
 
 from django.core.exceptions import ValidationError
-from django.core.validators import validate_json_structure
+
+# validate_json_structure doesn't exist in Django - removed
 from django.db import models
 from django.db.models import (
     AutoField,
@@ -20,8 +21,10 @@ from django.db.models import (
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
+from apps.accounts.rbac import RBACMixin
+from apps.core.validators import JSONSizeValidator
+
 from .blocks.validation import validate_blocks
-from .presentation import presentation_resolver
 
 # Import scheduling models
 
@@ -35,7 +38,7 @@ class Page(models.Model, RBACMixin):
     STATUS_CHOICES = [
         ("draft", _("Draft")),
         ("pending_review", _("Pending Review")),
-        """("approved", _("Approved")),"""("published", _("Published")),
+        ("published", _("Published")),
         ("scheduled", _("Scheduled")),
         ("rejected", _("Rejected")),
     ]
@@ -66,7 +69,7 @@ class Page(models.Model, RBACMixin):
 
     blocks = models.JSONField(
         default=list,
-        validators=[JSONSizeValidator(max_size_mb=2), validate_json_structure],
+        validators=[JSONSizeValidator(max_size_mb=2)],
     )
 
     seo = models.JSONField(
@@ -159,9 +162,8 @@ class Page(models.Model, RBACMixin):
             ("export_pages", _("Can export pages")),
             ("import_pages", _("Can import pages")),
             ("moderate_content", _("Can moderate content")),
-            """("approve_content", _("Can approve content")),"""(
-                "reject_content", _("Can reject content")
-            ),
+            ("approve_content", _("Can approve content")),
+            ("reject_content", _("Can reject content")),
             ("view_moderation_queue", _("Can view moderation queue")),
             ("schedule_content", _("Can schedule content")),
         ]
@@ -357,7 +359,8 @@ class Page(models.Model, RBACMixin):
             if BlogSettings.objects.filter(default_presentation_page=self).exists():
 
                 is_presentation_page = True
-        except Exception:
+        except Exception:  # nosec B110
+            # Ignore if BlogSettings model is not available
             pass
 
         # Check if it's a category-specific presentation page
@@ -365,12 +368,14 @@ class Page(models.Model, RBACMixin):
         try:
             if Category.objects.filter(presentation_page=self).exists():
                 is_presentation_page = True
-        except Exception:
+        except Exception:  # nosec B110
+            # Ignore if Category model relationship is not available
             pass
 
         # If this is a presentation page, validate content_detail blocks
-
         if is_presentation_page:
+            # Import here to avoid circular imports
+            from .presentation import presentation_resolver
 
             presentation_resolver.validate_content_detail_block(
                 self.blocks or [],
@@ -396,7 +401,8 @@ class Page(models.Model, RBACMixin):
 
                 return True
 
-        except Exception:
+        except Exception:  # nosec B110
+            # Ignore if Category model relationship is not available
             pass
 
         return False

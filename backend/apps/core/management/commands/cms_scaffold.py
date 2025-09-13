@@ -18,10 +18,6 @@ from apps.registry.registry import content_registry
 # from {{app_label}}.models import {{ model_class }}  # Template line for code generation
 
 
-
-
-
-
 """
 Template file for code generation - contains Django template syntax that's not valid Python.
 The following lines would contain template variables like {{app_label}}, {{model_class}}, {{snake_name}} etc.
@@ -43,44 +39,27 @@ class Command(BaseCommand):
     def add_arguments(self, parser):
 
         parser.add_argument(
-
             "model_label",
-
             type=str,
-
             help='Model label in format "app.Model" (e.g., "blog.BlogPost")',
-
         )
 
         parser.add_argument(
-
             "--output-dir",
-
             type=str,
-
             default=".",
-
             help="Output directory for generated files (default: current directory)",
-
         )
 
         parser.add_argument(
-
             "--dry-run",
-
             action="store_true",
-
             help="Show what would be created without actually creating files",
-
         )
 
         parser.add_argument(
-
             "--force", action="store_true", help="Overwrite existing files"
-
         )
-
-
 
     def handle(self, *args, **options):
 
@@ -92,19 +71,13 @@ class Command(BaseCommand):
 
         force = options["force"]
 
-
-
         # Validate model label format
 
         if "." not in model_label:
 
             """raise CommandError('Model label must be in format "app.Model"')"""
 
-
-
         app_label, model_name = model_label.split(".", 1)
-
-
 
         # Get the model
 
@@ -116,41 +89,27 @@ class Command(BaseCommand):
 
             """raise CommandError(f"Model {model_label} not found")"""
 
-
-
         # Check if model is registered in content registry
 
         config = content_registry.get_config(model_label)
 
         if not config:
 
-            """raise CommandError("""
-
+            raise CommandError(
                 f"Model {model_label} is not registered in content registry. Register it first."
-
             )
-
-
 
         # Generate context for templates
 
         context = self._build_context(model, config, app_label, model_name)
 
-
-
         self.stdout.write(
-
             self.style.SUCCESS(f"Scaffolding API endpoints for {model_label}")
-
         )
-
-
 
         if dry_run:
 
             self._show_dry_run(context, output_dir)
-
-
 
         try:
 
@@ -158,50 +117,33 @@ class Command(BaseCommand):
 
             self._create_serializers_file(context, output_dir, force)
 
-
-
             # Create views file
 
             self._create_views_file(context, output_dir, force)
-
-
 
             # Create URLs file
 
             self._create_urls_file(context, output_dir, force)
 
-
-
             # Create admin integration
 
             self._create_admin_file(context, output_dir, force)
-
-
 
             # Create basic documentation
 
             self._create_docs_file(context, output_dir, force)
 
-
-
             self.stdout.write(
-
                 self.style.SUCCESS(f"Successfully scaffolded API for {model_label}")
-
             )
 
             self._show_next_steps(context)
-
-
 
         except Exception as e:
 
             """raise CommandError(f"Failed to scaffold API: {e}")"""
 
-
-
     def _build_context(self, model, config, app_label, model_name):
-
         """Build template context from model and config."""
 
         # Get model fields for serializer
@@ -213,90 +155,48 @@ class Command(BaseCommand):
             if not field.many_to_many and not (field.one_to_many or field.one_to_one):
 
                 field_info = {
-
                     "name": field.name,
-
                     "type": field.__class__.__name__,
-
                     "required": not field.null
-
                     and not field.blank
-
                     and not hasattr(field, "default"),
-
                     "help_text": getattr(field, "help_text", "")
-
                     or f"{field.name} field",
-
                 }
 
                 """fields.append(field_info)"""
 
-
-
         return {
-
-            """"app_label": app_label,"""
-
-            "model_name": model_name,
-
+            """"app_label": app_label,""" "model_name": model_name,
             "model_class": model.__name__,
-
             """"model_label": f"{app_label}.{model_name}","""
-
             "model_verbose": model._meta.verbose_name,
-
             "model_verbose_plural": model._meta.verbose_name_plural,
-
             "snake_name": inflection.underscore(model_name),
-
             "kebab_name": inflection.dasherize(inflection.underscore(model_name)),
-
             "plural_name": inflection.pluralize(inflection.underscore(model_name)),
-
             "fields": fields,
-
             "config": {
-
                 "kind": config.kind,
-
                 "slug_field": config.slug_field,
-
                 "locale_field": config.locale_field,
-
                 "translatable_fields": config.translatable_fields or [],
-
                 "searchable_fields": config.searchable_fields or [],
-
                 "can_publish": config.can_publish,
-
                 "route_pattern": config.route_pattern or "",
-
             },
-
         }
 
-
-
     def _show_dry_run(self, context, output_dir):
-
         """Show what would be created in dry run mode."""
 
         files = [
-
             f"{context['snake_name']}_serializers.py",
-
             f"{context['snake_name']}_views.py",
-
             f"{context['snake_name']}_urls.py",
-
             f"{context['snake_name']}_admin.py",
-
             f"docs/api/{context['kebab_name']}.md",
-
         ]
-
-
 
         self.stdout.write("\nFiles that would be created:")
 
@@ -306,80 +206,52 @@ class Command(BaseCommand):
 
             self.stdout.write(f"  * {file_path}")
 
-
-
         self.stdout.write("\nAPI endpoints that would be available:")
 
         self.stdout.write(
-
             f"  GET    /api/content/{context['model_label']}/           - List {context['model_verbose_plural']}"
-
         )
 
         self.stdout.write(
-
             f"  POST   /api/content/{context['model_label']}/           - Create {context['model_verbose']}"
-
         )
 
         self.stdout.write(
-
             f"  GET    /api/content/{context['model_label']}/{{id}}/       - Get {context['model_verbose']}"
-
         )
 
         self.stdout.write(
-
             f"  PUT    /api/content/{context['model_label']}/{{id}}/       - Update {context['model_verbose']}"
-
         )
 
         self.stdout.write(
-
             f"  PATCH  /api/content/{context['model_label']}/{{id}}/       - Partial update {context['model_verbose']}"
-
         )
 
         self.stdout.write(
-
             f"  DELETE /api/content/{context['model_label']}/{{id}}/       - Delete {context['model_verbose']}"
-
         )
-
-
 
         if context["config"]["slug_field"]:
 
             self.stdout.write(
-
                 f"  GET    /api/content/{context['model_label']}:by-slug    - Get by slug"
-
             )
-
-
 
         if context["config"]["can_publish"]:
 
             self.stdout.write(
-
                 f"  POST   /api/content/{context['model_label']}/{{id}}/publish   - Publish {context['model_verbose']}"
-
             )
 
             self.stdout.write(
-
                 f"  POST   /api/content/{context['model_label']}/{{id}}/unpublish - Unpublish {context['model_verbose']}"
-
             )
 
-
-
     def _create_serializers_file(self, context, output_dir, force):
-
         """Create serializers file."""
 
         template = Template(
-
             '''"""
 
 Serializers for {{ model_class }} model.
@@ -473,10 +345,7 @@ class {{ model_class }}WriteSerializer(serializers.ModelSerializer):
 {% endif %}
 
 '''
-
         )
-
-
 
         file_path = output_dir / f"{context['snake_name']}_serializers.py"
 
@@ -484,14 +353,10 @@ class {{ model_class }}WriteSerializer(serializers.ModelSerializer):
 
         self.stdout.write(f"  * Created {file_path}")
 
-
-
     def _create_views_file(self, context, output_dir, force):
-
         """Create views file."""
 
         template = Template(
-
             '''"""
 
 API views for {{ model_class }} model.
@@ -705,10 +570,7 @@ class {{ model_class }}ViewSet(viewsets.ModelViewSet):
     {% endif %}
 
 '''
-
         )
-
-
 
         file_path = output_dir / f"{context['snake_name']}_views.py"
 
@@ -716,14 +578,10 @@ class {{ model_class }}ViewSet(viewsets.ModelViewSet):
 
         self.stdout.write(f"  * Created {file_path}")
 
-
-
     def _create_urls_file(self, context, output_dir, force):
-
         """Create URLs file."""
 
         template = Template(
-
             '''"""
 
 URL configuration for {{ model_class }} API.
@@ -741,10 +599,7 @@ router.register(r'{{ plural_name }}', {{ model_class }}ViewSet, basename='{{ sna
 urlpatterns = router.urls
 
 '''
-
         )
-
-
 
         file_path = output_dir / f"{context['snake_name']}_urls.py"
 
@@ -752,14 +607,10 @@ urlpatterns = router.urls
 
         self.stdout.write(f"  * Created {file_path}")
 
-
-
     def _create_admin_file(self, context, output_dir, force):
-
         """Create admin integration file."""
 
         template = Template(
-
             '''"""
 
 Admin configuration for {{ model_class }} model.
@@ -829,10 +680,7 @@ class {{ model_class }}Admin(admin.ModelAdmin):
     )
 
 '''
-
         )
-
-
 
         file_path = output_dir / f"{context['snake_name']}_admin.py"
 
@@ -840,25 +688,17 @@ class {{ model_class }}Admin(admin.ModelAdmin):
 
         self.stdout.write(f"  * Created {file_path}")
 
-
-
     def _create_docs_file(self, context, output_dir, force):
-
         """Create documentation file."""
 
         docs_dir = output_dir / "docs/api"
 
         docs_dir.mkdir(parents=True, exist_ok=True)
 
-
-
         template = Template(
-
             """# {{ model_class }} API
 
-
-
-"""{{ model_verbose_plural }} management API endpoints."""
+{{ model_verbose_plural }} management API endpoints.
 
 
 
@@ -1055,9 +895,7 @@ POST /api/content/{{ model_label }}/{id}/unpublish
 ```bash
 
 curl -X POST /api/content/{{ model_label }}/ \\
-
-  """-H "Content-Type: application/json" \\"""
-
+  -H "Content-Type: application/json" \\
   -H "Authorization: Bearer YOUR_TOKEN" \\
 
   -d '{
@@ -1090,8 +928,7 @@ curl "/api/content/{{ model_label }}/?search=example{% if config.locale_field %}
 
 - **List/Read**: Authenticated users
 
-"""- **Create/Update/Delete**: Users with appropriate model permissions{% if config.can_publish %}"""
-
+- **Create/Update/Delete**: Users with appropriate model permissions{% if config.can_publish %}
 - **Publish/Unpublish**: Users with publish permissions{% endif %}
 
 
@@ -1105,12 +942,8 @@ curl "/api/content/{{ model_label }}/?search=example{% if config.locale_field %}
 - [API Authentication](../authentication.md)
 
 - [Permissions](../permissions.md)
-
-
-
+            """
         )
-
-
 
         file_path = docs_dir / f"{context['kebab_name']}.md"
 
@@ -1118,10 +951,7 @@ curl "/api/content/{{ model_label }}/?search=example{% if config.locale_field %}
 
         self.stdout.write(f"  * Created {file_path}")
 
-
-
     def _write_file(self, file_path, content, force):
-
         """Write content to file, checking for existing files."""
 
         if file_path.exists() and not force:
@@ -1130,18 +960,13 @@ curl "/api/content/{{ model_label }}/?search=example{% if config.locale_field %}
                 f"File {file_path} already exists. Use --force to overwrite."
             )
 
-
-
         file_path.parent.mkdir(parents=True, exist_ok=True)
 
         with open(file_path, "w") as f:
 
             f.write(content)
 
-
-
     def _show_next_steps(self, context):
-
         """Show next steps to the user."""
 
         self.stdout.write("\n" + "=" * 60)
@@ -1150,19 +975,13 @@ curl "/api/content/{{ model_label }}/?search=example{% if config.locale_field %}
 
         self.stdout.write("=" * 60)
 
-
-
         self.stdout.write("\n1. Add the URLs to your main URL configuration:")
 
         self.stdout.write("   # In your main urls.py")
 
         self.stdout.write(
-
             f'   path("api/content/{{ model_label }}/", include("path.to.{context["snake_name"]}_urls")),'
-
         )
-
-
 
         self.stdout.write("\n2. Review and customize the generated files:")
 
@@ -1172,8 +991,6 @@ curl "/api/content/{{ model_label }}/?search=example{% if config.locale_field %}
 
         self.stdout.write("   - Customize admin interface")
 
-
-
         """self.stdout.write("\n3. Test the API endpoints:")"""
 
         """self.stdout.write("   python manage.py test  # Run your tests")"""
@@ -1182,14 +999,8 @@ curl "/api/content/{{ model_label }}/?search=example{% if config.locale_field %}
 
         self.stdout.write(f"   curl /api/content/{context['model_label']}/")
 
-
-
         self.stdout.write("\n4. Update API documentation as needed")
 
-
-
         self.stdout.write(
-
             f"\nAPI endpoints for {context['model_label']} are ready to use!"
-
         )

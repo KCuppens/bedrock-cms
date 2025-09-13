@@ -1,9 +1,9 @@
 import hashlib
+import logging
+from typing import Any, Dict, List, Optional, Union
 
 from django.core.cache import cache
 
-from apps.blog.models import BlogPost
-from apps.cms.models import Page
 from apps.registry.registry import content_registry
 
 """Cache utilities and key management for CMS.
@@ -11,6 +11,7 @@ from apps.registry.registry import content_registry
 Provides consistent cache key generation and invalidation strategies.
 """
 
+logger = logging.getLogger(__name__)
 
 # mypy: ignore-errors
 
@@ -74,7 +75,7 @@ class CacheKeyBuilder:
         return f"{self.prefix}:{ns_prefix}:{key_suffix}"
 
     def page_key(
-        self, locale: str, path: str, revision_id: str | int | None = None
+        self, locale: str, path: str, revision_id: Optional[str] = None
     ) -> str:
         """Build cache key for a page.
 
@@ -102,7 +103,7 @@ class CacheKeyBuilder:
         model_label: str,
         locale: str,
         slug: str,
-        revision_id: str | int | None = None,
+        revision_id: Optional[Union[str, int]] = None,
     ) -> str:
         """Build cache key for registry content.
 
@@ -121,8 +122,8 @@ class CacheKeyBuilder:
         self,
         locale: str,
         slug: str,
-        post_rev: str | int | None = None,
-        page_rev: str | int | None = None,
+        post_rev: Optional[Union[str, int]] = None,
+        page_rev: Optional[Union[str, int]] = None,
     ) -> str:
         """Build cache key for blog post presentation.
 
@@ -163,7 +164,7 @@ class CacheKeyBuilder:
 
             return self.build_key("api", endpoint)
 
-    def search_key(self, query: str, filters: dict | None = None) -> str:
+    def search_key(self, query: str, filters: Optional[dict] = None) -> str:
         """Build cache key for search results.
 
         Format: cms:s:{query_hash}:{filter_hash}
@@ -197,7 +198,7 @@ class CacheKeyBuilder:
 
         return self.build_key("sitemap", locale)
 
-    def seo_key(self, model_label: str, object_id: str | int, locale: str) -> str:
+    def seo_key(self, model_label: str, object_id: Union[str, int], locale: str) -> str:
         """Build cache key for SEO data.
 
         Format: cms:seo:{model_label}:{object_id}:{locale}
@@ -209,7 +210,7 @@ class CacheKeyBuilder:
 class CacheManager:
     """High-level cache management with invalidation support."""
 
-    def __init__(self, key_builder: CacheKeyBuilder | None = None):
+    def __init__(self, key_builder: Optional[CacheKeyBuilder] = None):
 
         self.key_builder = key_builder or CacheKeyBuilder()
 
@@ -218,7 +219,7 @@ class CacheManager:
 
         return cache.get(key, default, version=version)
 
-    def set(self, key: str, value, timeout: int | None = None, version=None):
+    def set(self, key: str, value, timeout: Optional[int] = None, version=None):
         """Set value in cache with appropriate timeout."""
 
         if timeout is None:
@@ -267,13 +268,13 @@ class CacheManager:
                 # This is mainly for development/testing with local cache
                 pass
 
-        except Exception:
-            # If pattern deletion fails, ignore silently
+        except Exception as e:
+            # If pattern deletion fails, log but continue
             # Individual key invalidation will still work
-            pass
+            logger.debug(f"Pattern deletion failed for {pattern}: {e}")
 
     def get_or_set(
-        self, key: str, callable_func, timeout: int | None = None, version=None
+        self, key: str, callable_func, timeout: Optional[int] = None, version=None
     ):
         """Get from cache or set using callable if not found."""
 
@@ -317,13 +318,14 @@ class CacheManager:
         elif page_id:
             # Look up page and invalidate
             try:
-                page = Page.objects.get(id=page_id)
+                # Import here to avoid circular imports
+                from apps.cms.models import Page
 
+                page = Page.objects.get(id=page_id)
                 self.invalidate_page(locale=page.locale.code, path=page.path)
 
-            except Exception:
-
-                pass  # Page not found, nothing to invalidate
+            except Exception as e:
+                logger.debug(f"Page {page_id} not found for invalidation: {e}")
 
         # Delete specific keys
 
@@ -381,9 +383,9 @@ class CacheManager:
 
                         self.invalidate_content(model_label, locale_code, slug_value)
 
-            except Exception:
+            except Exception as e:
 
-                pass  # Object not found or error
+                logger.debug(f"Content object not found for invalidation: {e}")
 
         # Delete specific keys
 
@@ -407,12 +409,14 @@ class CacheManager:
         elif post_id:
             # Look up post and invalidate
             try:
-                post = BlogPost.objects.get(id=post_id)
+                # Import here to avoid circular imports
+                from apps.blog.models import BlogPost
 
+                post = BlogPost.objects.get(id=post_id)
                 self.invalidate_blog_post(locale=post.locale.code, slug=post.slug)
 
-            except Exception:
-                pass
+            except Exception as e:
+                logger.debug(f"Blog post {post_id} not found for invalidation: {e}")
 
     def invalidate_search(self, query: str = None):
         """Invalidate search cache entries."""

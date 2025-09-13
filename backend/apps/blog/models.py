@@ -23,8 +23,7 @@ from django.utils.translation import gettext_lazy as _
 
 from apps.accounts.rbac import RBACMixin
 from apps.cms import versioning
-from apps.cms.models import validate_json_structure
-from apps.core.validators import JSONSizeValidator
+from apps.core.validators import JSONSizeValidator, validate_json_structure
 
 User = get_user_model()
 

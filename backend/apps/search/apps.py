@@ -1,7 +1,5 @@
 from django.apps import AppConfig
 
-from . import signals  # noqa
-
 """Search app configuration."""
 
 
@@ -20,6 +18,6 @@ class SearchConfig(AppConfig):
         # Import signals to ensure they're connected
 
         try:
-            pass  # Import signals here if needed
+            from . import signals  # noqa
         except ImportError:
             pass

@@ -26,7 +26,7 @@ class Command(BaseCommand):
             if perms.exists():
 
                 self.stdout.write(
-                    """f"{ct.app_label}.{ct.model} ({perms.count()} permissions):""""
+                    f"{ct.app_label}.{ct.model} ({perms.count()} permissions):"
                 )
 
                 for perm in perms:
@@ -54,8 +54,7 @@ class Command(BaseCommand):
             ("i18n", "translationunit"),
         ]
 
-        """for app_label, model_name in key_models:"""
-
+        for app_label, model_name in key_models:
             try:
 
                 ct = ContentType.objects.get(app_label=app_label, model=model_name)
@@ -63,9 +62,9 @@ class Command(BaseCommand):
                 perm_count = Permission.objects.filter(content_type=ct).count()
 
                 self.stdout.write(
-                    """f"  {app_label}.{model_name}: {perm_count} permissions""""
+                    f"  {app_label}.{model_name}: {perm_count} permissions"
                 )
 
             except ContentType.DoesNotExist:
 
-                """self.stdout.write(f"  {app_label}.{model_name}: NOT FOUND")"""
+                self.stdout.write(f"  {app_label}.{model_name}: NOT FOUND")

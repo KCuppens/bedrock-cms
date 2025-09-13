@@ -27,6 +27,7 @@ class EmailTemplateAdmin(admin.ModelAdmin):
 
     fieldsets = (
         (
+            _("Basic Information"),
             {
                 "fields": (
                     "key",
@@ -139,6 +140,7 @@ class EmailMessageLogAdmin(admin.ModelAdmin):
         ),
     )
 
+    @admin.display(description="Subject")
     def subject_truncated(self, obj):  # noqa: C901
         """Show truncated subject"""
 
@@ -148,8 +150,7 @@ class EmailMessageLogAdmin(admin.ModelAdmin):
 
         return obj.subject
 
-    subject_truncated.short_description = "Subject"
-
+    @admin.display(description="Status", ordering="status")
     def status_colored(self, obj):  # noqa: C901
         """Show colored status"""
 
@@ -170,10 +171,6 @@ class EmailMessageLogAdmin(admin.ModelAdmin):
             color,
             obj.get_status_display(),
         )
-
-    status_colored.short_description = "Status"
-
-    status_colored.admin_order_field = "status"
 
     def has_add_permission(self, request):  # noqa: C901
         """Disable adding email logs through admin"""

@@ -383,7 +383,7 @@ class UiMessageTranslationViewSetTest(TestCase):
             "message": self.message.id,
             "locale": self.locale_es.id,
             "value": "Guardar Cambios",
-            """"status": "approved","""
+            "status": "approved",
         }
 
         response = self.client.put(url, data, format="json")
@@ -411,7 +411,7 @@ class UiMessageTranslationViewSetTest(TestCase):
                     "message_id": self.message.id,
                     "locale_id": self.locale_es.id,
                     "value": "Guardar Actualizado",
-                    """"status": "approved","""
+                    "status": "approved",
                 },
                 {
                     "message_id": message2.id,

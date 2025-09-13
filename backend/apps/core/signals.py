@@ -5,6 +5,7 @@ Automatically invalidates relevant cache entries when content changes.
 """
 
 import logging
+from typing import Optional
 
 from django.conf import settings
 from django.db.models.signals import m2m_changed, post_delete, post_save
@@ -341,7 +342,7 @@ def invalidate_cache_on_asset_change(sender, instance, created, **kwargs):
 # CDN Webhook Support (optional)
 
 
-def send_cdn_purge_webhook(keys: list, tags: list = None):
+def send_cdn_purge_webhook(keys: list, tags: Optional[list] = None):
     """
     Send cache purge webhook to CDN.
 
