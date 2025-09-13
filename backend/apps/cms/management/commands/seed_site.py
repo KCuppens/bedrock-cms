@@ -484,10 +484,10 @@ class Command(BaseCommand):
             title="Getting Started with Django CMS",
             slug="getting-started-django-cms",
             excerpt="Learn how to build powerful content management systems with Django.",
-            hero_asset=assets.get("blog_featured"),
+            social_image=assets.get("blog_featured"),
             category=tech_category,
-            author="Demo Author",
-            body_blocks=[
+            author=user,
+            blocks=[
                 {
                     "type": "rich_text",
                     "schema_version": 1,
@@ -528,7 +528,7 @@ class Command(BaseCommand):
             excerpt="Essential tips for creating web applications that can grow with your business.",
             category=business_category,
             author="Tech Expert",
-            body_blocks=[
+            blocks=[
                 {
                     "type": "rich_text",
                     "schema_version": 1,
@@ -553,10 +553,10 @@ class Command(BaseCommand):
             title="Comenzando con Django CMS",
             slug="comenzando-django-cms",
             excerpt="Aprende cómo construir sistemas de gestión de contenido poderosos con Django.",
-            hero_asset=assets.get("blog_featured"),
+            social_image=assets.get("blog_featured"),
             category=tech_category,
             author="Autor Demo",
-            body_blocks=[
+            blocks=[
                 {
                     "type": "rich_text",
                     "schema_version": 1,

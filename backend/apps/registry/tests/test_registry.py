@@ -549,8 +549,8 @@ class RegistryIntegrationTests(TestCase):
         self.assertIsNotNone(config)
 
         # The auto-registered Page has name 'Pages'
-
-        self.assertEqual(config.name, "Pages")
+        if config:
+            self.assertEqual(config.name, "Pages")
 
         # Test serializer creation
 

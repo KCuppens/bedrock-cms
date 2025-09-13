@@ -19,12 +19,12 @@ class StandardResultsSetPagination(PageNumberPagination):
         return Response(
             OrderedDict(
                 [
-                    ("count", self.page.paginator.count),
+                    ("count", self.page.paginator.count if self.page else 0),
                     ("next", self.get_next_link()),
                     ("previous", self.get_previous_link()),
                     ("page_size", self.page_size),
-                    ("total_pages", self.page.paginator.num_pages),
-                    ("current_page", self.page.number),
+                    ("total_pages", self.page.paginator.num_pages if self.page else 0),
+                    ("current_page", self.page.number if self.page else 1),
                     ("results", data),
                 ]
             )

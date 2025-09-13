@@ -187,14 +187,14 @@ class CMSRealModelTests(TestCase):
         """Test Redirect model creation."""
 
         redirect = Redirect.objects.create(
-            old_path="/old-path", new_path="/new-path", status_code=301, is_active=True
+            from_path="/old-path", to_path="/new-path", status=301, is_active=True
         )
 
-        self.assertEqual(redirect.old_path, "/old-path")
+        self.assertEqual(redirect.from_path, "/old-path")
 
-        self.assertEqual(redirect.new_path, "/new-path")
+        self.assertEqual(redirect.to_path, "/new-path")
 
-        self.assertEqual(redirect.status_code, 301)
+        self.assertEqual(redirect.status, 301)
 
         self.assertTrue(redirect.is_active)
 
@@ -202,7 +202,7 @@ class CMSRealModelTests(TestCase):
         """Test redirect string representation."""
 
         redirect = Redirect.objects.create(
-            old_path="/test-redirect", new_path="/new-location"
+            from_path="/test-redirect", to_path="/new-location"
         )
 
         """self.assertIn("/test-redirect", str(redirect))"""
@@ -384,22 +384,22 @@ class CMSRealAPITests(APITestCase):
         # Create redirect
 
         redirect = Redirect.objects.create(
-            old_path="/old-api-path", new_path="/new-api-path", status_code=301
+            from_path="/old-api-path", to_path="/new-api-path", status=301
         )
 
         self.assertEqual(Redirect.objects.count(), 1)
 
-        self.assertEqual(redirect.old_path, "/old-api-path")
+        self.assertEqual(redirect.from_path, "/old-api-path")
 
         # Test redirect update
 
-        redirect.status_code = 302
+        redirect.status = 302
 
         redirect.save()
 
         redirect.refresh_from_db()
 
-        self.assertEqual(redirect.status_code, 302)
+        self.assertEqual(redirect.status, 302)
 
 
 class CMSRealIntegrationTests(TransactionTestCase):
@@ -568,28 +568,28 @@ class CMSRealIntegrationTests(TransactionTestCase):
         # Create redirect from old path
 
         redirect = Redirect.objects.create(
-            old_path="/old-path", new_path="/original", status_code=301, is_active=True
+            from_path="/old-path", to_path="/original", status=301, is_active=True
         )
 
         # Test redirect functionality
 
         self.assertTrue(redirect.is_active)
 
-        self.assertEqual(redirect.status_code, 301)
+        self.assertEqual(redirect.status, 301)
 
         # Update redirect
 
-        redirect.new_path = "/updated-path"
+        redirect.to_path = "/updated-path"
 
-        redirect.status_code = 302
+        redirect.status = 302
 
         redirect.save()
 
         redirect.refresh_from_db()
 
-        self.assertEqual(redirect.new_path, "/updated-path")
+        self.assertEqual(redirect.to_path, "/updated-path")
 
-        self.assertEqual(redirect.status_code, 302)
+        self.assertEqual(redirect.status, 302)
 
         # Deactivate redirect
 

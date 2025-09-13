@@ -20,7 +20,7 @@ from apps.core.throttling import (
 )
 from apps.i18n.models import Locale
 
-from .models import BlogPost, BlogPostRevision, BlogSettings, Category, Tag
+from .models import BlogPost, BlogSettings, Category, Tag
 from .serializers import (
     BlogPostAutosaveSerializer,
     BlogPostDuplicateSerializer,
@@ -32,6 +32,7 @@ from .serializers import (
     CategorySerializer,
     TagSerializer,
 )
+from .versioning import BlogPostRevision
 
 
 @extend_schema_view(

@@ -134,8 +134,9 @@ class CacheWarmer:
         configs = []
 
         # Common API endpoints to warm
+        from typing import Any, Dict, List, Tuple
 
-        endpoints = [
+        endpoints: List[Tuple[str, Dict[str, Any]]] = [
             ("pages", {"status": "published", "page_size": 20}),
             ("blog", {"status": "published", "featured": True}),
             ("categories", {}),

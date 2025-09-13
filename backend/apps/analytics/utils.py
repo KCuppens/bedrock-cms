@@ -6,10 +6,23 @@ from typing import Dict, Optional, Tuple
 from urllib.parse import parse_qs, urlencode, urlparse, urlunparse
 
 from django.contrib.contenttypes.models import ContentType
-from django.contrib.gis.geoip2 import GeoIP2
 from django.utils import timezone
 
-from user_agents import parse
+try:
+    from django.contrib.gis.geoip2 import GeoIP2
+
+    HAS_GEOIP2 = True
+except ImportError:
+    GeoIP2 = None
+    HAS_GEOIP2 = False
+
+try:
+    from user_agents import parse
+
+    HAS_USER_AGENTS = True
+except ImportError:
+    parse = None
+    HAS_USER_AGENTS = False
 
 from .models import PageView
 
@@ -23,6 +36,14 @@ def parse_user_agent(user_agent_string: str) -> Dict[str, str]:
     Returns:
         Dict containing browser, os, and device_type information
     """
+
+    if not HAS_USER_AGENTS:
+        # Fallback when user_agents module is not available
+        return {
+            "browser": "Unknown",
+            "os": "Unknown",
+            "device_type": "other",
+        }
 
     user_agent = parse(user_agent_string)
 
@@ -90,6 +111,9 @@ def get_geo_data(ip_address: str) -> Dict[str, Optional[str]]:
             "192.168."
         ):
 
+            return {"country": None, "city": None}
+
+        if not HAS_GEOIP2:
             return {"country": None, "city": None}
 
         g = GeoIP2()

@@ -137,13 +137,13 @@ class BlogPostRevision(models.Model):
                 if blog_post.scheduled_publish_at
                 else None
             ),
-            "category_id": blog_post.category.id if blog_post.category else None,  # type: ignore[attr-defined]
+            "category_id": blog_post.category.id if blog_post.category else None,
             "tag_ids": list(blog_post.tags.values_list("id", flat=True)),
             "social_image_id": (
-                blog_post.social_image.id if blog_post.social_image else None  # type: ignore[attr-defined]
+                blog_post.social_image.id if blog_post.social_image else None
             ),
-            "locale_id": blog_post.locale.id if blog_post.locale else None,  # type: ignore[attr-defined]
-            "author_id": blog_post.author.id if blog_post.author else None,  # type: ignore[attr-defined]
+            "locale_id": blog_post.locale.id if blog_post.locale else None,
+            "author_id": blog_post.author.id if blog_post.author else None,
         }
 
         # Create revision

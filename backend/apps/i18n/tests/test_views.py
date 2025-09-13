@@ -522,7 +522,8 @@ class TranslationUnitViewSetTest(TestCase):
 
         self.assertIsNotNone(history)
 
-        self.assertEqual(history.comment, "Looks good")
+        if history:
+            self.assertEqual(history.comment, "Looks good")
 
     def test_reject_translation(self):  # noqa: C901
         """Test rejecting a translation."""

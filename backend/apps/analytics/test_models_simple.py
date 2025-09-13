@@ -120,18 +120,20 @@ class AnalyticsModelsTest(TestCase):
         ]
 
         for case in test_cases:
+            probability: int = case["probability"]
+            impact: int = case["impact"]
             risk = Risk(
                 title="Test Risk",
                 description="Test description",
                 category="security",
-                probability=case["probability"],
-                impact=case["impact"],
+                probability=probability,
+                impact=impact,
             )
 
             # Manually call save to trigger calculations
             risk.save()
 
-            expected_score = case["probability"] * case["impact"]
+            expected_score = probability * impact
             self.assertEqual(risk.risk_score, expected_score)
             self.assertEqual(risk.severity, case["expected_severity"])
 

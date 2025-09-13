@@ -12,7 +12,6 @@ from celery import shared_task
 from apps.core.enums import EmailStatus
 
 from .models import EmailMessageLog, EmailTemplate
-from .services import EmailService
 
 logger = logging.getLogger(__name__)
 
@@ -29,6 +28,8 @@ def send_email_task(self, email_log_id: int):  # noqa: C901
     """
 
     try:
+        # Import here to avoid circular dependency
+        from .services import EmailService
 
         # Get email log
 

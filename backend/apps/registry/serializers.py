@@ -89,11 +89,12 @@ class ContentSerializerFactory:
 
             def get_url(self, obj):  # noqa: C901
 
-                slug_value = getattr(obj, config.slug_field)
+                slug_value = getattr(obj, config.slug_field or "")
 
                 if slug_value:
-
-                    return config.get_route_pattern().format(slug=slug_value)
+                    route_pattern = config.get_route_pattern()
+                    if route_pattern:
+                        return route_pattern.format(slug=slug_value)
 
                 return None
 

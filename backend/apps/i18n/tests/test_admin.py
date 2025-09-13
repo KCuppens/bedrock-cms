@@ -1,7 +1,7 @@
 from django.contrib.admin.sites import AdminSite
 from django.contrib.auth import get_user_model
 from django.contrib.contenttypes.models import ContentType
-from django.test import TestCase
+from django.test import RequestFactory, TestCase
 
 from apps.i18n.admin import (  # interface; Imports that were malformed - commented out; """apps.i18n.models,"""
     Locale,
@@ -154,8 +154,9 @@ class I18nAdminTest(TestCase):
         admin = LocaleAdmin(Locale, self.site)
 
         # Test that ordering includes default locale first
-
-        ordering = admin.get_ordering(None)
+        factory = RequestFactory()
+        request = factory.get("/")
+        ordering = admin.get_ordering(request)
 
         self.assertIsNotNone(ordering)
 
@@ -169,10 +170,11 @@ class I18nAdminTest(TestCase):
         if hasattr(admin, "get_queryset"):
 
             # Basic test that it doesn't crash
-
+            factory = RequestFactory()
+            request = factory.get("/")
             try:
 
-                admin.get_queryset(None)
+                admin.get_queryset(request)
 
             except Exception:
 

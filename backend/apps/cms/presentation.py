@@ -216,7 +216,7 @@ class PresentationPageResolver:
         )
 
     def validate_content_detail_block(
-        self, blocks: list, allowed_labels: list | None = None
+        self, blocks: list, allowed_labels: list = None
     ) -> None:
         """
         Validate that a page has exactly one content_detail block for presentation pages.

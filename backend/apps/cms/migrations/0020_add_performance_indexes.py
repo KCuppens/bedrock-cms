@@ -3,6 +3,8 @@
 
 from django.db import migrations, models
 
+from apps.core.migration_utils import gin_index_operation
+
 
 class Migration(migrations.Migration):
 
@@ -11,24 +13,18 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        # Add GIN index for JSON fields on PostgreSQL
-        migrations.RunSQL(
-            sql="""
-            CREATE INDEX IF NOT EXISTS cms_page_blocks_gin
-            ON cms_page USING gin (blocks jsonb_path_ops)
-            WHERE blocks IS NOT NULL;
-            """,
-            reverse_sql="DROP INDEX IF EXISTS cms_page_blocks_gin;",
-            state_operations=[],
+        # Add GIN index for JSON fields on PostgreSQL only
+        gin_index_operation(
+            table_name="cms_page",
+            column_name="blocks",
+            index_name="cms_page_blocks_gin",
+            condition="blocks IS NOT NULL",
         ),
-        migrations.RunSQL(
-            sql="""
-            CREATE INDEX IF NOT EXISTS cms_page_seo_gin
-            ON cms_page USING gin (seo jsonb_path_ops)
-            WHERE seo IS NOT NULL;
-            """,
-            reverse_sql="DROP INDEX IF EXISTS cms_page_seo_gin;",
-            state_operations=[],
+        gin_index_operation(
+            table_name="cms_page",
+            column_name="seo",
+            index_name="cms_page_seo_gin",
+            condition="seo IS NOT NULL",
         ),
         # Add composite index for homepage lookup
         migrations.AddIndex(

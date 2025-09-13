@@ -90,6 +90,7 @@ class PublicPageSerializer(serializers.ModelSerializer):
                 "canonical_url": (
                     self.context.get("request").build_absolute_uri(obj.path)
                     if self.context.get("request")
+                    and hasattr(self.context.get("request"), "build_absolute_uri")
                     else obj.path
                 ),
                 "locale_code": obj.locale.code,

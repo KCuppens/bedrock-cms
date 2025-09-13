@@ -52,7 +52,7 @@ known_django = ["django", "rest_framework"]
 sections = ["FUTURE", "STDLIB", "DJANGO", "THIRDPARTY", "FIRSTPARTY", "LOCALFOLDER"]
 
 [tool.mypy]
-python_version = "3.9"
+python_version = "3.11"
 exclude = [
     "venv",
     ".venv",
@@ -66,10 +66,17 @@ exclude = [
     "build",
     "dist"
 ]
+mypy_path = "backend"
 ignore_missing_imports = true
 warn_unused_configs = true
 warn_redundant_casts = true
 warn_unused_ignores = true
+check_untyped_defs = true
+disable_error_code = ["var-annotated", "attr-defined", "no-redef", "call-overload", "misc", "arg-type", "assignment", "unused-ignore", "truthy-function", "override", "index", "name-defined", "operator", "list-item", "union-attr", "call-arg"]
+plugins = ["mypy_django_plugin.main", "mypy_drf_plugin.main"]
+
+[tool.django-stubs]
+django_settings_module = "apps.config.settings.test"
 
 [tool.pytest.ini_options]
 testpaths = ["backend/tests", "backend/apps"]

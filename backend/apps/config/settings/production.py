@@ -153,15 +153,15 @@ FILE_UPLOAD_MAX_MEMORY_SIZE = 10 * 1024 * 1024  # 10MB
 
 EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
 
-EMAIL_HOST = env("EMAIL_HOST")  # noqa: F405
+EMAIL_HOST = env("EMAIL_HOST", default="")  # noqa: F405
 
 EMAIL_PORT = env.int("EMAIL_PORT", 587)  # noqa: F405
 
 EMAIL_USE_TLS = True
 
-EMAIL_HOST_USER = env("EMAIL_HOST_USER")  # noqa: F405
+EMAIL_HOST_USER = env("EMAIL_HOST_USER", default="")  # noqa: F405
 
-EMAIL_HOST_PASSWORD = env("EMAIL_HOST_PASSWORD")  # noqa: F405
+EMAIL_HOST_PASSWORD = env("EMAIL_HOST_PASSWORD", default="")  # noqa: F405
 
 
 # Celery optimizations

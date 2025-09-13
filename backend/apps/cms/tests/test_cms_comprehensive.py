@@ -9,13 +9,41 @@ from rest_framework import status
 from rest_framework.test import APIClient, APITestCase
 
 from apps.cms import tasks
-from apps.cms.models import Group, Page
+from apps.cms.models import Page
 from apps.cms.serializers.pages import PageDetailSerializer, PageSerializer
 from apps.cms.versioning import create_page_version, revert_page_to_version
 from apps.i18n.models import Locale
 
 # ContentBlock doesn't exist yet, so we'll mock it if needed
 
+
+# Mock managers for testing
+class MockSecurityManager:
+    def can_edit(self, user, page):
+        return True
+
+    def can_publish(self, user, page):
+        return True
+
+
+class MockSEOManager:
+    def generate_meta_description(self, page):
+        return "Mock meta description"
+
+    def calculate_seo_score(self, page):
+        return 85
+
+
+# Create mock instances
+try:
+    from apps.cms.security import security_manager
+except ImportError:
+    security_manager = MockSecurityManager()
+
+try:
+    from apps.cms.seo import seo_manager
+except ImportError:
+    seo_manager = MockSEOManager()
 
 User = get_user_model()
 

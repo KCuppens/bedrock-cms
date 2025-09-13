@@ -266,7 +266,12 @@ class BlogPostSerializer(serializers.ModelSerializer):
     def validate_status(self, value):  # noqa: C901
         """Validate status transitions."""
 
-        if self.instance and self.instance.status == "published" and value == "draft":
+        if (
+            self.instance
+            and hasattr(self.instance, "status")
+            and self.instance.status == "published"
+            and value == "draft"
+        ):
 
             # Allow unpublishing but warn about SEO impact
             pass
@@ -403,9 +408,13 @@ class BlogPostWriteSerializer(serializers.ModelSerializer):
 
             # Update case - exclude current instance
 
-            queryset = BlogPost.objects.filter(
-                slug=value, locale=self.instance.locale
-            ).exclude(id=self.instance.id)
+            queryset = (
+                BlogPost.objects.filter(
+                    slug=value, locale=self.instance.locale
+                ).exclude(id=self.instance.id)
+                if hasattr(self.instance, "locale") and hasattr(self.instance, "id")
+                else BlogPost.objects.none()
+            )
 
         else:
 

@@ -29,14 +29,9 @@ urlpatterns = [
         name="api-block-schema",
     ),
     # Include other app APIs
-    # Imports that were malformed - commented out
-    #     """path("auth/", include("apps.accounts.urls")),"""
-    # Imports that were malformed - commented out
-    #     """path("", include("apps.files.urls")),  # Files API"""
-    # Imports that were malformed - commented out
-    #     # path("cms/", include("apps.cms.urls")),  # CMS API - temporarily disabled due to import issues
-    # Imports that were malformed - commented out
-    #     """path("search/", include("apps.search.urls")),  # Search API"""
-    # Imports that were malformed - commented out
-    #     """path("system/", include("apps.core.urls")),  # System/Core API"""
+    path("auth/", include("apps.accounts.urls")),
+    path("", include("apps.files.urls")),  # Files API
+    # path("cms/", include("apps.cms.urls")),  # CMS API - temporarily disabled due to import issues
+    path("search/", include("apps.search.urls")),  # Search API
+    path("system/", include("apps.core.urls")),  # System/Core API
 ]

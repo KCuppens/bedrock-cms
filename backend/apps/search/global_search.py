@@ -40,7 +40,7 @@ def search_pages(query: str, limit: int = 5) -> List[Dict[str, Any]]:
             "description": f"Path: {page.path}",
             "url": f"/dashboard/pages/{page.id}/edit",
             "status": page.status,
-            "locale": page.locale.code if page.locale else None,  # type: ignore[attr-defined]
+            "locale": page.locale.code if page.locale else None,
         }
         for page in pages
     ]
@@ -64,7 +64,7 @@ def search_blog_posts(query: str, limit: int = 5) -> List[Dict[str, Any]]:
             "description": post.excerpt[:100] if post.excerpt else "",
             "url": f"/dashboard/blog-posts/{post.id}/edit",
             "status": post.status,
-            "author": post.author.get_full_name() if post.author else None,  # type: ignore[attr-defined]
+            "author": post.author.get_full_name() if post.author else None,
         }
         for post in posts
     ]
@@ -101,16 +101,16 @@ def search_collections(query: str, limit: int = 5) -> List[Dict[str, Any]]:
 
     return [
         {
-            "id": collection.id,  # type: ignore[attr-defined]
+            "id": collection.id,
             "title": collection.name,
             "type": "collection",
             "icon": "📁",
             "description": (
                 collection.description[:100] if collection.description else ""
             ),
-            "url": f"/dashboard/collections?id={collection.id}",  # type: ignore[attr-defined]
+            "url": f"/dashboard/collections?id={collection.id}",
             "status": collection.status,
-            "item_count": collection.item_count,  # type: ignore[attr-defined]
+            "item_count": collection.item_count,
         }
         for collection in collections
     ]
@@ -152,7 +152,7 @@ def search_tags(query: str, limit: int = 5) -> List[Dict[str, Any]]:
             "icon": "🔖",
             "description": tag.description[:100] if tag.description else "",
             "url": f"/dashboard/tags?id={tag.id}",
-            "color": tag.color,  # type: ignore[attr-defined]
+            "color": tag.color,
         }
         for tag in tags
     ]
@@ -169,8 +169,8 @@ def search_translations(query: str, limit: int = 5) -> List[Dict[str, Any]]:
 
     return [
         {
-            "id": translation.id,  # type: ignore[attr-defined]
-            "title": translation.key,  # type: ignore[attr-defined]
+            "id": translation.id,
+            "title": translation.key,
             "type": "translation",
             "icon": "🌐",
             "description": (
@@ -178,9 +178,9 @@ def search_translations(query: str, limit: int = 5) -> List[Dict[str, Any]]:
                 if translation.target_text
                 else translation.source_text[:100]
             ),
-            "url": f"/dashboard/translations/workspace?id={translation.id}",  # type: ignore[attr-defined]
+            "url": f"/dashboard/translations/workspace?id={translation.id}",
             "status": translation.status,
-            "locales": f"{translation.source_locale.code} → {translation.target_locale.code}",  # type: ignore[attr-defined]
+            "locales": f"{translation.source_locale.code} → {translation.target_locale.code}",
         }
         for translation in translations
     ]
@@ -197,12 +197,12 @@ def search_users(query: str, limit: int = 5) -> List[Dict[str, Any]]:
 
     return [
         {
-            "id": user.id,  # type: ignore[attr-defined]
-            "title": user.get_full_name() or user.email,  # type: ignore[attr-defined]
+            "id": user.id,
+            "title": user.get_full_name() or user.email,
             "type": "user",
             "icon": "👤",
-            "description": user.email,  # type: ignore[attr-defined]
-            "url": f"/dashboard/users-roles?user={user.id}",  # type: ignore[attr-defined]
+            "description": user.email,
+            "url": f"/dashboard/users-roles?user={user.id}",
             "is_active": user.is_active,
         }
         for user in users
@@ -218,12 +218,12 @@ def search_redirects(query: str, limit: int = 5) -> List[Dict[str, Any]]:
 
     return [
         {
-            "id": redirect.id,  # type: ignore[attr-defined]
+            "id": redirect.id,
             "title": redirect.from_path,
             "type": "redirect",
             "icon": "↪️",
             "description": f"→ {redirect.to_path}",
-            "url": f"/dashboard/seo/redirects?id={redirect.id}",  # type: ignore[attr-defined]
+            "url": f"/dashboard/seo/redirects?id={redirect.id}",
             "status": redirect.status,
         }
         for redirect in redirects
@@ -371,8 +371,8 @@ def search_suggestions(request):
     # Get recent searches by this user
 
     recent_searches = (
-        SearchQuery.objects.filter(user=request.user, query__istartswith=query)
-        .values_list("query", flat=True)
+        SearchQuery.objects.filter(user=request.user, query_text__istartswith=query)
+        .values_list("query_text", flat=True)
         .distinct()[:5]
     )
 

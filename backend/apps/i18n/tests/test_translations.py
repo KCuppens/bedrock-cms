@@ -711,7 +711,7 @@ class TranslationAPITests(TransactionTestCase):
         """self.assertEqual(title_unit["source_text"], "Test Page")"""
 
         # target_locale is returned as locale ID, not code
-
+        assert title_unit is not None  # for mypy
         self.assertEqual(title_unit["target_locale"], self.locale_es.id)
 
     def test_get_units_for_object(self):

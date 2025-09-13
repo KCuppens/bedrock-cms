@@ -1,5 +1,7 @@
 import uuid
+from typing import TYPE_CHECKING
 
+from django.core.cache import cache
 from django.core.exceptions import ValidationError
 
 # validate_json_structure doesn't exist in Django - removed
@@ -16,6 +18,22 @@ from django.db.models import (
     TextField,
     UUIDField,
 )
+
+if TYPE_CHECKING:
+    from apps.accounts.models import User
+    from apps.i18n.models import Locale
+
+# Import optional models that may not be available
+try:
+    from apps.blog.models import BlogSettings, Category
+except ImportError:
+    BlogSettings = None  # type: ignore
+    Category = None  # type: ignore
+
+try:
+    from apps.ops.models import AuditEntry
+except ImportError:
+    AuditEntry = None  # type: ignore
 
 # Import additional modules
 from django.utils import timezone
@@ -356,7 +374,10 @@ class Page(models.Model, RBACMixin):
 
         try:
 
-            if BlogSettings.objects.filter(default_presentation_page=self).exists():
+            if (
+                BlogSettings
+                and BlogSettings.objects.filter(default_presentation_page=self).exists()
+            ):
 
                 is_presentation_page = True
         except Exception:  # nosec B110
@@ -366,7 +387,7 @@ class Page(models.Model, RBACMixin):
         # Check if it's a category-specific presentation page
 
         try:
-            if Category.objects.filter(presentation_page=self).exists():
+            if Category and Category.objects.filter(presentation_page=self).exists():
                 is_presentation_page = True
         except Exception:  # nosec B110
             # Ignore if Category model relationship is not available
@@ -391,13 +412,16 @@ class Page(models.Model, RBACMixin):
 
             # Check blog settings
 
-            if BlogSettings.objects.filter(default_presentation_page=self).exists():
+            if (
+                BlogSettings
+                and BlogSettings.objects.filter(default_presentation_page=self).exists()
+            ):
 
                 return True
 
             # Check categories
 
-            if Category.objects.filter(presentation_page=self).exists():
+            if Category and Category.objects.filter(presentation_page=self).exists():
 
                 return True
 
@@ -439,12 +463,13 @@ class Page(models.Model, RBACMixin):
 
         if hasattr(self, "_current_user") and self._current_user:
 
-            AuditEntry.objects.create(
-                content_object=self,
-                action="submitted_for_review",
-                user=self._current_user,
-                metadata={"submitted_at": self.submitted_for_review_at.isoformat()},
-            )
+            if AuditEntry:
+                AuditEntry.objects.create(
+                    content_object=self,
+                    action="submitted_for_review",
+                    user=self._current_user,
+                    metadata={"submitted_at": self.submitted_for_review_at.isoformat()},
+                )
 
     def approve(self, reviewer, notes=""):  # noqa: C901
         """Approve the page."""
@@ -463,12 +488,13 @@ class Page(models.Model, RBACMixin):
 
         # Create audit entry
 
-        AuditEntry.objects.create(
-            content_object=self,
-            action="approved",
-            user=reviewer,
-            metadata={"notes": notes, "approved_at": timezone.now().isoformat()},
-        )
+        if AuditEntry:
+            AuditEntry.objects.create(
+                content_object=self,
+                action="approved",
+                user=reviewer,
+                metadata={"notes": notes, "approved_at": timezone.now().isoformat()},
+            )
 
     def reject(self, reviewer, notes=""):  # noqa: C901
         """Reject the page with review notes."""
@@ -487,12 +513,13 @@ class Page(models.Model, RBACMixin):
 
         # Create audit entry
 
-        AuditEntry.objects.create(
-            content_object=self,
-            action="rejected",
-            user=reviewer,
-            metadata={"notes": notes, "rejected_at": timezone.now().isoformat()},
-        )
+        if AuditEntry:
+            AuditEntry.objects.create(
+                content_object=self,
+                action="rejected",
+                user=reviewer,
+                metadata={"notes": notes, "rejected_at": timezone.now().isoformat()},
+            )
 
     def can_be_submitted_for_review(self):  # noqa: C901
         """Check if page can be submitted for review."""
@@ -539,7 +566,7 @@ class Redirect(models.Model):
         default=0, help_text=_("Number of times this redirect has been used")
     )
 
-    locale: ForeignKey = models.ForeignKey(
+    locale: "ForeignKey[Locale | None]" = models.ForeignKey(
         "i18n.Locale", null=True, blank=True, on_delete=models.SET_NULL
     )
 
@@ -728,7 +755,7 @@ class BlockType(models.Model):
 
     updated_at: DateTimeField = models.DateTimeField(auto_now=True)
 
-    created_by: ForeignKey = models.ForeignKey(
+    created_by: "ForeignKey[User | None]" = models.ForeignKey(
         "accounts.User",
         on_delete=models.SET_NULL,
         null=True,
@@ -736,7 +763,7 @@ class BlockType(models.Model):
         related_name="created_block_types",
     )
 
-    updated_by: ForeignKey = models.ForeignKey(
+    updated_by: "ForeignKey[User | None]" = models.ForeignKey(
         "accounts.User",
         on_delete=models.SET_NULL,
         null=True,

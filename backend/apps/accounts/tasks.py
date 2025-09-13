@@ -134,7 +134,8 @@ def cleanup_inactive_sessions(self, days=30):  # noqa: C901
 
             data = session.get_decoded()
 
-            if data.get("_auth_user_id") in map(str, inactive_users):
+            auth_user_id = data.get("_auth_user_id")
+            if auth_user_id and auth_user_id in map(str, inactive_users):
 
                 session.delete()
 

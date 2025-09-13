@@ -259,7 +259,22 @@ class EmailMessageLog(TimestampMixin):
 
     def __str__(self):  # noqa: C901
 
-        return f"Email to {self.to_email} - {self.subject[:50]}"
+        return f"Email to {self.to_email} - {self.status}"
+
+    @property
+    def is_sent(self):  # noqa: C901
+        """Check if email has been sent"""
+        return self.status == EmailStatus.SENT
+
+    @property
+    def metadata(self):  # noqa: C901
+        """Alias for context_data for backward compatibility"""
+        return self.context_data
+
+    @metadata.setter
+    def metadata(self, value):  # noqa: C901
+        """Set metadata (alias for context_data)"""
+        self.context_data = value
 
     @property
     def cc_list(self):  # noqa: C901

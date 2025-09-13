@@ -343,9 +343,19 @@ class TranslationUnitViewSet(viewsets.ModelViewSet):
 
             model_class = content_type.model_class()
 
+            if model_class is None:
+                raise ValueError("Model class not found")
+
             model_class.objects.get(pk=object_id)
 
-        except (ValueError, ContentType.DoesNotExist, model_class.DoesNotExist):
+        except (ValueError, ContentType.DoesNotExist):
+
+            return Response(
+                {"error": "Invalid model_label or object not found"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        except Exception:
 
             return Response(
                 {"error": "Invalid model_label or object not found"},
@@ -467,7 +477,9 @@ class TranslationUnitViewSet(viewsets.ModelViewSet):
 
         translation_unit = self.get_object()
 
-        serializer = TranslationApprovalSerializer(data=request.data)
+        serializer: TranslationApprovalSerializer = TranslationApprovalSerializer(
+            data=request.data
+        )
 
         serializer.is_valid(raise_exception=True)
 
@@ -526,7 +538,9 @@ class TranslationUnitViewSet(viewsets.ModelViewSet):
 
         translation_unit = self.get_object()
 
-        serializer = TranslationApprovalSerializer(data=request.data)
+        serializer: TranslationApprovalSerializer = TranslationApprovalSerializer(
+            data=request.data
+        )
 
         serializer.is_valid(raise_exception=True)
 
@@ -576,7 +590,9 @@ class TranslationUnitViewSet(viewsets.ModelViewSet):
 
         translation_unit = self.get_object()
 
-        serializer = TranslationApprovalSerializer(data=request.data)
+        serializer: TranslationApprovalSerializer = TranslationApprovalSerializer(
+            data=request.data
+        )
 
         serializer.is_valid(raise_exception=True)
 
@@ -626,7 +642,9 @@ class TranslationUnitViewSet(viewsets.ModelViewSet):
 
         translation_unit = self.get_object()
 
-        serializer = TranslationApprovalSerializer(data=request.data)
+        serializer: TranslationApprovalSerializer = TranslationApprovalSerializer(
+            data=request.data
+        )
 
         serializer.is_valid(raise_exception=True)
 
@@ -754,7 +772,9 @@ class TranslationUnitViewSet(viewsets.ModelViewSet):
 
         translation_unit = self.get_object()
 
-        serializer = TranslationAssignmentSerializer(data=request.data)
+        serializer: TranslationAssignmentSerializer = TranslationAssignmentSerializer(
+            data=request.data
+        )
 
         serializer.is_valid(raise_exception=True)
 
@@ -930,7 +950,9 @@ class TranslationUnitViewSet(viewsets.ModelViewSet):
 
         translation_unit = self.get_object()
 
-        serializer = TranslationApprovalSerializer(data=request.data)
+        serializer: TranslationApprovalSerializer = TranslationApprovalSerializer(
+            data=request.data
+        )
 
         serializer.is_valid(raise_exception=True)
 
@@ -1259,7 +1281,7 @@ class UiMessageViewSet(viewsets.ModelViewSet):
         # Determine if we should auto-approve
 
         auto_approve = source == "build" or getattr(
-            """settings, "AUTO_APPROVE_TRANSLATIONS", False"""
+            settings, "AUTO_APPROVE_TRANSLATIONS", False
         )
 
         created = []
@@ -1353,9 +1375,9 @@ class UiMessageViewSet(viewsets.ModelViewSet):
             from django.contrib.contenttypes.models import ContentType
 
             LogEntry.objects.log_action(
-                user_id=request.user.pk if request.user.is_authenticated else None,
+                user_id=request.user.pk if request.user.is_authenticated else 0,
                 content_type_id=ContentType.objects.get_for_model(UiMessage).pk,
-                object_id=None,
+                object_id="",
                 object_repr=f"Synced {len(created)} new and {len(updated)} updated keys from {source}",
                 action_flag=ADDITION,
                 change_message=f"Source: {source}",
@@ -2326,7 +2348,9 @@ class TranslationGlossaryViewSet(viewsets.ModelViewSet):
     def search(self, request):
         """Search glossary terms."""
 
-        serializer = GlossarySearchSerializer(data=request.query_params)
+        serializer: GlossarySearchSerializer = GlossarySearchSerializer(
+            data=request.query_params
+        )
 
         serializer.is_valid(raise_exception=True)
 

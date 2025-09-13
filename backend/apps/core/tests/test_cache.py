@@ -4,17 +4,18 @@ from django.contrib.auth import get_user_model
 from django.core.cache import cache
 from django.test import TestCase, override_settings
 
-from apps.core.cache import CacheKeyBuilder, CacheManager, cache_manager
-from apps.core.signals import (  # functionality; Imports that were malformed - commented out; """apps.core.cache,"""; """apps.i18n.models,"""
+from apps.core.cache import (
     CACHE_PREFIXES,
     CACHE_TIMEOUTS,
-    Locale,
-    caching,
+    CacheKeyBuilder,
+    CacheManager,
+    cache_manager,
+)
+from apps.core.signals import (
     invalidate_all_cache,
     invalidate_blog_cache,
     invalidate_content_cache,
     invalidate_page_cache,
-    time,
 )
 
 User = get_user_model()

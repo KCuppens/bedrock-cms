@@ -160,7 +160,7 @@ def generate_hreflang_alternates(
 
             alternates.append(
                 {
-                    "hreflang": related_page.locale.code,  # type: ignore[attr-defined]
+                    "hreflang": related_page.locale.code,
                     "href": f"{base_url.rstrip('/')}{related_page.path}",
                 }
             )

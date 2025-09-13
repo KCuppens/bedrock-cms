@@ -646,4 +646,6 @@ class VersioningSignalsTests(TestCase):
 
         self.assertEqual(audit_entries.count(), 1)
 
-        self.assertEqual(audit_entries.first().action, "create")
+        audit_entry = audit_entries.first()
+        self.assertIsNotNone(audit_entry)
+        self.assertEqual(audit_entry.action, "create")

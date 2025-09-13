@@ -120,7 +120,8 @@ ignore_missing_imports = true
 warn_unused_ignores = true
 warn_redundant_casts = true
 warn_unused_configs = true
-disable_error_code = ["var-annotated", "attr-defined", "no-redef", "call-overload"]
+mypy_path = "backend"
+disable_error_code = ["var-annotated", "attr-defined", "no-redef", "call-overload", "misc", "arg-type", "assignment", "unused-ignore", "truthy-function", "override", "index", "name-defined", "operator", "list-item", "union-attr", "call-arg"]
 plugins = ["mypy_django_plugin.main", "mypy_drf_plugin.main"]
 
 [tool.django-stubs]

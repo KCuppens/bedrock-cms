@@ -3,6 +3,11 @@
 
 from django.db import migrations, models
 
+from apps.core.migration_utils import (
+    conditional_sql_for_postgresql,
+    gin_index_operation,
+)
+
 
 class Migration(migrations.Migration):
 
@@ -59,18 +64,15 @@ class Migration(migrations.Migration):
                 )
             ),
         ),
-        # Add GIN index for blocks field on PostgreSQL
-        migrations.RunSQL(
-            sql="""
-            CREATE INDEX IF NOT EXISTS blog_blogpost_blocks_gin
-            ON blog_blogpost USING gin (blocks jsonb_path_ops)
-            WHERE blocks IS NOT NULL;
-            """,
-            reverse_sql="DROP INDEX IF EXISTS blog_blogpost_blocks_gin;",
-            state_operations=[],
+        # Add GIN index for blocks field on PostgreSQL only
+        gin_index_operation(
+            table_name="blog_blogpost",
+            column_name="blocks",
+            index_name="blog_blogpost_blocks_gin",
+            condition="blocks IS NOT NULL",
         ),
-        # Add full text search index for PostgreSQL
-        migrations.RunSQL(
+        # Add full text search index for PostgreSQL only
+        conditional_sql_for_postgresql(
             sql="""
             CREATE INDEX IF NOT EXISTS blog_blogpost_search_idx
             ON blog_blogpost USING gin (
@@ -82,7 +84,6 @@ class Migration(migrations.Migration):
             );
             """,
             reverse_sql="DROP INDEX IF EXISTS blog_blogpost_search_idx;",
-            state_operations=[],
         ),
         # Add index for tag lookups
         migrations.AddIndex(

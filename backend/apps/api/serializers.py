@@ -76,6 +76,28 @@ class NoteSerializer(serializers.ModelSerializer):
         return data
 
 
+class NoteListSerializer(NoteSerializer):
+    """Serializer for listing notes with limited fields"""
+
+    class Meta(NoteSerializer.Meta):
+        fields = [
+            "id",
+            "title",
+            "is_public",
+            "tag_list",
+            "created_at",
+            "updated_at",
+            "created_by_name",
+        ]
+
+
+class NoteDetailSerializer(NoteSerializer):
+    """Serializer for detailed note view"""
+
+    class Meta(NoteSerializer.Meta):
+        fields = "__all__"
+
+
 class NoteCreateUpdateSerializer(NoteSerializer):
     """Serializer for creating/updating notes"""
 
@@ -111,4 +133,6 @@ class HealthCheckSerializer(serializers.Serializer):
 
     services = serializers.DictField(required=False)
 
-    errors = serializers.ListField(required=False)
+    error_messages = serializers.ListField(
+        child=serializers.CharField(), required=False
+    )

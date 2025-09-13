@@ -111,7 +111,7 @@ class TranslationUnitUpdateSerializer(serializers.ModelSerializer):
     def validate_status(self, value):  # noqa: C901
         """Validate status transitions."""
 
-        if self.instance:
+        if self.instance and hasattr(self.instance, "status"):
 
             current_status = self.instance.status
 

@@ -56,9 +56,7 @@ class CircuitBreakerTest(TestCase):
     def test_circuit_breaker_recovery(self):
         """Test circuit breaker recovery after timeout."""
 
-        @circuit_breaker(
-            failure_threshold=1, recovery_timeout=0.1
-        )  # Very short timeout
+        @circuit_breaker(failure_threshold=1, recovery_timeout=1)  # Very short timeout
         def initially_failing_operation():
 
             if not hasattr(initially_failing_operation, "recovered"):
@@ -120,7 +118,7 @@ class CircuitBreakerTest(TestCase):
 
         call_count = 0
 
-        @circuit_breaker(failure_threshold=1, recovery_timeout=0.1)
+        @circuit_breaker(failure_threshold=1, recovery_timeout=1)
         def half_open_test():
 
             nonlocal call_count

@@ -1,13 +1,12 @@
 from django.conf import settings
 
-from storages.backends.s3boto3 import S3Boto3Storage
-
 """
 Custom storage backends for different use cases.
 """
 
 
 try:
+    from storages.backends.s3boto3 import S3Boto3Storage
 
     class S3MediaStorage(S3Boto3Storage):
         """Custom S3 storage for media files."""
@@ -28,9 +27,7 @@ try:
         file_overwrite = True
 
 except ImportError:
-
     # django-storages not available, create dummy classes
-
     class S3MediaStorage:  # type: ignore[no-redef]
         """Dummy S3 storage class when django-storages is not available."""
 

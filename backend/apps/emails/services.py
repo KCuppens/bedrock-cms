@@ -97,8 +97,8 @@ class EmailService:
             template_key=template_key,
             to_email=primary_recipient,
             from_email=from_email or settings.DEFAULT_FROM_EMAIL,
-            cc=cc or [],
-            bcc=bcc or [],
+            cc=",".join(cc) if cc else "",
+            bcc=",".join(bcc) if bcc else "",
             subject=rendered_content["subject"],
             html_content=rendered_content["html_content"],
             text_content=rendered_content["text_content"],
@@ -112,7 +112,7 @@ class EmailService:
 
             # Send asynchronously via Celery
 
-            task = send_email_task.delay(email_log.id)  # type: ignore[attr-defined]
+            task = send_email_task.delay(email_log.id)
 
             email_log.celery_task_id = task.id
 

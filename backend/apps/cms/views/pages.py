@@ -17,6 +17,12 @@ from rest_framework.response import Response
 from rest_framework.throttling import UserRateThrottle
 
 from apps.cms import models, seo_utils, versioning
+
+# Optional import for audit functionality
+try:
+    from apps.ops.models import AuditEntry
+except ImportError:
+    AuditEntry = None  # type: ignore
 from apps.cms.seo_utils import generate_hreflang_alternates
 from apps.cms.serializers import (
     PageReadSerializer,
@@ -46,7 +52,7 @@ class PagesViewSet(VersioningMixin, viewsets.ModelViewSet):
     def get_queryset(self):
 
         return (
-            Page.objects.select_related("locale", "parent")
+            models.Page.objects.select_related("locale", "parent")
             .annotate(_children_count=Count("children"))
             .all()
         )
@@ -70,7 +76,7 @@ class PagesViewSet(VersioningMixin, viewsets.ModelViewSet):
 
         parent = serializer.validated_data.get("parent")
 
-        last_position = Page.objects.filter(parent=parent).count()
+        last_position = models.Page.objects.filter(parent=parent).count()
 
         with transaction.atomic():
 
@@ -82,7 +88,7 @@ class PagesViewSet(VersioningMixin, viewsets.ModelViewSet):
 
         # Use select_related to include locale data
 
-        page = Page.objects.select_related("locale").get(pk=page.pk)
+        page = models.Page.objects.select_related("locale").get(pk=page.pk)
 
         return Response(PageReadSerializer(page).data, status=status.HTTP_201_CREATED)
 
@@ -175,7 +181,9 @@ class PagesViewSet(VersioningMixin, viewsets.ModelViewSet):
 
         try:
 
-            page = Page.objects.select_related("locale").get(path=path, locale=locale)
+            page = models.Page.objects.select_related("locale").get(
+                path=path, locale=locale
+            )
 
         except Page.DoesNotExist:
 
@@ -329,13 +337,13 @@ class PagesViewSet(VersioningMixin, viewsets.ModelViewSet):
 
         # Build tree query
 
-        queryset = Page.objects.filter(locale=locale, status="published")
+        queryset = models.Page.objects.filter(locale=locale, status="published")
 
         if root_id:
 
             try:
 
-                root_page = Page.objects.get(id=root_id, locale=locale)
+                root_page = models.Page.objects.get(id=root_id, locale=locale)
 
                 queryset = queryset.filter(parent=root_page)
 
@@ -398,7 +406,7 @@ class PagesViewSet(VersioningMixin, viewsets.ModelViewSet):
 
         # Use select_related to include locale data
 
-        page = Page.objects.select_related("locale").get(pk=page.pk)
+        page = models.Page.objects.select_related("locale").get(pk=page.pk)
 
         return Response(PageReadSerializer(page).data)
 
@@ -424,7 +432,9 @@ class PagesViewSet(VersioningMixin, viewsets.ModelViewSet):
 
                 try:
 
-                    new_parent = Page.objects.get(id=new_parent_id, locale=page.locale)
+                    new_parent = models.Page.objects.get(
+                        id=new_parent_id, locale=page.locale
+                    )
 
                     page.parent = new_parent
 
@@ -441,7 +451,7 @@ class PagesViewSet(VersioningMixin, viewsets.ModelViewSet):
             # Get siblings at the new parent level
 
             siblings = (
-                Page.objects.filter(parent_id=page.parent_id, locale=page.locale)
+                models.Page.objects.filter(parent_id=page.parent_id, locale=page.locale)
                 .exclude(pk=page.pk)
                 .order_by("position", "id")
             )
@@ -559,7 +569,7 @@ class PagesViewSet(VersioningMixin, viewsets.ModelViewSet):
 
             # Lock the pages we're updating to prevent race conditions
 
-            pages_query = Page.objects.select_for_update()
+            pages_query = models.Page.objects.select_for_update()
 
             # Build the filter based on parent_id
 
@@ -571,7 +581,7 @@ class PagesViewSet(VersioningMixin, viewsets.ModelViewSet):
 
                 # Validate parent exists
 
-                if not Page.objects.filter(id=parent_id).exists():
+                if not models.Page.objects.filter(id=parent_id).exists():
 
                     return Response(
                         {"error": f"Parent page with ID {parent_id} does not exist"},
@@ -600,7 +610,7 @@ class PagesViewSet(VersioningMixin, viewsets.ModelViewSet):
                 for position, page_id in enumerate(page_ids)
             ]
 
-            updated_count = Page.objects.filter(id__in=page_ids).update(
+            updated_count = models.Page.objects.filter(id__in=page_ids).update(
                 position=Case(*cases, output_field=IntegerField())
             )
 
@@ -609,7 +619,7 @@ class PagesViewSet(VersioningMixin, viewsets.ModelViewSet):
             # This ensures there are no gaps in positioning
 
             all_siblings = (
-                Page.objects.filter(
+                models.Page.objects.filter(
                     parent_id=parent_id if parent_id is not None else None
                 )
                 .exclude(id__in=page_ids)
@@ -624,7 +634,7 @@ class PagesViewSet(VersioningMixin, viewsets.ModelViewSet):
 
                 if page.position != position:
 
-                    Page.objects.filter(pk=page.pk).update(position=position)
+                    models.Page.objects.filter(pk=page.pk).update(position=position)
 
         return Response(
             {"success": True, "reordered_count": updated_count, "parent_id": parent_id}
@@ -995,7 +1005,7 @@ class PagesViewSet(VersioningMixin, viewsets.ModelViewSet):
             in_main_menu=False,  # Don't duplicate menu settings
             in_footer=False,
             is_homepage=False,
-            position=Page.objects.filter(parent=page.parent).count(),
+            position=models.Page.objects.filter(parent=page.parent).count(),
         )
 
         # Set user context
@@ -1016,17 +1026,21 @@ class PagesViewSet(VersioningMixin, viewsets.ModelViewSet):
 
             # Create audit entry for duplication
 
-            AuditEntry.objects.create(
-                content_object=duplicated_page,
-                action="duplicate",
-                actor=request.user,
-                model_label="cms.Page",
-                meta={"original_page_id": page.id, "original_page_title": page.title},
-            )
+            if AuditEntry:
+                AuditEntry.objects.create(
+                    content_object=duplicated_page,
+                    action="duplicate",
+                    actor=request.user,
+                    model_label="cms.Page",
+                    meta={
+                        "original_page_id": page.id,
+                        "original_page_title": page.title,
+                    },
+                )
 
             # Get with related data for proper serialization
 
-            duplicated_page = Page.objects.select_related("locale").get(
+            duplicated_page = models.Page.objects.select_related("locale").get(
                 pk=duplicated_page.pk
             )
 
@@ -1071,17 +1085,18 @@ class PagesViewSet(VersioningMixin, viewsets.ModelViewSet):
 
                 # Create audit entry before deletion
 
-                AuditEntry.objects.create(
-                    content_object=page,
-                    action="delete",
-                    actor=request.user,
-                    model_label="cms.Page",
-                    meta={
-                        "page_title": page_title,
-                        "page_path": page_path,
-                        "children_deleted": children_count if cascade else 0,
-                    },
-                )
+                if AuditEntry:
+                    AuditEntry.objects.create(
+                        content_object=page,
+                        action="delete",
+                        actor=request.user,
+                        model_label="cms.Page",
+                        meta={
+                            "page_title": page_title,
+                            "page_path": page_path,
+                            "children_deleted": children_count if cascade else 0,
+                        },
+                    )
 
                 # Delete the page (will cascade to children if they exist)
 
@@ -1142,7 +1157,7 @@ def sitemap_view(request, locale_code):
     # Use iterator for memory efficiency
 
     pages = (
-        Page.objects.filter(locale=locale, status="published")
+        models.Page.objects.filter(locale=locale, status="published")
         .order_by("updated_at")[:50000]
         .iterator(chunk_size=1000)
     )

@@ -8,7 +8,7 @@ from pathlib import Path
 BASE_DIR = Path(__file__).resolve().parent.parent.parent.parent
 
 # Security settings
-SECRET_KEY = "test-secret-key-not-for-production"
+SECRET_KEY = "test-secret-key-not-for-production"  # nosec B105
 DEBUG = True
 ALLOWED_HOSTS = ["*"]
 
@@ -28,11 +28,14 @@ THIRD_PARTY_APPS = [
 
 LOCAL_APPS = [
     "apps.core",
+    "apps.i18n",  # Required by apps.accounts
     "apps.accounts",
     "apps.files",
+    "apps.cms",  # Required by blog
+    "apps.blog",  # Required by signals
+    "apps.registry",  # Required by signals
     # Exclude problematic apps for now
     # "apps.search",
-    # "apps.registry",
 ]
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS

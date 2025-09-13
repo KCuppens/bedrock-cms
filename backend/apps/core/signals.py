@@ -238,7 +238,7 @@ def invalidate_content_cache(instance, model_label):
 
         # Invalidate content cache
 
-        if slug_value:
+        if slug_value and locale_code:
 
             cache_manager.invalidate_content(
                 model_label=model_label, locale=locale_code, slug=slug_value

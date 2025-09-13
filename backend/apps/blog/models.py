@@ -1,5 +1,6 @@
 import re
 import uuid
+from typing import TYPE_CHECKING
 
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
@@ -27,6 +28,10 @@ from apps.core.validators import JSONSizeValidator, validate_json_structure
 
 User = get_user_model()
 
+if TYPE_CHECKING:
+    from apps.cms.models import Page
+    from apps.files.models import FileUpload
+
 
 class Category(models.Model, RBACMixin):
     """Blog category model."""
@@ -43,7 +48,7 @@ class Category(models.Model, RBACMixin):
         max_length=7, default="#6366f1", help_text=_("Hex color code for the category")
     )
 
-    presentation_page: ForeignKey = models.ForeignKey(
+    presentation_page: "ForeignKey[Page | None]" = models.ForeignKey(
         "cms.Page",
         on_delete=models.SET_NULL,
         null=True,
@@ -165,7 +170,7 @@ class BlogPost(models.Model, RBACMixin):
         User, on_delete=models.PROTECT, related_name="blog_posts"
     )
 
-    category: ForeignKey = models.ForeignKey(
+    category: "ForeignKey[Category | None]" = models.ForeignKey(
         Category, on_delete=models.SET_NULL, null=True, blank=True, related_name="posts"
     )
 
@@ -221,7 +226,7 @@ class BlogPost(models.Model, RBACMixin):
 
     # Social sharing
 
-    social_image: ForeignKey = models.ForeignKey(
+    social_image: "ForeignKey[FileUpload | None]" = models.ForeignKey(
         "files.FileUpload",
         on_delete=models.SET_NULL,
         null=True,
@@ -406,7 +411,7 @@ class BlogPost(models.Model, RBACMixin):
         related = (
             BlogPost.objects.select_related("category", "locale", "author")
             .prefetch_related("tags")
-            .filter(status="published", locale=self.locale)
+            .filter(status="published", locale=self.locale)  # type: ignore[misc]
             .exclude(id=self.id)
         )
 
@@ -462,7 +467,7 @@ class BlogSettings(models.Model):
 
     # Presentation page configuration
 
-    default_presentation_page: ForeignKey = models.ForeignKey(
+    default_presentation_page: "ForeignKey[Page | None]" = models.ForeignKey(
         "cms.Page",
         on_delete=models.SET_NULL,
         null=True,

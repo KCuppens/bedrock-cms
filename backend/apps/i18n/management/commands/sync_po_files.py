@@ -88,7 +88,7 @@ class Command(BaseCommand):
 
         else:
 
-            app_configs = apps.get_app_configs()
+            app_configs = list(apps.get_app_configs())
 
         if direction in ["import", "sync"]:
 

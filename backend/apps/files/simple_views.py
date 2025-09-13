@@ -31,7 +31,10 @@ class SimpleFileUploadViewSet(viewsets.ModelViewSet):
     def get_queryset(self):  # noqa: C901
         """Get files for the current user"""
 
-        return FileUpload.objects.filter(created_by=self.request.user)
+        if self.request.user.is_authenticated:
+            return FileUpload.objects.filter(created_by=self.request.user)
+        else:
+            return FileUpload.objects.none()
 
     def create(self, request, *args, **kwargs):  # noqa: C901
         """Handle file upload with detailed logging"""

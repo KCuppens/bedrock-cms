@@ -1,6 +1,7 @@
 import json
 import statistics
 import time
+from typing import Any, Dict
 
 from django.conf import settings
 from django.core.cache import cache
@@ -40,7 +41,7 @@ class Command(BaseCommand):
 
         self.client = Client()
 
-        self.results = {
+        self.results: Dict[str, Any] = {
             "database": {},
             "api": {},
             "caching": {},
@@ -488,9 +489,7 @@ class Command(BaseCommand):
 
         start_time = time.time()
 
-        assets_with_renditions = list(
-            Asset.objects.prefetch_related("renditions").all()[:10]
-        )
+        assets_with_renditions = list(Asset.objects.all()[:10])
 
         for asset in assets_with_renditions:
 
@@ -654,7 +653,7 @@ class Command(BaseCommand):
 
         self.stdout.write("-" * 30)
 
-        db = self.results["database"]
+        db: Dict[str, Any] = self.results["database"]
 
         if "page_tree" in db:
 

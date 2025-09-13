@@ -18,6 +18,7 @@ from .serializers import (
     SearchResponseSerializer,
     SearchSuggestionSerializer,
 )
+from .services import get_search_service
 
 
 class SearchThrottle(UserRateThrottle):
@@ -64,7 +65,7 @@ class SearchAPIView(generics.GenericAPIView):
 
         # Perform search
 
-        results = search_service.search(
+        results = get_search_service().search(
             query=query,
             filters=filters,
             page=page,
@@ -98,7 +99,7 @@ def autocomplete_view(request):  # noqa: C901
 
     limit = serializer.validated_data.get("limit", 10)
 
-    suggestions = search_service.get_suggestions(query, limit)
+    suggestions = get_search_service().get_suggestions(query, limit)
 
     return Response({"query": query, "suggestions": suggestions})
 
@@ -141,7 +142,7 @@ def search_analytics_view(request):  # noqa: C901
 
     days = int(request.GET.get("days", 30))
 
-    analytics = search_service.get_search_analytics(days)
+    analytics = get_search_service().get_search_analytics(days)
 
     serializer = SearchAnalyticsSerializer(data=analytics)
 
@@ -202,7 +203,7 @@ def bulk_index_view(request):  # noqa: C901
 
     try:
 
-        indexed_count = search_service.reindex_all(model_label)
+        indexed_count = get_search_service().reindex_all(model_label)
 
         return Response(
             {

@@ -53,7 +53,11 @@ class EmailTemplatePreviewView(DetailView):
 
         sample_context = {
             "user": self.request.user,
-            "user_name": self.request.user.get_full_name(),
+            "user_name": (
+                getattr(self.request.user, "get_full_name", lambda: "Anonymous")()
+                if self.request.user.is_authenticated
+                else "Anonymous"
+            ),
             "site_name": "Django SaaS Boilerplate",
             "site_url": self.request.build_absolute_uri("/"),
             "login_url": self.request.build_absolute_uri("/auth/login/"),

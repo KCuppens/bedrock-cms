@@ -119,7 +119,9 @@ class RedirectViewSet(viewsets.ModelViewSet):
 
             required_columns = ["from_path", "to_path"]
 
-            if not all(col in csv_reader.fieldnames for col in required_columns):
+            if not csv_reader.fieldnames or not all(
+                col in csv_reader.fieldnames for col in required_columns
+            ):
 
                 return Response(
                     {

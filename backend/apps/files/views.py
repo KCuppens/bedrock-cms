@@ -1,6 +1,9 @@
 import logging
+import os
+import uuid
 
 from django.core.files.storage import default_storage
+from django.db.models import Q
 from django.http import FileResponse, Http404
 from django.shortcuts import get_object_or_404
 
@@ -68,7 +71,7 @@ class FileUploadViewSet(viewsets.ModelViewSet):
 
         # Users can see their own files and public files
 
-        if not self.request.user.is_admin():
+        if not (self.request.user.is_authenticated and self.request.user.is_admin()):
 
             queryset = queryset.filter(
                 Q(created_by=self.request.user) | Q(is_public=True)

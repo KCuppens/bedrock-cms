@@ -1,9 +1,12 @@
+import json
+
 from django.core.cache import cache
 from django.db.models import Count, Q
 
 from django_filters.rest_framework import DjangoFilterBackend
+from drf_spectacular.openapi import OpenApiParameter
 from drf_spectacular.utils import extend_schema, extend_schema_view
-from rest_framework import filters, status, viewsets
+from rest_framework import filters, serializers, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
@@ -302,7 +305,7 @@ class BlockTypeViewSet(viewsets.ModelViewSet):
                 "name": "filters",
                 "in": "query",
                 "required": False,
-                """"description": "JSON object of filters to apply","""
+                "description": "JSON object of filters to apply",
                 "schema": {"type": "string"},
             },
             {

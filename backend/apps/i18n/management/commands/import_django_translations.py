@@ -183,9 +183,9 @@ class Command(BaseCommand):
 
             # Get default value (in default locale)
 
-            with translation.override(default_locale.code):
-
-                default_value = str(lazy_string)
+            if default_locale:
+                with translation.override(default_locale.code):
+                    default_value = str(lazy_string)
 
             # Create or get UiMessage
 
@@ -209,7 +209,11 @@ class Command(BaseCommand):
             for locale in locales:
 
                 # Skip if same as default and not forced
-                if locale.id == default_locale.id and not update_existing:
+                if (
+                    default_locale
+                    and locale.id == default_locale.id
+                    and not update_existing
+                ):
                     continue
 
                 # Get translated value
@@ -218,7 +222,11 @@ class Command(BaseCommand):
                     translated_value = str(lazy_string)
 
                 # Skip if translation is same as default (not actually translated)
-                if translated_value == default_value and locale.id != default_locale.id:
+                if (
+                    default_locale
+                    and translated_value == default_value
+                    and locale.id != default_locale.id
+                ):
                     continue
 
                 # Create or update translation

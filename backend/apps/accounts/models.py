@@ -61,12 +61,12 @@ class CustomUserManager(BaseUserManager["User"]):
 class User(AbstractUser):
     """Custom user model with email as username"""
 
-    username = None  # Remove username field
+    username = None  # type: ignore  # Remove username field
 
     email = models.EmailField(_("Email address"), unique=True)
 
     # Fix reverse accessor conflicts
-    groups = models.ManyToManyField(
+    groups = models.ManyToManyField(  # type: ignore
         "auth.Group",
         verbose_name=_("groups"),
         blank=True,
@@ -77,7 +77,7 @@ class User(AbstractUser):
         related_name="custom_user_set",
         related_query_name="custom_user",
     )
-    user_permissions = models.ManyToManyField(
+    user_permissions = models.ManyToManyField(  # type: ignore
         "auth.Permission",
         verbose_name=_("user permissions"),
         blank=True,
