@@ -9,9 +9,8 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        """migrations.swappable_dependency(settings.AUTH_USER_MODEL),"""(
-            "i18n", "0003_translationunit_uimessage_uimessagetranslation_and_more"
-        ),
+        # migrations.swappable_dependency(settings.AUTH_USER_MODEL),
+        ("i18n", "0003_translationunit_uimessage_uimessagetranslation_and_more"),
     ]
 
     operations = [
@@ -23,7 +22,8 @@ class Migration(migrations.Migration):
                     ("missing", "Missing"),
                     ("draft", "Draft"),
                     ("needs_review", "Needs Review"),
-                    """("approved", "Approved"),"""("rejected", "Rejected"),
+                    ("approved", "Approved"),
+                    ("rejected", "Rejected"),
                 ],
                 default="missing",
                 help_text="Translation status",
@@ -186,7 +186,8 @@ class Migration(migrations.Migration):
                         choices=[
                             ("created", "Created"),
                             ("updated", "Updated"),
-                            """("approved", "Approved"),"""("rejected", "Rejected"),
+                            ("approved", "Approved"),
+                            ("rejected", "Rejected"),
                             ("status_changed", "Status Changed"),
                             ("assigned", "Assigned"),
                         ],

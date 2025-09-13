@@ -9,9 +9,8 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        """migrations.swappable_dependency(settings.AUTH_USER_MODEL),"""(
-            "cms", "0010_delete_seodefaults"
-        ),
+        migrations.swappable_dependency(settings.AUTH_USER_MODEL),
+        ("cms", "0010_delete_seodefaults"),
     ]
 
     operations = [
@@ -30,9 +29,8 @@ class Migration(migrations.Migration):
                     ("export_pages", "Can export pages"),
                     ("import_pages", "Can import pages"),
                     ("moderate_content", "Can moderate content"),
-                    """("approve_content", "Can approve content"),"""(
-                        "reject_content", "Can reject content"
-                    ),
+                    ("approve_content", "Can approve content"),
+                    ("reject_content", "Can reject content"),
                     ("view_moderation_queue", "Can view moderation queue"),
                     ("schedule_content", "Can schedule content"),
                 ],
@@ -66,7 +64,8 @@ class Migration(migrations.Migration):
                 choices=[
                     ("draft", "Draft"),
                     ("pending_review", "Pending Review"),
-                    """("approved", "Approved"),"""("published", "Published"),
+                    ("approved", "Approved"),
+                    ("published", "Published"),
                     ("scheduled", "Scheduled"),
                     ("rejected", "Rejected"),
                 ],

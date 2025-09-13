@@ -47,10 +47,8 @@ urlpatterns = [
     #     """path("api/v1/blog/", include("apps.blog.urls")),"""
     # Imports that were malformed - commented out
     #     """path("api/v1/cms/", include("apps.cms.urls")),"""
-    path(
-        # Imports that were malformed - commented out
-        #         """"api/v1/redirects/", include("apps.cms.redirect_urls")"""
-    ),  # Direct redirects endpoint
+    # Imports that were malformed - commented out
+    # path("api/v1/redirects/", include("apps.cms.redirect_urls")),  # Direct redirects endpoint
     # Imports that were malformed - commented out
     #     """path("api/v1/i18n/", include("apps.i18n.urls")),"""
     # Imports that were malformed - commented out

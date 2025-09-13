@@ -9,9 +9,8 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        """migrations.swappable_dependency(settings.AUTH_USER_MODEL),"""(
-            "cms", "0017_migrate_scheduling_data"
-        ),
+        # migrations.swappable_dependency(settings.AUTH_USER_MODEL),
+        ("cms", "0017_migrate_scheduling_data"),
     ]
 
     operations = [

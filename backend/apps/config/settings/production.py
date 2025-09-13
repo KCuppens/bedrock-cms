@@ -94,6 +94,10 @@ CACHES = {
 
 DATABASES["default"]["CONN_MAX_AGE"] = 600  # noqa: F405
 
+# Ensure OPTIONS key exists before updating
+if "OPTIONS" not in DATABASES["default"]:  # noqa: F405
+    DATABASES["default"]["OPTIONS"] = {}  # noqa: F405
+
 DATABASES["default"]["OPTIONS"].update(  # noqa: F405
     {
         "connect_timeout": 10,
