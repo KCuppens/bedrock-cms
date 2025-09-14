@@ -7,13 +7,17 @@
 
 # Import base factories first to avoid circular dependencies
 
-from .base import BaseFactory, UserFactory
+from .base import AdminUserFactory, BaseFactory, StaffUserFactory, UserFactory
 
 # Then import other factories
 
 try:
 
-    from .accounts import UserProfileFactory  # noqa: F401
+    from .accounts import (  # noqa: F401
+        EditorUserFactory,
+        TranslatorUserFactory,
+        UserProfileFactory,
+    )
 
 except ImportError:
     pass
@@ -21,7 +25,9 @@ except ImportError:
 
 try:
 
-    from .analytics import AnalyticsEventFactory
+    from .analytics import EventFactory
+    from .analytics import EventFactory as AnalyticsEventFactory
+    from .analytics import SessionFactory
 
 except ImportError:
     pass
@@ -29,7 +35,14 @@ except ImportError:
 
 try:
 
-    from .cms import PageFactory
+    from .cms import (
+        CategoryFactory,
+        DraftPageFactory,
+        LocaleFactory,
+        PageFactory,
+        PublishedPageFactory,
+        TagFactory,
+    )
 
 except ImportError:
     pass
@@ -54,10 +67,20 @@ except ImportError:
 __all__ = [
     "BaseFactory",
     "UserFactory",
+    "AdminUserFactory",
+    "StaffUserFactory",
     "UserProfileFactory",
+    "EditorUserFactory",
+    "TranslatorUserFactory",
     "PageFactory",
+    "PublishedPageFactory",
+    "DraftPageFactory",
+    "CategoryFactory",
+    "TagFactory",
     "MediaItemFactory",
     "TranslationUnitFactory",
     "AnalyticsEventFactory",
     "LocaleFactory",
+    "EventFactory",
+    "SessionFactory",
 ]

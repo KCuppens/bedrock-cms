@@ -24,6 +24,8 @@ DJANGO_APPS = [
 
 THIRD_PARTY_APPS = [
     "rest_framework",
+    "allauth",
+    "allauth.account",
 ]
 
 LOCAL_APPS = [
@@ -37,6 +39,8 @@ LOCAL_APPS = [
     "apps.cms",  # Required by blog
     "apps.blog",  # Required by signals
     "apps.registry",  # Required by signals
+    "apps.api",  # Required by ops.metrics
+    "apps.ops",  # For ops tests
     # Exclude problematic apps for now
     # "apps.search",
 ]
@@ -52,6 +56,7 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "allauth.account.middleware.AccountMiddleware",  # Required by allauth
 ]
 
 ROOT_URLCONF = "apps.config.urls"

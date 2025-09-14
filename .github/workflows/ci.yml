@@ -118,27 +118,18 @@ jobs:
     - name: Create static directory
       run: mkdir -p backend/static
 
-    - name: Create missing migrations
-      run: |
-        cd backend
-        # Debug: Show current migration status
-        echo "=== Checking migration status ==="
-        python manage.py showmigrations --skip-checks || echo "showmigrations failed"
-
-        # Create migrations for any apps that need them
-        echo "=== Creating migrations ==="
-        python manage.py makemigrations --noinput --skip-checks
-
-        # Show what migrations were created
-        echo "=== Migration status after makemigrations ==="
-        python manage.py showmigrations --skip-checks || echo "showmigrations failed after makemigrations"
-
     - name: Run migrations
       run: |
         cd backend
-        # Apply all migrations including Django's built-in apps
-        echo "=== Running migrations ==="
-        python manage.py migrate --noinput --verbosity=2 --skip-checks
+        # First migrate Django's built-in apps to ensure content types table exists
+        echo "=== Migrating Django core apps ==="
+        python manage.py migrate contenttypes --noinput --verbosity=2
+        python manage.py migrate auth --noinput --verbosity=2
+        python manage.py migrate sessions --noinput --verbosity=2
+
+        # Then run all other migrations
+        echo "=== Running all migrations ==="
+        python manage.py migrate --noinput --verbosity=2
 
     - name: Run tests with coverage
       run: |
@@ -178,6 +169,8 @@ jobs:
         python -m pip install --upgrade pip
         python -m pip install "setuptools>=78.1.1"
         pip install -r backend/requirements/dev.txt
+        # Install type stubs for mypy
+        pip install types-bleach types-polib
 
     - name: Run mypy
       run: |

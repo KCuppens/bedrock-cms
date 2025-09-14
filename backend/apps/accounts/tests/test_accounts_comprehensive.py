@@ -3,6 +3,14 @@
 """Accounts app tests with high coverage and real database operations."""
 #
 
+import os
+
+import django
+
+# Configure Django settings before any imports
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "apps.config.settings.test_minimal")
+django.setup()
+
 from django.contrib.auth import authenticate, get_user_model
 from django.contrib.auth.models import Group, Permission
 from django.core.exceptions import ValidationError

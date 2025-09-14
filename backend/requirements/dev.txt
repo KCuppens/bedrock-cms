@@ -16,6 +16,8 @@ pre-commit>=3.5.0
 mypy>=1.7.0
 django-stubs[compatible-mypy]>=4.2.0
 djangorestframework-stubs[compatible-mypy]>=3.14.0
+types-bleach>=6.0.0
+types-polib>=1.2.0
 
 # Security Scanning
 bandit>=1.7.5

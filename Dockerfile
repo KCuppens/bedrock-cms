@@ -88,6 +88,8 @@ RUN apt-get update \
         redis-tools \
         # For monitoring
         curl \
+        # For connection testing in entrypoint script
+        netcat-openbsd \
         # nginx for static files
         nginx \
     && rm -rf /var/lib/apt/lists/*
