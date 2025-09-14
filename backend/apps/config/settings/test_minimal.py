@@ -118,6 +118,20 @@ REST_FRAMEWORK = {
         "rest_framework.permissions.IsAuthenticated",
     ],
     "TEST_REQUEST_DEFAULT_FORMAT": "json",
+    "DEFAULT_THROTTLE_RATES": {
+        "anon": "10000/hour",
+        "user": "10000/hour",
+        "auth": "1000/min",
+        "login": "1000/min",
+        "write": "10000/hour",
+        "burst_write": "1000/min",
+        "publish": "10000/hour",
+        "media_upload": "10000/hour",
+        "admin": "10000/hour",
+        "security_scan": "10000/hour",
+        "search": "10000/hour",
+        "password_reset": "1000/hour",
+    },
 }
 
 # Templates

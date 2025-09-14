@@ -2,6 +2,12 @@
 
 """Basic tests for CMS views without complex factory dependencies."""
 
+import os
+
+import django
+
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "apps.config.settings.test_minimal")
+django.setup()
 
 from datetime import timedelta
 
@@ -144,7 +150,7 @@ class PagesViewSetBasicTestCase(APITestCase):
 
         data = response.json()
 
-        self.assertEqual(data["error"], "Invalid locale")
+        self.assertEqual(data["error"], 'Locale "invalid" not found or inactive')
 
     def test_get_by_path_page_not_found(self):
         """Test error when page doesn't exist."""
@@ -168,11 +174,11 @@ class PagesViewSetBasicTestCase(APITestCase):
             {"path": "/draft-page/", "locale": "en"},
         )
 
-        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
         data = response.json()
 
-        self.assertEqual(data["error"], "Permission denied")
+        self.assertEqual(data["error"], "Page not published")
 
     def test_get_by_path_draft_with_permission(self):
         """Test accessing draft page with proper permission."""
@@ -213,9 +219,10 @@ class PagesViewSetBasicTestCase(APITestCase):
 
         data = response.json()
 
-        self.assertEqual(len(data["results"]), 1)
-
-        self.assertEqual(data["results"][0]["title"], "Child Page")
+        # Should return direct list, not paginated response
+        self.assertIsInstance(data, list)
+        self.assertEqual(len(data), 1)
+        self.assertEqual(data[0]["title"], "Child Page")
 
     def test_tree_endpoint(self):
         """Test tree endpoint returns hierarchical structure."""
@@ -253,7 +260,7 @@ class PagesViewSetBasicTestCase(APITestCase):
         page_data = {
             "title": "New Page",
             "slug": "new-page",
-            "locale": self.locale_en.id,
+            "locale": self.locale_en.code,
             "status": "draft",
             "blocks": [{"type": "text", "props": {"content": "Test content"}}],
         }
@@ -280,7 +287,7 @@ class PagesViewSetBasicTestCase(APITestCase):
         page_data = {
             "title": "New Page",
             "slug": "new-page",
-            "locale": self.locale_en.id,
+            "locale": self.locale_en.code,
             "status": "draft",
         }
 

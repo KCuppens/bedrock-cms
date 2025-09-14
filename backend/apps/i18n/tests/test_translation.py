@@ -269,7 +269,8 @@ class TranslationManagerTest(TestCase):
             {
                 "obj": self.user,
                 "field": "first_name",
-                """"source_text": "Test",""" "target_text": "Prueba",
+                "source_text": "Test",
+                "target_text": "Prueba",
             },
             {
                 "obj": self.user,

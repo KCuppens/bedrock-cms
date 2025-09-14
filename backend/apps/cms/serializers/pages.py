@@ -15,6 +15,8 @@ class PageTreeItemSerializer(serializers.ModelSerializer):
 
     children_count = serializers.SerializerMethodField()
 
+    children = serializers.SerializerMethodField()
+
     class Meta:
 
         model = Page
@@ -32,6 +34,7 @@ class PageTreeItemSerializer(serializers.ModelSerializer):
             "created_at",
             "updated_at",
             "children_count",
+            "children",
             "in_main_menu",
             "in_footer",
             "is_homepage",
@@ -48,6 +51,32 @@ class PageTreeItemSerializer(serializers.ModelSerializer):
             return obj._children_count
 
         return obj.children.count()
+
+    def get_children(self, obj):
+        """Get children pages recursively for tree structure."""
+        # Check if children are prefetched to avoid N+1 queries
+        if (
+            hasattr(obj, "_prefetched_objects_cache")
+            and "children" in obj._prefetched_objects_cache
+        ):
+            # Get prefetched children that are published
+            children = [
+                child
+                for child in obj._prefetched_objects_cache["children"]
+                if child.status == "published"
+            ]
+            children.sort(key=lambda x: x.position or 0)
+            return PageTreeItemSerializer(children, many=True).data
+
+        # Fallback: if children are available directly (might be prefetched differently)
+        try:
+            children = obj.children.filter(status="published").order_by("position")
+            if children.exists():
+                return PageTreeItemSerializer(children, many=True).data
+        except:
+            pass
+
+        return []
 
 
 class PageReadSerializer(serializers.ModelSerializer):

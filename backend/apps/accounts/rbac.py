@@ -141,8 +141,12 @@ class RBACMixin:
     def user_has_locale_access(self, user):
         """Check if user has access to this object's locale."""
 
-        if not hasattr(self, "locale") or not user.is_authenticated:
+        if not hasattr(self, "locale") or not user or not user.is_authenticated:
 
+            return False
+
+        # Check if user has been saved to database (has a primary key)
+        if not user.pk:
             return False
 
         # Superuser has access to everything
@@ -162,8 +166,17 @@ class RBACMixin:
     def user_has_section_access(self, user):
         """Check if user has access to this object's path section."""
 
-        if not hasattr(self, "path") or not user.is_authenticated:
+        if (
+            not hasattr(self, "path")
+            or not self.path
+            or not user
+            or not user.is_authenticated
+        ):
 
+            return False
+
+        # Check if user has been saved to database (has a primary key)
+        if not user.pk:
             return False
 
         # Superuser has access to everything

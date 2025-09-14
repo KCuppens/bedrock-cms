@@ -54,7 +54,7 @@ class AnalyticsAggregatorTestCase(TestCase):
             view_time = now - timedelta(days=i)
             for j in range(3):  # 3 views per day
                 PageView.objects.create(
-                    path=f"/test-page-{i}",
+                    url=f"http://example.com/test-page-{i}",
                     user=self.user if j == 0 else None,
                     ip_address=f"192.168.1.{i+j}",
                     user_agent="Test Browser",
@@ -73,7 +73,7 @@ class AnalyticsAggregatorTestCase(TestCase):
         # Each trend should have required fields
         for trend in trends:
             self.assertIn("period_date", trend)
-            self.assertIn("page_views", trend)
+            self.assertIn("total_views", trend)
             self.assertIn("unique_visitors", trend)
 
     def test_get_traffic_trends_weekly(self):
@@ -85,7 +85,7 @@ class AnalyticsAggregatorTestCase(TestCase):
         if trends:
             trend = trends[0]
             self.assertIn("period_date", trend)
-            self.assertIn("page_views", trend)
+            self.assertIn("total_views", trend)
 
     def test_get_traffic_trends_monthly(self):
         """Test monthly traffic trends calculation."""
@@ -95,7 +95,7 @@ class AnalyticsAggregatorTestCase(TestCase):
         if trends:
             trend = trends[0]
             self.assertIn("period_date", trend)
-            self.assertIn("page_views", trend)
+            self.assertIn("total_views", trend)
 
     def test_get_traffic_trends_hourly(self):
         """Test hourly traffic trends calculation."""
@@ -105,7 +105,7 @@ class AnalyticsAggregatorTestCase(TestCase):
         if trends:
             trend = trends[0]
             self.assertIn("period_date", trend)
-            self.assertIn("page_views", trend)
+            self.assertIn("total_views", trend)
 
     def test_get_traffic_trends_invalid_period(self):
         """Test traffic trends with invalid period defaults to daily."""
@@ -134,9 +134,11 @@ class AnalyticsAggregatorTestCase(TestCase):
             # Create some user activity data
             UserActivity.objects.create(
                 user=self.user,
-                activity_type="page_view",
-                data={"page": "/test"},
-                timestamp=timezone.now(),
+                action="search",
+                metadata={"page": "/test"},
+                ip_address="127.0.0.1",
+                session_id="test-session",
+                created_at=timezone.now(),
             )
 
             metrics = AnalyticsAggregator.get_user_engagement_metrics(days=30)
@@ -157,7 +159,12 @@ class AnalyticsAggregatorTestCase(TestCase):
     def test_calculate_bounce_rate(self):
         """Test bounce rate calculation."""
         if hasattr(AnalyticsAggregator, "calculate_bounce_rate"):
-            bounce_rate = AnalyticsAggregator.calculate_bounce_rate(days=7)
+            now = timezone.now()
+            start_date = now - timedelta(days=7)
+            end_date = now
+            bounce_rate = AnalyticsAggregator.calculate_bounce_rate(
+                start_date, end_date
+            )
 
             self.assertIsInstance(bounce_rate, (int, float))
             self.assertGreaterEqual(bounce_rate, 0)
@@ -277,15 +284,20 @@ class AnalyticsModelsIntegrationTestCase(TestCase):
 
     def test_content_metrics_aggregation(self):
         """Test aggregation with ContentMetrics model."""
+        # Get content type for User model
+        from django.contrib.contenttypes.models import ContentType
+
+        user_content_type = ContentType.objects.get_for_model(User)
+
         # Create content metrics
         ContentMetrics.objects.create(
-            content_type_id=1,
-            object_id=1,
+            content_type=user_content_type,
+            object_id=self.user.id,
             views=100,
-            likes=10,
+            unique_views=50,
             shares=5,
             comments=3,
-            engagement_score=75.5,
+            downloads=10,
             date=timezone.now().date(),
         )
 
@@ -299,16 +311,20 @@ class AnalyticsModelsIntegrationTestCase(TestCase):
         # Create user activity
         UserActivity.objects.create(
             user=self.user,
-            activity_type="login",
-            data={"source": "web"},
-            timestamp=timezone.now(),
+            action="login",
+            metadata={"source": "web"},
+            ip_address="127.0.0.1",
+            session_id="test-session-1",
+            created_at=timezone.now(),
         )
 
         UserActivity.objects.create(
             user=self.user,
-            activity_type="page_view",
-            data={"page": "/dashboard"},
-            timestamp=timezone.now(),
+            action="search",
+            metadata={"page": "/dashboard"},
+            ip_address="127.0.0.1",
+            session_id="test-session-1",
+            created_at=timezone.now(),
         )
 
         # Test aggregation methods that might use UserActivity
@@ -320,17 +336,22 @@ class AnalyticsModelsIntegrationTestCase(TestCase):
         """Test aggregation with Assessment and Risk models."""
         # Create assessment
         assessment = Assessment.objects.create(
-            name="Security Assessment", description="Test assessment", status="active"
+            title="Security Assessment",
+            description="Test assessment",
+            assessment_type="security",
+            status="completed",
+            created_by=self.user,
         )
 
         # Create risk
         Risk.objects.create(
-            assessment=assessment,
-            name="Test Risk",
+            title="Test Risk",
             description="Test risk description",
-            likelihood="medium",
-            impact="high",
-            risk_level="high",
+            category="security",
+            probability=3,
+            impact=4,
+            risk_score=12,
+            severity="high",
         )
 
         # Test aggregation methods that might use these models
@@ -343,18 +364,16 @@ class AnalyticsModelsIntegrationTestCase(TestCase):
         # Create an analytics summary
         summary = AnalyticsSummary.objects.create(
             period_type="daily",
-            period_start=timezone.now().date(),
-            period_end=timezone.now().date(),
-            total_page_views=100,
+            date=timezone.now().date(),
+            total_views=100,
             unique_visitors=50,
             bounce_rate=25.5,
             avg_session_duration=300,
-            data={"additional": "metrics"},
         )
 
         self.assertIsNotNone(summary.id)
         self.assertEqual(summary.period_type, "daily")
-        self.assertEqual(summary.total_page_views, 100)
+        self.assertEqual(summary.total_views, 100)
 
     def test_complex_aggregation_queries(self):
         """Test complex aggregation scenarios."""
@@ -370,7 +389,7 @@ class AnalyticsModelsIntegrationTestCase(TestCase):
             for j in range(5):  # 5 pages
                 for k in range(2):  # 2 views per page per user
                     PageView.objects.create(
-                        path=f"/page-{j}",
+                        url=f"http://example.com/page-{j}",
                         user=user,
                         ip_address=f"10.0.{i}.{k}",
                         user_agent=f"Browser {i}",

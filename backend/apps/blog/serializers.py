@@ -219,9 +219,32 @@ class BlogPostSerializer(serializers.ModelSerializer):
         return obj.get_reading_time()
 
     def get_related_posts(self, obj):  # noqa: C901
-        """Get related posts."""
+        """Get related posts with optimized querying."""
 
-        related = obj.get_related_posts(limit=3)
+        # Use optimized queryset for serialization to prevent N+1 queries
+        related = (
+            obj.get_related_posts(limit=3)
+            .select_related("locale", "author", "category")
+            .prefetch_related("tags")
+            .only(
+                # Only fetch fields needed by BlogPostListSerializer
+                "id",
+                "group_id",
+                "title",
+                "slug",
+                "excerpt",
+                "status",
+                "featured",
+                "published_at",
+                "created_at",
+                "updated_at",
+                "locale__code",
+                "author__first_name",
+                "author__last_name",
+                "author__email",
+                "category__name",
+            )
+        )
 
         return BlogPostListSerializer(related, many=True).data
 

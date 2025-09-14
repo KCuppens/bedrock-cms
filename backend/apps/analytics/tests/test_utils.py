@@ -464,7 +464,13 @@ class GetAnalyticsContextTest(TestCase):
         request = self.factory.get("/", HTTP_USER_AGENT="Mozilla/5.0 Chrome/91.0")
         request.META["REMOTE_ADDR"] = "192.168.1.100"
         request.META["HTTP_REFERER"] = "https://google.com/search?q=test"
-        request.session = {"session_key": "test_session_123"}
+
+        # Mock session object with session_key attribute
+        from unittest.mock import Mock
+
+        mock_session = Mock()
+        mock_session.session_key = "test_session_123"
+        request.session = mock_session
 
         context = get_analytics_context(request)
 

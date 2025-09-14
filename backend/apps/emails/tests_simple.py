@@ -107,8 +107,8 @@ class EmailTemplateModelTest(TestCase):
         result = template.render_all(context)
 
         self.assertIn("subject", result)
-        self.assertIn("html", result)
-        self.assertIn("text", result)
+        self.assertIn("html_content", result)
+        self.assertIn("text_content", result)
 
 
 class EmailMessageLogModelTest(TestCase):

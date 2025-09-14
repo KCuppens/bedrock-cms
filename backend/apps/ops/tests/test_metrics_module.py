@@ -51,8 +51,10 @@ class PrometheusMetricsTestCase(TestCase):
         request = self.factory.get("/metrics")
         response = prometheus_metrics(request)
 
-        # Should return plain text content type for Prometheus
-        self.assertEqual(response["Content-Type"], "text/plain; charset=utf-8")
+        # Should return plain text content type for Prometheus with version
+        self.assertEqual(
+            response["Content-Type"], "text/plain; version=0.0.4; charset=utf-8"
+        )
 
     def test_user_metrics_included(self):
         """Test that user metrics are included in response."""
@@ -228,10 +230,12 @@ class PrometheusMetricsTestCase(TestCase):
                         f"Metric value '{metric_value}' in line '{line}' is not numeric"
                     )
 
-    def test_empty_database_handling(self):
+    @patch("apps.ops.metrics.User.objects")
+    def test_empty_database_handling(self, mock_user_objects):
         """Test metrics handling when database is empty."""
-        # Clear all users
-        User.objects.all().delete()
+        # Mock empty database by returning 0 for all counts
+        mock_user_objects.count.return_value = 0
+        mock_user_objects.filter.return_value.count.return_value = 0
 
         request = self.factory.get("/metrics")
         response = prometheus_metrics(request)
@@ -273,7 +277,9 @@ class PrometheusMetricsTestCase(TestCase):
 
         # Should have content type header
         self.assertIn("Content-Type", response)
-        self.assertEqual(response["Content-Type"], "text/plain; charset=utf-8")
+        self.assertEqual(
+            response["Content-Type"], "text/plain; version=0.0.4; charset=utf-8"
+        )
 
     def test_large_dataset_performance(self):
         """Test metrics performance with larger dataset."""

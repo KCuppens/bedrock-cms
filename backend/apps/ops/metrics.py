@@ -254,6 +254,9 @@ def prometheus_metrics(request):
 
     except Exception as e:
 
+        # Log the exception
+        logger.exception("Failed to collect metrics: %s", e)
+
         # Fallback metrics if database is unavailable
 
         metrics = [

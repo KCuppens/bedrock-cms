@@ -163,6 +163,7 @@ class TranslationUnitViewSetTestCase(APITestCase):
             field="title",
             source_text="Hello World",
             target_text="Bonjour Monde",
+            source_locale=self.en_locale,
             target_locale=self.fr_locale,
             status="draft",
         )
@@ -235,7 +236,10 @@ class UiMessageViewSetTestCase(APITestCase):
         )
 
         self.ui_message = UiMessage.objects.create(
-            key="welcome_msg", default_text="Welcome to our site", context="homepage"
+            key="welcome_msg",
+            namespace="homepage",
+            default_value="Welcome to our site",
+            description="Welcome message displayed on homepage",
         )
 
     def test_list_ui_messages(self):
@@ -310,8 +314,8 @@ class TranslationGlossaryViewSetTestCase(APITestCase):
         )
 
         self.glossary_entry = TranslationGlossary.objects.create(
-            source_term="button",
-            target_term="bouton",
+            term="button",
+            translation="bouton",
             source_locale=self.en_locale,
             target_locale=self.fr_locale,
             context="UI elements",
@@ -362,14 +366,27 @@ class TranslationQueueViewSetTestCase(APITestCase):
             code="en", name="English", native_name="English", is_default=True
         )
 
-        self.content_type = ContentType.objects.create(
-            app_label="test", model="testmodel"
+        self.fr_locale = Locale.objects.create(
+            code="fr", name="French", native_name="Français"
         )
 
-        self.queue_item = TranslationQueue.objects.create(
+        self.content_type = ContentType.objects.get_for_model(User)
+
+        # Create a TranslationUnit first
+        self.translation_unit = TranslationUnit.objects.create(
             content_type=self.content_type,
-            object_id=1,
-            target_locale=self.en_locale,
+            object_id=self.user.pk,
+            field="title",
+            source_text="Hello",
+            target_text="",
+            source_locale=self.en_locale,
+            target_locale=self.fr_locale,
+            status="draft",
+        )
+
+        # Create TranslationQueue that references the TranslationUnit
+        self.queue_item = TranslationQueue.objects.create(
+            translation_unit=self.translation_unit,
             priority="high",
             status="pending",
         )
@@ -507,7 +524,7 @@ class ViewSetIntegrationTestCase(APITestCase):
 
         # Create UI message
         ui_message = UiMessage.objects.create(
-            key="test_msg", default_text="Test message", context="test"
+            key="test_msg", default_value="Test message", description="test"
         )
 
         # Mock a bulk translate request that would trigger a task

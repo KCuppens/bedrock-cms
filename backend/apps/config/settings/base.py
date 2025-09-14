@@ -80,8 +80,7 @@ INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
 
 MIDDLEWARE = [
     # Performance monitoring (first to track everything)
-    # Imports that were malformed - commented out
-    #     """"apps.core.middleware_performance.PerformanceMonitoringMiddleware","""
+    "apps.core.middleware_performance.PerformanceMonitoringMiddleware",
     # Compression and optimization (early for efficiency)
     "django.middleware.gzip.GZipMiddleware",
     # Imports that were malformed - commented out
@@ -99,8 +98,7 @@ MIDDLEWARE = [
     "corsheaders.middleware.CorsMiddleware",
     # Cache and conditional responses (early for cache hits)
     "django.middleware.http.ConditionalGetMiddleware",
-    # Imports that were malformed - commented out
-    #     """"apps.core.middleware_performance.CacheHitRateMiddleware","""
+    "apps.core.middleware_performance.CacheHitRateMiddleware",
     # Session management
     "django.contrib.sessions.middleware.SessionMiddleware",
     # Dynamic language loading
@@ -125,10 +123,8 @@ MIDDLEWARE = [
     # Feature flags
     "waffle.middleware.WaffleMiddleware",
     # Database optimization
-    # Imports that were malformed - commented out
-    #     """"apps.core.middleware_performance.DatabaseConnectionPoolMiddleware","""
-    # Imports that were malformed - commented out
-    #     # "apps.core.middleware_performance.QueryCountLimitMiddleware",  # Disabled in dev
+    "apps.core.middleware_performance.DatabaseConnectionPoolMiddleware",
+    "apps.core.middleware_performance.QueryCountLimitMiddleware",
     # Heavy middleware at the end
     # Imports that were malformed - commented out
     #     """"apps.accounts.middleware.LastSeenMiddleware","""
@@ -522,6 +518,11 @@ CELERY_BEAT_SCHEDULE = {
     "cleanup-orphaned-translation-units": {
         # Imports that were malformed - commented out
         #         """"task": "apps.i18n.tasks.cleanup_orphaned_translation_units","""
+        "schedule": 60.0 * 60.0 * 24.0 * 7.0,  # Weekly
+        "options": {"queue": "maintenance"},
+    },
+    "cleanup-analytics-comprehensive": {
+        "task": "apps.analytics.tasks.cleanup_analytics_comprehensive",
         "schedule": 60.0 * 60.0 * 24.0 * 7.0,  # Weekly
         "options": {"queue": "maintenance"},
     },

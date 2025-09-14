@@ -66,8 +66,8 @@ export const useSEOSettings = (localeCode: string = 'en') => {
         setLoading(true);
         setError(null);
 
-        // Try to get SEO settings for the locale
-        const response = await api.seoSettings.getByLocale(localeCode);
+        // Try to get SEO settings for the locale using public endpoint
+        const response = await api.seoSettings.getPublic(localeCode);
         setSettings(response.data || response);
       } catch (err) {
         // If no settings found, use defaults

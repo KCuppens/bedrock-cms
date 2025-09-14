@@ -210,6 +210,9 @@ def invalidate_content_cache(instance, model_label):
     """
 
     try:
+        # Skip if registry is not initialized (e.g., during tests)
+        if not hasattr(content_registry, "_configs") or not content_registry._configs:
+            return
 
         config = content_registry.get_config(model_label)
 
@@ -418,6 +421,9 @@ def invalidate_content_type_cache(model_label: str):
     """
 
     try:
+        # Skip if registry is not initialized (e.g., during tests)
+        if not hasattr(content_registry, "_configs") or not content_registry._configs:
+            return
 
         config = content_registry.get_config(model_label)
 
@@ -425,6 +431,18 @@ def invalidate_content_type_cache(model_label: str):
             logger.warning(
                 "Unknown model label for cache invalidation: %s", model_label
             )
+            return
+
+        # Skip if database tables don't exist
+        from django.db import connection
+
+        try:
+            with connection.cursor() as cursor:
+                table_names = connection.introspection.table_names(cursor)
+                model_table = config.model._meta.db_table
+                if model_table not in table_names:
+                    return
+        except Exception:
             return
 
         # Get all objects of this type and invalidate their cache
@@ -452,6 +470,16 @@ def invalidate_blog_settings_cache(blog_settings):
     """
 
     try:
+        # Skip if this is during app initialization (no database access)
+        from django.db import connection
+
+        try:
+            with connection.cursor() as cursor:
+                table_names = connection.introspection.table_names(cursor)
+                if "blog_blogpost" not in table_names:
+                    return
+        except Exception:
+            return
 
         # Get all published blog posts for this locale
 

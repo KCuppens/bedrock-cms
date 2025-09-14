@@ -12,6 +12,7 @@ from rest_framework.permissions import AllowAny, IsAdminUser, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.throttling import UserRateThrottle
 
+from apps.core.decorators import cache_method_response, invalidate_cache
 from apps.core.tasks import track_view_async
 from apps.core.throttling import (
     BurstWriteThrottle,
@@ -75,6 +76,13 @@ class BlogPostViewSet(viewsets.ModelViewSet):
     ordering_fields = ["created_at", "updated_at", "published_at", "title"]
 
     ordering = ["-created_at"]
+
+    @cache_method_response(
+        timeout=600, vary_on_user=False, vary_on_headers=["Accept-Language"]
+    )
+    def list(self, request, *args, **kwargs):
+        """Cached list method for blog posts."""
+        return super().list(request, *args, **kwargs)
 
     def get_queryset(self):  # noqa: C901
         """Get queryset with optimizations and filtering."""
@@ -195,6 +203,7 @@ class BlogPostViewSet(viewsets.ModelViewSet):
 
         return Response(serializer.data)
 
+    @invalidate_cache(pattern="api:BlogPostViewSet:list*")
     def perform_create(self, serializer):  # noqa: C901
         """Set author and create initial revision on create."""
 
@@ -208,6 +217,7 @@ class BlogPostViewSet(viewsets.ModelViewSet):
             blog_post=blog_post, user=self.request.user, comment="Initial creation"
         )
 
+    @invalidate_cache(pattern="api:BlogPostViewSet:list*")
     def perform_update(self, serializer):  # noqa: C901
         """Create revision on update."""
 
@@ -491,6 +501,11 @@ class BlogCategoryViewSet(viewsets.ModelViewSet):
 
     serializer_class = CategorySerializer
 
+    @cache_method_response(timeout=900, vary_on_user=False)
+    def list(self, request, *args, **kwargs):
+        """Cached list method for blog categories."""
+        return super().list(request, *args, **kwargs)
+
     permission_classes = [IsAuthenticated]
 
     filter_backends = [
@@ -535,6 +550,11 @@ class BlogTagViewSet(viewsets.ModelViewSet):
     """ViewSet for managing blog tags."""
 
     serializer_class = TagSerializer
+
+    @cache_method_response(timeout=900, vary_on_user=False)
+    def list(self, request, *args, **kwargs):
+        """Cached list method for blog tags."""
+        return super().list(request, *args, **kwargs)
 
     permission_classes = [IsAuthenticated]
 

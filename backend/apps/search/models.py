@@ -113,6 +113,7 @@ class SearchIndex(models.Model):
     created_at: DateTimeField = models.DateTimeField(auto_now_add=True)
 
     class Meta:
+        app_label = "search"
 
         verbose_name = "Search Index Entry"
 
@@ -367,6 +368,7 @@ class SearchQuery(models.Model):
     created_at: DateTimeField = models.DateTimeField(auto_now_add=True)
 
     class Meta:
+        app_label = "search"
 
         verbose_name = "Search Query"
 
@@ -444,6 +446,7 @@ class SearchSuggestion(models.Model):
     updated_at: DateTimeField = models.DateTimeField(auto_now=True)
 
     class Meta:
+        app_label = "search"
 
         verbose_name = "Search Suggestion"
 

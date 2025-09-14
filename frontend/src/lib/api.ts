@@ -804,6 +804,10 @@ class ApiClient {
 
     preview: (params: { locale?: string; page_title?: string; page_description?: string }): Promise<ApiResponse<any>> =>
       this.request({ method: 'GET', url: '/api/v1/cms/seo-settings/preview/', params }),
+
+    // Public SEO settings for frontend (no authentication required)
+    getPublic: (localeCode: string): Promise<ApiResponse<any>> =>
+      this.request({ method: 'GET', url: `/api/v1/cms/public/seo-settings/${localeCode}/` }),
   };
 
   // Enhanced Redirects API

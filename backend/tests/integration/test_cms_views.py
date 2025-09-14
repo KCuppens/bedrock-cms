@@ -163,7 +163,7 @@ class PageRetrievalTestCase(APITestCase):
 
         response = self.client.get(
             "/api/v1/cms/pages/get_by_path/",
-            """{"path": "/test-page/", "locale": "en"},""",
+            {"path": "/test-page/", "locale": "en"},
         )
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -190,14 +190,14 @@ class PageRetrievalTestCase(APITestCase):
 
         response = self.client.get(
             "/api/v1/cms/pages/get_by_path/",
-            """{"path": "/test-page/", "locale": "invalid"},""",
+            {"path": "/test-page/", "locale": "invalid"},
         )
 
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
         data = response.json()
 
-        self.assertEqual(data["error"], "Invalid locale")
+        self.assertEqual(data["error"], 'Locale "invalid" not found or inactive')
 
     def test_get_by_path_page_not_found(self):
         """Test error when page doesn't exist."""
@@ -257,11 +257,11 @@ class PageRetrievalTestCase(APITestCase):
             {"path": "/draft-page/", "locale": "en"},
         )
 
-        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
         data = response.json()
 
-        self.assertEqual(data["error"], "Permission denied")
+        self.assertEqual(data["error"], "Page not published")
 
     def test_get_by_path_draft_with_permission(self):
         """Test accessing draft page with proper permission."""
@@ -335,11 +335,11 @@ class PageHierarchyTestCase(APITestCase):
 
         data = response.json()
 
-        # Should return direct children only
+        # Should return direct children only (as a direct list, not paginated)
+        self.assertIsInstance(data, list)
+        self.assertEqual(len(data), 2)
 
-        self.assertEqual(len(data["results"]), 2)
-
-        child_titles = [child["title"] for child in data["results"]]
+        child_titles = [child["title"] for child in data]
 
         self.assertIn("Child 1", child_titles)
 
@@ -350,30 +350,28 @@ class PageHierarchyTestCase(APITestCase):
     def test_tree_endpoint(self):
         """Test tree endpoint returns hierarchical structure."""
 
-        response = self.client.get("/api/v1/cms/pages/tree/")
+        response = self.client.get("/api/v1/cms/pages/tree/", {"depth": 3})
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
         data = response.json()
 
         # Should return tree structure
-
         self.assertIsInstance(data, list)
 
         # Find parent in tree
-
         parent_node = next(node for node in data if node["title"] == "Parent")
 
+        # Test hierarchical structure
+        self.assertIn("children", parent_node)
         self.assertEqual(len(parent_node["children"]), 2)
 
         # Check nested structure
-
         child1_node = next(
             child for child in parent_node["children"] if child["title"] == "Child 1"
         )
 
         self.assertEqual(len(child1_node["children"]), 1)
-
         self.assertEqual(child1_node["children"][0]["title"], "Grandchild")
 
 
@@ -406,7 +404,7 @@ class PageCRUDTestCase(APITestCase):
         page_data = {
             "title": "New Page",
             "slug": "new-page",
-            "locale": self.locale_en.id,
+            "locale": self.locale_en.code,
             "status": "draft",
             "blocks": [{"type": "text", "props": {"content": "Test content"}}],
         }
@@ -433,7 +431,7 @@ class PageCRUDTestCase(APITestCase):
         page_data = {
             "title": "New Page",
             "slug": "new-page",
-            "locale": self.locale_en.id,
+            "locale": self.locale_en.code,
             "status": "draft",
         }
 

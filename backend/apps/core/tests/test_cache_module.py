@@ -28,13 +28,15 @@ class CacheKeyBuilderTestCase(TestCase):
     def test_build_key_multiple_parts(self):
         """Test building cache key with multiple parts."""
         key = self.builder.build_key("page", "en", "home", "v1")
-        self.assertEqual(key, "test:page:en:home:v1")
+        # "page" gets abbreviated to "p" per CACHE_PREFIXES
+        self.assertEqual(key, "test:p:en:home:v1")
 
     def test_build_key_with_dict(self):
         """Test building cache key with dictionary argument."""
         key = self.builder.build_key("api", {"locale": "en", "type": "blog"})
         # Dict should be converted to deterministic string
-        self.assertIn("test:api:", key)
+        # "api" gets abbreviated to "a" per CACHE_PREFIXES
+        self.assertIn("test:a:", key)
         self.assertIn("locale:en", key)
         self.assertIn("type:blog", key)
 
@@ -42,7 +44,8 @@ class CacheKeyBuilderTestCase(TestCase):
         """Test building cache key with special characters."""
         key = self.builder.build_key("content", "my-slug/with-chars")
         # Special characters should be handled
-        self.assertIn("test:content:", key)
+        # "content" gets abbreviated to "c" per CACHE_PREFIXES
+        self.assertIn("test:c:", key)
 
     def test_hash_key_long_input(self):
         """Test key hashing for very long inputs."""

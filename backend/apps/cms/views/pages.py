@@ -32,6 +32,7 @@ from apps.cms.serializers import (
 )
 from apps.cms.services.scheduling import SchedulingService
 from apps.cms.versioning_views import VersioningMixin
+from apps.core.pagination import StandardResultsSetPagination
 from apps.core.throttling import (
     BurstWriteThrottle,
     PublishOperationThrottle,
@@ -50,12 +51,15 @@ class PagesViewSet(VersioningMixin, viewsets.ModelViewSet):
         PublishOperationThrottle,
     ]
 
+    # Explicitly set pagination class
+    pagination_class = StandardResultsSetPagination
+
     def get_queryset(self):
 
         return (
             models.Page.objects.select_related("locale", "parent")
             .annotate(_children_count=Count("children"))
-            .all()
+            .order_by("id")
         )
 
     def get_serializer_class(self):
@@ -186,7 +190,7 @@ class PagesViewSet(VersioningMixin, viewsets.ModelViewSet):
                 path=path, locale=locale
             )
 
-        except Page.DoesNotExist:
+        except models.Page.DoesNotExist:
 
             return Response(
                 {"error": "Page not found"}, status=status.HTTP_404_NOT_FOUND
@@ -348,7 +352,7 @@ class PagesViewSet(VersioningMixin, viewsets.ModelViewSet):
 
                 queryset = queryset.filter(parent=root_page)
 
-            except Page.DoesNotExist:
+            except models.Page.DoesNotExist:
 
                 return Response(
                     {"error": "Root page not found"}, status=status.HTTP_404_NOT_FOUND
@@ -365,8 +369,11 @@ class PagesViewSet(VersioningMixin, viewsets.ModelViewSet):
         queryset = queryset.annotate(_children_count=Count("children"))
 
         if depth >= 2:
-
-            queryset = queryset.prefetch_related("children")
+            # Prefetch children recursively based on depth
+            if depth >= 3:
+                queryset = queryset.prefetch_related("children__children")
+            else:
+                queryset = queryset.prefetch_related("children")
 
         serializer = PageTreeItemSerializer(queryset, many=True)
 
@@ -439,7 +446,7 @@ class PagesViewSet(VersioningMixin, viewsets.ModelViewSet):
 
                     page.parent = new_parent
 
-                except Page.DoesNotExist:
+                except models.Page.DoesNotExist:
 
                     return Response(
                         {"error": "Invalid parent"}, status=status.HTTP_400_BAD_REQUEST
@@ -469,13 +476,13 @@ class PagesViewSet(VersioningMixin, viewsets.ModelViewSet):
 
                 sibling.position = index
 
-                sibling.save(
-                    update_fields=(
-                        ["position"]
-                        if sibling.pk != page.pk
-                        else ["parent", "position"]
-                    )
-                )
+                if sibling.pk == page.pk:
+                    # For the moved page, update path and trigger descendant updates
+                    sibling.path = sibling.compute_path()
+                    sibling.save(update_fields=["parent", "position", "path"])
+                    sibling._update_descendant_paths()
+                else:
+                    sibling.save(update_fields=["position"])
 
             # If page moved to different parent, resequence old parent's children
 
@@ -557,7 +564,7 @@ class PagesViewSet(VersioningMixin, viewsets.ModelViewSet):
 
                 seen.add(page_id)
 
-                """unique_page_ids.append(page_id)"""
+                unique_page_ids.append(page_id)
 
         if len(unique_page_ids) != len(page_ids):
 
@@ -565,6 +572,9 @@ class PagesViewSet(VersioningMixin, viewsets.ModelViewSet):
                 {"error": "Duplicate page IDs found"},
                 status=status.HTTP_400_BAD_REQUEST,
             )
+
+        # Use the deduplicated list from now on
+        page_ids = unique_page_ids
 
         with transaction.atomic():
 
@@ -890,9 +900,13 @@ class PagesViewSet(VersioningMixin, viewsets.ModelViewSet):
 
         return Response(PageReadSerializer(page).data)
 
-    @action(detail=True, methods=["delete"], url_path=r"blocks/(?P<block_index>\d+)")
+    @action(
+        detail=True,
+        methods=["delete", "patch"],
+        url_path=r"blocks/(?P<block_index>\d+)",
+    )
     def remove_block(self, request, pk=None, block_index=None):
-        """Delete a block."""
+        """Delete or update a block."""
 
         page = self.get_object()
 
@@ -903,7 +917,7 @@ class PagesViewSet(VersioningMixin, viewsets.ModelViewSet):
             if index < 0 or index >= len(page.blocks):
 
                 return Response(
-                    {"error": "Block index out of range"},
+                    {"error": "Invalid block index"},
                     status=status.HTTP_400_BAD_REQUEST,
                 )
 
@@ -913,17 +927,45 @@ class PagesViewSet(VersioningMixin, viewsets.ModelViewSet):
                 {"error": "Invalid block index"}, status=status.HTTP_400_BAD_REQUEST
             )
 
-        page.blocks.pop(index)
+        if request.method == "PATCH":
+            # Update block
+            block_type = request.data.get("type")
+            props = request.data.get("props", {})
 
-        # Set user context
+            if block_type:
+                page.blocks[index]["type"] = block_type
 
-        page._current_user = self.request.user
+            if props:
+                page.blocks[index]["props"] = {
+                    **page.blocks[index].get("props", {}),
+                    **props,
+                }
 
-        page._current_request = self.request
+            # Set user context and validate updated blocks
+            page._current_user = self.request.user
+            page._current_request = self.request
 
-        page.save(update_fields=["blocks"])
+            try:
+                page.clean()
+                page.save(update_fields=["blocks"])
+            except Exception as e:
+                return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
-        return Response(PageReadSerializer(page).data)
+            return Response({"message": "Block updated successfully"})
+
+        else:
+            # Delete block
+            page.blocks.pop(index)
+
+            # Set user context
+
+            page._current_user = self.request.user
+
+            page._current_request = self.request
+
+            page.save(update_fields=["blocks"])
+
+            return Response({"message": "Block deleted successfully"})
 
     @action(detail=True, methods=["post"])
     def duplicate(self, request, pk=None):
@@ -955,7 +997,7 @@ class PagesViewSet(VersioningMixin, viewsets.ModelViewSet):
 
         # Create a copy of the page
 
-        duplicated_page = Page(
+        duplicated_page = models.Page(
             parent=page.parent,
             locale=page.locale,
             title=f"{page.title} (Copy)",

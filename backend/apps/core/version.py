@@ -7,20 +7,21 @@ from functools import lru_cache
 from pathlib import Path
 from typing import Any, Dict
 
-from git import Repo
-
 """
 Version tracking service using GitPython
 """
 
+# Silence git warnings in environments without git
+os.environ.setdefault("GIT_PYTHON_REFRESH", "quiet")
 
 try:
+    from git import Repo
 
     GIT_AVAILABLE = True
-
-except ImportError:
-
+except (ImportError, Exception):
+    # Catch any exception including git executable not found
     GIT_AVAILABLE = False
+    Repo = None  # type: ignore
 
 
 class VersionService:
@@ -94,6 +95,14 @@ class VersionService:
     @staticmethod
     def _get_git_info() -> Dict[str, Any]:
         """Get information from git repository"""
+
+        if not GIT_AVAILABLE or Repo is None:
+            return {
+                "version": "0.0.0",
+                "commit": "unknown",
+                "branch": "unknown",
+                "error": "GitPython not available",
+            }
 
         try:
 

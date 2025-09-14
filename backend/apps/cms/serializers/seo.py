@@ -89,7 +89,7 @@ class SeoSettingsSerializer(serializers.ModelSerializer):
             "meta_generator",
             "meta_viewport",
             # Social Media
-            """"facebook_app_id","""
+            "facebook_app_id",
             # Timestamps
             "created_at",
             "updated_at",

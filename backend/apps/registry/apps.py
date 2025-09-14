@@ -18,6 +18,24 @@ class RegistryConfig(AppConfig):
 
     def ready(self):
         """Initialize the content registry when the app is ready."""
+        # Skip initialization if database tables don't exist (common in tests with disabled migrations)
+        from django.core.management.color import no_style
+        from django.db import connection
+
+        try:
+            # Check if django_content_type table exists
+            with connection.cursor() as cursor:
+                table_names = connection.introspection.table_names(cursor)
+                if "django_content_type" not in table_names:
+                    logger.info(
+                        "Database tables not ready, skipping registry initialization"
+                    )
+                    return
+        except Exception:
+            # Database connection issues, skip initialization
+            logger.info("Database not accessible, skipping registry initialization")
+            return
+
         try:
             # Register core models
             register_core_models()

@@ -8,7 +8,13 @@ from django.db import connection
 from django.http import JsonResponse
 from django.utils.deprecation import MiddlewareMixin
 
-import brotli
+# Optional import for brotli compression
+try:
+    import brotli
+
+    HAS_BROTLI = True
+except ImportError:
+    HAS_BROTLI = False
 
 """Performance monitoring and optimization middleware."""
 
@@ -96,7 +102,7 @@ class PerformanceMonitoringMiddleware(MiddlewareMixin):
 class QueryCountLimitMiddleware(MiddlewareMixin):
     """Middleware to prevent N+1 queries by limiting query count."""
 
-    MAX_QUERIES = 50  # Maximum queries per request
+    MAX_QUERIES = 15  # Maximum queries per request - reduced for better performance
 
     def process_request(self, request):
         """Reset query count."""
@@ -324,7 +330,7 @@ class CompressionMiddleware(MiddlewareMixin):
 
         # Try Brotli first (better compression)
 
-        if "br" in accepted:
+        if "br" in accepted and HAS_BROTLI:
 
             try:
 
@@ -340,7 +346,7 @@ class CompressionMiddleware(MiddlewareMixin):
 
                     del response["Content-Length"]
 
-            except ImportError:
+            except Exception:
                 pass
 
         # Fall back to gzip (handled by GZipMiddleware)

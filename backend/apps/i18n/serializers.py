@@ -118,10 +118,10 @@ class TranslationUnitUpdateSerializer(serializers.ModelSerializer):
             # Only allow certain transitions
 
             valid_transitions = {
-                """"missing": ["draft", "approved"],"""
-                """"draft": ["needs_review", "approved", "rejected", "missing"],"""
-                """"needs_review": ["approved", "rejected", "draft"],"""
-                """"approved": ["needs_review", "draft"],"""
+                "missing": ["draft", "approved"],
+                "draft": ["needs_review", "approved", "rejected", "missing"],
+                "needs_review": ["approved", "rejected", "draft"],
+                "approved": ["needs_review", "draft"],
                 "rejected": ["draft", "needs_review"],
             }
 

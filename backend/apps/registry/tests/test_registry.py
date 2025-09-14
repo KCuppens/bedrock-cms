@@ -442,8 +442,6 @@ class RegistryAPITests(APITestCase):
 
     def tearDown(self):
         """Clean up after test."""
-        from django.db import connection
-
         User = get_user_model()
 
         # Clean up test data - handle database errors gracefully for test environments
@@ -460,19 +458,11 @@ class RegistryAPITests(APITestCase):
             pass
 
         try:
-            # Use raw SQL to avoid cascade issues with missing tables
-            with connection.cursor() as cursor:
-                cursor.execute(
-                    "DELETE FROM accounts_user WHERE email = %s", ["test@example.com"]
-                )
+            # Use ORM delete to properly handle cascade relationships (User -> UserProfile)
+            User.objects.filter(email="test@example.com").delete()
         except Exception:
-            # Handle cases where tables don't exist or tracking models are missing
-            try:
-                # Fallback to ORM delete if raw SQL fails
-                User.objects.filter(email="test@example.com").delete()
-            except Exception:
-                # If both fail, just ignore - test cleanup is best effort
-                pass
+            # If ORM delete fails, it's likely due to test environment issues - ignore
+            pass
 
     def test_registry_list_endpoint(self):
         """Test listing registry configurations."""

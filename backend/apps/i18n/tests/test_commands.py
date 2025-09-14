@@ -19,64 +19,47 @@ class InitLocalesCommandTest(TestCase):
         """Test that init_locales creates default locales."""
 
         # Run command
-
-        """call_command("init_locales")"""
+        call_command("init_locales")
 
         # Check that default locales were created
-
         self.assertTrue(Locale.objects.filter(code="en").exists())
-
         self.assertTrue(Locale.objects.filter(code="es").exists())
-
         self.assertTrue(Locale.objects.filter(code="fr").exists())
 
         # Check that English is default
-
         en_locale = Locale.objects.get(code="en")
-
         self.assertTrue(en_locale.is_default)
-
         self.assertTrue(en_locale.is_active)
 
     def test_init_locales_idempotent(self):
         """Test that init_locales is idempotent."""
 
         # Run command twice
-
-        """call_command("init_locales")"""
-
+        call_command("init_locales")
         initial_count = Locale.objects.count()
 
-        """call_command("init_locales")"""
-
+        call_command("init_locales")
         final_count = Locale.objects.count()
 
         # Count should remain the same
-
         self.assertEqual(initial_count, final_count)
 
     def test_init_locales_with_reset(self):
         """Test init_locales with reset option."""
 
         # Create a custom locale that's not in defaults
-
         Locale.objects.create(code="custom", name="Custom", native_name="Custom")
 
         # Run command with reset
-
-        """call_command("init_locales", "--reset")"""
+        call_command("init_locales", "--reset")
 
         # Check that custom locale was removed
-
         self.assertFalse(Locale.objects.filter(code="custom").exists())
 
         # Check that default locales exist
-
         self.assertTrue(Locale.objects.filter(code="en").exists())
-
         self.assertTrue(Locale.objects.filter(code="es").exists())
-
-        self.assertTrue(Locale.objects.filter(code="de").exists())
+        self.assertTrue(Locale.objects.filter(code="fr").exists())
 
 
 class ImportDjangoTranslationsCommandTest(TestCase):

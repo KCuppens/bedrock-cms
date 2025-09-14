@@ -66,7 +66,7 @@ class ScopedPermissionBackend(BaseBackend):
     def _has_base_permission(self, user_obj, perm):
         """Check if user has the base permission via groups."""
 
-        if not user_obj.is_active or user_obj.is_anonymous:
+        if not user_obj or not user_obj.is_active or user_obj.is_anonymous:
 
             return False
 
@@ -98,6 +98,10 @@ class ScopedPermissionBackend(BaseBackend):
         Returns:
             bool: True if user has scope access
         """
+
+        if not user_obj or not user_obj.is_authenticated:
+
+            return False
 
         # Check locale scope if object has a locale
 
@@ -132,6 +136,10 @@ class ScopedPermissionBackend(BaseBackend):
     def get_user_scoped_locales(self, user_obj):
         """Get all locales this user has access to."""
 
+        if not user_obj or not user_obj.is_authenticated:
+
+            return Locale.objects.none()
+
         if user_obj.is_superuser:
 
             return Locale.objects.filter(is_active=True)
@@ -146,6 +154,10 @@ class ScopedPermissionBackend(BaseBackend):
 
     def get_user_scoped_sections(self, user_obj):
         """Get all section scopes this user has access to."""
+
+        if not user_obj or not user_obj.is_authenticated:
+
+            return []
 
         if user_obj.is_superuser:
 
@@ -162,6 +174,10 @@ class ScopedPermissionBackend(BaseBackend):
     def user_can_access_locale(self, user_obj, locale):
         """Check if user can access a specific locale."""
 
+        if not user_obj or not user_obj.is_authenticated:
+
+            return False
+
         if user_obj.is_superuser:
 
             return True
@@ -174,6 +190,10 @@ class ScopedPermissionBackend(BaseBackend):
 
     def user_can_access_path(self, user_obj, path):
         """Check if user can access a specific path."""
+
+        if not user_obj or not user_obj.is_authenticated:
+
+            return False
 
         if user_obj.is_superuser:
 

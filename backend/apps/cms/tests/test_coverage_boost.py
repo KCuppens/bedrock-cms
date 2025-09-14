@@ -1,7 +1,13 @@
 """Comprehensive tests to boost CMS coverage to 80%+"""
 
 import json
+import os
 from unittest.mock import MagicMock, patch
+
+import django
+
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "apps.config.settings.test_minimal")
+django.setup()
 
 from django.contrib.auth import get_user_model
 from django.test import Client, TestCase
@@ -138,7 +144,7 @@ Block.objects = type(
     (),
     {
         "create": Block.objects_create,
-        "filter": lambda **kwargs: type(
+        "filter": lambda self, **kwargs: type(
             "MockQuerySet",
             (),
             {
@@ -421,7 +427,7 @@ class CMSSEOUtilsTest(TestCase):
         # Valid data
         valid_data = {
             "title": "Good Title",
-            "description": "A good description that is long enough to meet the minimum requirements and not too long to exceed the maximum",
+            "description": "A good description that is long enough to meet the minimum requirements and not too long to exceed the maximum allowed length for SEO",
         }
         self.assertTrue(validate_seo_data(valid_data))
 

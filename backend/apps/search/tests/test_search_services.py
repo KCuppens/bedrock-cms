@@ -1,5 +1,12 @@
 """Tests for search services functionality."""
 
+import os
+
+import django
+
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "apps.config.settings.test_minimal")
+django.setup()
+
 from datetime import timedelta
 from unittest.mock import MagicMock, Mock, PropertyMock, patch
 
@@ -94,14 +101,6 @@ class SearchServiceTestCase(TestCase):
 
     def test_search_basic(self):
         """Test basic search functionality."""
-        # Mock the index model by setting it directly
-        mock_index_model = Mock()
-        mock_queryset = Mock()
-
-        # Setup mock queryset chain
-        mock_index_model.objects.filter.return_value = mock_queryset
-        mock_queryset.count.return_value = 2
-
         # Mock search results
         mock_result1 = Mock()
         mock_result1.id = 1
@@ -133,22 +132,27 @@ class SearchServiceTestCase(TestCase):
         mock_result2.object_id = 2
         mock_result2.content = "Test content 2"
 
-        # Mock the pagination behavior
-        with patch("django.core.paginator.Paginator") as mock_paginator_class:
-            mock_paginator = Mock()
-            mock_page = Mock()
-            mock_page.object_list = [mock_result1, mock_result2]
-            mock_page.has_next.return_value = False
-            mock_page.has_previous.return_value = False
+        # Create a list that behaves like a queryset but can be used by Paginator
+        mock_results_list = [mock_result1, mock_result2]
 
-            mock_paginator.get_page.return_value = mock_page
-            mock_paginator.num_pages = 1
-            mock_paginator_class.return_value = mock_paginator
+        # Create a proper mock queryset that has both count() and list-like behavior
+        class MockQuerySet(list):
+            def count(self):
+                return len(self)
 
-            # Set the mock model
-            self.service._index_model = mock_index_model
+        mock_queryset = MockQuerySet(mock_results_list)
 
-            # Mock other methods that are called
+        # Mock the index model by setting it directly
+        mock_index_model = Mock()
+        mock_index_model.objects.filter.return_value = mock_queryset
+
+        # Set the mock model
+        self.service._index_model = mock_index_model
+
+        # Mock other methods that are called
+        with patch.object(
+            self.service, "_build_search_queryset", return_value=mock_queryset
+        ) as mock_build:
             with patch.object(self.service, "_log_search_query") as mock_log:
                 with patch.object(self.service, "_update_suggestions") as mock_update:
                     with patch.object(
@@ -156,12 +160,12 @@ class SearchServiceTestCase(TestCase):
                     ) as mock_suggestions:
                         results = self.service.search("test query")
 
-                        # Verify results structure
-                        self.assertIsInstance(results, dict)
-                        self.assertIn("results", results)
-                        self.assertIn("pagination", results)
-                        self.assertEqual(len(results["results"]), 2)
-                        self.assertEqual(results["pagination"]["total_results"], 2)
+                    # Verify results structure
+                    self.assertIsInstance(results, dict)
+                    self.assertIn("results", results)
+                    self.assertIn("pagination", results)
+                    self.assertEqual(len(results["results"]), 2)
+                    self.assertEqual(results["pagination"]["total_results"], 2)
 
     def test_log_search_query(self):
         """Test search query logging."""
@@ -300,15 +304,7 @@ class SearchServiceTestCase(TestCase):
 
     def test_get_search_analytics(self):
         """Test getting search analytics."""
-        # Mock query log model
-        mock_queryset = Mock()
-        mock_queryset.count.return_value = 100
-        mock_queryset.aggregate.side_effect = [
-            {"avg_results": 5.2},
-            {"avg_time": 150.5},
-        ]
-
-        # Mock for top queries and zero result queries
+        # Mock for top queries
         top_queries_qs = Mock()
         top_queries_qs.values.return_value = top_queries_qs
         top_queries_qs.annotate.return_value = top_queries_qs
@@ -320,8 +316,8 @@ class SearchServiceTestCase(TestCase):
             ]
         )
 
+        # Mock for zero result queries
         zero_result_qs = Mock()
-        zero_result_qs.filter.return_value = zero_result_qs
         zero_result_qs.values.return_value = zero_result_qs
         zero_result_qs.annotate.return_value = zero_result_qs
         zero_result_qs.order_by.return_value = zero_result_qs
@@ -329,15 +325,19 @@ class SearchServiceTestCase(TestCase):
             return_value=[{"query_text": "no results query", "count": 5}]
         )
 
-        mock_query_log_model = Mock()
-        # First call for main queryset, second for zero results
-        mock_query_log_model.objects.filter.side_effect = [
-            mock_queryset,
-            zero_result_qs,
+        # Mock main queryset
+        mock_queryset = Mock()
+        mock_queryset.count.return_value = 100
+        mock_queryset.aggregate.side_effect = [
+            {"avg_results": 5.2},
+            {"avg_time": 150.5},
         ]
-
-        # Mock the values/annotate chain for top queries
         mock_queryset.values.return_value = top_queries_qs
+        mock_queryset.filter.return_value = zero_result_qs
+
+        # Mock query log model
+        mock_query_log_model = Mock()
+        mock_query_log_model.objects.filter.return_value = mock_queryset
 
         # Set the mock model
         self.service._query_log_model = mock_query_log_model
@@ -359,28 +359,27 @@ class SearchServiceTestCase(TestCase):
         with patch("time.time") as mock_time:
             mock_time.side_effect = [1000.0, 1000.5]  # 0.5 second execution
 
+            # Create empty list for no results
+            mock_results_list = []
+
+            # Create a proper mock queryset that has both count() and list-like behavior
+            class MockQuerySet(list):
+                def count(self):
+                    return len(self)
+
+            mock_queryset = MockQuerySet(mock_results_list)
+
             # Mock the index model
             mock_index_model = Mock()
-            mock_queryset = Mock()
             mock_index_model.objects.filter.return_value = mock_queryset
-            mock_queryset.count.return_value = 0
 
-            # Mock the pagination behavior
-            with patch("django.core.paginator.Paginator") as mock_paginator_class:
-                mock_paginator = Mock()
-                mock_page = Mock()
-                mock_page.object_list = []
-                mock_page.has_next.return_value = False
-                mock_page.has_previous.return_value = False
+            # Set the mock model
+            self.service._index_model = mock_index_model
 
-                mock_paginator.get_page.return_value = mock_page
-                mock_paginator.num_pages = 1
-                mock_paginator_class.return_value = mock_paginator
-
-                # Set the mock model
-                self.service._index_model = mock_index_model
-
-                # Mock other methods that are called
+            # Mock other methods that are called
+            with patch.object(
+                self.service, "_build_search_queryset", return_value=mock_queryset
+            ) as mock_build:
                 with patch.object(self.service, "_log_search_query") as mock_log:
                     with patch.object(
                         self.service, "_update_suggestions"
@@ -390,9 +389,9 @@ class SearchServiceTestCase(TestCase):
                         ) as mock_suggestions:
                             result = self.service.search("test query")
 
-                            # Should include timing information
-                            self.assertIn("execution_time_ms", result)
-                            self.assertGreater(result["execution_time_ms"], 0)
+                        # Should include timing information
+                        self.assertIn("execution_time_ms", result)
+                        self.assertGreater(result["execution_time_ms"], 0)
 
 
 class SearchServiceIntegrationTestCase(TestCase):

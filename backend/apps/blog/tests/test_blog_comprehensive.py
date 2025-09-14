@@ -1,5 +1,13 @@
 """Blog app tests with high coverage and real database operations."""
 
+import os
+
+import django
+
+# Configure Django settings before any imports
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "apps.config.settings.test")
+django.setup()
+
 from datetime import datetime, timedelta
 
 from django.contrib.auth import get_user_model
@@ -203,14 +211,14 @@ class BlogModelTests(TestCase):
         post = BlogPost.objects.create(
             title="Scheduled Post",
             status="scheduled",
-            publish_at=future_date,
+            scheduled_publish_at=future_date,
             author=self.author,
             locale=self.locale,
         )
 
         if hasattr(post, "schedule"):
 
-            post.schedule(publish_at=future_date)
+            post.schedule(scheduled_publish_at=future_date)
 
             post.refresh_from_db()
 
@@ -1072,13 +1080,13 @@ class BlogIntegrationTests(TransactionTestCase):
 
         if hasattr(post, "schedule"):
 
-            post.schedule(publish_at=future_date)
+            post.schedule(scheduled_publish_at=future_date)
 
         else:
 
             post.status = "scheduled"
 
-            post.publish_at = future_date
+            post.scheduled_publish_at = future_date
 
             post.save()
 

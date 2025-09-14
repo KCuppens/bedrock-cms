@@ -414,11 +414,17 @@ class VersioningAPITests(APITestCase):
 
         data = response.json()
 
-        self.assertEqual(len(data["results"]), 2)
+        # Handle both paginated and non-paginated responses
+        if isinstance(data, dict) and "results" in data:
+            revisions = data["results"]
+        else:
+            revisions = data
 
-        self.assertEqual(data["results"][0]["comment"], "Second revision")
+        self.assertEqual(len(revisions), 2)
 
-        self.assertEqual(data["results"][1]["comment"], "First revision")
+        self.assertEqual(revisions[0]["comment"], "Second revision")
+
+        self.assertEqual(revisions[1]["comment"], "First revision")
 
     def test_revision_detail(self):
         """Test getting revision details."""

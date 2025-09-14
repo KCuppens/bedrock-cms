@@ -292,6 +292,10 @@ class BlogPost(models.Model, RBACMixin):
 
         errors = {}
 
+        # Title validation
+        if not self.title or not self.title.strip():
+            errors["title"] = _("Title is required and cannot be empty")
+
         # Scheduling validation
 
         # Rule 1: Scheduled status requires scheduled_publish_at

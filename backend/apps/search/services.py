@@ -362,54 +362,111 @@ class SearchService:
             content_type=content_type, object_id=obj.pk
         ).delete()
 
-    def reindex_all(self, model_label: Optional[str] = None):
-        """Re-index all registered content types or a specific model.
+    def reindex_all(self, model_label: Optional[str] = None, batch_size: int = 1000):
+        """Re-index all registered content types or a specific model with bulk operations.
 
         Args:
             model_label: Optional model label to index (e.g., 'blog.blogpost')
+            batch_size: Number of objects to process in each batch for memory efficiency
         """
+        from django.db import transaction
+
         configs = content_registry.get_all_configs()
 
         if model_label:
-
             configs = [c for c in configs if c.model_label == model_label]
 
         indexed_count = 0
 
         for config in configs:
-
             model = config.model
+            content_type = ContentType.objects.get_for_model(model)
 
             # Get all objects for this model
-
             queryset = model.objects.all()
 
             # Apply additional filters if needed
-
             if hasattr(model, "is_published"):
-
                 # Only index published content
-
                 queryset = queryset.filter(is_published=True)
-
             elif hasattr(model, "status"):
-
                 # Only index published content
-
                 queryset = queryset.filter(status="published")
 
-            # Index each object
+            # Get total count for progress tracking
+            total_objects = queryset.count()
+            logger.info(
+                f"Starting bulk reindexing of {total_objects} {model.__name__} objects"
+            )
 
-            for obj in queryset.iterator():
+            # Process in batches for better memory usage
+            for offset in range(0, total_objects, batch_size):
+                batch_queryset = queryset[offset : offset + batch_size]
+                search_indexes_to_create = []
+                search_indexes_to_update = []
 
-                try:
+                # Prefetch existing search indexes for this batch
+                object_ids = list(batch_queryset.values_list("pk", flat=True))
+                existing_indexes = {
+                    idx.object_id: idx
+                    for idx in self.index_model.objects.filter(
+                        content_type=content_type, object_id__in=object_ids
+                    )
+                }
 
-                    self.index_object(obj)
+                # Prepare bulk operations
+                for obj in batch_queryset:
+                    try:
+                        if obj.pk in existing_indexes:
+                            # Update existing index
+                            search_index = existing_indexes[obj.pk]
+                            search_index.update_from_object(obj)
+                            search_indexes_to_update.append(search_index)
+                        else:
+                            # Create new index
+                            search_index = self.index_model(
+                                content_type=content_type,
+                                object_id=obj.pk,
+                                title=str(obj),
+                            )
+                            search_index.update_from_object(obj)
+                            search_indexes_to_create.append(search_index)
 
-                    indexed_count += 1
+                        indexed_count += 1
+                    except Exception as e:
+                        logger.warning(f"Failed to prepare index for object {obj}: {e}")
 
-                except Exception as e:
-                    logger.warning(f"Failed to index object {obj}: {e}")
+                # Perform bulk operations in a transaction
+                with transaction.atomic():
+                    if search_indexes_to_create:
+                        self.index_model.objects.bulk_create(search_indexes_to_create)
+
+                    if search_indexes_to_update:
+                        # Bulk update - update all fields that might have changed
+                        self.index_model.objects.bulk_update(
+                            search_indexes_to_update,
+                            fields=[
+                                "title",
+                                "content",
+                                "excerpt",
+                                "url",
+                                "image_url",
+                                "search_category",
+                                "search_tags",
+                                "search_weight",
+                                "locale_code",
+                                "is_published",
+                                "published_at",
+                            ],
+                        )
+
+                logger.info(
+                    f"Processed batch {offset//batch_size + 1}/{(total_objects-1)//batch_size + 1} for {model.__name__}"
+                )
+
+        logger.info(
+            f"Bulk reindexing completed. Indexed {indexed_count} objects total."
+        )
         return indexed_count
 
     def get_search_analytics(self, days: int = 30) -> Dict[str, Any]:
