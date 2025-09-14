@@ -53,6 +53,9 @@ whitenoise>=6.6.0
 # System Monitoring
 psutil>=5.9.0
 
+# Version Control
+GitPython>=3.1.0
+
 # Logging
 python-json-logger>=2.0.0
 

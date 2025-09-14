@@ -241,8 +241,10 @@ jobs:
 
     - name: Test Docker image
       run: |
-        docker run --rm django-saas-boilerplate:latest python --version
-        docker run --rm -w /app/backend -e DATABASE_URL=sqlite:///temp.db django-saas-boilerplate:latest python manage.py check --skip-checks
+        # Test Python version without entrypoint
+        docker run --rm --entrypoint python django-saas-boilerplate:latest --version
+        # Test Django check command without entrypoint
+        docker run --rm --entrypoint python -w /app/backend -e DATABASE_URL=sqlite:///temp.db -e SECRET_KEY=test-key django-saas-boilerplate:latest manage.py check --skip-checks
 
   integration-test:
     name: Integration Tests
