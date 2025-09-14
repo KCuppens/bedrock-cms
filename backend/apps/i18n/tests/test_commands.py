@@ -199,8 +199,7 @@ class SyncPoFilesCommandTest(TestCase):
 
         shutil.rmtree(self.temp_dir, ignore_errors=True)
 
-    """@patch("apps.i18n.management.commands.sync_po_files.polib")"""
-
+    @patch("apps.i18n.management.commands.sync_po_files.polib")
     def test_import_from_po_files(self, mock_polib):
         """Test importing from .po files."""
 
@@ -246,8 +245,7 @@ class SyncPoFilesCommandTest(TestCase):
 
             self.assertIn("Import complete", output)
 
-    """@patch("apps.i18n.management.commands.sync_po_files.polib")"""
-
+    @patch("apps.i18n.management.commands.sync_po_files.polib")
     def test_export_to_po_files(self, mock_polib):
         """Test exporting to .po files."""
 

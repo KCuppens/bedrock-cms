@@ -21,7 +21,7 @@ class BlogModelTests(TestCase):
     def setUp(self):
 
         self.user = User.objects.create_user(
-            username="testuser", email="test@example.com", password="testpass123"
+            email="test@example.com", password="testpass123"
         )
 
         self.category = Group.objects.create(
@@ -300,7 +300,7 @@ class BlogVersioningTests(TestCase):
     def setUp(self):
 
         self.user = User.objects.create_user(
-            username="testuser", email="test@example.com", password="testpass123"
+            email="test@example.com", password="testpass123"
         )
 
         try:
@@ -373,7 +373,7 @@ class BlogAPITests(APITestCase):
     def setUp(self):
 
         self.user = User.objects.create_user(
-            username="testuser", email="test@example.com", password="testpass123"
+            email="test@example.com", password="testpass123"
         )
 
         self.client = APIClient()
@@ -668,7 +668,7 @@ class BlogSerializerTests(TestCase):
     def setUp(self):
 
         self.user = User.objects.create_user(
-            username="testuser", email="test@example.com", password="testpass123"
+            email="test@example.com", password="testpass123"
         )
 
         self.category = Group.objects.create(name="Tech", slug="tech")
@@ -853,7 +853,7 @@ class BlogIntegrationTests(TransactionTestCase):
     def setUp(self):
 
         self.user = User.objects.create_user(
-            username="testuser", email="test@example.com", password="testpass123"
+            email="test@example.com", password="testpass123"
         )
 
         self.category = Group.objects.create(name="Integration", slug="integration")
@@ -1028,7 +1028,7 @@ class BlogIntegrationTests(TransactionTestCase):
             )
 
             user2 = User.objects.create_user(
-                username="author2", email="author2@example.com", password="pass123"
+                email="author2@example.com", password="pass123"
             )
 
             author2 = User.objects.create(

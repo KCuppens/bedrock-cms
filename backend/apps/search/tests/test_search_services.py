@@ -121,6 +121,7 @@ class SearchServiceTestCase(TestCase):
         mock_result2.relevance_score = 0.7
 
         mock_queryset.__iter__ = Mock(return_value=iter([mock_result1, mock_result2]))
+        mock_queryset.__len__ = Mock(return_value=2)
         mock_queryset.count.return_value = 2
 
         if hasattr(self.service, "search"):
@@ -218,17 +219,18 @@ class SearchServiceTestCase(TestCase):
         mock_queryset = Mock()
         mock_suggestion_model.objects.filter.return_value = mock_queryset
         mock_queryset.order_by.return_value = mock_queryset
-        mock_queryset.values_list.return_value = [
+        mock_suggestions = [
             "test suggestion",
             "another suggestion",
         ]
+        mock_queryset.values_list.return_value = mock_suggestions
 
         if hasattr(self.service, "get_suggestions"):
             suggestions = self.service.get_suggestions("test")
 
             # Verify the query
             mock_suggestion_model.objects.filter.assert_called_once()
-            self.assertEqual(suggestions, ["test suggestion", "another suggestion"])
+            self.assertEqual(suggestions, mock_suggestions)
 
     def test_calculate_relevance_score(self):
         """Test relevance score calculation."""
@@ -298,6 +300,7 @@ class SearchServiceTestCase(TestCase):
                     mock_queryset.select_related.return_value = mock_queryset
                     mock_queryset.order_by.return_value = mock_queryset
                     mock_queryset.__iter__ = Mock(return_value=iter([]))
+                    mock_queryset.__len__ = Mock(return_value=0)
                     mock_queryset.count.return_value = 0
 
                     result = self.service.search("test query")

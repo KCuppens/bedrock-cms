@@ -42,11 +42,13 @@ class UserModelTest(TestCase):
 
     def test_user_str_method(self):
         """Test user string representation"""
-        user = User.objects.create_user(email="test@example.com", username="testuser")
+        user = User.objects.create_user(
+            email="test@example.com", password="testpass123"
+        )
 
-        # String representation might be email or username
+        # String representation should be email since that's the USERNAME_FIELD
         str_repr = str(user)
-        self.assertIn(str_repr, ["test@example.com", "testuser"])
+        self.assertEqual(str_repr, "test@example.com")
 
     def test_normalize_email(self):
         """Test email normalization"""

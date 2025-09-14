@@ -51,13 +51,21 @@ class LocaleViewSetTestCase(APITestCase):
         )
 
         self.en_locale = Locale.objects.create(
-            code="en", name="English", is_default=True, is_active=True
+            code="en",
+            name="English",
+            native_name="English",
+            is_default=True,
+            is_active=True,
         )
         self.fr_locale = Locale.objects.create(
-            code="fr", name="French", is_active=True, fallback_locale=self.en_locale
+            code="fr",
+            name="French",
+            native_name="Français",
+            is_active=True,
+            fallback_locale=self.en_locale,
         )
         self.inactive_locale = Locale.objects.create(
-            code="de", name="German", is_active=False
+            code="de", name="German", native_name="Deutsch", is_active=False
         )
 
     def test_list_locales_anonymous(self):
@@ -136,10 +144,13 @@ class TranslationUnitViewSetTestCase(APITestCase):
         )
 
         self.en_locale = Locale.objects.create(
-            code="en", name="English", is_default=True
+            code="en", name="English", native_name="English", is_default=True
         )
         self.fr_locale = Locale.objects.create(
-            code="fr", name="French", fallback_locale=self.en_locale
+            code="fr",
+            name="French",
+            native_name="Français",
+            fallback_locale=self.en_locale,
         )
 
         # Create mock content type and translation unit
@@ -221,7 +232,7 @@ class UiMessageViewSetTestCase(APITestCase):
         )
 
         self.en_locale = Locale.objects.create(
-            code="en", name="English", is_default=True
+            code="en", name="English", native_name="English", is_default=True
         )
 
         self.ui_message = UiMessage.objects.create(
@@ -294,9 +305,11 @@ class TranslationGlossaryViewSetTestCase(APITestCase):
         )
 
         self.en_locale = Locale.objects.create(
-            code="en", name="English", is_default=True
+            code="en", name="English", native_name="English", is_default=True
         )
-        self.fr_locale = Locale.objects.create(code="fr", name="French")
+        self.fr_locale = Locale.objects.create(
+            code="fr", name="French", native_name="Français"
+        )
 
         self.glossary_entry = TranslationGlossary.objects.create(
             source_term="button",
@@ -348,7 +361,7 @@ class TranslationQueueViewSetTestCase(APITestCase):
         )
 
         self.en_locale = Locale.objects.create(
-            code="en", name="English", is_default=True
+            code="en", name="English", native_name="English", is_default=True
         )
 
         self.content_type = ContentType.objects.create(
@@ -424,7 +437,7 @@ class ViewSetIntegrationTestCase(APITestCase):
         )
 
         self.en_locale = Locale.objects.create(
-            code="en", name="English", is_default=True
+            code="en", name="English", native_name="English", is_default=True
         )
 
     def test_viewset_permissions(self):

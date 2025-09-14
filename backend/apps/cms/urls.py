@@ -7,7 +7,6 @@ from .views import sitemap_view
 from .views.block_types import BlockTypeViewSet
 from .views.blocks import BlockSchemaView, BlockTypesView
 from .views.category import CategoryViewSet, CollectionViewSet, TagViewSet
-from .views.mock_revisions import MockRevisionsView
 from .views.navigation import FooterView, NavigationView, SiteSettingsView
 from .views.pages import PagesViewSet
 from .views.redirect import RedirectViewSet
@@ -45,10 +44,5 @@ urlpatterns = [
     path("navigation/", NavigationView.as_view(), name="navigation"),
     path("footer/", FooterView.as_view(), name="footer"),
     path("site-settings/", SiteSettingsView.as_view(), name="site-settings"),
-    path(
-        "pages/<int:page_id>/revisions/",
-        MockRevisionsView.as_view(),
-        name="page-revisions",
-    ),
     path("sitemap-<str:locale_code>.xml", sitemap_view, name="sitemap"),
 ]

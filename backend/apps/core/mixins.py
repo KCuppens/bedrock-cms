@@ -1,3 +1,5 @@
+import uuid
+
 from django.contrib.auth import get_user_model
 from django.db import models
 from django.utils import timezone
@@ -117,3 +119,43 @@ class AllObjectsManager(models.Manager):
     def get_queryset(self):
 
         return super().get_queryset()
+
+
+class OrderingMixin(models.Model):
+    """Abstract model that provides ordering functionality"""
+
+    order = models.IntegerField("Order", default=0)
+
+    class Meta:
+
+        abstract = True
+
+
+class SlugMixin(models.Model):
+    """Abstract model that provides slug functionality"""
+
+    slug = models.SlugField("Slug", max_length=255, unique=True)
+
+    class Meta:
+
+        abstract = True
+
+
+class MetadataMixin(models.Model):
+    """Abstract model that provides metadata JSON field"""
+
+    metadata = models.JSONField("Metadata", default=dict, blank=True)
+
+    class Meta:
+
+        abstract = True
+
+
+class BaseModel(TimestampMixin, UserTrackingMixin, MetadataMixin, models.Model):
+    """Base abstract model that combines common mixins"""
+
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+
+    class Meta:
+
+        abstract = True

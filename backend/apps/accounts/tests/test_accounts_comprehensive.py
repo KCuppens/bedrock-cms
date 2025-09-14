@@ -34,7 +34,6 @@ class AccountsModelTests(TestCase):
     def setUp(self):
 
         self.user = User.objects.create_user(
-            username="testuser",
             email="test@example.com",
             password="testpass123",
             first_name="Test",
@@ -45,14 +44,13 @@ class AccountsModelTests(TestCase):
         """Test user creation with all fields."""
 
         user = User.objects.create_user(
-            username="newuser",
             email="newuser@example.com",
             password="newpass123",
             first_name="New",
             last_name="User",
         )
 
-        self.assertEqual(user.username, "newuser")
+        self.assertEqual(user.email, "newuser@example.com")
 
         self.assertEqual(user.email, "newuser@example.com")
 
@@ -69,7 +67,7 @@ class AccountsModelTests(TestCase):
 
         if hasattr(self.user, "__str__"):
 
-            self.assertIn(self.user.username, str(self.user))
+            self.assertIn(self.user.email, str(self.user))
 
     def test_user_full_name(self):
         """Test user full name property."""
@@ -122,7 +120,7 @@ class AccountsModelTests(TestCase):
 
             profile = UserProfile.objects.create(user=self.user)
 
-            self.assertIn(self.user.username, str(profile))
+            self.assertIn(self.user.email, str(profile))
 
         except Exception:
 
@@ -217,7 +215,7 @@ class AccountsModelTests(TestCase):
 
         # Test invalid email
 
-        user = User(username="testuser2", email="invalid-email", password="testpass123")
+        user = User(email="invalid-email", password="testpass123")
 
         if hasattr(user, "clean"):
 
@@ -232,15 +230,15 @@ class AccountsAuthTests(TestCase):
     def setUp(self):
 
         self.user = User.objects.create_user(
-            username="testuser", email="test@example.com", password="testpass123"
+            email="test@example.com", password="testpass123"
         )
 
     def test_user_authentication(self):
         """Test user login authentication."""
 
-        # Test username authentication
+        # Test email authentication
 
-        user = authenticate(username="testuser", password="testpass123")
+        user = authenticate(username="test@example.com", password="testpass123")
 
         self.assertEqual(user, self.user)
 
@@ -254,7 +252,7 @@ class AccountsAuthTests(TestCase):
 
         # Test invalid credentials
 
-        user = authenticate(username="testuser", password="wrongpass")
+        user = authenticate(username="test@example.com", password="wrongpass")
 
         self.assertIsNone(user)
 
@@ -270,7 +268,7 @@ class AccountsAuthTests(TestCase):
             if hasattr(backend, "authenticate"):
 
                 user = backend.authenticate(
-                    None, username="testuser", password="testpass123"
+                    None, username="test@example.com", password="testpass123"
                 )
 
                 if user:
@@ -300,7 +298,7 @@ class AccountsAuthTests(TestCase):
 
         for weak_pass in weak_passwords:
 
-            user = User(username="testuser2", password=weak_pass)
+            user = User(email="test2@example.com", password=weak_pass)
 
             if hasattr(user, "clean"):
 
@@ -318,7 +316,6 @@ class AccountsAuthTests(TestCase):
         # Create inactive user
 
         inactive_user = User.objects.create_user(
-            username="inactive",
             email="inactive@example.com",
             password="testpass123",
             is_active=False,
@@ -351,7 +348,7 @@ class AccountsAPITests(APITestCase):
     def setUp(self):
 
         self.user = User.objects.create_user(
-            username="testuser", email="test@example.com", password="testpass123"
+            email="test@example.com", password="testpass123"
         )
 
         self.client = APIClient()
@@ -363,9 +360,7 @@ class AccountsAPITests(APITestCase):
 
         # Create additional users
 
-        User.objects.create_user(
-            username="user2", email="user2@example.com", password="testpass123"
-        )
+        User.objects.create_user(email="user2@example.com", password="testpass123")
 
         try:
 
@@ -410,7 +405,6 @@ class AccountsAPITests(APITestCase):
         """Test user registration API endpoint."""
 
         registration_data = {
-            "username": "newuser",
             "email": "newuser@example.com",
             "password": "newpass123",
             "first_name": "New",
@@ -431,7 +425,7 @@ class AccountsAPITests(APITestCase):
 
                 # Verify user was created
 
-                new_user = User.objects.filter(username="newuser").first()
+                new_user = User.objects.filter(email="newuser@example.com").first()
 
                 if new_user:
 
@@ -552,13 +546,13 @@ class AccountsRBACTests(TestCase):
     def setUp(self):
 
         self.user = User.objects.create_user(
-            username="testuser", email="test@example.com", password="testpass123"
+            email="test@example.com", password="testpass123"
         )
 
         # Create superuser for comparison
 
         self.superuser = User.objects.create_superuser(
-            username="admin", email="admin@example.com", password="adminpass123"
+            email="admin@example.com", password="adminpass123"
         )
 
     def test_rbac_permission_check(self):
@@ -667,7 +661,6 @@ class AccountsSerializerTests(TestCase):
     def setUp(self):
 
         self.user = User.objects.create_user(
-            username="testuser",
             email="test@example.com",
             password="testpass123",
             first_name="Test",
@@ -703,7 +696,6 @@ class AccountsSerializerTests(TestCase):
             # Test valid data
 
             valid_data = {
-                "username": "newuser",
                 "email": "newuser@example.com",
                 "first_name": "New",
                 "last_name": "User",
@@ -722,9 +714,9 @@ class AccountsSerializerTests(TestCase):
 
             # Test invalid data
 
-            # Empty username
+            # Empty email
 
-            invalid_data = {"username": "", "email": "invalid-email"}
+            invalid_data = {"email": "invalid-email"}
 
             serializer = UserSerializer(data=invalid_data)
 
@@ -766,7 +758,7 @@ class AccountsIntegrationTests(TransactionTestCase):
     def setUp(self):
 
         self.user = User.objects.create_user(
-            username="testuser", email="test@example.com", password="testpass123"
+            email="test@example.com", password="testpass123"
         )
 
     def test_complete_user_registration_workflow(self):
@@ -775,7 +767,6 @@ class AccountsIntegrationTests(TransactionTestCase):
         # Create new user
 
         new_user = User.objects.create_user(
-            username="newuser",
             email="newuser@example.com",
             password="newpass123",
             first_name="New",
@@ -821,7 +812,9 @@ class AccountsIntegrationTests(TransactionTestCase):
 
         # Verify user can authenticate
 
-        authenticated_user = authenticate(username="newuser", password="newpass123")
+        authenticated_user = authenticate(
+            username="newuser@example.com", password="newpass123"
+        )
 
         self.assertEqual(authenticated_user, new_user)
 

@@ -359,26 +359,9 @@ class VersioningAPITests(APITestCase):
     def setUp(self):
         """Set up test data."""
 
-        self.user = User.objects.create_user(
+        self.user = User.objects.create_superuser(
             email="test@example.com", password="testpass123"
         )
-
-        # Add necessary permissions for CMS operations
-
-        content_type = ContentType.objects.get_for_model(Page)
-
-        permissions = Permission.objects.filter(
-            content_type=content_type,
-            codename__in=[
-                "change_page",
-                "add_page",
-                "delete_page",
-                "view_page",
-                "publish_page",
-            ],
-        )
-
-        self.user.user_permissions.add(*permissions)
 
         self.locale = Locale.objects.create(
             code="en",
@@ -425,7 +408,7 @@ class VersioningAPITests(APITestCase):
     def test_list_revisions(self):
         """Test listing revisions for a page."""
 
-        response = self.client.get(f"/api/v1/cms/api/pages/{self.page.id}/revisions/")
+        response = self.client.get(f"/api/v1/cms/pages/{self.page.id}/revisions/")
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
@@ -440,7 +423,7 @@ class VersioningAPITests(APITestCase):
     def test_revision_detail(self):
         """Test getting revision details."""
 
-        response = self.client.get(f"/api/v1/cms/api/revisions/{self.revision1.id}/")
+        response = self.client.get(f"/api/v1/cms/revisions/{self.revision1.id}/")
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
@@ -456,7 +439,7 @@ class VersioningAPITests(APITestCase):
         """Test diffing between revisions."""
 
         response = self.client.get(
-            f"/api/v1/cms/api/revisions/{self.revision2.id}/diff/",
+            f"/api/v1/cms/revisions/{self.revision2.id}/diff/",
             {"against": str(self.revision1.id)},
         )
 
@@ -478,7 +461,7 @@ class VersioningAPITests(APITestCase):
         self.page.save()
 
         response = self.client.get(
-            f"/api/v1/cms/api/revisions/{self.revision1.id}/diff_current/"
+            f"/api/v1/cms/revisions/{self.revision1.id}/diff_current/"
         )
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -495,7 +478,7 @@ class VersioningAPITests(APITestCase):
         """Test reverting to a revision."""
 
         response = self.client.post(
-            f"/api/v1/cms/api/revisions/{self.revision1.id}/revert/",
+            f"/api/v1/cms/revisions/{self.revision1.id}/revert/",
             {"comment": "Reverted to first revision"},
         )
 
@@ -512,9 +495,12 @@ class VersioningAPITests(APITestCase):
     def test_manual_autosave(self):
         """Test manual autosave creation."""
 
+        import json
+
         response = self.client.post(
-            f"/api/v1/cms/api/pages/{self.page.id}/autosave/",
-            """{"comment": "Manual autosave test"},""",
+            f"/api/v1/cms/pages/{self.page.id}/autosave/",
+            json.dumps({"comment": "Manual autosave test"}),
+            content_type="application/json",
         )
 
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
@@ -535,7 +521,7 @@ class VersioningAPITests(APITestCase):
         """Test publishing a page."""
 
         response = self.client.post(
-            f"/api/v1/cms/api/pages/{self.page.id}/publish/",
+            f"/api/v1/cms/pages/{self.page.id}/publish/",
             {"comment": "Publishing page"},
         )
 
@@ -569,7 +555,7 @@ class VersioningAPITests(APITestCase):
         self.page.save()
 
         response = self.client.post(
-            f"/api/v1/cms/api/pages/{self.page.id}/unpublish/",
+            f"/api/v1/cms/pages/{self.page.id}/unpublish/",
             {"comment": "Unpublishing page"},
         )
 

@@ -243,8 +243,13 @@ jobs:
       run: |
         # Test Python version without entrypoint
         docker run --rm --entrypoint python django-saas-boilerplate:latest --version
-        # Test Django check command without entrypoint
-        docker run --rm --entrypoint python -w /app/backend -e DATABASE_URL=sqlite:///temp.db -e SECRET_KEY=test-key django-saas-boilerplate:latest manage.py check --skip-checks
+        # Test Django check command without entrypoint and with test settings
+        docker run --rm --entrypoint python -w /app/backend \
+          -e DJANGO_SETTINGS_MODULE=apps.config.settings.test \
+          -e DATABASE_URL=sqlite:///temp.db \
+          -e SECRET_KEY=test-key \
+          -e LOGGING_CONFIG=None \
+          django-saas-boilerplate:latest manage.py check --skip-checks
 
   integration-test:
     name: Integration Tests

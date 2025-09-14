@@ -1,3 +1,4 @@
+import json
 from typing import Any, Dict, List, Optional
 
 from django.conf import settings
@@ -175,3 +176,63 @@ def generate_seo_links(page: Page, base_url: Optional[str] = None) -> Dict[str, 
         "canonical": generate_canonical_url(page, base_url),
         "alternates": generate_hreflang_alternates(page, base_url),
     }
+
+
+def generate_meta_tags(data: Dict[str, str]) -> str:
+    """Generate HTML meta tags from SEO data."""
+
+    tags = []
+
+    if "description" in data:
+        tags.append(f'<meta name="description" content="{data["description"]}" />')
+
+    if "keywords" in data:
+        tags.append(f'<meta name="keywords" content="{data["keywords"]}" />')
+
+    if "robots" in data:
+        tags.append(f'<meta name="robots" content="{data["robots"]}" />')
+
+    return "\n".join(tags)
+
+
+def generate_schema_org(data: Dict[str, Any]) -> str:
+    """Generate schema.org JSON-LD markup."""
+
+    # Set default context if not provided
+    if "@context" not in data:
+        data["@context"] = "https://schema.org"
+
+    json_ld = json.dumps(data, indent=2)
+
+    return f'<script type="application/ld+json">\n{json_ld}\n</script>'
+
+
+def generate_sitemap_entry(page: Page) -> Dict[str, Any]:
+    """Generate sitemap entry for a page."""
+
+    return {
+        "loc": (
+            page.get_absolute_url() if hasattr(page, "get_absolute_url") else page.path
+        ),
+        "lastmod": page.updated_at.isoformat() if hasattr(page, "updated_at") else None,
+        "priority": "1.0" if getattr(page, "is_homepage", False) else "0.8",
+        "changefreq": "weekly",
+    }
+
+
+def validate_seo_data(data: Dict[str, str]) -> bool:
+    """Validate SEO data for common issues."""
+
+    # Check title length
+    if "title" in data:
+        title_length = len(data["title"])
+        if title_length > 60:  # Google truncates around 60 characters
+            return False
+
+    # Check description length
+    if "description" in data:
+        desc_length = len(data["description"])
+        if desc_length < 120 or desc_length > 160:  # Optimal range
+            return False
+
+    return True

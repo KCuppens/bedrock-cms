@@ -440,11 +440,12 @@ def clean_referrer(referrer: str) -> str:
 
         clean_url = f"{parsed.scheme}://{parsed.netloc}{parsed.path}"
 
-        # Remove trailing slash
+        # Remove trailing slash (but keep root slash)
 
-        if clean_url.endswith("/") and len(clean_url) > 1:
-
-            clean_url = clean_url.rstrip("/")
+        if clean_url.endswith("/") and not clean_url.endswith("://"):
+            parsed_path = parsed.path
+            if parsed_path != "/":
+                clean_url = clean_url.rstrip("/")
 
         return clean_url
 

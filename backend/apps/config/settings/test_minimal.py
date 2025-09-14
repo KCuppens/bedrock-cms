@@ -94,6 +94,11 @@ PASSWORD_HASHERS = [
     "django.contrib.auth.hashers.MD5PasswordHasher",
 ]
 
+# Authentication backends
+AUTHENTICATION_BACKENDS = [
+    "django.contrib.auth.backends.ModelBackend",
+]
+
 # Email backend for tests
 EMAIL_BACKEND = "django.core.mail.backends.locmem.EmailBackend"
 
@@ -139,6 +144,9 @@ USE_TZ = True
 
 # Default primary key field type
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+# Custom User model
+AUTH_USER_MODEL = "accounts.User"
 
 # Disable logging during tests
 LOGGING_CONFIG = None

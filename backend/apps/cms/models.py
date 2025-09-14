@@ -270,7 +270,7 @@ class Page(models.Model, RBACMixin):
 
             if current.locale_id == self.locale_id:
 
-                """ancestors.append(current.slug)"""
+                ancestors.append(current.slug)
 
             current = current.parent
 
@@ -282,7 +282,7 @@ class Page(models.Model, RBACMixin):
 
         if self.slug:
 
-            """path_parts.append(self.slug)"""
+            path_parts.append(self.slug)
 
         # For homepage with no parent and no slug, return just "/"
 
@@ -790,29 +790,28 @@ class BlockType(models.Model):
 
         super().clean()
 
-        # Ensure component follows naming convention
+        errors = {}
 
-        if self.component and not self.component.endswith("Block"):
-
-            raise ValidationError(
-                {
-                    "component": _(
-                        'Component name should end with "Block" (e.g., "HeroBlock")'
-                    )
-                }
+        # Require component field
+        if not self.component:
+            errors["component"] = _("Component field is required.")
+        elif not self.component.endswith("Block"):
+            errors["component"] = _(
+                'Component name should end with "Block" (e.g., "HeroBlock")'
             )
+
+        # Require default_props field
+        if self.default_props is None:
+            errors["default_props"] = _("Default props field is required.")
 
         # Validate icon name (basic check)
-
         if self.icon and not self.icon.replace("-", "").replace("_", "").isalnum():
-
-            raise ValidationError(
-                {
-                    "icon": _(
-                        "Icon name should only contain letters, numbers, hyphens, and underscores"
-                    )
-                }
+            errors["icon"] = _(
+                "Icon name should only contain letters, numbers, hyphens, and underscores"
             )
+
+        if errors:
+            raise ValidationError(errors)
 
     def save(self, *args, **kwargs):  # noqa: C901
 

@@ -26,10 +26,13 @@ class ImportDjangoTranslationsTestCase(TestCase):
     def setUp(self):
         """Set up test data."""
         self.en_locale = Locale.objects.create(
-            code="en", name="English", is_default=True
+            code="en", name="English", native_name="English", is_default=True
         )
         self.fr_locale = Locale.objects.create(
-            code="fr", name="French", fallback_locale=self.en_locale
+            code="fr",
+            name="French",
+            native_name="Français",
+            fallback_locale=self.en_locale,
         )
 
     def test_command_help(self):
@@ -261,7 +264,7 @@ class ManagementCommandIntegrationTestCase(TestCase):
     def setUp(self):
         """Set up integration test data."""
         self.en_locale = Locale.objects.create(
-            code="en", name="English", is_default=True
+            code="en", name="English", native_name="English", is_default=True
         )
 
     def test_command_exists(self):
@@ -301,7 +304,10 @@ class ManagementCommandIntegrationTestCase(TestCase):
         """Test command behavior with multiple locales."""
         # Create additional locale
         fr_locale = Locale.objects.create(
-            code="fr", name="French", fallback_locale=self.en_locale
+            code="fr",
+            name="French",
+            native_name="Français",
+            fallback_locale=self.en_locale,
         )
 
         out = StringIO()
@@ -357,7 +363,9 @@ class ManagementCommandIntegrationTestCase(TestCase):
     def test_command_locale_filtering(self):
         """Test command filtering by locale."""
         # Create messages for specific locale test
-        fr_locale = Locale.objects.create(code="fr", name="French", is_active=True)
+        fr_locale = Locale.objects.create(
+            code="fr", name="French", native_name="Français", is_active=True
+        )
 
         try:
             out = StringIO()

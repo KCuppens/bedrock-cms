@@ -50,7 +50,7 @@ class CMSModelTests(TestCase):
     def setUp(self):
 
         self.user = User.objects.create_user(
-            username="testuser", email="test@example.com", password="testpass123"
+            email="test@example.com", password="testpass123"
         )
 
         self.locale = Locale.objects.create(code="en", name="English", is_default=True)
@@ -226,7 +226,7 @@ class CMSVersioningTests(TestCase):
     def setUp(self):
 
         self.user = User.objects.create_user(
-            username="testuser", email="test@example.com", password="testpass123"
+            email="test@example.com", password="testpass123"
         )
 
         self.locale = Locale.objects.create(code="en", name="English", is_default=True)
@@ -315,7 +315,7 @@ class CMSAPITests(APITestCase):
     def setUp(self):
 
         self.user = User.objects.create_user(
-            username="testuser", email="test@example.com", password="testpass123"
+            email="test@example.com", password="testpass123"
         )
 
         self.client = APIClient()
@@ -468,7 +468,7 @@ class CMSSerializerTests(TestCase):
     def setUp(self):
 
         self.user = User.objects.create_user(
-            username="testuser", email="test@example.com", password="testpass123"
+            email="test@example.com", password="testpass123"
         )
 
         self.locale = Locale.objects.create(code="en", name="English", is_default=True)
@@ -527,7 +527,7 @@ class CMSTaskTests(TestCase):
     def setUp(self):
 
         self.user = User.objects.create_user(
-            username="testuser", email="test@example.com", password="testpass123"
+            email="test@example.com", password="testpass123"
         )
 
         self.locale = Locale.objects.create(code="en", name="English", is_default=True)
@@ -607,11 +607,11 @@ class CMSSecurityTests(TestCase):
     def setUp(self):
 
         self.user = User.objects.create_user(
-            username="testuser", email="test@example.com", password="testpass123"
+            email="test@example.com", password="testpass123"
         )
 
         self.superuser = User.objects.create_superuser(
-            username="admin", email="admin@example.com", password="adminpass123"
+            email="admin@example.com", password="adminpass123"
         )
 
         self.locale = Locale.objects.create(code="en", name="English", is_default=True)
@@ -658,7 +658,7 @@ class CMSSEOTests(TestCase):
     def setUp(self):
 
         self.user = User.objects.create_user(
-            username="testuser", email="test@example.com", password="testpass123"
+            email="test@example.com", password="testpass123"
         )
 
         self.locale = Locale.objects.create(code="en", name="English", is_default=True)
@@ -721,7 +721,7 @@ class CMSIntegrationTests(TransactionTestCase):
     def setUp(self):
 
         self.user = User.objects.create_user(
-            username="testuser", email="test@example.com", password="testpass123"
+            email="test@example.com", password="testpass123"
         )
 
         self.locale = Locale.objects.create(code="en", name="English", is_default=True)

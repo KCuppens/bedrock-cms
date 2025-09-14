@@ -35,7 +35,7 @@ class AnalyticsAggregatorTestCase(TestCase):
     def setUp(self):
         """Set up test data."""
         self.user = User.objects.create_user(
-            username="testuser", email="test@example.com", password="testpass123"
+            email="test@example.com", password="testpass123"
         )
 
         self.locale = Locale.objects.create(code="en", name="English", is_default=True)
@@ -266,7 +266,7 @@ class AnalyticsModelsIntegrationTestCase(TestCase):
     def setUp(self):
         """Set up integration test data."""
         self.user = User.objects.create_user(
-            username="analyst", email="analyst@example.com", password="testpass123"
+            email="analyst@example.com", password="testpass123"
         )
 
         self.locale = Locale.objects.create(code="en", name="English", is_default=True)
@@ -360,7 +360,7 @@ class AnalyticsModelsIntegrationTestCase(TestCase):
         # Multiple users, multiple pages, multiple days
         for i in range(3):
             user = User.objects.create_user(
-                username=f"user{i}", email=f"user{i}@example.com", password="pass"
+                email=f"user{i}@example.com", password="pass"
             )
 
             for j in range(5):  # 5 pages

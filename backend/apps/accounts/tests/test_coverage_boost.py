@@ -26,7 +26,7 @@ class AccountsModelTest(TestCase):
 
     def setUp(self):
         self.user = User.objects.create_user(
-            username="testuser", email="test@test.com", password="TestPass123!"
+            email="test@test.com", password="TestPass123!"
         )
 
     def test_user_profile_creation(self):
@@ -37,7 +37,7 @@ class AccountsModelTest(TestCase):
     def test_user_profile_str(self):
         """Test UserProfile string representation"""
         profile = self.user.profile
-        self.assertEqual(str(profile), f"Profile for {self.user.username}")
+        self.assertEqual(str(profile), f"{self.user.email} Profile")
 
     def test_user_profile_fields(self):
         """Test UserProfile fields"""
@@ -58,7 +58,7 @@ class AccountsSerializerTest(TestCase):
 
     def setUp(self):
         self.user = User.objects.create_user(
-            username="testuser", email="test@test.com", password="TestPass123!"
+            email="test@test.com", password="TestPass123!"
         )
 
     def test_user_serializer(self):
@@ -68,7 +68,7 @@ class AccountsSerializerTest(TestCase):
         serializer = UserSerializer(self.user)
         data = serializer.data
 
-        self.assertEqual(data["username"], "testuser")
+        self.assertEqual(data["email"], "test@test.com")
         self.assertEqual(data["email"], "test@test.com")
         self.assertNotIn("password", data)
 
@@ -93,20 +93,21 @@ class AccountsViewTest(TestCase):
     def setUp(self):
         self.client = Client()
         self.user = User.objects.create_user(
-            username="testuser", email="test@test.com", password="TestPass123!"
+            email="test@test.com", password="TestPass123!"
         )
 
     def test_login_view(self):
         """Test login endpoint"""
         response = self.client.post(
-            "/api/auth/login/", {"username": "testuser", "password": "TestPass123!"}
+            "/api/auth/login/",
+            {"username": "test@test.com", "password": "TestPass123!"},
         )
 
         self.assertEqual(response.status_code, 200)
 
     def test_logout_view(self):
         """Test logout endpoint"""
-        self.client.login(username="testuser", password="TestPass123!")
+        self.client.login(username="test@test.com", password="TestPass123!")
 
         response = self.client.post("/api/auth/logout/")
 
@@ -117,7 +118,6 @@ class AccountsViewTest(TestCase):
         response = self.client.post(
             "/api/auth/register/",
             {
-                "username": "newuser",
                 "email": "new@test.com",
                 "password": "NewPass123!",
                 "password2": "NewPass123!",
@@ -134,7 +134,7 @@ class AccountsViewTest(TestCase):
 
     def test_profile_update(self):
         """Test profile update"""
-        self.client.login(username="testuser", password="TestPass123!")
+        self.client.login(username="test@test.com", password="TestPass123!")
 
         response = self.client.patch("/api/auth/profile/", {"bio": "Updated bio"})
 

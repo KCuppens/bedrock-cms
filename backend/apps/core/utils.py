@@ -207,3 +207,89 @@ def validate_json_structure(
             errors[field] = f"Field '{field}' is required"
 
     return errors
+
+
+def generate_unique_slug(
+    model_class, title: str, slug_field: str = "slug", max_length: int = 50
+) -> str:
+    """Generate a unique slug for a model"""
+
+    base_slug = create_slug(title, max_length)
+
+    slug = base_slug
+    counter = 1
+
+    while model_class.objects.filter(**{slug_field: slug}).exists():
+        # Calculate the suffix length to ensure we don't exceed max_length
+        suffix = f"-{counter}"
+        if len(base_slug) + len(suffix) > max_length:
+            # Truncate base slug to make room for suffix
+            truncated_length = max_length - len(suffix)
+            slug = base_slug[:truncated_length] + suffix
+        else:
+            slug = f"{base_slug}{suffix}"
+        counter += 1
+
+    return slug
+
+
+def get_object_or_none(model_class, **kwargs):
+    """Get an object or return None if it doesn't exist"""
+
+    try:
+        return model_class.objects.get(**kwargs)
+    except model_class.DoesNotExist:
+        return None
+
+
+def bulk_update_or_create(
+    model_class, objects_data: List[Dict], unique_field: str = "id"
+):
+    """Bulk update or create objects"""
+
+    if not objects_data:
+        return [], []
+
+    # Separate existing vs new objects
+    existing_values = [
+        obj.get(unique_field) for obj in objects_data if obj.get(unique_field)
+    ]
+    existing_objects = {
+        getattr(obj, unique_field): obj
+        for obj in model_class.objects.filter(
+            **{f"{unique_field}__in": existing_values}
+        )
+    }
+
+    objects_to_create = []
+    objects_to_update = []
+
+    for obj_data in objects_data:
+        unique_value = obj_data.get(unique_field)
+        if unique_value and unique_value in existing_objects:
+            # Update existing object
+            existing_obj = existing_objects[unique_value]
+            for field, value in obj_data.items():
+                setattr(existing_obj, field, value)
+            objects_to_update.append(existing_obj)
+        else:
+            # Create new object
+            objects_to_create.append(model_class(**obj_data))
+
+    # Perform bulk operations
+    created = []
+    if objects_to_create:
+        created = model_class.objects.bulk_create(objects_to_create)
+
+    updated = []
+    if objects_to_update:
+        # Get all field names except the unique field
+        update_fields = [
+            field.name
+            for field in model_class._meta.fields
+            if field.name != unique_field and not field.primary_key
+        ]
+        model_class.objects.bulk_update(objects_to_update, update_fields)
+        updated = objects_to_update
+
+    return created, updated

@@ -16,13 +16,19 @@ class TranslationResolverTestCase(TestCase):
         """Set up test data."""
         # Create test locales
         self.en_locale = Locale.objects.create(
-            code="en", name="English", is_default=True
+            code="en", name="English", native_name="English", is_default=True
         )
         self.fr_locale = Locale.objects.create(
-            code="fr", name="French", fallback_locale=self.en_locale
+            code="fr",
+            name="French",
+            native_name="Français",
+            fallback_locale=self.en_locale,
         )
         self.es_locale = Locale.objects.create(
-            code="es", name="Spanish", fallback_locale=self.en_locale
+            code="es",
+            name="Spanish",
+            native_name="Español",
+            fallback_locale=self.en_locale,
         )
 
         # Create resolver
@@ -258,10 +264,13 @@ class TranslationUtilitiesTestCase(TestCase):
     def setUp(self):
         """Set up test data."""
         self.en_locale = Locale.objects.create(
-            code="en", name="English", is_default=True
+            code="en", name="English", native_name="English", is_default=True
         )
         self.fr_locale = Locale.objects.create(
-            code="fr", name="French", fallback_locale=self.en_locale
+            code="fr",
+            name="French",
+            native_name="Français",
+            fallback_locale=self.en_locale,
         )
 
     def test_ui_message_translation(self):
@@ -315,7 +324,10 @@ class TranslationUtilitiesTestCase(TestCase):
         """Test locale fallback chain functionality."""
         # Create chain: es -> fr -> en
         es_locale = Locale.objects.create(
-            code="es", name="Spanish", fallback_locale=self.fr_locale
+            code="es",
+            name="Spanish",
+            native_name="Español",
+            fallback_locale=self.fr_locale,
         )
 
         # Test fallback chain
@@ -352,10 +364,13 @@ class TranslationIntegrationTestCase(TestCase):
     def setUp(self):
         """Set up integration test data."""
         self.en_locale = Locale.objects.create(
-            code="en", name="English", is_default=True
+            code="en", name="English", native_name="English", is_default=True
         )
         self.fr_locale = Locale.objects.create(
-            code="fr", name="French", fallback_locale=self.en_locale
+            code="fr",
+            name="French",
+            native_name="Français",
+            fallback_locale=self.en_locale,
         )
 
     def test_translation_workflow(self):
@@ -423,7 +438,10 @@ class TranslationIntegrationTestCase(TestCase):
 
         # Create German locale
         de_locale = Locale.objects.create(
-            code="de", name="German", fallback_locale=self.en_locale
+            code="de",
+            name="German",
+            native_name="Deutsch",
+            fallback_locale=self.en_locale,
         )
 
         with patch(

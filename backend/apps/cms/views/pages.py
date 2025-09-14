@@ -925,46 +925,6 @@ class PagesViewSet(VersioningMixin, viewsets.ModelViewSet):
         return Response(PageReadSerializer(page).data)
 
     @action(detail=True, methods=["post"])
-    def publish(self, request, pk=None):
-        """Publish a page."""
-
-        page = self.get_object()
-
-        page.status = "published"
-
-        page.published_at = timezone.now()
-
-        page._current_user = request.user
-
-        page._current_request = request
-
-        page._was_published_now = True
-
-        page.save()
-
-        return Response(PageReadSerializer(page).data)
-
-    @action(detail=True, methods=["post"])
-    def unpublish(self, request, pk=None):
-        """Unpublish a page."""
-
-        page = self.get_object()
-
-        page.status = "draft"
-
-        page.published_at = None
-
-        page._current_user = request.user
-
-        page._current_request = request
-
-        page._was_unpublished_now = True
-
-        page.save()
-
-        return Response(PageReadSerializer(page).data)
-
-    @action(detail=True, methods=["post"])
     def duplicate(self, request, pk=None):
         """Duplicate a page with all its content."""
 

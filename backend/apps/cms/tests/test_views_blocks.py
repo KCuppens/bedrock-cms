@@ -28,22 +28,25 @@ class BlockTypesViewTestCase(APITestCase):
         """Set up test data."""
         self.client = APIClient()
         self.user = User.objects.create_user(
-            username="testuser", email="test@example.com", password="testpass123"
+            email="test@example.com", password="testpass123"
         )
 
         # Create test block types
         self.text_block = BlockType.objects.create(
             type="text",
+            component="TextBlock",
             label="Text Block",
             description="Simple text content block",
             category="content",
             icon="text",
             schema={"type": "object", "properties": {"text": {"type": "string"}}},
+            default_props={"text": ""},
             is_active=True,
         )
 
         self.image_block = BlockType.objects.create(
             type="image",
+            component="ImageBlock",
             label="Image Block",
             description="Image with caption",
             category="media",
@@ -55,16 +58,19 @@ class BlockTypesViewTestCase(APITestCase):
                     "caption": {"type": "string"},
                 },
             },
+            default_props={"src": "", "caption": ""},
             is_active=True,
         )
 
         self.inactive_block = BlockType.objects.create(
             type="deprecated",
+            component="DeprecatedBlock",
             label="Deprecated Block",
             description="Old block type",
-            category="deprecated",
+            category="other",
             icon="warning",
             schema={"type": "object"},
+            default_props={"deprecated": True},
             is_active=False,
         )
 
@@ -228,11 +234,13 @@ class BlockTypesViewTestCase(APITestCase):
         for i in range(10):
             BlockType.objects.create(
                 type=f"test_block_{i}",
+                component=f"TestBlock{i}Block",
                 label=f"Test Block {i}",
                 description=f"Test block {i}",
-                category="test",
+                category="other",
                 icon="test",
                 schema={"type": "object"},
+                default_props={"test_id": i},
                 is_active=True,
             )
 
@@ -244,9 +252,10 @@ class BlockTypesViewTestCase(APITestCase):
         """Test handling of complex block schemas."""
         complex_block = BlockType.objects.create(
             type="complex",
+            component="ComplexBlock",
             label="Complex Block",
             description="Block with complex schema",
-            category="advanced",
+            category="other",
             icon="gear",
             schema={
                 "type": "object",
@@ -267,6 +276,12 @@ class BlockTypesViewTestCase(APITestCase):
                 },
                 "required": ["title"],
             },
+            default_props={
+                "title": "",
+                "content": "",
+                "settings": {"background": "", "alignment": "left"},
+                "items": [],
+            },
             is_active=True,
         )
 
@@ -281,7 +296,7 @@ class BlockViewsIntegrationTestCase(TestCase):
     def setUp(self):
         """Set up integration test data."""
         self.user = User.objects.create_user(
-            username="blockuser", email="block@example.com", password="testpass123"
+            email="block@example.com", password="testpass123"
         )
 
     def test_view_import_success(self):
@@ -301,11 +316,13 @@ class BlockViewsIntegrationTestCase(TestCase):
         # Create block type
         block_type = BlockType.objects.create(
             type="integration_test",
+            component="IntegrationTestBlock",
             label="Integration Test Block",
             description="Block for integration testing",
-            category="test",
+            category="other",
             icon="test",
             schema={"type": "object", "properties": {"test": {"type": "string"}}},
+            default_props={"test": ""},
             is_active=True,
         )
 
@@ -353,13 +370,23 @@ class BlockViewsIntegrationTestCase(TestCase):
         ]
 
         for bt_data in block_types:
+            # Map invalid categories to valid ones
+            category_mapping = {
+                "interactive": "other",
+                "content": "content",
+                "media": "media",
+            }
+            category = category_mapping.get(bt_data["category"], "other")
+
             BlockType.objects.create(
                 type=bt_data["type"],
+                component=f"{bt_data['type'].title()}Block",
                 label=bt_data["type"].title(),
                 description=f'{bt_data["type"]} block',
-                category=bt_data["category"],
+                category=category,
                 icon=bt_data["type"],
                 schema={"type": "object"},
+                default_props={"initialized": True},
                 is_active=True,
             )
 

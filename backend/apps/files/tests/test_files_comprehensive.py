@@ -25,7 +25,7 @@ class FilesModelTests(TestCase):
     def setUp(self):
 
         self.user = User.objects.create_user(
-            username="testuser", email="test@example.com", password="testpass123"
+            email="test@example.com", password="testpass123"
         )
 
         self.category = MediaCategory.objects.create(
@@ -235,7 +235,7 @@ class FilesAPITests(APITestCase):
     def setUp(self):
 
         self.user = User.objects.create_user(
-            username="testuser", email="test@example.com", password="testpass123"
+            email="test@example.com", password="testpass123"
         )
 
         self.client = APIClient()
@@ -423,7 +423,7 @@ class FilesSerializerTests(TestCase):
     def setUp(self):
 
         self.user = User.objects.create_user(
-            username="testuser", email="test@example.com", password="testpass123"
+            email="test@example.com", password="testpass123"
         )
 
         self.category = MediaCategory.objects.create(
@@ -510,7 +510,7 @@ class FilesServiceTests(TestCase):
     def setUp(self):
 
         self.user = User.objects.create_user(
-            username="testuser", email="test@example.com", password="testpass123"
+            email="test@example.com", password="testpass123"
         )
 
     def test_file_storage_service(self):
@@ -621,7 +621,7 @@ class FilesViewTests(TestCase):
     def setUp(self):
 
         self.user = User.objects.create_user(
-            username="testuser", email="test@example.com", password="testpass123"
+            email="test@example.com", password="testpass123"
         )
 
     def test_file_viewset_methods(self):
@@ -672,7 +672,7 @@ class FilesIntegrationTests(TestCase):
     def setUp(self):
 
         self.user = User.objects.create_user(
-            username="testuser", email="test@example.com", password="testpass123"
+            email="test@example.com", password="testpass123"
         )
 
         self.category = MediaCategory.objects.create(name="Documents", slug="documents")

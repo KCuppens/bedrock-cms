@@ -2,10 +2,20 @@ from django.db.models.signals import post_delete, post_save, pre_save
 from django.dispatch import receiver
 from django.utils import timezone
 
-from apps.media.usage import cleanup_usage_for_instance, update_usage_for_instance
-
 from .models import Page
-from .versioning import AuditEntry, PageRevision
+
+# Try to import optional dependencies
+try:
+    from apps.media.usage import cleanup_usage_for_instance, update_usage_for_instance
+except ImportError:
+    cleanup_usage_for_instance = None
+    update_usage_for_instance = None
+
+try:
+    from .versioning import AuditEntry, PageRevision
+except ImportError:
+    AuditEntry = None
+    PageRevision = None
 
 
 @receiver(post_save, sender=Page)
@@ -54,31 +64,35 @@ def store_old_path(sender, instance, **kwargs):
 def update_asset_usage(sender, instance, created, **kwargs):
     """Update asset usage tracking when page is saved."""
 
-    try:
-
-        update_usage_for_instance(instance)
-    except ImportError:
-        # Media app not available
-        pass
+    if update_usage_for_instance:
+        try:
+            update_usage_for_instance(instance)
+        except Exception:
+            # Media app error - skip
+            pass
 
 
 @receiver(post_delete, sender=Page)
 def cleanup_asset_usage(sender, instance, **kwargs):
     """Clean up asset usage records when page is deleted."""
 
-    try:
-        cleanup_usage_for_instance(instance)
-    except ImportError:
-        # Media app not available
-        pass
+    if cleanup_usage_for_instance:
+        try:
+            cleanup_usage_for_instance(instance)
+        except Exception:
+            # Media app error - skip
+            pass
 
 
 @receiver(post_save, sender=Page)
 def create_page_revision(sender, instance, created, **kwargs):
     """Create revision snapshots when pages are saved."""
 
-    try:
+    if not PageRevision or not AuditEntry:
+        # Versioning models not available
+        return
 
+    try:
         # Skip if this is being called during revision restoration
         if getattr(instance, "_skip_revision_creation", False):
             return
@@ -148,8 +162,8 @@ def create_page_revision(sender, instance, created, **kwargs):
                 request=getattr(instance, "_current_request", None),
             )
 
-    except ImportError:
-        # Versioning models not available
+    except Exception:
+        # Versioning error - skip
         pass
 
 

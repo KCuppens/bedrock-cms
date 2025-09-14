@@ -6,7 +6,7 @@ Tests all utility functions in apps/analytics/utils.py for high coverage.
 
 import re
 from datetime import date, datetime, timedelta
-from unittest.mock import Mock, patch
+from unittest.mock import MagicMock, Mock, patch
 
 from django.contrib.auth import get_user_model
 from django.contrib.contenttypes.models import ContentType
@@ -33,8 +33,21 @@ User = get_user_model()
 class ParseUserAgentTest(TestCase):
     """Test parse_user_agent function."""
 
-    def test_desktop_user_agent(self):
+    @patch("apps.analytics.utils.HAS_USER_AGENTS", True)
+    @patch("apps.analytics.utils.parse")
+    def test_desktop_user_agent(self, mock_parse):
         """Test parsing desktop user agent."""
+        # Mock the user agent parsing
+        mock_ua = MagicMock()
+        mock_ua.is_mobile = False
+        mock_ua.is_tablet = False
+        mock_ua.is_pc = True
+        mock_ua.browser.family = "Chrome"
+        mock_ua.browser.version_string = "91.0.4472.124"
+        mock_ua.os.family = "Windows"
+        mock_ua.os.version_string = "10.0"
+        mock_parse.return_value = mock_ua
+
         ua_string = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"
         result = parse_user_agent(ua_string)
 
@@ -42,8 +55,21 @@ class ParseUserAgentTest(TestCase):
         self.assertIn("Chrome", result["browser"])
         self.assertIn("Windows", result["os"])
 
-    def test_mobile_user_agent(self):
+    @patch("apps.analytics.utils.HAS_USER_AGENTS", True)
+    @patch("apps.analytics.utils.parse")
+    def test_mobile_user_agent(self, mock_parse):
         """Test parsing mobile user agent."""
+        # Mock the user agent parsing
+        mock_ua = MagicMock()
+        mock_ua.is_mobile = True
+        mock_ua.is_tablet = False
+        mock_ua.is_pc = False
+        mock_ua.browser.family = "Mobile Safari"
+        mock_ua.browser.version_string = "14.6"
+        mock_ua.os.family = "iOS"
+        mock_ua.os.version_string = "14.6"
+        mock_parse.return_value = mock_ua
+
         ua_string = "Mozilla/5.0 (iPhone; CPU iPhone OS 14_6 like Mac OS X) AppleWebKit/605.1.15 Mobile/15E148"
         result = parse_user_agent(ua_string)
 
@@ -51,21 +77,37 @@ class ParseUserAgentTest(TestCase):
         self.assertIn("Mobile Safari", result["browser"])
         self.assertIn("iOS", result["os"])
 
-    def test_tablet_user_agent(self):
+    @patch("apps.analytics.utils.HAS_USER_AGENTS", True)
+    @patch("apps.analytics.utils.parse")
+    def test_tablet_user_agent(self, mock_parse):
         """Test parsing tablet user agent."""
+        # Mock the user agent parsing
+        mock_ua = MagicMock()
+        mock_ua.is_mobile = False
+        mock_ua.is_tablet = True
+        mock_ua.is_pc = False
+        mock_ua.browser.family = "Safari"
+        mock_ua.browser.version_string = "14.6"
+        mock_ua.os.family = "iOS"
+        mock_ua.os.version_string = "14.6"
+        mock_parse.return_value = mock_ua
+
         ua_string = "Mozilla/5.0 (iPad; CPU OS 14_6 like Mac OS X) AppleWebKit/605.1.15"
         result = parse_user_agent(ua_string)
 
         self.assertEqual(result["device_type"], "tablet")
 
     def test_unknown_user_agent(self):
-        """Test parsing unknown/bot user agent."""
+        """Test parsing unknown/bot user agent without user_agents module."""
         ua_string = "CustomBot/1.0"
         result = parse_user_agent(ua_string)
 
+        # Without user_agents module, should return fallback values
         self.assertEqual(result["device_type"], "other")
         self.assertIn("browser", result)
         self.assertIn("os", result)
+        self.assertEqual(result["browser"], "Unknown")
+        self.assertEqual(result["os"], "Unknown")
 
 
 class GetClientIpTest(TestCase):
@@ -109,6 +151,7 @@ class GetGeoDataTest(TestCase):
         result = get_geo_data("192.168.1.1")
         self.assertEqual(result, {"country": None, "city": None})
 
+    @patch("apps.analytics.utils.HAS_GEOIP2", True)
     @patch("apps.analytics.utils.GeoIP2")
     def test_external_ip_success(self, mock_geoip2):
         """Test successful geo lookup for external IP."""
@@ -122,6 +165,7 @@ class GetGeoDataTest(TestCase):
         self.assertEqual(result["country"], "US")
         self.assertEqual(result["city"], "New York")
 
+    @patch("apps.analytics.utils.HAS_GEOIP2", True)
     @patch("apps.analytics.utils.GeoIP2")
     def test_geoip_exception(self, mock_geoip2):
         """Test handling of GeoIP exceptions."""
@@ -168,9 +212,7 @@ class CalculateSessionDurationTest(TestCase):
     """Test calculate_session_duration function."""
 
     def setUp(self):
-        self.user = User.objects.create_user(
-            username="testuser", email="test@example.com"
-        )
+        self.user = User.objects.create_user(email="test@example.com")
 
     def test_no_page_views(self):
         """Test session duration with no page views."""
@@ -230,7 +272,9 @@ class GetContentTypeAndIdTest(TestCase):
 
     def test_get_content_type_and_id(self):
         """Test getting content type and ID for model instance."""
-        user = User.objects.create_user(username="testuser", email="test@example.com")
+        user = User.objects.create_user(
+            email="test@example.com", password="testpass123"
+        )
 
         content_type_id, object_id = get_content_type_and_id(user)
 

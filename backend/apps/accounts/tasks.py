@@ -148,3 +148,42 @@ def cleanup_inactive_sessions(self, days=30):  # noqa: C901
         logger.error("Error cleaning up inactive sessions: %s", str(e))
 
         raise self.retry(exc=e, countdown=2**self.request.retries)
+
+
+@shared_task(
+    bind=True,
+    max_retries=3,
+    soft_time_limit=30,
+    time_limit=60,
+    queue="default",
+)
+def send_welcome_email(self, user_id):
+    """Send welcome email to a new user.
+
+    Args:
+        user_id: ID of the user to send welcome email to
+    """
+    try:
+        from apps.emails.services import send_welcome_email as send_email_service
+
+        # Get the user
+        user = User.objects.get(id=user_id)
+
+        # Send the welcome email using the email service
+        email_log = send_email_service(user)
+
+        logger.info(
+            "Welcome email sent to user %s (email_log_id: %s)", user_id, email_log.id
+        )
+
+        return {"user_id": user_id, "email_log_id": email_log.id}
+
+    except User.DoesNotExist:
+        logger.warning("User %s not found for welcome email", user_id)
+        # Don't retry if user doesn't exist
+        return {"error": "User not found", "user_id": user_id}
+
+    except Exception as e:
+        logger.error("Error sending welcome email to user %s: %s", user_id, str(e))
+        # Retry with exponential backoff
+        raise self.retry(exc=e, countdown=2**self.request.retries)

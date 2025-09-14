@@ -33,7 +33,7 @@ class CircuitBreakerTest(TestCase):
 
         @circuit_breaker(failure_threshold=2, recovery_timeout=60)
         def failing_operation():
-            """raise Exception("Test failure")"""
+            raise Exception("Test failure")
 
         # First failure
 
@@ -56,7 +56,9 @@ class CircuitBreakerTest(TestCase):
     def test_circuit_breaker_recovery(self):
         """Test circuit breaker recovery after timeout."""
 
-        @circuit_breaker(failure_threshold=1, recovery_timeout=1)  # Very short timeout
+        @circuit_breaker(
+            failure_threshold=1, recovery_timeout=1, success_threshold=1
+        )  # Very short timeout
         def initially_failing_operation():
 
             if not hasattr(initially_failing_operation, "recovered"):
@@ -87,7 +89,7 @@ class CircuitBreakerTest(TestCase):
 
         # Wait for recovery timeout
 
-        time.sleep(0.2)
+        time.sleep(1.1)  # Wait slightly longer than timeout
 
         # Should now succeed
 
@@ -118,7 +120,7 @@ class CircuitBreakerTest(TestCase):
 
         call_count = 0
 
-        @circuit_breaker(failure_threshold=1, recovery_timeout=1)
+        @circuit_breaker(failure_threshold=1, recovery_timeout=1, success_threshold=1)
         def half_open_test():
 
             nonlocal call_count
@@ -135,29 +137,29 @@ class CircuitBreakerTest(TestCase):
 
         with self.assertRaises(Exception):
 
-            """half_open_test()"""
+            half_open_test()
 
         # Circuit should be open
 
         with self.assertRaises(CircuitOpenException):
 
-            """half_open_test()"""
+            half_open_test()
 
         # Wait for recovery
 
-        time.sleep(0.2)
+        time.sleep(1.1)  # Wait slightly longer than timeout
 
         # First call after recovery should still fail
 
         with self.assertRaises(Exception):
 
-            """half_open_test()"""
+            half_open_test()
 
         # Should be open again
 
         with self.assertRaises(CircuitOpenException):
 
-            """half_open_test()"""
+            half_open_test()
 
     def test_circuit_breaker_cache_error_handling(self):
         """Test circuit breaker handles cache errors gracefully."""

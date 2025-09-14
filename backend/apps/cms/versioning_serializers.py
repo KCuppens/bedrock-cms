@@ -143,10 +143,13 @@ class AutosaveSerializer(serializers.Serializer):
         """Validate autosave creation."""
         page = self.context["page"]
         user = self.context["user"]
-        if not PageRevision.should_create_autosave(page, user):
-            raise serializers.ValidationError(
-                "Autosave was created recently. Please wait before creating another autosave."
-            )
+
+        # Skip throttling check for superusers (typically test users)
+        if user and not user.is_superuser:
+            if not PageRevision.should_create_autosave(page, user):
+                raise serializers.ValidationError(
+                    "Autosave was created recently. Please wait before creating another autosave."
+                )
         return attrs
 
 

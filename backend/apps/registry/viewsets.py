@@ -83,14 +83,18 @@ class ContentViewSetFactory:
 
             fields.append("status")
 
-        # Add common fields that are usually filterable
-
+        # Add configured filterable fields
         model_fields = {f.name for f in config.model._meta.get_fields()}
 
+        # Add configured filterable fields if they exist in the model
+        if hasattr(config, "filterable_fields") and config.filterable_fields:
+            for field in config.filterable_fields:
+                if field in model_fields and field not in fields:
+                    fields.append(field)
+
+        # Add common fields that are usually filterable
         for field in ["category", "tags", "author", "created_at", "updated_at"]:
-
-            if field in model_fields:
-
+            if field in model_fields and field not in fields:
                 fields.append(field)
 
         return fields

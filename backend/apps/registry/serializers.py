@@ -30,12 +30,9 @@ class ContentSerializerFactory:
         custom_fields = cls._get_custom_fields(config)
 
         # Add custom field names to fields list
-
         for field_name in custom_fields.keys():
-
             if not field_name.startswith("get_"):
-
-                """form_fields.append(field_name)"""
+                form_fields.append(field_name)
 
         # Create the serializer class dynamically
 
@@ -50,10 +47,8 @@ class ContentSerializerFactory:
             read_only_fields = ["id", "created_at", "updated_at"]
 
             # If model has group_id, make it read-only
-
             if hasattr(model, "group_id"):
-
-                """read_only_fields.append("group_id")"""
+                read_only_fields.append("group_id")
 
         # Create the serializer class
 

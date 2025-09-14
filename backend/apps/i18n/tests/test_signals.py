@@ -6,7 +6,12 @@ from django.test import TestCase
 
 from apps.cms.models import Page
 from apps.i18n.models import Locale, TranslationUnit
-from apps.i18n.signals import create_page_translation_units
+from apps.i18n.signals import (
+    create_page_translation_units,
+    create_translation_units_handler,
+    register_model_for_translation,
+    store_old_page_data,
+)
 from apps.i18n.translation import TranslationManager
 
 User = get_user_model()
@@ -38,8 +43,7 @@ class PageSignalsTest(TestCase):
 
         TranslationManager.register_translatable_fields("cms.page", ["title", "blocks"])
 
-    """@patch("apps.i18n.signals.TranslationManager.create_translation_units")"""
-
+    @patch("apps.i18n.signals.TranslationManager.create_translation_units")
     def test_create_page_translation_units_on_save(self, mock_create_units):
         """Test that translation units are created when a page is saved."""
 
@@ -71,7 +75,7 @@ class PageSignalsTest(TestCase):
         page._skip_translation_units = True
 
         with patch(
-            # apps.i18n.signals.TranslationManager.create_translation_units
+            "apps.i18n.signals.TranslationManager.create_translation_units"
         ) as mock_create_units:
 
             create_page_translation_units(sender=Page, instance=page, created=True)
@@ -86,7 +90,7 @@ class PageSignalsTest(TestCase):
         page = Page.objects.create(title="Test Page", locale=self.locale_en)
 
         with patch(
-            # apps.i18n.signals.TranslationManager.create_translation_units
+            "apps.i18n.signals.TranslationManager.create_translation_units"
         ) as mock_create_units:
 
             mock_create_units.side_effect = Exception("Translation error")
@@ -168,8 +172,7 @@ class GenericSignalsTest(TestCase):
             code="es", name="Spanish", native_name="Español", is_active=True
         )
 
-    """@patch("apps.i18n.signals.TranslationManager.create_translation_units")"""
-
+    @patch("apps.i18n.signals.TranslationManager.create_translation_units")
     def test_create_translation_units_handler_with_locale(self, mock_create_units):
         """Test generic handler with a model that has a locale field."""
 
@@ -189,8 +192,7 @@ class GenericSignalsTest(TestCase):
             obj=page, source_locale=self.locale_en, user=self.user
         )
 
-    """@patch("apps.i18n.signals.TranslationManager.create_translation_units")"""
-
+    @patch("apps.i18n.signals.TranslationManager.create_translation_units")
     def test_create_translation_units_handler_without_locale(self, mock_create_units):
         """Test generic handler with a model that doesn't have a locale field."""
 
@@ -226,7 +228,7 @@ class GenericSignalsTest(TestCase):
         page = Page.objects.create(title="Test Page", locale=self.locale_en)
 
         with patch(
-            # apps.i18n.signals.TranslationManager.create_translation_units
+            "apps.i18n.signals.TranslationManager.create_translation_units"
         ) as mock_create_units:
 
             mock_create_units.side_effect = Exception("Translation error")
@@ -254,13 +256,11 @@ class GenericSignalsTest(TestCase):
         fields = ["title", "content"]
 
         with (
-            # Imports that were malformed - commented out
-            #             """patch("apps.i18n.signals.ContentType.objects.get_for_model") as mock_get_ct,"""
+            patch("apps.i18n.signals.ContentType.objects.get_for_model") as mock_get_ct,
             patch(
-                # apps.i18n.signals.TranslationManager.register_translatable_fields
+                "apps.i18n.signals.TranslationManager.register_translatable_fields"
             ) as mock_register,
-            # Imports that were malformed - commented out
-            #             """patch("apps.i18n.signals.post_save.connect") as mock_connect,"""
+            patch("apps.i18n.signals.post_save.connect") as mock_connect,
         ):
 
             # Mock ContentType
@@ -279,7 +279,7 @@ class GenericSignalsTest(TestCase):
 
             # Verify translatable fields were registered
 
-            """mock_register.assert_called_once_with("test_app.mockmodel", fields)"""
+            mock_register.assert_called_once_with("test_app.mockmodel", fields)
 
             # Verify signal was connected
 
@@ -295,10 +295,9 @@ class GenericSignalsTest(TestCase):
 
         with (
             patch(
-                # apps.i18n.signals.TranslationManager.register_translatable_fields
+                "apps.i18n.signals.TranslationManager.register_translatable_fields"
             ) as mock_register,
-            # Imports that were malformed - commented out
-            #             """patch("apps.i18n.signals.post_save.connect") as mock_connect,"""
+            patch("apps.i18n.signals.post_save.connect") as mock_connect,
         ):
 
             # Call register function without fields

@@ -28,9 +28,7 @@ class ScopedLocaleModelTest(TestCase):
 
     def setUp(self):
         self.group = Group.objects.create(name="Test Editors")
-        self.locale = Locale.objects.create(
-            code="en", name="English", default_language="en"
-        )
+        self.locale = Locale.objects.create(code="en", name="English")
 
     def test_scoped_locale_creation(self):
         """Test creating a ScopedLocale instance."""
@@ -219,14 +217,12 @@ class RBACMixinTest(TestCase):
     def setUp(self):
         # Create users
         self.superuser = User.objects.create_user(
-            username="admin", email="admin@example.com", is_superuser=True
+            email="admin@example.com", is_superuser=True
         )
 
-        self.regular_user = User.objects.create_user(
-            username="user", email="user@example.com"
-        )
+        self.regular_user = User.objects.create_user(email="user@example.com")
 
-        self.anonymous_user = User()  # Not authenticated
+        self.anonymous_user = User(email="anonymous@example.com")  # Not authenticated
 
         # Create groups
         self.blog_editors = Group.objects.create(name="Blog Editors")
@@ -236,12 +232,8 @@ class RBACMixinTest(TestCase):
         self.regular_user.groups.add(self.blog_editors)
 
         # Create locales
-        self.en_locale = Locale.objects.create(
-            code="en", name="English", default_language="en"
-        )
-        self.fr_locale = Locale.objects.create(
-            code="fr", name="French", default_language="fr"
-        )
+        self.en_locale = Locale.objects.create(code="en", name="English")
+        self.fr_locale = Locale.objects.create(code="fr", name="French")
 
         # Create scoped permissions
         ScopedLocale.objects.create(group=self.blog_editors, locale=self.en_locale)
@@ -341,16 +333,12 @@ class RBACIntegrationTest(TestCase):
     def setUp(self):
         # Create a more complex setup
         self.superuser = User.objects.create_user(
-            username="admin", email="admin@example.com", is_superuser=True
+            email="admin@example.com", is_superuser=True
         )
 
-        self.content_manager = User.objects.create_user(
-            username="manager", email="manager@example.com"
-        )
+        self.content_manager = User.objects.create_user(email="manager@example.com")
 
-        self.blog_editor = User.objects.create_user(
-            username="blogger", email="blogger@example.com"
-        )
+        self.blog_editor = User.objects.create_user(email="blogger@example.com")
 
         # Create groups
         self.managers = Group.objects.create(name="Content Managers")
@@ -361,12 +349,8 @@ class RBACIntegrationTest(TestCase):
         self.blog_editor.groups.add(self.bloggers)
 
         # Create locales
-        self.en = Locale.objects.create(
-            code="en", name="English", default_language="en"
-        )
-        self.es = Locale.objects.create(
-            code="es", name="Spanish", default_language="es"
-        )
+        self.en = Locale.objects.create(code="en", name="English")
+        self.es = Locale.objects.create(code="es", name="Spanish")
 
         # Create scoped permissions
         # Managers have access to all content (root path) in English
@@ -446,8 +430,12 @@ class RBACIntegrationTest(TestCase):
         blog_editors = Group.objects.create(name="General Blog Editors")
         tech_editors = Group.objects.create(name="Tech Blog Editors")
 
-        user1 = User.objects.create_user(username="user1", email="user1@example.com")
-        user2 = User.objects.create_user(username="user2", email="user2@example.com")
+        user1 = User.objects.create_user(
+            email="user1@example.com", password="testpass123"
+        )
+        user2 = User.objects.create_user(
+            email="user2@example.com", password="testpass123"
+        )
 
         user1.groups.add(blog_editors)
         user2.groups.add(tech_editors)

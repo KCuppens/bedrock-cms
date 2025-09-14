@@ -9,7 +9,11 @@ from django.test import TestCase
 from django.utils import timezone
 
 from apps.core.mixins import (
+    BaseModel,
     FullTrackingMixin,
+    MetadataMixin,
+    OrderingMixin,
+    SlugMixin,
     SoftDeleteMixin,
     TimestampMixin,
     UserTrackingMixin,
@@ -326,8 +330,7 @@ class BaseModelTest(TestCase):
 class ModelManagerTest(TestCase):
     """Test custom model managers"""
 
-    @patch("apps.core.models.models.Manager")
-    def test_soft_delete_manager(self, mock_manager):
+    def test_soft_delete_manager(self):
         """Test SoftDeleteManager filters out deleted items"""
         from apps.core.managers import SoftDeleteManager
 
@@ -342,8 +345,7 @@ class ModelManagerTest(TestCase):
             result = manager.active()
             mock_qs.filter.assert_called_with(is_deleted=False)
 
-    @patch("apps.core.models.models.Manager")
-    def test_published_manager(self, mock_manager):
+    def test_published_manager(self):
         """Test PublishedManager filters published items"""
         from apps.core.managers import PublishedManager
 
@@ -394,8 +396,14 @@ class ModelUtilsTest(TestCase):
         """Test get_object_or_none utility"""
         from apps.core.utils import get_object_or_none
 
-        MockModel = MagicMock()
-        MockModel.objects.get.side_effect = MockModel.DoesNotExist
+        # Create a mock model class with DoesNotExist exception
+        class MockModel:
+            class DoesNotExist(Exception):
+                pass
+
+            objects = MagicMock()
+
+        MockModel.objects.get.side_effect = MockModel.DoesNotExist()
 
         result = get_object_or_none(MockModel, pk=1)
 

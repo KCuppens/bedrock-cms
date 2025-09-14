@@ -61,18 +61,30 @@ class CacheKeyBuilder:
         Returns:
             Formatted cache key
         """
-
-        # Convert all parts to strings and filter out None values
-
-        clean_parts = [str(part) for part in parts if part is not None]
+        # Convert all parts to strings and handle dictionaries properly
+        clean_parts = []
+        for part in parts:
+            if part is not None:
+                if isinstance(part, dict):
+                    # Sort dict keys for consistent string representation
+                    dict_str = ":".join(f"{k}:{v}" for k, v in sorted(part.items()))
+                    clean_parts.append(dict_str)
+                else:
+                    clean_parts.append(str(part))
 
         key_suffix = ":".join(clean_parts)
 
-        # Get prefix for namespace
+        # Build the full key with namespace (not abbreviated)
+        full_key = f"{self.prefix}:{namespace}:{key_suffix}"
 
-        ns_prefix = CACHE_PREFIXES.get(namespace, namespace[:2])
+        # If the key is too long, hash the suffix part to keep it under 250 chars
+        if len(full_key) > 250:
+            suffix_hash = hashlib.md5(
+                key_suffix.encode(), usedforsecurity=False
+            ).hexdigest()[:16]
+            full_key = f"{self.prefix}:{namespace}:{suffix_hash}"
 
-        return f"{self.prefix}:{ns_prefix}:{key_suffix}"
+        return full_key
 
     def page_key(
         self, locale: str, path: str, revision_id: Optional[str] = None
@@ -479,6 +491,42 @@ class CacheManager:
         pattern = f"{self.key_builder.prefix}:*"
 
         self.delete_pattern(pattern)
+
+    def invalidate_by_pattern(self, pattern: str):
+        """Invalidate cache entries matching a pattern.
+
+        This is an alias for delete_pattern for backward compatibility.
+
+        Args:
+            pattern: Pattern to match cache keys (e.g., 'page:en:*')
+        """
+        self.delete_pattern(pattern)
+
+    def get_cache_info(self) -> dict:
+        """Get cache information and statistics.
+
+        Returns:
+            Dictionary with cache information
+        """
+        info = {
+            "backend": str(type(cache)),
+            "prefix": self.key_builder.prefix,
+            "timeouts": CACHE_TIMEOUTS,
+            "prefixes": CACHE_PREFIXES,
+        }
+
+        # Try to get additional backend-specific stats if available
+        try:
+            if hasattr(cache, "_cache"):
+                backend = cache._cache
+                if hasattr(backend, "get_stats"):
+                    info["stats"] = backend.get_stats()
+                elif hasattr(backend, "info"):
+                    info["stats"] = backend.info()
+        except Exception as e:
+            logger.debug(f"Could not get cache backend stats: {e}")
+
+        return info
 
 
 # Global cache manager instance

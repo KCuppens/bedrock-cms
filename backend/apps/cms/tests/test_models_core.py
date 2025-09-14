@@ -27,7 +27,7 @@ class PageModelTestCase(TestCase):
     def setUp(self):
         """Set up test data."""
         self.user = User.objects.create_user(
-            username="pageuser", email="page@example.com", password="testpass123"
+            email="page@example.com", password="testpass123"
         )
 
         self.locale = Locale.objects.create(code="en", name="English", is_default=True)
@@ -419,7 +419,6 @@ class ModelIntegrationTestCase(TestCase):
     def setUp(self):
         """Set up integration test data."""
         self.user = User.objects.create_user(
-            username="integrationuser",
             email="integration@example.com",
             password="testpass123",
         )

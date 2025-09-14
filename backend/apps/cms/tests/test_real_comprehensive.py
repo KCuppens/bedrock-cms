@@ -24,7 +24,7 @@ class CMSRealModelTests(TestCase):
     def setUp(self):
 
         self.user = User.objects.create_user(
-            username="testuser", email="test@example.com", password="testpass123"
+            email="test@example.com", password="testpass123"
         )
 
         self.locale = Locale.objects.create(code="en", name="English", is_default=True)
@@ -225,7 +225,7 @@ class CMSRealModelMethodTests(TestCase):
     def setUp(self):
 
         self.user = User.objects.create_user(
-            username="testuser", email="test@example.com", password="testpass123"
+            email="test@example.com", password="testpass123"
         )
 
         self.locale = Locale.objects.create(code="en", name="English", is_default=True)
@@ -328,7 +328,7 @@ class CMSRealAPITests(APITestCase):
     def setUp(self):
 
         self.user = User.objects.create_user(
-            username="testuser", email="test@example.com", password="testpass123"
+            email="test@example.com", password="testpass123"
         )
 
         self.client = APIClient()
@@ -408,7 +408,7 @@ class CMSRealIntegrationTests(TransactionTestCase):
     def setUp(self):
 
         self.user = User.objects.create_user(
-            username="testuser", email="test@example.com", password="testpass123"
+            email="test@example.com", password="testpass123"
         )
 
         self.locale = Locale.objects.create(code="en", name="English", is_default=True)

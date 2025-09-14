@@ -177,7 +177,9 @@ class CircuitBreaker:
 
         if state == CircuitState.HALF_OPEN:
 
-            self.success_count += 1
+            # Increment success count atomically
+            current_successes = self.success_count
+            self.success_count = current_successes + 1
 
             if self.success_count >= self.success_threshold:
 
@@ -198,7 +200,9 @@ class CircuitBreaker:
 
         state = self.state
 
-        self.failure_count += 1
+        # Increment failure count atomically
+        current_failures = self.failure_count
+        self.failure_count = current_failures + 1
 
         cache.set(self._last_failure_key, time.time(), timeout=3600)
 

@@ -53,8 +53,7 @@ class I18nTasksTest(TestCase):
             assigned_to=self.user,
         )
 
-    """@patch("apps.i18n.tasks.logger")"""
-
+    @patch("apps.i18n.tasks.logger")
     def test_process_translation_queue_success(self, mock_logger):  # noqa: C901
         """Test successful processing of translation queue."""
 
@@ -68,8 +67,7 @@ class I18nTasksTest(TestCase):
 
             mock_logger.info.assert_called()
 
-    """@patch("apps.i18n.tasks.logger")"""
-
+    @patch("apps.i18n.tasks.logger")
     def test_process_translation_queue_with_errors(self, mock_logger):  # noqa: C901
         """Test translation queue processing with errors."""
 
@@ -85,8 +83,7 @@ class I18nTasksTest(TestCase):
 
             mock_logger.error.assert_called()
 
-    """@patch("apps.i18n.tasks.logger")"""
-
+    @patch("apps.i18n.tasks.logger")
     def test_auto_translate_content_basic(self, mock_logger):  # noqa: C901
         """Test basic auto-translation functionality."""
 
@@ -103,8 +100,7 @@ class I18nTasksTest(TestCase):
 
         mock_logger.info.assert_called()
 
-    """@patch("apps.i18n.tasks.logger")"""
-
+    @patch("apps.i18n.tasks.logger")
     def test_auto_translate_content_with_service(self, mock_logger):  # noqa: C901
         """Test auto-translation with external service."""
 
@@ -126,8 +122,7 @@ class I18nTasksTest(TestCase):
 
             mock_logger.info.assert_called()
 
-    """@patch("apps.i18n.tasks.logger")"""
-
+    @patch("apps.i18n.tasks.logger")
     def test_generate_translation_report(self, mock_logger):  # noqa: C901
         """Test translation report generation."""
 
@@ -137,8 +132,7 @@ class I18nTasksTest(TestCase):
 
         mock_logger.info.assert_called()
 
-    """@patch("apps.i18n.tasks.logger")"""
-
+    @patch("apps.i18n.tasks.logger")
     def test_generate_translation_report_with_params(self, mock_logger):  # noqa: C901
         """Test translation report with specific parameters."""
 
@@ -150,8 +144,7 @@ class I18nTasksTest(TestCase):
 
         mock_logger.info.assert_called()
 
-    """@patch("apps.i18n.tasks.logger")"""
-
+    @patch("apps.i18n.tasks.logger")
     def test_sync_locale_fallbacks(self, mock_logger):  # noqa: C901
         """Test locale fallback synchronization."""
 
@@ -161,8 +154,7 @@ class I18nTasksTest(TestCase):
 
         mock_logger.info.assert_called()
 
-    """@patch("apps.i18n.tasks.logger")"""
-
+    @patch("apps.i18n.tasks.logger")
     def test_sync_locale_fallbacks_specific_locale(self, mock_logger):  # noqa: C901
         """Test syncing specific locale fallbacks."""
 
@@ -172,8 +164,7 @@ class I18nTasksTest(TestCase):
 
         mock_logger.info.assert_called()
 
-    """@patch("apps.i18n.tasks.logger")"""
-
+    @patch("apps.i18n.tasks.logger")
     def test_cleanup_old_translations(self, mock_logger):  # noqa: C901
         """Test cleanup of old translations."""
 
@@ -183,8 +174,7 @@ class I18nTasksTest(TestCase):
 
         mock_logger.info.assert_called()
 
-    """@patch("apps.i18n.tasks.logger")"""
-
+    @patch("apps.i18n.tasks.logger")
     def test_cleanup_old_translations_with_days(self, mock_logger):  # noqa: C901
         """Test cleanup with specific retention period."""
 
@@ -194,8 +184,7 @@ class I18nTasksTest(TestCase):
 
         mock_logger.info.assert_called()
 
-    """@patch("apps.i18n.tasks.logger")"""
-
+    @patch("apps.i18n.tasks.logger")
     def test_task_error_handling(self, mock_logger):  # noqa: C901
         """Test that tasks handle errors gracefully."""
 

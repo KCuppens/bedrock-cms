@@ -33,13 +33,35 @@ class ContentViewSetFactoryTestCase(TestCase):
         self.mock_model.__name__ = "TestModel"
         self.mock_model.objects.all.return_value = Mock()
 
+        # Mock the _meta attribute with fields
+        mock_field1 = Mock()
+        mock_field1.name = "status"
+        mock_field2 = Mock()
+        mock_field2.name = "category"
+        mock_field3 = Mock()
+        mock_field3.name = "created_at"
+        mock_field4 = Mock()
+        mock_field4.name = "updated_at"
+
+        self.mock_model._meta = Mock()
+        self.mock_model._meta.get_fields.return_value = [
+            mock_field1,
+            mock_field2,
+            mock_field3,
+            mock_field4,
+        ]
+
         # Create a mock config
         self.mock_config = Mock(spec=ContentConfig)
         self.mock_config.model = self.mock_model
+        self.mock_config.name = "Test Model"
         self.mock_config.searchable_fields = ["title", "content"]
         self.mock_config.filterable_fields = ["status", "category"]
         self.mock_config.ordering_fields = ["created_at", "updated_at"]
         self.mock_config.default_ordering = ["-created_at"]
+        self.mock_config.ordering = ["-created_at"]
+        self.mock_config.locale_field = None
+        self.mock_config.supports_publishing.return_value = False
 
     def test_create_viewset_basic(self):
         """Test basic viewset creation."""
@@ -65,8 +87,13 @@ class ContentViewSetFactoryTestCase(TestCase):
         """Test _get_filterset_fields method."""
         fields = ContentViewSetFactory._get_filterset_fields(self.mock_config)
 
-        # Should return the filterable fields
-        self.assertEqual(fields, ["status", "category"])
+        # Should return fields that exist in model meta
+        # With the improved logic, it includes:
+        # 1. Configured filterable_fields: ["status", "category"]
+        # 2. Common fields: ["created_at", "updated_at"] (that exist in model)
+        # Our mock model has: status, category, created_at, updated_at
+        expected_fields = ["status", "category", "created_at", "updated_at"]
+        self.assertEqual(sorted(fields), sorted(expected_fields))
 
     def test_get_search_fields(self):
         """Test _get_search_fields method."""
@@ -79,8 +106,9 @@ class ContentViewSetFactoryTestCase(TestCase):
         """Test _get_ordering_fields method."""
         fields = ContentViewSetFactory._get_ordering_fields(self.mock_config)
 
-        # Should return the ordering fields
-        self.assertEqual(fields, ["created_at", "updated_at"])
+        # Should return the ordering fields from config plus common fields found in model
+        expected_fields = ["created_at", "updated_at"]
+        self.assertEqual(sorted(fields), sorted(expected_fields))
 
     def test_viewset_has_locale_filtering(self):
         """Test that created viewset has locale filtering capability."""
@@ -125,10 +153,14 @@ class ContentViewSetFactoryTestCase(TestCase):
         """Test config with no searchable/filterable fields."""
         config_no_fields = Mock(spec=ContentConfig)
         config_no_fields.model = self.mock_model
+        config_no_fields.name = "Test Model"
         config_no_fields.searchable_fields = []
         config_no_fields.filterable_fields = []
         config_no_fields.ordering_fields = []
+        config_no_fields.ordering = []
         config_no_fields.default_ordering = []
+        config_no_fields.locale_field = None
+        config_no_fields.supports_publishing.return_value = False
 
         with patch(
             "apps.registry.viewsets.get_serializer_for_config"
@@ -168,10 +200,12 @@ class RegistryViewSetTestCase(APITestCase):
         """Set up test data."""
         self.client = APIClient()
         self.user = User.objects.create_user(
-            username="testuser", email="test@example.com", password="testpass123"
+            email="test@example.com", password="testpass123"
         )
 
-        self.locale = Locale.objects.create(code="en", name="English", is_default=True)
+        self.locale = Locale.objects.create(
+            code="en", name="English", native_name="English", is_default=True
+        )
 
     def test_list_configurations_anonymous(self):
         """Test listing configurations as anonymous user."""
@@ -306,7 +340,9 @@ class ViewSetIntegrationTestCase(TestCase):
 
     def setUp(self):
         """Set up integration test data."""
-        self.locale = Locale.objects.create(code="en", name="English", is_default=True)
+        self.locale = Locale.objects.create(
+            code="en", name="English", native_name="English", is_default=True
+        )
 
     @patch("apps.registry.viewsets.content_registry")
     def test_factory_with_real_config(self, mock_registry):
@@ -316,14 +352,35 @@ class ViewSetIntegrationTestCase(TestCase):
         mock_model.__name__ = "BlogPost"
         mock_model.objects.all.return_value = Mock()
 
+        # Mock the _meta attribute with fields
+        mock_fields = []
+        field_names = [
+            "status",
+            "category",
+            "author",
+            "created_at",
+            "updated_at",
+            "published_at",
+        ]
+        for name in field_names:
+            mock_field = Mock()
+            mock_field.name = name
+            mock_fields.append(mock_field)
+
+        mock_model._meta = Mock()
+        mock_model._meta.get_fields.return_value = mock_fields
+
         config = Mock(spec=ContentConfig)
         config.model = mock_model
-        config.name = "blog_post"
+        config.name = "Blog Posts"
         config.verbose_name = "Blog Post"
         config.searchable_fields = ["title", "content", "excerpt"]
         config.filterable_fields = ["status", "category", "author"]
         config.ordering_fields = ["created_at", "updated_at", "published_at"]
+        config.ordering = ["-published_at"]
         config.default_ordering = ["-published_at"]
+        config.locale_field = None
+        config.supports_publishing.return_value = True
         config.has_locale = True
         config.has_versioning = True
 
@@ -336,15 +393,29 @@ class ViewSetIntegrationTestCase(TestCase):
 
             # Should create a fully functional viewset
             self.assertEqual(viewset_class.__name__, "BlogPostViewSet")
+
+            # Check that filterset_fields contains expected fields (order may vary)
+            expected_filterset_fields = [
+                "status",
+                "category",
+                "author",
+                "created_at",
+                "updated_at",
+            ]
             self.assertEqual(
-                viewset_class.filterset_fields, ["status", "category", "author"]
+                sorted(viewset_class.filterset_fields),
+                sorted(expected_filterset_fields),
             )
+
+            # Check search fields
             self.assertEqual(
                 viewset_class.search_fields, ["title", "content", "excerpt"]
             )
+
+            # Check ordering fields
+            expected_ordering_fields = ["created_at", "updated_at", "published_at"]
             self.assertEqual(
-                viewset_class.ordering_fields,
-                ["created_at", "updated_at", "published_at"],
+                sorted(viewset_class.ordering_fields), sorted(expected_ordering_fields)
             )
 
     def test_viewset_method_coverage(self):
@@ -368,13 +439,22 @@ class ViewSetIntegrationTestCase(TestCase):
             mock_model.__name__ = model_name
             mock_model.objects.all.return_value = Mock()
 
+            # Mock _meta attribute
+            mock_field = Mock()
+            mock_field.name = "created_at"
+            mock_model._meta = Mock()
+            mock_model._meta.get_fields.return_value = [mock_field]
+
             config = Mock(spec=ContentConfig)
             config.model = mock_model
-            config.name = model_name.lower()
+            config.name = model_name
             config.searchable_fields = ["title"]
             config.filterable_fields = ["status"]
             config.ordering_fields = ["created_at"]
+            config.ordering = ["-created_at"]
             config.default_ordering = ["-created_at"]
+            config.locale_field = None
+            config.supports_publishing.return_value = False
 
             configs.append(config)
 
@@ -418,12 +498,20 @@ class ViewSetIntegrationTestCase(TestCase):
         mock_model.__name__ = "TestModel"
         mock_model.objects.all.return_value = Mock()
 
+        # Mock _meta attribute
+        mock_model._meta = Mock()
+        mock_model._meta.get_fields.return_value = []
+
         config = Mock(spec=ContentConfig)
         config.model = mock_model
+        config.name = "Test Model"
         config.searchable_fields = []
         config.filterable_fields = []
         config.ordering_fields = []
+        config.ordering = []
         config.default_ordering = []
+        config.locale_field = None
+        config.supports_publishing.return_value = False
 
         with patch(
             "apps.registry.viewsets.get_serializer_for_config"
@@ -443,12 +531,24 @@ class ViewSetIntegrationTestCase(TestCase):
         mock_model.__name__ = "CustomModel"
         mock_model.objects.all.return_value = Mock()
 
+        # Mock _meta attribute with custom fields
+        mock_field1 = Mock()
+        mock_field1.name = "custom_order"
+        mock_field2 = Mock()
+        mock_field2.name = "custom_filter"
+        mock_model._meta = Mock()
+        mock_model._meta.get_fields.return_value = [mock_field1, mock_field2]
+
         config = Mock(spec=ContentConfig)
         config.model = mock_model
+        config.name = "Custom Model"
         config.searchable_fields = ["custom_field"]
         config.filterable_fields = ["custom_filter"]
         config.ordering_fields = ["custom_order"]
+        config.ordering = ["-custom_order"]
         config.default_ordering = ["-custom_order"]
+        config.locale_field = None
+        config.supports_publishing.return_value = False
 
         with patch(
             "apps.registry.viewsets.get_serializer_for_config"

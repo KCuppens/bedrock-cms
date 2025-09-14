@@ -101,7 +101,8 @@ COPY --from=builder-base $PYSETUP_PATH $PYSETUP_PATH
 RUN groupadd -r django \
     && useradd -r -g django django \
     && mkdir -p /app /var/log/bedrock /var/run/gunicorn \
-    && chown -R django:django /app /var/log/bedrock /var/run/gunicorn
+    && chown -R django:django /app /var/log/bedrock /var/run/gunicorn \
+    && chmod -R 755 /var/log/bedrock
 
 # Copy application code
 WORKDIR /app

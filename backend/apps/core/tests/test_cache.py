@@ -1,3 +1,4 @@
+import time
 from unittest.mock import MagicMock, patch
 
 from django.contrib.auth import get_user_model
@@ -17,6 +18,7 @@ from apps.core.signals import (
     invalidate_content_cache,
     invalidate_page_cache,
 )
+from apps.i18n.models import Locale
 
 User = get_user_model()
 
@@ -34,74 +36,74 @@ class CacheKeyBuilderTests(TestCase):
 
         key = self.key_builder.build_key("page", "en", "about")
 
-        """self.assertEqual(key, "test:p:en:about")"""
+        self.assertEqual(key, "test:p:en:about")
 
     def test_build_key_with_none_values(self):
         """Test key building filters out None values."""
 
         key = self.key_builder.build_key("page", "en", None, "about")
 
-        """self.assertEqual(key, "test:p:en:about")"""
+        self.assertEqual(key, "test:p:en:about")
 
     def test_page_key_simple(self):
         """Test simple page key generation."""
 
         key = self.key_builder.page_key("en", "/about")
 
-        """self.assertEqual(key, "test:p:en:about")"""
+        self.assertEqual(key, "test:p:en:about")
 
     def test_page_key_with_revision(self):
         """Test page key with revision ID."""
 
         key = self.key_builder.page_key("en", "/about", "123")
 
-        """self.assertEqual(key, "test:p:en:about:123")"""
+        self.assertEqual(key, "test:p:en:about:123")
 
     def test_page_key_root_path(self):
         """Test page key for root path."""
 
         key = self.key_builder.page_key("en", "/")
 
-        """self.assertEqual(key, "test:p:en:home")"""
+        self.assertEqual(key, "test:p:en:home")
 
         key = self.key_builder.page_key("en", "")
 
-        """self.assertEqual(key, "test:p:en:home")"""
+        self.assertEqual(key, "test:p:en:home")
 
     def test_content_key(self):
         """Test content key generation."""
 
         key = self.key_builder.content_key("blog.blogpost", "en", "my-post")
 
-        """self.assertEqual(key, "test:c:blog.blogpost:en:my-post")"""
+        self.assertEqual(key, "test:c:blog.blogpost:en:my-post")
 
     def test_content_key_with_revision(self):
         """Test content key with revision."""
 
         key = self.key_builder.content_key("blog.blogpost", "en", "my-post", "456")
 
-        """self.assertEqual(key, "test:c:blog.blogpost:en:my-post:456")"""
+        self.assertEqual(key, "test:c:blog.blogpost:en:my-post:456")
 
     def test_blog_key(self):
         """Test blog presentation key generation."""
 
         key = self.key_builder.blog_key("en", "my-post")
 
-        """self.assertEqual(key, "test:b:en:my-post")"""
+        self.assertEqual(key, "test:b:en:my-post")
 
     def test_blog_key_with_revisions(self):
         """Test blog key with post and page revisions."""
 
         key = self.key_builder.blog_key("en", "my-post", "123", "456")
 
-        """self.assertEqual(key, "test:b:en:my-post:123:456")"""
+        self.assertEqual(key, "test:b:en:my-post:123:456")
 
     def test_api_key_simple(self):
         """Test API key generation."""
 
         key = self.key_builder.api_key("search")
 
-        """self.assertEqual(key, "test:a:search")"""
+        self.assertEqual(key, "test:a:search")
 
     def test_api_key_with_params(self):
         """Test API key with parameters."""
@@ -110,7 +112,7 @@ class CacheKeyBuilderTests(TestCase):
 
         # Should include a hash of the parameters
 
-        """self.assertTrue(key.startswith("test:a:search:"))"""
+        self.assertTrue(key.startswith("test:a:search:"))
 
         self.assertEqual(len(key.split(":")), 4)
 
@@ -119,7 +121,7 @@ class CacheKeyBuilderTests(TestCase):
 
         key = self.key_builder.search_key("django cms")
 
-        """self.assertTrue(key.startswith("test:s:"))"""
+        self.assertTrue(key.startswith("test:s:"))
 
         # Should be consistent for same query
 
@@ -132,7 +134,7 @@ class CacheKeyBuilderTests(TestCase):
 
         key = self.key_builder.search_key("django", {"locale": "en", "type": "page"})
 
-        """self.assertTrue(key.startswith("test:s:"))"""
+        self.assertTrue(key.startswith("test:s:"))
 
         self.assertEqual(
             len(key.split(":")), 4
@@ -143,14 +145,14 @@ class CacheKeyBuilderTests(TestCase):
 
         key = self.key_builder.sitemap_key("en")
 
-        """self.assertEqual(key, "test:sm:en")"""
+        self.assertEqual(key, "test:sm:en")
 
     def test_seo_key(self):
         """Test SEO key generation."""
 
         key = self.key_builder.seo_key("cms.page", 123, "en")
 
-        """self.assertEqual(key, "test:seo:cms.page:123:en")"""
+        self.assertEqual(key, "test:seo:cms.page:123:en")
 
 
 class CacheManagerTests(TestCase):
@@ -216,8 +218,7 @@ class CacheManagerTests(TestCase):
 
         self.assertIsNone(self.cache_manager.get(key))
 
-    """@patch("apps.core.cache.cache")"""
-
+    @patch("apps.core.cache.cache")
     def test_delete_pattern_redis(self, mock_cache):
         """Test pattern deletion with Redis backend."""
 
@@ -227,12 +228,11 @@ class CacheManagerTests(TestCase):
 
         mock_cache._cache.delete_pattern = MagicMock(return_value=5)
 
-        """self.cache_manager.delete_pattern("test:*")"""
+        self.cache_manager.delete_pattern("test:*")
 
-        """mock_cache._cache.delete_pattern.assert_called_once_with("test:*")"""
+        mock_cache._cache.delete_pattern.assert_called_once_with("test:*")
 
-    """@patch("apps.core.cache.cache")"""
-
+    @patch("apps.core.cache.cache")
     def test_delete_pattern_fallback(self, mock_cache):
         """Test pattern deletion fallback for non-Redis backends."""
 
@@ -242,7 +242,7 @@ class CacheManagerTests(TestCase):
 
         # Should not raise an exception
 
-        """self.cache_manager.delete_pattern("test:*")"""
+        self.cache_manager.delete_pattern("test:*")
 
 
 class CacheInvalidationTests(TestCase):
@@ -272,13 +272,13 @@ class CacheInvalidationTests(TestCase):
 
         # Set some test cache entries
 
-        """cache_manager.set("cms:p:en:test", "page_data")"""
+        cache_manager.set("cms:p:en:test", "page_data")
 
         cache_manager.set("cms:b:en:post", "blog_data")
 
         # Verify they exist
 
-        """self.assertIsNotNone(cache_manager.get("cms:p:en:test"))"""
+        self.assertIsNotNone(cache_manager.get("cms:p:en:test"))
 
         self.assertIsNotNone(cache_manager.get("cms:b:en:post"))
 
@@ -322,7 +322,7 @@ class CacheInvalidationTests(TestCase):
 
         # Invalidate
 
-        """cache_manager.invalidate_search("test query")"""
+        cache_manager.invalidate_search("test query")
 
         # Should be invalidated (pattern-dependent)
 
@@ -486,7 +486,7 @@ class CacheSignalTests(TestCase):
 
         # Should not raise an exception
 
-        """invalidate_content_cache(mock_content, "test.model")"""
+        invalidate_content_cache(mock_content, "test.model")
 
 
 @override_settings(

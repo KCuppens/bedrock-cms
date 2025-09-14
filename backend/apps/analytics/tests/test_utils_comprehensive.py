@@ -247,8 +247,8 @@ class CalculateSessionDurationTest(TestCase):
     def test_calculate_session_duration_with_pageviews(self, mock_pageview):
         """Test calculating duration from page views"""
         now = timezone.now()
-        first_view = MagicMock(created_at=now)
-        last_view = MagicMock(created_at=now + timedelta(minutes=30))
+        first_view = MagicMock(viewed_at=now)
+        last_view = MagicMock(viewed_at=now + timedelta(minutes=30))
 
         mock_pageview.objects.filter.return_value.order_by.return_value.first.return_value = (
             first_view
@@ -265,7 +265,7 @@ class CalculateSessionDurationTest(TestCase):
     def test_calculate_session_duration_single_pageview(self, mock_pageview):
         """Test duration with single page view"""
         now = timezone.now()
-        single_view = MagicMock(created_at=now)
+        single_view = MagicMock(viewed_at=now)
 
         mock_pageview.objects.filter.return_value.order_by.return_value.first.return_value = (
             single_view
