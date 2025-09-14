@@ -9,13 +9,6 @@ from django.urls import reverse
 from django.utils.text import slugify
 
 from apps.cms.models import Page
-from apps.cms.seo_utils import (
-    generate_meta_tags,
-    generate_schema_org,
-    generate_sitemap_entry,
-    validate_seo_data,
-)
-from apps.cms.serializers import BlockSerializer, PageSerializer
 
 User = get_user_model()
 

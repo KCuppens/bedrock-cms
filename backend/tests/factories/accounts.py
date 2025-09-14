@@ -50,7 +50,7 @@ class UserProfileFactory(BaseFactory):
 
         model = UserProfile
 
-    user = factory.SubFactory(lambda: None)
+    user = factory.SubFactory("tests.factories.base.UserFactory")
 
     avatar = None
 

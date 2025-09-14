@@ -31,6 +31,9 @@ LOCAL_APPS = [
     "apps.i18n",  # Required by apps.accounts
     "apps.accounts",
     "apps.files",
+    "apps.emails",  # Required for email tests
+    "apps.analytics",  # Required for analytics tests
+    "apps.featureflags",  # Required for feature flag tests
     "apps.cms",  # Required by blog
     "apps.blog",  # Required by signals
     "apps.registry",  # Required by signals

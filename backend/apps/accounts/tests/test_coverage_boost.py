@@ -9,12 +9,6 @@ from django.test import Client, TestCase
 from django.urls import reverse
 
 from apps.accounts.models import UserProfile
-from apps.accounts.permissions import IsOwnerOrReadOnly, IsTeamMember
-from apps.accounts.serializers import (
-    TeamSerializer,
-    UserProfileSerializer,
-    UserSerializer,
-)
 from apps.accounts.utils import (
     check_rate_limit,
     generate_api_key,

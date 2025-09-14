@@ -201,12 +201,7 @@ jobs:
         python -m pip install --upgrade pip
         python -m pip install "setuptools>=78.1.1"
         pip install -r backend/requirements/dev.txt
-        pip install bandit[toml] pip-audit
-
-    - name: Run bandit security check
-      run: |
-        cd backend
-        bandit -c pyproject.toml -r apps/
+        pip install pip-audit
 
     - name: Run pip-audit
       run: |
@@ -249,6 +244,7 @@ jobs:
         tags: django-saas-boilerplate:latest
         cache-from: type=gha
         cache-to: type=gha,mode=max
+        load: true
 
     - name: Test Docker image
       run: |

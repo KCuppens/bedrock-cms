@@ -8,17 +8,7 @@ from rest_framework.test import APITestCase
 from apps.cms.models import Page
 from apps.i18n.models import Locale
 from apps.registry.config import ContentConfig
-from apps.registry.registry import (
-    ContentRegistry,
-    ContentRegistryError,
-    content,
-    content_registry,
-    get_serializer_for_model,
-    get_user_model,
-    get_viewset_for_model,
-    register_core_models,
-    registry,
-)
+from apps.registry.registry import ContentRegistry, ContentRegistryError
 
 User = get_user_model()
 

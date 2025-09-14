@@ -6,7 +6,7 @@ import factory
 import factory.django
 from faker import Faker
 
-from apps.media.models import MediaItem
+from apps.files.models import FileUpload as MediaItem
 
 from .base import BaseFactory, UserFactory
 

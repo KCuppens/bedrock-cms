@@ -13,10 +13,8 @@ from PIL import Image
 from rest_framework import status
 from rest_framework.test import APIClient, APITestCase
 
-from apps.files import services
 from apps.files.models import FileUpload
-from apps.files.serializers import FileSerializer, FileUploadSerializer
-from apps.files.views import FileViewSet
+from apps.files.serializers import FileUploadSerializer
 
 User = get_user_model()
 

@@ -10,15 +10,7 @@ from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APIClient, APITestCase
 
-from apps.accounts.serializers import UserSerializer
 from apps.blog.models import BlogPost, Tag
-from apps.blog.serializers import (
-    BlogPostListSerializer,
-    BlogPostSerializer,
-    CategorySerializer,
-    TagSerializer,
-)
-from apps.blog.versioning import create_post_version, revert_post_to_version
 
 User = get_user_model()
 

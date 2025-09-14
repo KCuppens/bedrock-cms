@@ -7,7 +7,7 @@ from django.test import TestCase
 from apps.cms.models import Page
 from apps.i18n.models import Locale, TranslationUnit
 from apps.i18n.signals import create_page_translation_units
-from apps.i18n.translation import TranslationManager, signal, store_old_page_data
+from apps.i18n.translation import TranslationManager
 
 User = get_user_model()
 
