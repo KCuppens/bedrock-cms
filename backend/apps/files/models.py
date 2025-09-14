@@ -20,6 +20,24 @@ from apps.core.utils import format_file_size
 User = get_user_model()
 
 
+class MediaCategory(models.Model):
+    """Category for organizing media files."""
+
+    name = models.CharField(max_length=100, help_text="Category name")
+    slug = models.SlugField(max_length=120, unique=True, help_text="URL slug")
+    description = models.TextField(blank=True, help_text="Category description")
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = "Media Category"
+        verbose_name_plural = "Media Categories"
+        ordering = ["name"]
+
+    def __str__(self):
+        return self.name
+
+
 class FileUpload(TimestampMixin, UserTrackingMixin):
     """File upload model with S3/MinIO storage"""
 

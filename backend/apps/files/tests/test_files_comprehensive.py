@@ -13,8 +13,10 @@ from PIL import Image
 from rest_framework import status
 from rest_framework.test import APIClient, APITestCase
 
-from apps.files.models import FileUpload
+from apps.files import services
+from apps.files.models import FileUpload, MediaCategory
 from apps.files.serializers import FileUploadSerializer
+from apps.files.views import FileUploadViewSet
 
 User = get_user_model()
 
@@ -28,26 +30,21 @@ class FilesModelTests(TestCase):
             email="test@example.com", password="testpass123"
         )
 
-        self.category = MediaCategory.objects.create(
-            name="Test Group", slug="test-category"
-        )
-
-        self.tag = FileTag.objects.create(name="test-tag")
+        # Note: MediaCategory and FileTag models don't exist in this app
+        # Using simplified approach without categories and tags
 
     def test_file_creation(self):
         """Test file creation with all fields."""
 
-        file_obj = File.objects.create(
-            name="test.pdf",
-            original_name="Test Document.pdf",
+        file_obj = FileUpload.objects.create(
+            original_filename="Test Document.pdf",
+            filename="test.pdf",
             mime_type="application/pdf",
-            size=1024000,
-            path="/media/files/test.pdf",
+            file_size=1024000,
             uploaded_by=self.user,
-            category=self.category,
         )
 
-        """self.assertEqual(file_obj.name, "test.pdf")"""
+        self.assertEqual(file_obj.filename, "test.pdf")
 
         """self.assertEqual(file_obj.original_name, "Test Document.pdf")"""
 
@@ -518,7 +515,8 @@ class FilesServiceTests(TestCase):
 
         try:
 
-            storage_service = services.FileStorageService()
+            # Note: FileStorageService doesn't exist, using FileService instead
+            storage_service = services.FileService()
 
             # Test file saving
 
@@ -557,7 +555,8 @@ class FilesServiceTests(TestCase):
 
         try:
 
-            processing_service = services.FileProcessingService()
+            # Note: FileProcessingService doesn't exist, using FileService instead
+            processing_service = services.FileService()
 
             # Create test image
 
@@ -588,7 +587,8 @@ class FilesServiceTests(TestCase):
 
         try:
 
-            validation_service = services.FileValidationService()
+            # Note: FileValidationService doesn't exist, using FileService instead
+            validation_service = services.FileService()
 
             # Test file validation
 
@@ -629,7 +629,7 @@ class FilesViewTests(TestCase):
 
         try:
 
-            viewset = FileViewSet()
+            viewset = FileUploadViewSet()
 
             viewset.request = type(
                 "MockRequest",

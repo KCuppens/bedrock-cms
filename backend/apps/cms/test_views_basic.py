@@ -76,7 +76,7 @@ class PagesViewSetBasicTestCase(APITestCase):
     def test_list_pages_unauthenticated(self):
         """Test listing pages without authentication."""
 
-        response = self.client.get("/api/v1/cms/api/pages/")
+        response = self.client.get("/api/v1/cms/pages/")
 
         # Should still work but only show published content
 
@@ -87,7 +87,7 @@ class PagesViewSetBasicTestCase(APITestCase):
 
         self.client.force_authenticate(user=self.admin_user)
 
-        response = self.client.get("/api/v1/cms/api/pages/")
+        response = self.client.get("/api/v1/cms/pages/")
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
@@ -98,7 +98,7 @@ class PagesViewSetBasicTestCase(APITestCase):
     def test_retrieve_page(self):
         """Test page retrieval."""
 
-        response = self.client.get(f"/api/v1/cms/api/pages/{self.published_page.id}/")
+        response = self.client.get(f"/api/v1/cms/pages/{self.published_page.id}/")
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 

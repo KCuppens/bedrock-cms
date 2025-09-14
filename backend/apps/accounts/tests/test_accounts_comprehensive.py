@@ -13,6 +13,7 @@ django.setup()
 
 from django.contrib.auth import authenticate, get_user_model
 from django.contrib.auth.models import Group, Permission
+from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ValidationError
 from django.test import TestCase, TransactionTestCase
 from django.urls import reverse
@@ -88,42 +89,49 @@ class AccountsModelTests(TestCase):
         """Test UserProfile creation and relationship."""
 
         try:
-
-            profile = UserProfile.objects.create(
-                user=self.user,
-                bio="Test bio",
-                avatar="avatars/test.jpg",
-                phone_number="+1234567890",
-                date_of_birth="1990-01-01",
-            )
+            # UserProfile is automatically created by signal, so get or update it
+            if hasattr(self.user, "profile"):
+                profile = self.user.profile
+                profile.bio = "Test bio"
+                profile.avatar = "avatars/test.jpg"
+                profile.phone_number = "+1234567890"
+                profile.date_of_birth = "1990-01-01"
+                profile.save()
+            else:
+                # Fallback if no profile exists (signal might be disabled in tests)
+                profile, created = UserProfile.objects.get_or_create(
+                    user=self.user,
+                    defaults={
+                        "bio": "Test bio",
+                        "avatar": "avatars/test.jpg",
+                        "phone_number": "+1234567890",
+                        "date_of_birth": "1990-01-01",
+                    },
+                )
 
             self.assertEqual(profile.user, self.user)
-
-            """self.assertEqual(profile.bio, "Test bio")"""
-
             self.assertEqual(profile.phone_number, "+1234567890")
 
             # Test profile relationship
-
             if hasattr(self.user, "profile"):
-
                 self.assertEqual(self.user.profile, profile)
 
         except Exception:
-
             pass  # UserProfile model may not exist
 
     def test_user_profile_str_representation(self):
         """Test UserProfile string representation."""
 
         try:
-
-            profile = UserProfile.objects.create(user=self.user)
+            # Get existing profile or create if needed
+            if hasattr(self.user, "profile"):
+                profile = self.user.profile
+            else:
+                profile, created = UserProfile.objects.get_or_create(user=self.user)
 
             self.assertIn(self.user.email, str(profile))
 
         except Exception:
-
             pass  # UserProfile model may not exist
 
     def test_role_creation(self):
@@ -169,46 +177,46 @@ class AccountsModelTests(TestCase):
     def test_user_permissions(self):
         """Test user permission system."""
 
-        # Create permission
+        # Get a valid ContentType (use User model's ContentType)
+        content_type = ContentType.objects.get_for_model(User)
 
+        # Create permission
         permission = Permission.objects.create(
-            name="Can edit pages", content_type_id=1, codename="edit_pages"
+            name="Can edit pages", content_type=content_type, codename="edit_pages"
         )
 
         # Assign permission to user
-
         self.user.user_permissions.add(permission)
 
         # Test permission check
-
-        self.assertTrue(self.user.has_perm("edit_pages"))
+        self.assertTrue(self.user.has_perm(f"{content_type.app_label}.edit_pages"))
 
     def test_user_groups(self):
         """Test user group membership."""
 
         # Create group
-
         group = Group.objects.create(name="Editors")
 
-        # Add permission to group
+        # Get a valid ContentType (use User model's ContentType)
+        content_type = ContentType.objects.get_for_model(User)
 
+        # Add permission to group
         permission = Permission.objects.create(
-            name="Can publish pages", content_type_id=1, codename="publish_pages"
+            name="Can publish pages",
+            content_type=content_type,
+            codename="publish_pages",
         )
 
         group.permissions.add(permission)
 
         # Add user to group
-
         self.user.groups.add(group)
 
         # Test group membership
-
         self.assertIn(group, self.user.groups.all())
 
         # Test permission through group
-
-        self.assertTrue(self.user.has_perm("publish_pages"))
+        self.assertTrue(self.user.has_perm(f"{content_type.app_label}.publish_pages"))
 
     def test_user_validation(self):
         """Test user model validation."""
@@ -626,10 +634,13 @@ class AccountsRBACTests(TestCase):
 
             role = Group.objects.create(name="Content Manager")
 
-            # Create permissions
+            # Create permissions with valid ContentType
+            content_type = ContentType.objects.get_for_model(User)
 
             edit_perm = Permission.objects.create(
-                name="Can edit content", content_type_id=1, codename="edit_content"
+                name="Can edit content",
+                content_type=content_type,
+                codename="edit_content_rbac",
             )
 
             # Test permission assignment through role
@@ -733,11 +744,17 @@ class AccountsSerializerTests(TestCase):
 
         try:
 
-            # Create profile
-
-            profile = UserProfile.objects.create(
-                user=self.user, bio="Test bio", phone_number="+1234567890"
-            )
+            # Get or create profile (signal should create it automatically)
+            if hasattr(self.user, "profile"):
+                profile = self.user.profile
+                profile.bio = "Test bio"
+                profile.phone_number = "+1234567890"
+                profile.save()
+            else:
+                profile, created = UserProfile.objects.get_or_create(
+                    user=self.user,
+                    defaults={"bio": "Test bio", "phone_number": "+1234567890"},
+                )
 
             serializer = UserProfileSerializer(profile)
 
@@ -774,11 +791,17 @@ class AccountsIntegrationTests(TransactionTestCase):
             is_active=False,  # Start inactive
         )
 
-        # Create profile
-
+        # Handle profile creation (signal should create it automatically)
         try:
-
-            profile = UserProfile.objects.create(user=new_user, bio="New user bio")
+            # Get existing profile or create if needed
+            if hasattr(new_user, "profile"):
+                profile = new_user.profile
+                profile.bio = "New user bio"
+                profile.save()
+            else:
+                profile, created = UserProfile.objects.get_or_create(
+                    user=new_user, defaults={"bio": "New user bio"}
+                )
 
             self.assertEqual(profile.user, new_user)
 
@@ -821,14 +844,17 @@ class AccountsIntegrationTests(TransactionTestCase):
     def test_user_permission_workflow(self):
         """Test user permission assignment and checking workflow."""
 
-        # Create permissions
+        # Create permissions with valid ContentType
+        content_type = ContentType.objects.get_for_model(User)
 
         edit_permission = Permission.objects.create(
-            name="Can edit content", content_type_id=1, codename="edit_content"
+            name="Can edit content", content_type=content_type, codename="edit_content"
         )
 
         publish_permission = Permission.objects.create(
-            name="Can publish content", content_type_id=1, codename="publish_content"
+            name="Can publish content",
+            content_type=content_type,
+            codename="publish_content",
         )
 
         # Create group with permissions
@@ -846,10 +872,8 @@ class AccountsIntegrationTests(TransactionTestCase):
         self.user.user_permissions.add(publish_permission)
 
         # Test permission checking
-
-        self.assertTrue(self.user.has_perm("edit_content"))
-
-        self.assertTrue(self.user.has_perm("publish_content"))
+        self.assertTrue(self.user.has_perm(f"{content_type.app_label}.edit_content"))
+        self.assertTrue(self.user.has_perm(f"{content_type.app_label}.publish_content"))
 
         # Test non-existent permission
 
@@ -864,10 +888,13 @@ class AccountsIntegrationTests(TransactionTestCase):
 
             content_manager_role = Group.objects.create(name="Content Manager")
 
-            # Create permissions
+            # Create permissions with valid ContentType
+            content_type = ContentType.objects.get_for_model(User)
 
             manage_permission = Permission.objects.create(
-                name="Can manage content", content_type_id=1, codename="manage_content"
+                name="Can manage content",
+                content_type=content_type,
+                codename="manage_content",
             )
 
             # Assign permission to role if supported

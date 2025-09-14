@@ -96,6 +96,7 @@ PASSWORD_HASHERS = [
 
 # Authentication backends
 AUTHENTICATION_BACKENDS = [
+    "apps.accounts.auth_backends.ScopedPermissionBackend",
     "django.contrib.auth.backends.ModelBackend",
 ]
 

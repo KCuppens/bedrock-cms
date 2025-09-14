@@ -74,7 +74,7 @@ class PagesViewSetBasicTestCase(APITestCase):
 
         self.client.force_authenticate(user=self.admin_user)
 
-        response = self.client.get("/api/v1/cms/api/pages/")
+        response = self.client.get("/api/v1/cms/pages/")
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
@@ -109,7 +109,7 @@ class PagesViewSetBasicTestCase(APITestCase):
         """Test successful page retrieval by path."""
 
         response = self.client.get(
-            "/api/v1/cms/api/pages/get_by_path/",
+            "/api/v1/cms/pages/get_by_path/",
             {"path": "/published-page/", "locale": "en"},
         )
 
@@ -124,9 +124,7 @@ class PagesViewSetBasicTestCase(APITestCase):
     def test_get_by_path_missing_path_parameter(self):
         """Test error when path parameter is missing."""
 
-        response = self.client.get(
-            "/api/v1/cms/api/pages/get_by_path/", {"locale": "en"}
-        )
+        response = self.client.get("/api/v1/cms/pages/get_by_path/", {"locale": "en"})
 
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
@@ -138,7 +136,7 @@ class PagesViewSetBasicTestCase(APITestCase):
         """Test error with invalid locale."""
 
         response = self.client.get(
-            "/api/v1/cms/api/pages/get_by_path/",
+            "/api/v1/cms/pages/get_by_path/",
             {"path": "/published-page/", "locale": "invalid"},
         )
 
@@ -152,7 +150,7 @@ class PagesViewSetBasicTestCase(APITestCase):
         """Test error when page doesn't exist."""
 
         response = self.client.get(
-            "/api/v1/cms/api/pages/get_by_path/",
+            "/api/v1/cms/pages/get_by_path/",
             {"path": "/nonexistent-page/", "locale": "en"},
         )
 
@@ -166,7 +164,7 @@ class PagesViewSetBasicTestCase(APITestCase):
         """Test accessing draft page without permission."""
 
         response = self.client.get(
-            "/api/v1/cms/api/pages/get_by_path/",
+            "/api/v1/cms/pages/get_by_path/",
             {"path": "/draft-page/", "locale": "en"},
         )
 
@@ -182,7 +180,7 @@ class PagesViewSetBasicTestCase(APITestCase):
         self.client.force_authenticate(user=self.admin_user)
 
         response = self.client.get(
-            "/api/v1/cms/api/pages/get_by_path/",
+            "/api/v1/cms/pages/get_by_path/",
             {"path": "/draft-page/", "locale": "en"},
         )
 
@@ -208,7 +206,7 @@ class PagesViewSetBasicTestCase(APITestCase):
         )
 
         response = self.client.get(
-            f"/api/v1/cms/api/pages/{self.published_page.id}/children/"
+            f"/api/v1/cms/pages/{self.published_page.id}/children/"
         )
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -222,7 +220,7 @@ class PagesViewSetBasicTestCase(APITestCase):
     def test_tree_endpoint(self):
         """Test tree endpoint returns hierarchical structure."""
 
-        response = self.client.get("/api/v1/cms/api/pages/tree/")
+        response = self.client.get("/api/v1/cms/pages/tree/")
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
@@ -237,7 +235,7 @@ class PagesViewSetBasicTestCase(APITestCase):
     def test_retrieve_page(self):
         """Test page retrieval."""
 
-        response = self.client.get(f"/api/v1/cms/api/pages/{self.published_page.id}/")
+        response = self.client.get(f"/api/v1/cms/pages/{self.published_page.id}/")
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
@@ -260,7 +258,7 @@ class PagesViewSetBasicTestCase(APITestCase):
             "blocks": [{"type": "text", "props": {"content": "Test content"}}],
         }
 
-        response = self.client.post("/api/v1/cms/api/pages/", page_data, format="json")
+        response = self.client.post("/api/v1/cms/pages/", page_data, format="json")
 
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
@@ -286,7 +284,7 @@ class PagesViewSetBasicTestCase(APITestCase):
             "status": "draft",
         }
 
-        response = self.client.post("/api/v1/cms/api/pages/", page_data, format="json")
+        response = self.client.post("/api/v1/cms/pages/", page_data, format="json")
 
         # Should require permissions
 
@@ -305,7 +303,7 @@ class PagesViewSetBasicTestCase(APITestCase):
         }
 
         response = self.client.patch(
-            f"/api/v1/cms/api/pages/{self.draft_page.id}/", update_data, format="json"
+            f"/api/v1/cms/pages/{self.draft_page.id}/", update_data, format="json"
         )
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -325,7 +323,7 @@ class PagesViewSetBasicTestCase(APITestCase):
 
         self.client.force_authenticate(user=self.admin_user)
 
-        response = self.client.delete(f"/api/v1/cms/api/pages/{self.draft_page.id}/")
+        response = self.client.delete(f"/api/v1/cms/pages/{self.draft_page.id}/")
 
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
 
@@ -382,7 +380,7 @@ class PagePublishingTestCase(APITestCase):
         self.client.force_authenticate(user=self.admin_user)
 
         response = self.client.post(
-            f"/api/v1/cms/api/pages/{self.draft_page.id}/publish/",
+            f"/api/v1/cms/pages/{self.draft_page.id}/publish/",
             {"comment": "Publishing for launch"},
         )
 
@@ -411,9 +409,7 @@ class PagePublishingTestCase(APITestCase):
 
         self.client.force_authenticate(user=regular_user)
 
-        response = self.client.post(
-            f"/api/v1/cms/api/pages/{self.draft_page.id}/publish/"
-        )
+        response = self.client.post(f"/api/v1/cms/pages/{self.draft_page.id}/publish/")
 
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
@@ -423,7 +419,7 @@ class PagePublishingTestCase(APITestCase):
         self.client.force_authenticate(user=self.admin_user)
 
         response = self.client.post(
-            f"/api/v1/cms/api/pages/{self.published_page.id}/unpublish/",
+            f"/api/v1/cms/pages/{self.published_page.id}/unpublish/",
             {"comment": "Unpublishing for updates"},
         )
 
@@ -451,7 +447,7 @@ class PagePublishingTestCase(APITestCase):
         scheduled_time = timezone.now() + timedelta(hours=1)
 
         response = self.client.post(
-            f"/api/v1/cms/api/pages/{self.draft_page.id}/schedule/",
+            f"/api/v1/cms/pages/{self.draft_page.id}/schedule/",
             {"scheduled_at": scheduled_time.isoformat(), "comment": "Scheduled launch"},
         )
 
@@ -467,7 +463,7 @@ class PagePublishingTestCase(APITestCase):
 
         self.assertEqual(self.draft_page.status, "scheduled")
 
-        self.assertIsNotNone(self.draft_page.scheduled_at)
+        self.assertIsNotNone(self.draft_page.scheduled_publish_at)
 
     def test_schedule_page_past_time_error(self):
         """Test error when scheduling in the past."""
@@ -479,7 +475,7 @@ class PagePublishingTestCase(APITestCase):
         past_time = timezone.now() - timedelta(hours=1)
 
         response = self.client.post(
-            f"/api/v1/cms/api/pages/{self.draft_page.id}/schedule/",
+            f"/api/v1/cms/pages/{self.draft_page.id}/schedule/",
             {"scheduled_at": past_time.isoformat(), "comment": "Invalid schedule"},
         )
 
@@ -502,13 +498,13 @@ class PagePublishingTestCase(APITestCase):
             path="/scheduled-page/",
             locale=self.locale_en,
             status="scheduled",
-            scheduled_at=scheduled_time,
+            scheduled_publish_at=scheduled_time,
             blocks=[{"type": "text", "props": {"content": "Scheduled content"}}],
         )
 
         self.client.force_authenticate(user=self.admin_user)
 
-        response = self.client.get("/api/v1/cms/api/pages/scheduled_content/")
+        response = self.client.get("/api/v1/cms/pages/scheduled_content/")
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 

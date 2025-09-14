@@ -4,7 +4,13 @@ from django.contrib.contenttypes.models import ContentType
 from django.db.models.signals import post_delete, post_save, pre_save
 from django.dispatch import receiver
 
-from apps.cms.models import Page
+try:
+    from apps.cms.models import Page
+
+    PAGE_MODEL_AVAILABLE = True
+except ImportError:
+    PAGE_MODEL_AVAILABLE = False
+    Page = None
 
 from .models import Locale
 from .settings_sync import DjangoSettingsSync
@@ -16,7 +22,6 @@ from .translation import TranslationManager
 logger = logging.getLogger(__name__)
 
 
-@receiver(post_save, sender=Page)
 def create_page_translation_units(sender, instance, created, **kwargs):
     """Create translation units when a page is saved."""
 
@@ -44,7 +49,6 @@ def create_page_translation_units(sender, instance, created, **kwargs):
         pass
 
 
-@receiver(pre_save, sender=Page)
 def store_old_page_data(sender, instance, **kwargs):
     """Store old page data to detect changes in translatable fields."""
 
@@ -268,3 +272,9 @@ def validate_locale_changes(sender, instance, **kwargs):
     except Exception as e:
 
         logger.error(f"Failed to validate locale changes: {e}")
+
+
+# Conditionally register Page-related signals if the model is available
+if PAGE_MODEL_AVAILABLE and Page:
+    post_save.connect(create_page_translation_units, sender=Page)
+    pre_save.connect(store_old_page_data, sender=Page)

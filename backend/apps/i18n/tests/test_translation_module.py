@@ -22,13 +22,13 @@ class TranslationResolverTestCase(TestCase):
             code="fr",
             name="French",
             native_name="Français",
-            fallback_locale=self.en_locale,
+            fallback=self.en_locale,
         )
         self.es_locale = Locale.objects.create(
             code="es",
             name="Spanish",
             native_name="Español",
-            fallback_locale=self.en_locale,
+            fallback=self.en_locale,
         )
 
         # Create resolver
@@ -270,7 +270,7 @@ class TranslationUtilitiesTestCase(TestCase):
             code="fr",
             name="French",
             native_name="Français",
-            fallback_locale=self.en_locale,
+            fallback=self.en_locale,
         )
 
     def test_ui_message_translation(self):
@@ -327,7 +327,7 @@ class TranslationUtilitiesTestCase(TestCase):
             code="es",
             name="Spanish",
             native_name="Español",
-            fallback_locale=self.fr_locale,
+            fallback=self.fr_locale,
         )
 
         # Test fallback chain
@@ -370,7 +370,7 @@ class TranslationIntegrationTestCase(TestCase):
             code="fr",
             name="French",
             native_name="Français",
-            fallback_locale=self.en_locale,
+            fallback=self.en_locale,
         )
 
     def test_translation_workflow(self):
@@ -441,7 +441,7 @@ class TranslationIntegrationTestCase(TestCase):
             code="de",
             name="German",
             native_name="Deutsch",
-            fallback_locale=self.en_locale,
+            fallback=self.en_locale,
         )
 
         with patch(

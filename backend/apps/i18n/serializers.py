@@ -214,7 +214,7 @@ class TranslationStatusSerializer(serializers.Serializer):
 
     status = serializers.CharField()
 
-    fallback_locale = serializers.CharField(allow_null=True)
+    fallback = serializers.CharField(allow_null=True)
 
     needs_update = serializers.BooleanField()
 

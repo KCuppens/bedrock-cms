@@ -32,7 +32,7 @@ class ImportDjangoTranslationsTestCase(TestCase):
             code="fr",
             name="French",
             native_name="Français",
-            fallback_locale=self.en_locale,
+            fallback=self.en_locale,
         )
 
     def test_command_help(self):
@@ -307,7 +307,7 @@ class ManagementCommandIntegrationTestCase(TestCase):
             code="fr",
             name="French",
             native_name="Français",
-            fallback_locale=self.en_locale,
+            fallback=self.en_locale,
         )
 
         out = StringIO()

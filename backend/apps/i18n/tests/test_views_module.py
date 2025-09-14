@@ -47,7 +47,7 @@ class LocaleViewSetTestCase(APITestCase):
         """Set up test data."""
         self.client = APIClient()
         self.user = User.objects.create_user(
-            username="testuser", email="test@example.com", password="testpass123"
+            email="test@example.com", password="testpass123"
         )
 
         self.en_locale = Locale.objects.create(
@@ -62,7 +62,7 @@ class LocaleViewSetTestCase(APITestCase):
             name="French",
             native_name="Français",
             is_active=True,
-            fallback_locale=self.en_locale,
+            fallback=self.en_locale,
         )
         self.inactive_locale = Locale.objects.create(
             code="de", name="German", native_name="Deutsch", is_active=False
@@ -138,7 +138,6 @@ class TranslationUnitViewSetTestCase(APITestCase):
         """Set up test data."""
         self.client = APIClient()
         self.user = User.objects.create_user(
-            username="translator",
             email="translator@example.com",
             password="testpass123",
         )
@@ -150,7 +149,7 @@ class TranslationUnitViewSetTestCase(APITestCase):
             code="fr",
             name="French",
             native_name="Français",
-            fallback_locale=self.en_locale,
+            fallback=self.en_locale,
         )
 
         # Create mock content type and translation unit
@@ -228,7 +227,7 @@ class UiMessageViewSetTestCase(APITestCase):
         """Set up test data."""
         self.client = APIClient()
         self.user = User.objects.create_user(
-            username="admin", email="admin@example.com", password="testpass123"
+            email="admin@example.com", password="testpass123"
         )
 
         self.en_locale = Locale.objects.create(
@@ -299,7 +298,6 @@ class TranslationGlossaryViewSetTestCase(APITestCase):
         """Set up test data."""
         self.client = APIClient()
         self.user = User.objects.create_user(
-            username="glossary_admin",
             email="glossary@example.com",
             password="testpass123",
         )
@@ -357,7 +355,7 @@ class TranslationQueueViewSetTestCase(APITestCase):
         """Set up test data."""
         self.client = APIClient()
         self.user = User.objects.create_user(
-            username="queue_manager", email="queue@example.com", password="testpass123"
+            email="queue@example.com", password="testpass123"
         )
 
         self.en_locale = Locale.objects.create(
@@ -433,7 +431,7 @@ class ViewSetIntegrationTestCase(APITestCase):
         """Set up integration test data."""
         self.client = APIClient()
         self.admin_user = User.objects.create_superuser(
-            username="admin", email="admin@example.com", password="adminpass123"
+            email="admin@example.com", password="adminpass123"
         )
 
         self.en_locale = Locale.objects.create(
@@ -535,7 +533,7 @@ class ViewSetErrorHandlingTestCase(APITestCase):
         """Set up error handling test data."""
         self.client = APIClient()
         self.user = User.objects.create_user(
-            username="test_user", email="test@example.com", password="testpass123"
+            email="test@example.com", password="testpass123"
         )
 
     def test_unauthenticated_access(self):

@@ -28,7 +28,9 @@ class ScopedLocaleModelTest(TestCase):
 
     def setUp(self):
         self.group = Group.objects.create(name="Test Editors")
-        self.locale = Locale.objects.create(code="en", name="English")
+        self.locale = Locale.objects.create(
+            code="en", name="English", native_name="English"
+        )
 
     def test_scoped_locale_creation(self):
         """Test creating a ScopedLocale instance."""
@@ -232,8 +234,12 @@ class RBACMixinTest(TestCase):
         self.regular_user.groups.add(self.blog_editors)
 
         # Create locales
-        self.en_locale = Locale.objects.create(code="en", name="English")
-        self.fr_locale = Locale.objects.create(code="fr", name="French")
+        self.en_locale = Locale.objects.create(
+            code="en", name="English", native_name="English"
+        )
+        self.fr_locale = Locale.objects.create(
+            code="fr", name="French", native_name="Français"
+        )
 
         # Create scoped permissions
         ScopedLocale.objects.create(group=self.blog_editors, locale=self.en_locale)
@@ -349,8 +355,12 @@ class RBACIntegrationTest(TestCase):
         self.blog_editor.groups.add(self.bloggers)
 
         # Create locales
-        self.en = Locale.objects.create(code="en", name="English")
-        self.es = Locale.objects.create(code="es", name="Spanish")
+        self.en = Locale.objects.create(
+            code="en", name="English", native_name="English"
+        )
+        self.es = Locale.objects.create(
+            code="es", name="Spanish", native_name="Español"
+        )
 
         # Create scoped permissions
         # Managers have access to all content (root path) in English

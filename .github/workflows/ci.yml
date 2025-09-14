@@ -243,13 +243,15 @@ jobs:
       run: |
         # Test Python version without entrypoint
         docker run --rm --entrypoint python django-saas-boilerplate:latest --version
-        # Test Django check command without entrypoint and with test settings
+
+        # Test Django check command without database dependencies
         docker run --rm --entrypoint python -w /app/backend \
           -e DJANGO_SETTINGS_MODULE=apps.config.settings.test \
           -e DATABASE_URL=sqlite:///temp.db \
           -e SECRET_KEY=test-key \
+          -e REDIS_URL=redis://localhost:6379/0 \
           -e LOGGING_CONFIG=None \
-          django-saas-boilerplate:latest manage.py check --skip-checks
+          django-saas-boilerplate:latest manage.py check --database default
 
   integration-test:
     name: Integration Tests

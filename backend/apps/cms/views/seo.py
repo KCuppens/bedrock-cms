@@ -4,8 +4,9 @@ from django.core.cache import cache
 
 from rest_framework import status, viewsets
 from rest_framework.decorators import action
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
+from rest_framework.views import APIView
 
 from apps.cms.seo import SeoSettings
 from apps.cms.serializers.seo import SeoSettingsSerializer
@@ -432,3 +433,41 @@ class SeoSettingsViewSet(viewsets.ModelViewSet):
                 "twitter:image": default_og_image,
             }
         )
+
+
+class PublicSeoSettingsView(APIView):
+    """Public API view for SEO settings, accessible without authentication."""
+
+    permission_classes = [AllowAny]
+
+    def get(self, request, locale_code):
+        """Get SEO settings for a specific locale by locale code."""
+
+        try:
+            locale = Locale.objects.get(code=locale_code, is_active=True)
+        except Locale.DoesNotExist:
+            return Response(
+                {"error": f"Locale with code {locale_code} not found or inactive"},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+
+        try:
+            settings = SeoSettings.objects.get(locale=locale)
+            serializer = SeoSettingsSerializer(settings)
+            return Response(serializer.data)
+        except SeoSettings.DoesNotExist:
+            # Return default settings for this locale
+            return Response(
+                {
+                    "id": None,
+                    "locale": locale.id,
+                    "locale_code": locale.code,
+                    "locale_name": locale.name,
+                    "title_suffix": "",
+                    "default_description": "",
+                    "default_og_asset": None,
+                    "default_og_image_url": None,
+                    "robots_default": "index,follow",
+                    "jsonld_default": [],
+                }
+            )

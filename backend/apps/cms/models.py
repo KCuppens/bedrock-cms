@@ -12,6 +12,7 @@ from django.db.models import (
     CharField,
     DateTimeField,
     ForeignKey,
+    ManyToManyField,
     PositiveIntegerField,
     PositiveSmallIntegerField,
     SlugField,
@@ -25,10 +26,9 @@ if TYPE_CHECKING:
 
 # Import optional models that may not be available
 try:
-    from apps.blog.models import BlogSettings, Category
+    from apps.blog.models import BlogSettings
 except ImportError:
     BlogSettings = None  # type: ignore
-    Category = None  # type: ignore
 
 try:
     from apps.ops.models import AuditEntry
@@ -145,6 +145,15 @@ class Page(models.Model, RBACMixin):
     )
 
     review_notes: TextField = models.TextField(blank=True)
+
+    # Content organization fields
+
+    categories = models.ManyToManyField(
+        "cms.Category",
+        blank=True,
+        related_name="pages",
+        help_text=_("Categories for organizing this page"),
+    )
 
     class Meta:
 
@@ -387,7 +396,7 @@ class Page(models.Model, RBACMixin):
         # Check if it's a category-specific presentation page
 
         try:
-            if Category and Category.objects.filter(presentation_page=self).exists():
+            if Category.objects.filter(presentation_page=self).exists():
                 is_presentation_page = True
         except Exception:  # nosec B110
             # Ignore if Category model relationship is not available
@@ -420,9 +429,7 @@ class Page(models.Model, RBACMixin):
                 return True
 
             # Check categories
-
-            if Category and Category.objects.filter(presentation_page=self).exists():
-
+            if Category.objects.filter(presentation_page=self).exists():
                 return True
 
         except Exception:  # nosec B110
@@ -621,6 +628,7 @@ RedirectImport = None
 
 
 # Import models from model_parts
+from .model_parts.category import Category, Collection, Tag  # noqa: F401
 
 
 class BlockTypeCategory(models.TextChoices):
@@ -747,6 +755,12 @@ class BlockType(models.Model):
     default_props = models.JSONField(
         default=dict,
         help_text=_("Default props when creating a new instance of this block"),
+    )
+
+    # Display ordering
+
+    order: PositiveIntegerField = models.PositiveIntegerField(
+        default=0, help_text=_("Display order in the editor (lower numbers first)")
     )
 
     # Metadata

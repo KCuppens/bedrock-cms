@@ -1,11 +1,13 @@
 from typing import Any, Optional
 
 from django.contrib.auth.models import AbstractUser, BaseUserManager
-from django.core.validators import FileExtensionValidator
+from django.core.exceptions import ValidationError
+from django.core.validators import FileExtensionValidator, validate_email
 from django.db import models
 from django.db.models import (
     BooleanField,
     CharField,
+    DateField,
     DateTimeField,
     OneToOneField,
     TextField,
@@ -134,6 +136,17 @@ class User(AbstractUser):
 
         return self.email
 
+    def clean(self):
+        """Validate user data."""
+        super().clean()
+
+        # Validate email format
+        if self.email:
+            try:
+                validate_email(self.email)
+            except ValidationError:
+                raise ValidationError({"email": "Enter a valid email address."})
+
     def get_full_name(self):  # noqa: C901
         """Return the full name for the user."""
 
@@ -209,11 +222,27 @@ class UserProfile(models.Model):
 
     phone: CharField = models.CharField(_("Phone number"), max_length=20, blank=True)
 
+    phone_number: CharField = models.CharField(
+        _("Phone number (alt)"), max_length=20, blank=True
+    )
+
+    avatar: CharField = models.CharField(
+        _("Avatar URL"), max_length=255, blank=True, null=True
+    )
+
+    date_of_birth: DateField = models.DateField(
+        _("Date of birth"), blank=True, null=True
+    )
+
     # Preferences
 
     timezone: CharField = models.CharField(_("Timezone"), max_length=50, default="UTC")
 
     language: CharField = models.CharField(_("Language"), max_length=10, default="en")
+
+    language_preference: CharField = models.CharField(
+        _("Language Preference"), max_length=10, default="en", blank=True
+    )
 
     receive_notifications: BooleanField = models.BooleanField(
         _("Receive notifications"), default=True

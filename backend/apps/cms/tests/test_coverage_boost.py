@@ -142,7 +142,7 @@ Block.objects = type(
             "MockQuerySet",
             (),
             {
-                "order_by": lambda order: [
+                "order_by": lambda self, order: [
                     Block(page=kwargs.get("page"), order=1, block_type="text"),
                     Block(page=kwargs.get("page"), order=2, block_type="text"),
                     Block(page=kwargs.get("page"), order=3, block_type="text"),
@@ -421,7 +421,7 @@ class CMSSEOUtilsTest(TestCase):
         # Valid data
         valid_data = {
             "title": "Good Title",
-            "description": "A good description that is long enough to meet the requirements but not too long to be problematic",
+            "description": "A good description that is long enough to meet the minimum requirements and not too long to exceed the maximum",
         }
         self.assertTrue(validate_seo_data(valid_data))
 

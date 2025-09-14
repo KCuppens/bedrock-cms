@@ -52,9 +52,13 @@ class UserProfileFactory(BaseFactory):
 
     user = factory.SubFactory("tests.factories.base.UserFactory")
 
-    avatar = None
-
     bio = factory.Faker("paragraph", nb_sentences=3)
+
+    location = factory.Faker("city")
+
+    website = factory.Faker("url")
+
+    phone = factory.Faker("phone_number")
 
     timezone = factory.Iterator(
         [
@@ -67,7 +71,11 @@ class UserProfileFactory(BaseFactory):
         ]
     )
 
-    language_preference = factory.Iterator(["en", "es", "fr", "de"])
+    language = factory.Iterator(["en", "es", "fr", "de"])
+
+    receive_notifications = factory.Faker("boolean", chance_of_getting_true=75)
+
+    receive_marketing_emails = factory.Faker("boolean", chance_of_getting_true=25)
 
 
 # Specialized user factories with specific roles
@@ -88,9 +96,13 @@ class EditorUserFactory(UserFactory):
 
         self.groups.add(editor_group)
 
-        # Create profile
-
-        UserProfileFactory(user=self)
+        # Create profile if it doesn't exist
+        try:
+            # Check if profile already exists
+            self.profile
+        except UserProfile.DoesNotExist:
+            # Profile doesn't exist, create one
+            UserProfileFactory(user=self)
 
         # Note: ScopedSection model not available in current schema
 
@@ -110,9 +122,13 @@ class TranslatorUserFactory(UserFactory):
 
         self.groups.add(translator_group)
 
-        # Create profile
-
-        UserProfileFactory(user=self)
+        # Create profile if it doesn't exist
+        try:
+            # Check if profile already exists
+            self.profile
+        except UserProfile.DoesNotExist:
+            # Profile doesn't exist, create one
+            UserProfileFactory(user=self)
 
         # Note: ScopedLocale model not available in current schema
         locale_es = LocaleFactory(code="es")

@@ -129,7 +129,7 @@ class TranslationResolver:
                 "target_locale": self.target_locale.code,
                 "has_translation": False,
                 "status": "missing",
-                "fallback_locale": None,
+                "fallback": None,
                 "needs_update": False,
             }
 
@@ -168,7 +168,7 @@ class TranslationResolver:
 
                         if fallback_unit.target_text:
 
-                            field_info["fallback_locale"] = locale.code
+                            field_info["fallback"] = locale.code
 
                     except TranslationUnit.DoesNotExist:
                         pass

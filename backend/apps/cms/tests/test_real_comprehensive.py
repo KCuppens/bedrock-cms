@@ -27,7 +27,9 @@ class CMSRealModelTests(TestCase):
             email="test@example.com", password="testpass123"
         )
 
-        self.locale = Locale.objects.create(code="en", name="English", is_default=True)
+        self.locale = Locale.objects.create(
+            code="en", name="English", native_name="English", is_default=True
+        )
 
     def test_page_creation_with_real_fields(self):
         """Test page creation with all actual fields."""
@@ -228,7 +230,9 @@ class CMSRealModelMethodTests(TestCase):
             email="test@example.com", password="testpass123"
         )
 
-        self.locale = Locale.objects.create(code="en", name="English", is_default=True)
+        self.locale = Locale.objects.create(
+            code="en", name="English", native_name="English", is_default=True
+        )
 
     def test_page_get_absolute_url(self):
         """Test page get_absolute_url method if it exists."""
@@ -335,7 +339,9 @@ class CMSRealAPITests(APITestCase):
 
         self.client.force_authenticate(user=self.user)
 
-        self.locale = Locale.objects.create(code="en", name="English", is_default=True)
+        self.locale = Locale.objects.create(
+            code="en", name="English", native_name="English", is_default=True
+        )
 
     def test_page_api_operations(self):
         """Test basic page API operations."""
@@ -411,7 +417,9 @@ class CMSRealIntegrationTests(TransactionTestCase):
             email="test@example.com", password="testpass123"
         )
 
-        self.locale = Locale.objects.create(code="en", name="English", is_default=True)
+        self.locale = Locale.objects.create(
+            code="en", name="English", native_name="English", is_default=True
+        )
 
     def test_page_lifecycle_workflow(self):
         """Test complete page lifecycle."""
@@ -519,7 +527,9 @@ class CMSRealIntegrationTests(TransactionTestCase):
 
         # Create Spanish locale
 
-        spanish_locale = Locale.objects.create(code="es", name="Spanish")
+        spanish_locale = Locale.objects.create(
+            code="es", name="Spanish", native_name="Español"
+        )
 
         # Create English page
 

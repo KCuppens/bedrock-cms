@@ -10,7 +10,7 @@ from .views.category import CategoryViewSet, CollectionViewSet, TagViewSet
 from .views.navigation import FooterView, NavigationView, SiteSettingsView
 from .views.pages import PagesViewSet
 from .views.redirect import RedirectViewSet
-from .views.seo import SeoSettingsViewSet
+from .views.seo import PublicSeoSettingsView, SeoSettingsViewSet
 
 router = DefaultRouter()
 
@@ -44,5 +44,10 @@ urlpatterns = [
     path("navigation/", NavigationView.as_view(), name="navigation"),
     path("footer/", FooterView.as_view(), name="footer"),
     path("site-settings/", SiteSettingsView.as_view(), name="site-settings"),
+    path(
+        "public/seo-settings/<str:locale_code>/",
+        PublicSeoSettingsView.as_view(),
+        name="public-seo-settings",
+    ),
     path("sitemap-<str:locale_code>.xml", sitemap_view, name="sitemap"),
 ]

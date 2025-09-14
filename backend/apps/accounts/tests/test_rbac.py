@@ -585,10 +585,8 @@ class RBACMixinTests(TestCase):
 
 @override_settings(
     AUTHENTICATION_BACKENDS=[
-        # Imports that were malformed - commented out
-        #         """"apps.accounts.auth_backends.ScopedPermissionBackend","""
-        # Imports that were malformed - commented out
-        #         "django.contrib.auth.backends.ModelBackend",
+        "apps.accounts.auth_backends.ScopedPermissionBackend",
+        "django.contrib.auth.backends.ModelBackend",
     ]
 )
 class IntegrationTests(TestCase):

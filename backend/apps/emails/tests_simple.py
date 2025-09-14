@@ -17,7 +17,7 @@ class EmailTemplateModelTest(TestCase):
 
     def setUp(self):
         self.user = User.objects.create_user(
-            username="testuser", email="test@example.com", password="testpass123"
+            email="test@example.com", password="testpass123"
         )
 
     def test_create_email_template(self):
@@ -115,9 +115,7 @@ class EmailMessageLogModelTest(TestCase):
     """Test EmailMessageLog model"""
 
     def setUp(self):
-        self.user = User.objects.create_user(
-            username="testuser", email="test@example.com"
-        )
+        self.user = User.objects.create_user(email="test@example.com")
         self.template = EmailTemplate.objects.create(
             key="test",
             name="Test",

@@ -175,7 +175,7 @@ class CalculateSessionDurationTest(TestCase):
         from django.utils import timezone
 
         now = timezone.now()
-        mock_view = MagicMock(created_at=now)
+        mock_view = MagicMock(viewed_at=now)
 
         mock_pageview.objects.filter.return_value.order_by.return_value.first.return_value = (
             mock_view

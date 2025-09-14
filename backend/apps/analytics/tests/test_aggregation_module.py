@@ -38,7 +38,9 @@ class AnalyticsAggregatorTestCase(TestCase):
             email="test@example.com", password="testpass123"
         )
 
-        self.locale = Locale.objects.create(code="en", name="English", is_default=True)
+        self.locale = Locale.objects.create(
+            code="en", name="English", native_name="English", is_default=True
+        )
 
         # Create test page views
         self.create_test_page_views()
@@ -269,7 +271,9 @@ class AnalyticsModelsIntegrationTestCase(TestCase):
             email="analyst@example.com", password="testpass123"
         )
 
-        self.locale = Locale.objects.create(code="en", name="English", is_default=True)
+        self.locale = Locale.objects.create(
+            code="en", name="English", native_name="English", is_default=True
+        )
 
     def test_content_metrics_aggregation(self):
         """Test aggregation with ContentMetrics model."""

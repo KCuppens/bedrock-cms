@@ -74,15 +74,16 @@ class CacheKeyBuilder:
 
         key_suffix = ":".join(clean_parts)
 
-        # Build the full key with namespace (not abbreviated)
-        full_key = f"{self.prefix}:{namespace}:{key_suffix}"
+        # Use abbreviated prefix from CACHE_PREFIXES
+        abbreviation = CACHE_PREFIXES.get(namespace, namespace)
+        full_key = f"{self.prefix}:{abbreviation}:{key_suffix}"
 
         # If the key is too long, hash the suffix part to keep it under 250 chars
         if len(full_key) > 250:
             suffix_hash = hashlib.md5(
                 key_suffix.encode(), usedforsecurity=False
             ).hexdigest()[:16]
-            full_key = f"{self.prefix}:{namespace}:{suffix_hash}"
+            full_key = f"{self.prefix}:{abbreviation}:{suffix_hash}"
 
         return full_key
 
@@ -105,8 +106,7 @@ class CacheKeyBuilder:
         parts = [locale, clean_path]
 
         if revision_id:
-
-            """parts.append(revision_id)"""
+            parts.append(revision_id)
 
         return self.build_key("page", *parts)
 
@@ -125,8 +125,7 @@ class CacheKeyBuilder:
         parts = [model_label, locale, slug]
 
         if revision_id:
-
-            """parts.append(revision_id)"""
+            parts.append(revision_id)
 
         return self.build_key("content", *parts)
 
@@ -145,12 +144,10 @@ class CacheKeyBuilder:
         parts = [locale, slug]
 
         if post_rev:
-
-            """parts.append(post_rev)"""
+            parts.append(post_rev)
 
         if page_rev:
-
-            """parts.append(page_rev)"""
+            parts.append(page_rev)
 
         return self.build_key("blog", *parts)
 
@@ -319,7 +316,7 @@ class CacheManager:
 
             base_key = self.key_builder.page_key(locale, path)
 
-            """keys_to_invalidate.append(base_key)"""
+            keys_to_invalidate.append(base_key)
 
             # Also invalidate with any potential revision IDs
 
@@ -362,7 +359,7 @@ class CacheManager:
 
             base_key = self.key_builder.content_key(model_label, locale, slug)
 
-            """keys_to_invalidate.append(base_key)"""
+            keys_to_invalidate.append(base_key)
 
             # Pattern for revision variants
 

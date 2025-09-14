@@ -7,6 +7,12 @@
 
 """Target: +310 lines of coverage"""
 
+import os
+
+import django
+
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "apps.config.settings.test_minimal")
+django.setup()
 
 import uuid
 
@@ -82,7 +88,7 @@ class PagesViewSetTestCase(APITestCase):
 
         self.client.force_authenticate(user=self.admin_user)
 
-        response = self.client.get("/api/v1/cms/api/pages/")
+        response = self.client.get("/api/v1/cms/pages/")
 
         # Should return all pages with proper annotations
 
@@ -156,7 +162,7 @@ class PageRetrievalTestCase(APITestCase):
         """Test successful page retrieval by path."""
 
         response = self.client.get(
-            "/api/v1/cms/api/pages/get_by_path/",
+            "/api/v1/cms/pages/get_by_path/",
             """{"path": "/test-page/", "locale": "en"},""",
         )
 
@@ -171,9 +177,7 @@ class PageRetrievalTestCase(APITestCase):
     def test_get_by_path_missing_path_parameter(self):
         """Test error when path parameter is missing."""
 
-        response = self.client.get(
-            "/api/v1/cms/api/pages/get_by_path/", {"locale": "en"}
-        )
+        response = self.client.get("/api/v1/cms/pages/get_by_path/", {"locale": "en"})
 
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
@@ -185,7 +189,7 @@ class PageRetrievalTestCase(APITestCase):
         """Test error with invalid locale."""
 
         response = self.client.get(
-            "/api/v1/cms/api/pages/get_by_path/",
+            "/api/v1/cms/pages/get_by_path/",
             """{"path": "/test-page/", "locale": "invalid"},""",
         )
 
@@ -199,7 +203,7 @@ class PageRetrievalTestCase(APITestCase):
         """Test error when page doesn't exist."""
 
         response = self.client.get(
-            "/api/v1/cms/api/pages/get_by_path/",
+            "/api/v1/cms/pages/get_by_path/",
             {"path": "/nonexistent-page/", "locale": "en"},
         )
 
@@ -221,7 +225,7 @@ class PageRetrievalTestCase(APITestCase):
         self.draft_page.save()
 
         response = self.client.get(
-            "/api/v1/cms/api/pages/get_by_path/",
+            "/api/v1/cms/pages/get_by_path/",
             {"path": "/draft-page/", "locale": "en", "preview": preview_token},
         )
 
@@ -235,7 +239,7 @@ class PageRetrievalTestCase(APITestCase):
         """Test error with invalid preview token."""
 
         response = self.client.get(
-            "/api/v1/cms/api/pages/get_by_path/",
+            "/api/v1/cms/pages/get_by_path/",
             {"path": "/draft-page/", "locale": "en", "preview": "invalid-token"},
         )
 
@@ -249,7 +253,7 @@ class PageRetrievalTestCase(APITestCase):
         """Test accessing draft page without permission."""
 
         response = self.client.get(
-            "/api/v1/cms/api/pages/get_by_path/",
+            "/api/v1/cms/pages/get_by_path/",
             {"path": "/draft-page/", "locale": "en"},
         )
 
@@ -265,7 +269,7 @@ class PageRetrievalTestCase(APITestCase):
         self.client.force_authenticate(user=self.admin_user)
 
         response = self.client.get(
-            "/api/v1/cms/api/pages/get_by_path/",
+            "/api/v1/cms/pages/get_by_path/",
             {"path": "/draft-page/", "locale": "en"},
         )
 
@@ -325,7 +329,7 @@ class PageHierarchyTestCase(APITestCase):
     def test_children_endpoint(self):
         """Test children endpoint returns direct children."""
 
-        response = self.client.get(f"/api/v1/cms/api/pages/{self.parent.id}/children/")
+        response = self.client.get(f"/api/v1/cms/pages/{self.parent.id}/children/")
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
@@ -346,7 +350,7 @@ class PageHierarchyTestCase(APITestCase):
     def test_tree_endpoint(self):
         """Test tree endpoint returns hierarchical structure."""
 
-        response = self.client.get("/api/v1/cms/api/pages/tree/")
+        response = self.client.get("/api/v1/cms/pages/tree/")
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
@@ -407,7 +411,7 @@ class PageCRUDTestCase(APITestCase):
             "blocks": [{"type": "text", "props": {"content": "Test content"}}],
         }
 
-        response = self.client.post("/api/v1/cms/api/pages/", page_data, format="json")
+        response = self.client.post("/api/v1/cms/pages/", page_data, format="json")
 
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
@@ -433,7 +437,7 @@ class PageCRUDTestCase(APITestCase):
             "status": "draft",
         }
 
-        response = self.client.post("/api/v1/cms/api/pages/", page_data, format="json")
+        response = self.client.post("/api/v1/cms/pages/", page_data, format="json")
 
         # Should require permissions
 
@@ -452,7 +456,7 @@ class PageCRUDTestCase(APITestCase):
         }
 
         response = self.client.patch(
-            f"/api/v1/cms/api/pages/{self.test_page.id}/", update_data, format="json"
+            f"/api/v1/cms/pages/{self.test_page.id}/", update_data, format="json"
         )
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -470,7 +474,7 @@ class PageCRUDTestCase(APITestCase):
     def test_retrieve_page(self):
         """Test page retrieval."""
 
-        response = self.client.get(f"/api/v1/cms/api/pages/{self.test_page.id}/")
+        response = self.client.get(f"/api/v1/cms/pages/{self.test_page.id}/")
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
@@ -485,7 +489,7 @@ class PageCRUDTestCase(APITestCase):
 
         self.client.force_authenticate(user=self.admin_user)
 
-        response = self.client.delete(f"/api/v1/cms/api/pages/{self.test_page.id}/")
+        response = self.client.delete(f"/api/v1/cms/pages/{self.test_page.id}/")
 
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
 

@@ -28,14 +28,12 @@ class PrometheusMetricsTestCase(TestCase):
 
         # Create test users
         self.active_user = User.objects.create_user(
-            username="active_user",
             email="active@example.com",
             password="testpass123",
             is_active=True,
         )
 
         self.inactive_user = User.objects.create_user(
-            username="inactive_user",
             email="inactive@example.com",
             password="testpass123",
             is_active=False,
@@ -284,7 +282,6 @@ class PrometheusMetricsTestCase(TestCase):
         for i in range(50):
             users.append(
                 User(
-                    username=f"user_{i}",
                     email=f"user_{i}@example.com",
                     is_active=i % 2 == 0,  # Half active, half inactive
                 )
@@ -334,14 +331,12 @@ class MetricsIntegrationTestCase(TestCase):
         """Test metrics with actual model instances."""
         # Create real data
         user1 = User.objects.create_user(
-            username="real_user_1",
             email="real1@example.com",
             password="pass",
             is_active=True,
         )
 
         user2 = User.objects.create_user(
-            username="real_user_2",
             email="real2@example.com",
             password="pass",
             is_active=False,

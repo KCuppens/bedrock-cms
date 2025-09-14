@@ -32,6 +32,6 @@ urlpatterns = [
     path("auth/", include("apps.accounts.urls")),
     path("", include("apps.files.urls")),  # Files API
     # path("cms/", include("apps.cms.urls")),  # CMS API - temporarily disabled due to import issues
-    path("search/", include("apps.search.urls")),  # Search API
+    # path("search/", include("apps.search.urls")),  # Search API - disabled for minimal settings
     path("system/", include("apps.core.urls")),  # System/Core API
 ]

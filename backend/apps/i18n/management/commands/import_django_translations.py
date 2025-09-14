@@ -186,6 +186,9 @@ class Command(BaseCommand):
             if default_locale:
                 with translation.override(default_locale.code):
                     default_value = str(lazy_string)
+            else:
+                # Fallback to English if no default locale
+                default_value = str(lazy_string)
 
             # Create or get UiMessage
 

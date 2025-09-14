@@ -21,7 +21,10 @@ class I18nConfig(AppConfig):
     def ready(self):
         """Import signal handlers and initialize dynamic language settings when the app is ready."""
 
-        # from . import signals  # Commented out - Page model not available
+        try:
+            from . import signals  # Import signal handlers
+        except ImportError:
+            pass  # Handle case where models aren't available yet
 
         # Initialize dynamic language settings after Django is ready
 

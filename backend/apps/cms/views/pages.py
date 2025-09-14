@@ -30,6 +30,7 @@ from apps.cms.serializers import (
     PageWriteSerializer,
     PublicPageSerializer,
 )
+from apps.cms.services.scheduling import SchedulingService
 from apps.cms.versioning_views import VersioningMixin
 from apps.core.throttling import (
     BurstWriteThrottle,
@@ -480,7 +481,7 @@ class PagesViewSet(VersioningMixin, viewsets.ModelViewSet):
 
             if old_parent_id != page.parent_id:
 
-                Page.siblings_resequence(old_parent_id)
+                models.Page.siblings_resequence(old_parent_id)
 
         return Response(PageReadSerializer(page).data)
 
@@ -1069,6 +1070,152 @@ class PagesViewSet(VersioningMixin, viewsets.ModelViewSet):
             return Response(
                 {"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
+
+    @extend_schema(
+        request={
+            "application/json": {
+                "type": "object",
+                "properties": {
+                    "scheduled_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "description": "When to publish this page",
+                    },
+                    "comment": {
+                        "type": "string",
+                        "description": "Optional comment about the scheduling",
+                    },
+                },
+                "required": ["scheduled_at"],
+            }
+        },
+        responses={
+            200: {"description": "Page scheduled successfully"},
+            400: {"description": "Invalid request data"},
+        },
+    )
+    @action(detail=True, methods=["post"])
+    def schedule(self, request, pk=None):
+        """Schedule a page for publishing at a specific time."""
+        page = self.get_object()
+
+        scheduled_at = request.data.get("scheduled_at")
+        comment = request.data.get("comment", "")
+
+        if not scheduled_at:
+            return Response(
+                {"error": "scheduled_at is required"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        try:
+            # Parse the datetime string
+            from dateutil import parser as date_parser  # type: ignore
+
+            scheduled_datetime = date_parser.parse(scheduled_at)
+
+            # Make sure it's timezone-aware
+            if timezone.is_naive(scheduled_datetime):
+                scheduled_datetime = timezone.make_aware(scheduled_datetime)
+
+            # Validate that it's in the future
+            if scheduled_datetime <= timezone.now():
+                return Response(
+                    {"error": "Cannot schedule content in the past"},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+
+            # Use the scheduling service to schedule the page
+            with transaction.atomic():
+                publish_task, _ = SchedulingService.schedule_publish(
+                    content_object=page,
+                    publish_at=scheduled_datetime,
+                    user=request.user,
+                )
+
+                # Create audit entry if available
+                if AuditEntry:
+                    AuditEntry.objects.create(
+                        content_object=page,
+                        action="scheduled",
+                        user=request.user,
+                        metadata={
+                            "scheduled_for": scheduled_datetime.isoformat(),
+                            "comment": comment,
+                            "task_id": publish_task.id,
+                        },
+                    )
+
+            return Response(
+                {
+                    "message": "Page scheduled successfully",
+                    "scheduled_for": scheduled_datetime.isoformat(),
+                    "task_id": publish_task.id,
+                }
+            )
+
+        except ValueError as e:
+            return Response(
+                {"error": f"Invalid date format: {str(e)}"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+    @extend_schema(
+        responses={
+            200: {"description": "List of scheduled content"},
+        }
+    )
+    @action(detail=False, methods=["get"], url_path="scheduled_content")
+    def scheduled_content(self, request):
+        """Get list of scheduled content."""
+        # Get pages with scheduled status
+        scheduled_pages = (
+            models.Page.objects.filter(status="scheduled")
+            .select_related("locale")
+            .order_by("scheduled_publish_at")
+        )
+
+        # Serialize the pages
+        serializer = PageReadSerializer(scheduled_pages, many=True)
+
+        return Response({"results": serializer.data, "count": scheduled_pages.count()})
+
+    @extend_schema(
+        responses={
+            200: {"description": "Page unscheduled successfully"},
+            400: {"description": "Page is not scheduled"},
+        }
+    )
+    @action(detail=True, methods=["post"])
+    def unschedule(self, request, pk=None):
+        """Unschedule a page (cancel scheduling)."""
+        page = self.get_object()
+
+        if page.status != "scheduled":
+            return Response(
+                {"error": "Page is not scheduled"}, status=status.HTTP_400_BAD_REQUEST
+            )
+
+        try:
+            # Use the scheduling service to cancel scheduling
+            with transaction.atomic():
+                SchedulingService.cancel_scheduling(page)
+
+                # Create audit entry if available
+                if AuditEntry:
+                    AuditEntry.objects.create(
+                        content_object=page,
+                        action="unscheduled",
+                        user=request.user,
+                        metadata={"cancelled_at": timezone.now().isoformat()},
+                    )
+
+            return Response({"message": "Page unscheduled successfully"})
+
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 
 def default_sitemap_view(request):

@@ -436,6 +436,10 @@ def clean_referrer(referrer: str) -> str:
 
         parsed = urlparse(referrer)
 
+        # If no scheme is provided, treat as malformed URL
+        if not parsed.scheme:
+            return referrer
+
         # Remove query parameters and fragments
 
         clean_url = f"{parsed.scheme}://{parsed.netloc}{parsed.path}"
@@ -482,5 +486,5 @@ def get_analytics_context(request) -> dict:
         "city": geo_data["city"],
         "referrer": clean_referrer(request.META.get("HTTP_REFERER", "")),
         "is_bot": is_bot_user_agent(user_agent_string),
-        "session_key": request.session.session_key or "",
+        "session_key": getattr(request.session, "session_key", None) or "",
     }

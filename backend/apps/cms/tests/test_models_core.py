@@ -30,7 +30,9 @@ class PageModelTestCase(TestCase):
             email="page@example.com", password="testpass123"
         )
 
-        self.locale = Locale.objects.create(code="en", name="English", is_default=True)
+        self.locale = Locale.objects.create(
+            code="en", name="English", native_name="English", is_default=True
+        )
 
         self.page = Page.objects.create(
             title="Test Page",
@@ -276,11 +278,13 @@ class BlockTypeModelTestCase(TestCase):
         """Set up test data."""
         self.block_type = BlockType.objects.create(
             type="text",
+            component="TextBlock",
             label="Text Block",
             description="Simple text content",
             category="content",
             icon="text",
             schema={"type": "object", "properties": {"text": {"type": "string"}}},
+            default_props={"text": ""},
             is_active=True,
         )
 
@@ -308,11 +312,13 @@ class BlockTypeModelTestCase(TestCase):
         for category in categories:
             block_type = BlockType.objects.create(
                 type=f"{category}_block",
+                component=f"{category.title()}Block",
                 label=f"{category.title()} Block",
                 description=f"Block for {category}",
                 category=category,
                 icon=category,
                 schema={"type": "object"},
+                default_props={},
                 is_active=True,
             )
 
@@ -323,11 +329,13 @@ class BlockTypeModelTestCase(TestCase):
         # Create inactive block type
         inactive_block = BlockType.objects.create(
             type="deprecated",
+            component="DeprecatedBlock",
             label="Deprecated Block",
             description="Old block type",
             category="deprecated",
             icon="warning",
             schema={"type": "object"},
+            default_props={},
             is_active=False,
         )
 
@@ -372,11 +380,13 @@ class BlockTypeModelTestCase(TestCase):
 
         complex_block = BlockType.objects.create(
             type="complex",
+            component="ComplexBlock",
             label="Complex Block",
             description="Block with complex schema",
             category="advanced",
             icon="gear",
             schema=complex_schema,
+            default_props={"title": ""},
             is_active=True,
         )
 
@@ -387,22 +397,26 @@ class BlockTypeModelTestCase(TestCase):
         # Create block types with different orders
         block1 = BlockType.objects.create(
             type="first",
+            component="FirstBlock",
             label="First Block",
             description="First block",
             category="test",
             icon="first",
             schema={"type": "object"},
+            default_props={},
             order=1,
             is_active=True,
         )
 
         block2 = BlockType.objects.create(
             type="second",
+            component="SecondBlock",
             label="Second Block",
             description="Second block",
             category="test",
             icon="second",
             schema={"type": "object"},
+            default_props={},
             order=2,
             is_active=True,
         )
@@ -423,18 +437,22 @@ class ModelIntegrationTestCase(TestCase):
             password="testpass123",
         )
 
-        self.locale = Locale.objects.create(code="en", name="English", is_default=True)
+        self.locale = Locale.objects.create(
+            code="en", name="English", native_name="English", is_default=True
+        )
 
     def test_page_block_type_relationship(self):
         """Test relationship between pages and block types."""
         # Create block type
         text_block = BlockType.objects.create(
             type="text",
+            component="TextBlock",
             label="Text Block",
             description="Text content",
             category="content",
             icon="text",
             schema={"type": "object", "properties": {"text": {"type": "string"}}},
+            default_props={"text": ""},
             is_active=True,
         )
 
