@@ -3,6 +3,8 @@ import time
 from django.core.cache import cache
 from django.test import TestCase
 
+import pytest
+
 from apps.core.circuit_breaker import CircuitOpenException, circuit_breaker
 
 """Test cases for circuit breaker functionality."""
@@ -53,12 +55,13 @@ class CircuitBreakerTest(TestCase):
 
             failing_operation()
 
+    @pytest.mark.slow
     def test_circuit_breaker_recovery(self):
         """Test circuit breaker recovery after timeout."""
 
         @circuit_breaker(
-            failure_threshold=1, recovery_timeout=1, success_threshold=1
-        )  # Very short timeout
+            failure_threshold=1, recovery_timeout=0.1, success_threshold=1
+        )  # Very short timeout - 0.1 seconds instead of 1
         def initially_failing_operation():
 
             if not hasattr(initially_failing_operation, "recovered"):
@@ -89,7 +92,7 @@ class CircuitBreakerTest(TestCase):
 
         # Wait for recovery timeout
 
-        time.sleep(1.1)  # Wait slightly longer than timeout
+        time.sleep(0.15)  # Wait slightly longer than timeout
 
         # Should now succeed
 
@@ -115,12 +118,13 @@ class CircuitBreakerTest(TestCase):
 
             operation_with_custom_key()
 
+    @pytest.mark.slow
     def test_circuit_breaker_half_open_state(self):
         """Test circuit breaker half-open state behavior."""
 
         call_count = 0
 
-        @circuit_breaker(failure_threshold=1, recovery_timeout=1, success_threshold=1)
+        @circuit_breaker(failure_threshold=1, recovery_timeout=0.1, success_threshold=1)
         def half_open_test():
 
             nonlocal call_count
@@ -147,7 +151,7 @@ class CircuitBreakerTest(TestCase):
 
         # Wait for recovery
 
-        time.sleep(1.1)  # Wait slightly longer than timeout
+        time.sleep(0.15)  # Wait slightly longer than timeout
 
         # First call after recovery should still fail
 

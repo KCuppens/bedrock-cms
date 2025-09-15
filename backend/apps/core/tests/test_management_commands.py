@@ -3,6 +3,8 @@ from io import StringIO
 from django.core.management import call_command
 from django.test import TestCase
 
+import pytest
+
 #
 
 """Test cases for core management commands."""
@@ -12,6 +14,7 @@ from django.test import TestCase
 class ManagementCommandsTest(TestCase):
     """Test management commands in core app."""
 
+    @pytest.mark.slow
     def test_create_permissions_command(self):
         """Test create_permissions command runs without errors."""
 
