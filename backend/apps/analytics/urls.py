@@ -31,7 +31,7 @@ router.register(r"threats", ThreatViewSet, basename="threats")
 
 router.register(r"summaries", AnalyticsSummaryViewSet, basename="summaries")
 
-router.register(r"api", AnalyticsAPIViewSet, basename="analytics-api")
+router.register(r"exports", AnalyticsAPIViewSet, basename="analytics-api")
 
 
 app_name = "analytics"

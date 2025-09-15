@@ -1,3 +1,14 @@
+import os
+
+import django
+from django.conf import settings
+
+# Configure Django settings if not already configured
+if not settings.configured:
+    os.environ.setdefault("DJANGO_SETTINGS_MODULE", "apps.config.settings.test")
+    django.setup()
+
+
 import unittest
 from unittest.mock import Mock
 

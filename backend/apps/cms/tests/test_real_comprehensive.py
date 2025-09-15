@@ -1,15 +1,21 @@
 import os
 
 import django
+from django.conf import settings
 
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "apps.config.settings.test")
-django.setup()
+# Configure Django settings if not already configured
+if not settings.configured:
+    os.environ.setdefault("DJANGO_SETTINGS_MODULE", "apps.config.settings.test")
+    django.setup()
 
+
+import os
 from datetime import datetime, timedelta
 
+import django
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
-from django.test import TestCase, TransactionTestCase
+from django.test import TestCase
 from django.utils import timezone
 
 from rest_framework.test import APIClient, APITestCase
@@ -19,9 +25,7 @@ from apps.i18n.models import Locale
 
 """Real comprehensive CMS tests using actual models and targeting high coverage."""
 
-
 # Import actual models
-
 
 User = get_user_model()
 
@@ -431,7 +435,7 @@ class CMSRealAPITests(APITestCase):
         self.assertEqual(redirect.status, 302)
 
 
-class CMSRealIntegrationTests(TransactionTestCase):
+class CMSRealIntegrationTests(TestCase):
     """Integration tests with real CMS models."""
 
     def setUp(self):

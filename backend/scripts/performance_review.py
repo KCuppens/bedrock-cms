@@ -6,7 +6,6 @@ Performance review script for Bedrock CMS.
 Analyzes database queries, caching, API performance, and identifies bottlenecks.
 """
 
-
 import json
 import os
 import statistics
@@ -24,14 +23,6 @@ from django.utils import timezone
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
 # Imports that were malformed - commented out
-# os.environ.setdefault("DJANGO_SETTINGS_MODULE", "apps.config.settings.development")
-
-
-import django  # noqa: E402
-
-django.setup()
-
-
 from apps.blog.models import BlogPost  # noqa: E402
 from apps.cms.blocks.validation import validate_blocks  # noqa: E402
 from apps.cms.models import Page  # noqa: E402

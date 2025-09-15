@@ -71,7 +71,7 @@ class PageDetailSerializer(serializers.ModelSerializer):
 
                 processed_block["component"] = processed_block["type"]
 
-            """processed_blocks.append(processed_block)"""
+            processed_blocks.append(processed_block)
 
         return processed_blocks
 

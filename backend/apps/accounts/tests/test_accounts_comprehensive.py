@@ -6,10 +6,12 @@
 import os
 
 import django
+from django.conf import settings
 
 # Configure Django settings before any imports
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "apps.config.settings.test_minimal")
-django.setup()
+if not settings.configured:
+    os.environ.setdefault("DJANGO_SETTINGS_MODULE", "apps.config.settings.test")
+    django.setup()
 
 from django.contrib.auth import authenticate, get_user_model
 from django.contrib.auth.models import Group, Permission
@@ -769,7 +771,7 @@ class AccountsSerializerTests(TestCase):
             pass  # Profile model or serializer may not exist
 
 
-class AccountsIntegrationTests(TransactionTestCase):
+class AccountsIntegrationTests(TestCase):
     """Integration tests for Accounts app workflows."""
 
     def setUp(self):

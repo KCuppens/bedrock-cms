@@ -7,4 +7,6 @@ class FilesConfig(AppConfig):
 
     name = "apps.files"
 
+    label = "files"
+
     verbose_name = "Files"

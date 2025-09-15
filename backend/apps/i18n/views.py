@@ -858,9 +858,22 @@ class TranslationUnitViewSet(viewsets.ModelViewSet):
 
         translation_units = TranslationUnit.objects.filter(id__in=translation_unit_ids)
 
+        # Check for missing IDs
+        found_ids = set(translation_units.values_list("id", flat=True))
+        missing_ids = set(translation_unit_ids) - found_ids
+
         assigned_units = []
 
         errors = []
+
+        # Add errors for missing IDs
+        for missing_id in missing_ids:
+            errors.append(
+                {
+                    "id": missing_id,
+                    "error": f"Translation unit with ID {missing_id} not found",
+                }
+            )
 
         for translation_unit in translation_units:
 
@@ -1041,6 +1054,12 @@ class UiMessageViewSet(viewsets.ModelViewSet):
     ordering_fields = ["created_at", "updated_at", "namespace", "key"]
 
     ordering = ["namespace", "key"]
+
+    def get_permissions(self):
+        """Return the list of permission instances that this view requires."""
+        if self.action == "bundle":
+            return [permissions.AllowAny()]
+        return super().get_permissions()
 
     @extend_schema(
         summary="Sync with .po files",

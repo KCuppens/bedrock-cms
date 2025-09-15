@@ -1,3 +1,11 @@
+import os
+
+import django
+
+# Setup Django before imports
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "apps.config.settings.test_minimal")
+django.setup()
+
 import time
 from unittest.mock import MagicMock, patch
 

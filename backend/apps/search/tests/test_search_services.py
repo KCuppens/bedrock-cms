@@ -1,15 +1,10 @@
 """Tests for search services functionality."""
 
 import os
-
-import django
-
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "apps.config.settings.test_minimal")
-django.setup()
-
 from datetime import timedelta
 from unittest.mock import MagicMock, Mock, PropertyMock, patch
 
+import django
 from django.contrib.contenttypes.models import ContentType
 from django.test import TestCase
 from django.utils import timezone

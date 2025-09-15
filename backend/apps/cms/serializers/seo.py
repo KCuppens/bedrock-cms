@@ -18,6 +18,11 @@ class SeoSettingsSerializer(serializers.ModelSerializer):
         source="locale", queryset=Locale.objects.all(), write_only=True, required=False
     )
 
+    # Override title_suffix to preserve whitespace
+    title_suffix = serializers.CharField(
+        max_length=120, required=False, allow_blank=True, trim_whitespace=False
+    )
+
     # Override these fields to handle UUID strings
 
     default_og_asset_id = serializers.CharField(

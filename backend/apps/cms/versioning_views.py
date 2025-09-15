@@ -156,10 +156,10 @@ class PageRevisionViewSet(viewsets.ReadOnlyModelViewSet):
 
         page = revision.page
 
-        if not request.user.has_perm("cms.change_page"):
+        if not request.user.has_perm("cms.revert_page"):
 
             return Response(
-                {"error": "You do not have permission to edit pages"},
+                {"error": "You do not have permission to revert pages"},
                 status=status.HTTP_403_FORBIDDEN,
             )
 

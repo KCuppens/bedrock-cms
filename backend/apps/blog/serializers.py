@@ -105,6 +105,7 @@ class BlogPostListSerializer(serializers.ModelSerializer):
             "title",
             "slug",
             "excerpt",
+            "content",
             "author",
             "author_name",
             "category",
@@ -282,7 +283,7 @@ class BlogPostSerializer(serializers.ModelSerializer):
 
                 processed_block["component"] = processed_block["type"]
 
-            """processed_blocks.append(processed_block)"""
+            processed_blocks.append(processed_block)
 
         return processed_blocks
 
@@ -407,6 +408,8 @@ class BlogPostWriteSerializer(serializers.ModelSerializer):
         model = BlogPost
 
         fields = [
+            "id",
+            "group_id",
             "locale",
             "title",
             "slug",
@@ -423,6 +426,8 @@ class BlogPostWriteSerializer(serializers.ModelSerializer):
             "scheduled_unpublish_at",
             "social_image",
         ]
+
+        read_only_fields = ["id"]
 
     def validate_slug(self, value):  # noqa: C901
         """Validate slug uniqueness within locale."""
@@ -462,6 +467,51 @@ class BlogPostWriteSerializer(serializers.ModelSerializer):
             )
 
         return value
+
+    def validate_scheduled_publish_at(self, value):
+        """Validate scheduled publish time."""
+        if value and value <= timezone.now():
+            raise serializers.ValidationError(
+                "Scheduled publish time must be in the future."
+            )
+        return value
+
+    def validate_scheduled_unpublish_at(self, value):
+        """Validate scheduled unpublish time."""
+        if value and value <= timezone.now():
+            raise serializers.ValidationError(
+                "Scheduled unpublish time must be in the future."
+            )
+        return value
+
+    def validate(self, attrs):
+        """Cross-field validation."""
+        status = attrs.get("status", getattr(self.instance, "status", None))
+        scheduled_publish_at = attrs.get(
+            "scheduled_publish_at", getattr(self.instance, "scheduled_publish_at", None)
+        )
+        scheduled_unpublish_at = attrs.get(
+            "scheduled_unpublish_at",
+            getattr(self.instance, "scheduled_unpublish_at", None),
+        )
+
+        if status == "scheduled" and not scheduled_publish_at:
+            raise serializers.ValidationError(
+                "Scheduled posts must have a scheduled publication date."
+            )
+
+        if status != "scheduled" and scheduled_publish_at:
+            # Clear scheduled_publish_at if status is not scheduled
+            attrs["scheduled_publish_at"] = None
+
+        # If both are set, unpublish must be after publish
+        if scheduled_publish_at and scheduled_unpublish_at:
+            if scheduled_unpublish_at <= scheduled_publish_at:
+                raise serializers.ValidationError(
+                    {"scheduled_unpublish_at": "Must be after scheduled publish time"}
+                )
+
+        return attrs
 
 
 class BlogPostRevisionSerializer(serializers.Serializer):

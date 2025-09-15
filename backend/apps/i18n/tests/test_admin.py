@@ -1,3 +1,10 @@
+import os
+
+import django
+
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "apps.config.settings.test_minimal")
+django.setup()
+
 from django.contrib.admin.sites import AdminSite
 from django.contrib.auth import get_user_model
 from django.contrib.contenttypes.models import ContentType

@@ -17,18 +17,21 @@ class SecurityHeadersMiddleware(MiddlewareMixin):
     @classmethod
     def _get_cached_headers(cls):
         """Get or compute cached headers"""
+        try:
+            current_debug = settings.DEBUG
 
-        current_debug = settings.DEBUG
+            # Recompute if debug mode changed or not cached
 
-        # Recompute if debug mode changed or not cached
+            if cls._cached_headers is None or cls._cached_debug_mode != current_debug:
 
-        if cls._cached_headers is None or cls._cached_debug_mode != current_debug:
+                cls._cached_debug_mode = current_debug
 
-            cls._cached_debug_mode = current_debug
+                cls._cached_headers = cls._compute_headers()
 
-            cls._cached_headers = cls._compute_headers()
-
-        return cls._cached_headers
+            return cls._cached_headers
+        except Exception:
+            # Return empty headers if there's an error accessing settings
+            return {}
 
     @classmethod
     def _compute_headers(cls):
@@ -81,7 +84,7 @@ class SecurityHeadersMiddleware(MiddlewareMixin):
 
             return [
                 "default-src 'self'",
-                "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net",
+                "script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net",
                 "style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net",
                 "img-src 'self' data: https:",
                 "font-src 'self' https://cdn.jsdelivr.net",

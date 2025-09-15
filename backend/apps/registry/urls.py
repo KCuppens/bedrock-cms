@@ -9,6 +9,8 @@ from rest_framework.routers import DefaultRouter
 from .registry import content_registry
 from .viewsets import RegistryViewSet, get_viewset_for_config
 
+logger = logging.getLogger(__name__)
+
 
 def create_dynamic_router():
     """Create a dynamic router with routes for all registered content models.
@@ -39,13 +41,13 @@ def create_dynamic_router():
 
             router.register(route_pattern, viewset_class, basename=basename)
 
-        except Exception:
+        except Exception as e:
 
             # Log error but don't fail the entire routing
 
-            logger = logging.getLogger(__name__)
-
-            logger.error("Failed to register routes for %s: {e}", config.model_label)
+            logger.error(
+                "Failed to register routes for %s: %s", config.model_label, str(e)
+            )
 
     return router
 

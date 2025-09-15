@@ -69,7 +69,9 @@ class AutoCoverageTest(TestCase):
         """Test all view permission classes"""
         import sys
 
-        for name, module in sys.modules.items():
+        # Create a copy of sys.modules to avoid "dictionary changed size during iteration"
+        modules_copy = dict(sys.modules)
+        for name, module in modules_copy.items():
             if name.startswith("apps.") and "views" in name:
                 try:
                     for item_name in dir(module):

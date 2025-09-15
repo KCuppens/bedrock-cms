@@ -123,9 +123,15 @@ class UserRegistrationSerializer(serializers.Serializer):
 
         password = data.get("password1")
 
+        # Create a temporary user object for validation
+        from django.contrib.auth import get_user_model
+
+        User = get_user_model()
+        temp_user = User(email=data.get("email", ""), name=data.get("name", ""))
+
         try:
 
-            validate_password(password)
+            validate_password(password, user=temp_user)
 
         except Exception as e:
 
@@ -135,6 +141,7 @@ class UserRegistrationSerializer(serializers.Serializer):
 
     def save(self, request):  # noqa: C901
         """Create and return a new user"""
+        from allauth.account import app_settings as allauth_settings
 
         adapter = get_adapter()
 
@@ -145,6 +152,13 @@ class UserRegistrationSerializer(serializers.Serializer):
         user.name = self.validated_data.get("name", "")
 
         user.set_password(self.validated_data.get("password1"))
+
+        # Set is_active based on email verification requirement
+        if (
+            allauth_settings.EMAIL_VERIFICATION
+            == allauth_settings.EmailVerificationMethod.MANDATORY
+        ):
+            user.is_active = False
 
         user.save()
 

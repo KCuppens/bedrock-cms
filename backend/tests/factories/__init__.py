@@ -64,6 +64,24 @@ except ImportError:
     pass
 
 
+try:
+
+    from .search import (
+        AnonymousSearchQueryFactory,
+        BlogSearchIndexFactory,
+        NoResultSearchQueryFactory,
+        PageSearchIndexFactory,
+        PopularSearchSuggestionFactory,
+        SearchIndexFactory,
+        SearchQueryFactory,
+        SearchSuggestionFactory,
+        SlowSearchQueryFactory,
+    )
+
+except ImportError:
+    pass
+
+
 __all__ = [
     "BaseFactory",
     "UserFactory",
@@ -83,4 +101,13 @@ __all__ = [
     "LocaleFactory",
     "EventFactory",
     "SessionFactory",
+    "SearchIndexFactory",
+    "SearchQueryFactory",
+    "SearchSuggestionFactory",
+    "PopularSearchSuggestionFactory",
+    "PageSearchIndexFactory",
+    "BlogSearchIndexFactory",
+    "NoResultSearchQueryFactory",
+    "SlowSearchQueryFactory",
+    "AnonymousSearchQueryFactory",
 ]

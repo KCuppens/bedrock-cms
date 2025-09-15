@@ -66,14 +66,15 @@ class ScopedPermissionBackend(BaseBackend):
     def _has_base_permission(self, user_obj, perm):
         """Check if user has the base permission via groups."""
 
-        if not user_obj or not user_obj.is_active or user_obj.is_anonymous:
+        if not user_obj or not user_obj.is_active:
+            return False
 
+        # Check if user is authenticated
+        if hasattr(user_obj, "is_anonymous") and user_obj.is_anonymous:
             return False
 
         # Get permission object
-
         try:
-
             app_label, codename = perm.split(".", 1)
 
             permission = Permission.objects.get(
@@ -81,12 +82,12 @@ class ScopedPermissionBackend(BaseBackend):
             )
 
         except (ValueError, Permission.DoesNotExist):
-
             return False
 
         # Check if user's groups have this permission
+        has_permission = user_obj.groups.filter(permissions=permission).exists()
 
-        return user_obj.groups.filter(permissions=permission).exists()
+        return has_permission
 
     def _check_object_scopes(self, user_obj, obj):
         """Manually check locale and section scopes for an object.
@@ -99,8 +100,14 @@ class ScopedPermissionBackend(BaseBackend):
             bool: True if user has scope access
         """
 
-        if not user_obj or not user_obj.is_authenticated:
+        if not user_obj:
+            return False
 
+        # Check if user is authenticated (handles AnonymousUser)
+        if hasattr(user_obj, "is_authenticated"):
+            if not user_obj.is_authenticated:
+                return False
+        elif not user_obj.is_active:
             return False
 
         # Check locale scope if object has a locale

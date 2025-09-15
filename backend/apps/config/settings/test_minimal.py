@@ -24,6 +24,7 @@ DJANGO_APPS = [
 
 THIRD_PARTY_APPS = [
     "rest_framework",
+    "rest_framework.authtoken",
     "allauth",
     "allauth.account",
 ]
@@ -33,6 +34,7 @@ LOCAL_APPS = [
     "apps.i18n",  # Required by apps.accounts
     "apps.accounts",
     "apps.files",
+    "apps.media",  # Required for legacy migration compatibility
     "apps.emails",  # Required for email tests
     "apps.analytics",  # Required for analytics tests
     "apps.featureflags",  # Required for feature flag tests
@@ -41,8 +43,7 @@ LOCAL_APPS = [
     "apps.registry",  # Required by signals
     "apps.api",  # Required by ops.metrics
     "apps.ops",  # For ops tests
-    # Exclude problematic apps for now
-    # "apps.search",
+    "apps.search",  # Required for search tests
 ]
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
@@ -70,12 +71,38 @@ DATABASES = {
 }
 
 
-# Disable migrations for tests
+# Disable migrations for tests but keep essential ones
 class DisableMigrations:
     def __contains__(self, item):
+        # Keep migrations for critical apps needed for e2e tests
+        if item in [
+            "auth",
+            "authtoken",
+            "contenttypes",
+            "blog",
+            "cms",
+            "i18n",
+            "accounts",
+            "media",
+            "files",
+        ]:
+            return False
         return True
 
     def __getitem__(self, item):
+        # Keep migrations for critical apps needed for e2e tests
+        if item in [
+            "auth",
+            "authtoken",
+            "contenttypes",
+            "blog",
+            "cms",
+            "i18n",
+            "accounts",
+            "media",
+            "files",
+        ]:
+            return None
         return None
 
 
@@ -113,6 +140,7 @@ MEDIA_ROOT = Path(tempfile.mkdtemp(prefix="test_media_"))
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": [
         "rest_framework.authentication.SessionAuthentication",
+        "rest_framework.authentication.TokenAuthentication",
     ],
     "DEFAULT_PERMISSION_CLASSES": [
         "rest_framework.permissions.IsAuthenticated",
@@ -165,3 +193,34 @@ AUTH_USER_MODEL = "accounts.User"
 
 # Disable logging during tests
 LOGGING_CONFIG = None
+
+# Add LOGGING configuration for tests
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "handlers": {
+        "console": {
+            "class": "logging.StreamHandler",
+        },
+    },
+    "root": {
+        "handlers": ["console"],
+    },
+}
+
+# WSGI Application
+WSGI_APPLICATION = "apps.config.wsgi.application"
+
+# Cache middleware settings
+CACHE_MIDDLEWARE_ALIAS = "default"
+CACHE_MIDDLEWARE_SECONDS = 600  # 10 minutes
+CACHE_MIDDLEWARE_KEY_PREFIX = "bedrock"
+
+# Security settings for tests
+SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+
+# Celery configuration for tests - use eager mode to avoid external dependencies
+CELERY_TASK_ALWAYS_EAGER = True
+CELERY_TASK_EAGER_PROPAGATES = True
+CELERY_BROKER_URL = "memory://"
+CELERY_RESULT_BACKEND = "cache+memory://"

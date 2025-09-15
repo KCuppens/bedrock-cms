@@ -1,10 +1,24 @@
+import os
+
+import django
+from django.conf import settings
+
+# Configure Django settings if not already configured
+if not settings.configured:
+    os.environ.setdefault("DJANGO_SETTINGS_MODULE", "apps.config.settings.test")
+    django.setup()
+
+
 import copy
-from unittest.mock import Mock
+import json
+import uuid
+from datetime import timedelta
+from unittest.mock import Mock, patch
 
 from django.contrib.auth import get_user_model
-from django.contrib.auth.models import Permission
+from django.contrib.auth.models import Group, Permission
 from django.contrib.contenttypes.models import ContentType
-from django.test import TestCase
+from django.test import TestCase, TransactionTestCase
 from django.utils import timezone
 
 from rest_framework import status
@@ -641,3 +655,221 @@ class VersioningSignalsTests(TestCase):
         audit_entry = audit_entries.first()
         self.assertIsNotNone(audit_entry)
         self.assertEqual(audit_entry.action, "create")
+
+
+class ComprehensiveVersionCreationTests(TestCase):
+    """Comprehensive tests for version creation functionality."""
+
+    def setUp(self):
+        """Set up test data."""
+        self.user = User.objects.create_user(
+            email="test@example.com", password="testpass123"
+        )
+        self.editor = User.objects.create_user(
+            email="editor@example.com", password="testpass123"
+        )
+
+        self.locale = Locale.objects.create(
+            code="en",
+            name="English",
+            native_name="English",
+            is_default=True,
+            is_active=True,
+        )
+
+        self.page = Page.objects.create(
+            title="Test Page",
+            slug="test-page",
+            locale=self.locale,
+            blocks=[{"type": "text", "props": {"content": "Hello World"}}],
+            status="draft",
+        )
+
+    def test_automatic_version_creation_on_content_changes(self):
+        """Test automatic version creation when content changes."""
+        # Mock the signal to track revision creation
+        initial_count = PageRevision.objects.filter(page=self.page).count()
+
+        # Modify the page
+        self.page.title = "Updated Title"
+        self.page._current_user = self.user
+        self.page.save()
+
+        # Should create a new revision
+        new_count = PageRevision.objects.filter(page=self.page).count()
+        self.assertEqual(new_count, initial_count + 1)
+
+        latest_revision = PageRevision.objects.filter(page=self.page).first()
+        self.assertEqual(latest_revision.snapshot["title"], "Updated Title")
+        self.assertTrue(latest_revision.is_autosave)
+        self.assertFalse(latest_revision.is_published_snapshot)
+
+    def test_manual_version_snapshots(self):
+        """Test creating manual version snapshots."""
+        revision = PageRevision.create_snapshot(
+            page=self.page,
+            user=self.user,
+            is_published=False,
+            is_autosave=False,
+            comment="Manual snapshot for testing",
+        )
+
+        self.assertEqual(revision.page, self.page)
+        self.assertEqual(revision.created_by, self.user)
+        self.assertEqual(revision.comment, "Manual snapshot for testing")
+        self.assertFalse(revision.is_published_snapshot)
+        self.assertFalse(revision.is_autosave)
+
+        # Verify snapshot contains all necessary data
+        snapshot = revision.snapshot
+        self.assertEqual(snapshot["title"], self.page.title)
+        self.assertEqual(snapshot["slug"], self.page.slug)
+        self.assertEqual(snapshot["status"], self.page.status)
+        self.assertEqual(snapshot["blocks"], self.page.blocks)
+
+    def test_version_metadata_comprehensive(self):
+        """Test comprehensive version metadata tracking."""
+        # Create revision with all metadata
+        test_comment = "Comprehensive metadata test"
+
+        revision = PageRevision.create_snapshot(
+            page=self.page,
+            user=self.user,
+            is_published=False,
+            is_autosave=False,
+            comment=test_comment,
+        )
+
+        # Test author metadata
+        self.assertEqual(revision.created_by, self.user)
+        self.assertEqual(revision.created_by.email, "test@example.com")
+
+        # Test timestamp metadata
+        self.assertIsNotNone(revision.created_at)
+        self.assertLessEqual((timezone.now() - revision.created_at).total_seconds(), 5)
+
+        # Test comment metadata
+        self.assertEqual(revision.comment, test_comment)
+
+        # Test snapshot metadata completeness
+        snapshot = revision.snapshot
+        required_fields = [
+            "title",
+            "slug",
+            "path",
+            "blocks",
+            "seo",
+            "status",
+            "published_at",
+            "parent_id",
+            "position",
+            "locale_id",
+            "group_id",
+            "preview_token",
+            "created_at",
+            "updated_at",
+        ]
+        for field in required_fields:
+            self.assertIn(field, snapshot)
+
+    def test_version_numbering_and_incrementing(self):
+        """Test that version ordering works correctly."""
+        # Create multiple revisions in sequence
+        revision1 = PageRevision.create_snapshot(
+            page=self.page, user=self.user, comment="First revision"
+        )
+
+        # Small delay to ensure different timestamps
+        import time
+
+        time.sleep(0.01)
+
+        revision2 = PageRevision.create_snapshot(
+            page=self.page, user=self.user, comment="Second revision"
+        )
+
+        time.sleep(0.01)
+
+        revision3 = PageRevision.create_snapshot(
+            page=self.page, user=self.user, comment="Third revision"
+        )
+
+        # Get revisions in order (newest first)
+        revisions = list(
+            PageRevision.objects.filter(page=self.page).order_by("-created_at")
+        )
+
+        # There might be an initial revision created automatically
+        self.assertGreaterEqual(len(revisions), 3)
+        self.assertEqual(revisions[0].comment, "Third revision")
+        self.assertEqual(revisions[1].comment, "Second revision")
+        # Find the first revision we created (might not be at index 2 if auto-created)
+        first_revision = next(
+            (r for r in revisions if r.comment == "First revision"), None
+        )
+        self.assertIsNotNone(first_revision)
+
+        # Verify chronological ordering
+        self.assertGreater(revisions[0].created_at, revisions[1].created_at)
+        self.assertGreater(revisions[1].created_at, revisions[2].created_at)
+
+    def test_initial_version_creation(self):
+        """Test initial version creation for new pages."""
+        # Create a new page with explicit user context
+        new_page = Page(
+            title="New Page",
+            slug="new-page",
+            locale=self.locale,
+            blocks=[{"type": "heading", "props": {"text": "Welcome"}}],
+            status="draft",
+        )
+        new_page._current_user = self.user
+        new_page.save()
+
+        # Should have created initial revision
+        revisions = PageRevision.objects.filter(page=new_page)
+        self.assertEqual(revisions.count(), 1)
+
+        initial_revision = revisions.first()
+        self.assertEqual(initial_revision.created_by, self.user)
+        self.assertEqual(initial_revision.snapshot["title"], "New Page")
+        self.assertFalse(initial_revision.is_autosave)
+        self.assertFalse(initial_revision.is_published_snapshot)
+
+    def test_published_version_snapshots(self):
+        """Test creation of published version snapshots."""
+        # Create published snapshot
+        self.page.status = "published"
+        self.page.published_at = timezone.now()
+
+        revision = PageRevision.create_snapshot(
+            page=self.page,
+            user=self.user,
+            is_published=True,
+            comment="Published version",
+        )
+
+        self.assertTrue(revision.is_published_snapshot)
+        self.assertFalse(revision.is_autosave)
+        self.assertEqual(revision.comment, "Published version")
+        self.assertEqual(revision.snapshot["status"], "published")
+        self.assertIsNotNone(revision.snapshot["published_at"])
+
+    def test_autosave_version_creation(self):
+        """Test autosave version creation with throttling."""
+        # First autosave should work
+        revision1 = PageRevision.create_snapshot(
+            page=self.page,
+            user=self.user,
+            is_autosave=True,
+            comment="First autosave",
+        )
+
+        self.assertTrue(revision1.is_autosave)
+        self.assertFalse(revision1.is_published_snapshot)
+
+        # Immediate second autosave should be throttled
+        self.assertFalse(PageRevision.should_create_autosave(self.page, self.user))
+
+        # Different user should be able to autosave
+        self.assertTrue(PageRevision.should_create_autosave(self.page, self.editor))

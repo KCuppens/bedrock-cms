@@ -3,11 +3,12 @@
 import os
 
 import django
+from django.conf import settings
 
 # Configure Django settings before any imports
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "apps.config.settings.test_minimal")
-django.setup()
-
+if not settings.configured:
+    os.environ.setdefault("DJANGO_SETTINGS_MODULE", "apps.config.settings.test")
+    django.setup()
 from unittest.mock import MagicMock, patch
 
 from django.contrib.auth import get_user_model

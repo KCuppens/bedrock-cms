@@ -1,3 +1,10 @@
+import os
+
+import django
+
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "apps.config.settings.test_minimal")
+django.setup()
+
 import unittest
 from unittest.mock import Mock
 

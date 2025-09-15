@@ -6,7 +6,7 @@ from .views import FileUploadViewSet, file_download_view
 
 router = DefaultRouter()
 
-router.register(r"files", FileUploadViewSet, basename="file")
+router.register(r"fileupload", FileUploadViewSet, basename="fileupload")
 
 
 urlpatterns = [

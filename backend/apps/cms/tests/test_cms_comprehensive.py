@@ -1,16 +1,23 @@
 import os
 
 import django
+from django.conf import settings
+
+# Configure Django settings if not already configured
+if not settings.configured:
+    os.environ.setdefault("DJANGO_SETTINGS_MODULE", "apps.config.settings.test")
+    django.setup()
+
+
+import os
 
 # Configure Django settings before any imports
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "apps.config.settings.test_minimal")
-django.setup()
-
 from datetime import datetime, timedelta
 
+import django
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
-from django.test import TestCase, TransactionTestCase
+from django.test import TestCase
 from django.urls import reverse
 
 from rest_framework import status
@@ -846,7 +853,7 @@ class CMSSEOTests(TestCase):
             """self.assertEqual(page.meta_keywords, "test, seo, keywords")"""
 
 
-class CMSIntegrationTests(TransactionTestCase):
+class CMSIntegrationTests(TestCase):
     """Integration tests for CMS workflows."""
 
     def setUp(self):

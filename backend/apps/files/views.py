@@ -13,7 +13,8 @@ from rest_framework.decorators import action
 from rest_framework.parsers import FormParser, JSONParser, MultiPartParser
 from rest_framework.response import Response
 
-from apps.core.permissions import IsOwnerOrAdmin
+from apps.core.pagination import StandardResultsSetPagination
+from apps.core.permissions import IsOwnerOrAdmin, IsOwnerOrPublic
 
 from .models import FileUpload
 from .serializers import (
@@ -26,33 +27,14 @@ from .services import FileService
 logger = logging.getLogger(__name__)
 
 
-@extend_schema_view(
-    list=extend_schema(
-        summary="List files",
-        description="Get a list of files. Users can see their own files and public files.",
-    ),
-    create=extend_schema(
-        summary="Upload file",
-        description="Upload a new file. The authenticated user will be set as the owner.",
-    ),
-    retrieve=extend_schema(
-        summary="Get file details",
-        description="Get file metadata. Users can only access their own files or public files.",
-    ),
-    destroy=extend_schema(
-        summary="Delete file",
-        description="Delete a file. Users can only delete their own files.",
-    ),
-)
 class FileUploadViewSet(viewsets.ModelViewSet):
     """ViewSet for file upload management"""
 
+    queryset = FileUpload.objects.all()
     serializer_class = FileUploadSerializer
-
-    permission_classes = [permissions.IsAuthenticated, IsOwnerOrAdmin]
-
+    permission_classes = [permissions.IsAuthenticated]
     parser_classes = [MultiPartParser, FormParser, JSONParser]
-
+    pagination_class = StandardResultsSetPagination
     http_method_names = [
         "get",
         "post",
@@ -70,12 +52,21 @@ class FileUploadViewSet(viewsets.ModelViewSet):
         queryset = FileUpload.objects.select_related("created_by", "updated_by")
 
         # Users can see their own files and public files
-
-        if not (self.request.user.is_authenticated and self.request.user.is_admin()):
-
-            queryset = queryset.filter(
-                Q(created_by=self.request.user) | Q(is_public=True)
-            )
+        if self.request.user.is_authenticated:
+            # Check if user is admin
+            if self.request.user.is_staff or (
+                hasattr(self.request.user, "is_admin") and self.request.user.is_admin()
+            ):
+                # Admins can see all files
+                pass
+            else:
+                # Authenticated users can see their own files and public files
+                queryset = queryset.filter(
+                    Q(created_by=self.request.user) | Q(is_public=True)
+                )
+        else:
+            # Anonymous users can only see public files
+            queryset = queryset.filter(is_public=True)
 
         # Filter by file type
 
@@ -93,6 +84,14 @@ class FileUploadViewSet(viewsets.ModelViewSet):
 
             queryset = queryset.filter(is_public=is_public.lower() == "true")
 
+        # Filter by tags
+
+        tags = self.request.query_params.get("tags")
+
+        if tags:
+
+            queryset = queryset.filter(tags__icontains=tags)
+
         return queryset
 
     def get_serializer_class(self):  # noqa: C901
@@ -103,6 +102,16 @@ class FileUploadViewSet(viewsets.ModelViewSet):
             return FileUploadCreateSerializer
 
         return FileUploadSerializer
+
+    def list(self, request):
+        """List files"""
+        queryset = self.get_queryset()
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
 
     def create(self, request, *args, **kwargs):  # noqa: C901
         """Create a new file upload"""
@@ -157,6 +166,12 @@ class FileUploadViewSet(viewsets.ModelViewSet):
 
         instance = self.get_object()
 
+        # Check permissions - only owner or admin can update
+        if not self._can_modify_file(request.user, instance):
+            return Response(
+                {"error": "Permission denied"}, status=status.HTTP_403_FORBIDDEN
+            )
+
         # For metadata updates, we only allow certain fields
 
         allowed_fields = ["description", "tags", "is_public"]
@@ -171,6 +186,64 @@ class FileUploadViewSet(viewsets.ModelViewSet):
 
         return Response(serializer.data)
 
+    def retrieve(self, request, *args, **kwargs):
+        """Retrieve a specific file"""
+        instance = self.get_object()
+
+        # Check if user can access this file
+        if not self._can_access_file(request.user, instance):
+            raise Http404("File not found")
+
+        serializer = self.get_serializer(instance)
+        return Response(serializer.data)
+
+    def _can_access_file(self, user, file_instance):
+        """Check if user can access the file."""
+        # Public files can be accessed by anyone
+        if file_instance.is_public:
+            return True
+
+        # Must be authenticated for private files
+        if not user.is_authenticated:
+            return False
+
+        # File owner can access
+        if file_instance.created_by == user:
+            return True
+
+        # Admin can access
+        if user.is_staff or (hasattr(user, "is_admin") and user.is_admin()):
+            return True
+
+        return False
+
+    def _can_modify_file(self, user, file_instance):
+        """Check if user can modify the file."""
+        if not user.is_authenticated:
+            return False
+
+        # File owner can modify
+        if file_instance.created_by == user:
+            return True
+
+        # Admin can modify
+        if user.is_staff or (hasattr(user, "is_admin") and user.is_admin()):
+            return True
+
+        return False
+
+    def destroy(self, request, *args, **kwargs):
+        """Delete a file"""
+        instance = self.get_object()
+
+        # Check permissions - only owner or admin can delete
+        if not self._can_modify_file(request.user, instance):
+            return Response(
+                {"error": "Permission denied"}, status=status.HTTP_403_FORBIDDEN
+            )
+
+        return super().destroy(request, *args, **kwargs)
+
     def partial_update(self, request, *args, **kwargs):  # noqa: C901
         """Update file metadata (PATCH)"""
 
@@ -182,18 +255,32 @@ class FileUploadViewSet(viewsets.ModelViewSet):
         summary="Get download URL",
         description="Get a signed download URL for the file.",
     )
-    @action(detail=True, methods=["get"])
+    @action(
+        detail=True,
+        methods=["get"],
+        permission_classes=[permissions.AllowAny],
+        url_path="download-url",
+    )
     def download_url(self, request, pk=None):  # noqa: C901
         """Get download URL for file"""
 
-        file_upload = self.get_object()
+        # For download_url, we need to bypass the queryset filtering to check permissions manually
+        try:
+            file_upload = FileUpload.objects.get(pk=pk)
+        except FileUpload.DoesNotExist:
+            raise Http404("File not found")
 
         # Check access permissions
-
-        if not file_upload.can_access(request.user):
+        if not self._can_access_file(request.user, file_upload):
 
             return Response(
                 {"error": "Access denied"}, status=status.HTTP_403_FORBIDDEN
+            )
+
+        # Check expiration
+        if file_upload.is_expired:
+            return Response(
+                {"error": "File has expired"}, status=status.HTTP_403_FORBIDDEN
             )
 
         # Get download URL
@@ -216,8 +303,7 @@ class FileUploadViewSet(viewsets.ModelViewSet):
         file_upload = self.get_object()
 
         # Check access permissions
-
-        if not file_upload.can_access(request.user):
+        if not self._can_access_file(request.user, file_upload):
 
             raise Http404("File not found")
 
@@ -247,9 +333,9 @@ class FileUploadViewSet(viewsets.ModelViewSet):
 
             return response
 
-        except Exception:
+        except Exception as e:
 
-            logger.error("Error serving file %s: {str(e)}", file_upload.id)
+            logger.error("Error serving file %s: %s", file_upload.id, str(e))
 
             raise Http404("Error accessing file")
 
@@ -257,7 +343,7 @@ class FileUploadViewSet(viewsets.ModelViewSet):
         summary="Get signed upload URL",
         description="Get a signed URL for direct upload to storage (S3/MinIO).",
     )
-    @action(detail=False, methods=["post"])
+    @action(detail=False, methods=["post"], url_path="signed-upload-url")
     def signed_upload_url(self, request):  # noqa: C901
         """Get signed upload URL"""
 
@@ -301,7 +387,7 @@ class FileUploadViewSet(viewsets.ModelViewSet):
         summary="Get my files",
         description="Get all files uploaded by the current user.",
     )
-    @action(detail=False, methods=["get"])
+    @action(detail=False, methods=["get"], url_path="my-files")
     def my_files(self, request):  # noqa: C901
         """Get files uploaded by current user"""
 
@@ -320,11 +406,11 @@ class FileUploadViewSet(viewsets.ModelViewSet):
         return Response(serializer.data)
 
     @extend_schema(summary="Get public files", description="Get all public files.")
-    @action(detail=False, methods=["get"])
+    @action(detail=False, methods=["get"], permission_classes=[permissions.AllowAny])
     def public(self, request):  # noqa: C901
         """Get public files"""
 
-        queryset = self.get_queryset().filter(is_public=True)
+        queryset = FileUpload.objects.filter(is_public=True)
 
         page = self.paginate_queryset(queryset)
 
@@ -337,6 +423,63 @@ class FileUploadViewSet(viewsets.ModelViewSet):
         serializer = self.get_serializer(queryset, many=True)
 
         return Response(serializer.data)
+
+    @extend_schema(
+        summary="Bulk upload files",
+        description="Upload multiple files at once.",
+    )
+    @action(
+        detail=False,
+        methods=["post"],
+        parser_classes=[MultiPartParser],
+        url_path="bulk-upload",
+    )
+    def bulk_upload(self, request):
+        """Bulk upload multiple files"""
+        files = request.FILES.getlist("files")
+        if not files:
+            return Response(
+                {"error": "No files provided"}, status=status.HTTP_400_BAD_REQUEST
+            )
+
+        results = []
+        errors = []
+
+        for file in files:
+            try:
+                # Validate file
+                validation = FileService.validate_file(file)
+                if not validation["valid"]:
+                    errors.append(
+                        {"filename": file.name, "errors": validation["errors"]}
+                    )
+                    continue
+
+                # Upload file
+                file_upload = FileService.upload_file(
+                    file=file,
+                    user=request.user,
+                    description=f"Bulk uploaded: {file.name}",
+                )
+
+                serializer = FileUploadSerializer(
+                    file_upload, context={"request": request}
+                )
+                results.append(serializer.data)
+
+            except Exception as e:
+                errors.append({"filename": file.name, "errors": [str(e)]})
+
+        return Response(
+            {
+                "uploaded": results,
+                "errors": errors,
+                "total_files": len(files),
+                "successful": len(results),
+                "failed": len(errors),
+            },
+            status=status.HTTP_201_CREATED if results else status.HTTP_400_BAD_REQUEST,
+        )
 
 
 # Standalone view for direct file downloads (used in fallback URLs)
@@ -379,8 +522,8 @@ def file_download_view(request, file_id):  # noqa: C901
 
         return response
 
-    except Exception:
+    except Exception as e:
 
-        logger.error("Error serving file %s: {str(e)}", file_upload.id)
+        logger.error("Error serving file %s: %s", file_upload.id, str(e))
 
         raise Http404("Error accessing file")

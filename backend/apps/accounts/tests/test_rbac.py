@@ -1,11 +1,12 @@
 import os
 
 import django
+from django.conf import settings
 
 # Configure Django settings before any imports
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "apps.config.settings.test_minimal")
-django.setup()
-
+if not settings.configured:
+    os.environ.setdefault("DJANGO_SETTINGS_MODULE", "apps.config.settings.test")
+    django.setup()
 from django.contrib.auth.models import Group, Permission
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ValidationError

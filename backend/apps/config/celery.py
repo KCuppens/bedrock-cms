@@ -5,9 +5,7 @@ from celery.schedules import crontab
 from kombu import Exchange, Queue
 
 # Set the default Django settings module for the 'celery' program.
-
-# Imports that were malformed - commented out
-# os.environ.setdefault("DJANGO_SETTINGS_MODULE", "apps.config.settings.local")
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "apps.config.settings.local")
 
 
 app = Celery("django-saas-boilerplate")
@@ -87,8 +85,7 @@ app.conf.result_compression = "gzip"  # Compress results
 
 
 # Load task modules from all registered Django apps.
-
-"""app.autodiscover_tasks()"""
+app.autodiscover_tasks()
 
 
 # Celery Beat Schedule with optimized timing

@@ -1,5 +1,13 @@
 """Simple passing tests for core mixins"""
 
+import os
+
+import django
+
+# Setup Django before imports
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "apps.config.settings.test_minimal")
+django.setup()
+
 from django.contrib.auth import get_user_model
 from django.db import models
 from django.test import TestCase
@@ -37,7 +45,7 @@ class TestFullTrackingModel(FullTrackingMixin):
         app_label = "core"
 
 
-class TestSoftDeleteModel(SoftDeleteMixin):
+class SimpleSoftDeleteModel(SoftDeleteMixin):
     name = models.CharField(max_length=100)
 
     class Meta:
@@ -95,26 +103,26 @@ class SoftDeleteMixinTest(TestCase):
 
     def test_soft_delete_fields_exist(self):
         """Test that soft delete fields are present"""
-        model = TestSoftDeleteModel()
+        model = SimpleSoftDeleteModel()
         self.assertTrue(hasattr(model, "is_deleted"))
         self.assertTrue(hasattr(model, "deleted_at"))
         self.assertTrue(hasattr(model, "deleted_by"))
 
     def test_delete_method_exists(self):
         """Test that delete method exists"""
-        model = TestSoftDeleteModel()
+        model = SimpleSoftDeleteModel()
         self.assertTrue(hasattr(model, "delete"))
         self.assertTrue(callable(model.delete))
 
     def test_hard_delete_method_exists(self):
         """Test that hard_delete method exists"""
-        model = TestSoftDeleteModel()
+        model = SimpleSoftDeleteModel()
         self.assertTrue(hasattr(model, "hard_delete"))
         self.assertTrue(callable(model.hard_delete))
 
     def test_restore_method_exists(self):
         """Test that restore method exists"""
-        model = TestSoftDeleteModel()
+        model = SimpleSoftDeleteModel()
         self.assertTrue(hasattr(model, "restore"))
         self.assertTrue(callable(model.restore))
 

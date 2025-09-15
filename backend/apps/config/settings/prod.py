@@ -2,7 +2,11 @@ import sentry_sdk
 from opentelemetry import trace
 from opentelemetry.exporter.otlp.proto.grpc.trace_exporter import OTLPSpanExporter
 from opentelemetry.instrumentation.django import DjangoInstrumentor
-from opentelemetry.instrumentation.psycopg2 import Psycopg2Instrumentor
+
+try:
+    from opentelemetry.instrumentation.psycopg2 import Psycopg2Instrumentor
+except ImportError:
+    Psycopg2Instrumentor = None  # psycopg2 not installed
 from opentelemetry.instrumentation.redis import RedisInstrumentor
 from opentelemetry.sdk.trace import TracerProvider
 from opentelemetry.sdk.trace.export import BatchSpanProcessor
@@ -74,7 +78,9 @@ EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
 
 EMAIL_USE_TLS = env.bool("EMAIL_USE_TLS", default=True)  # noqa: F405
 
-DEFAULT_FROM_EMAIL = env("DEFAULT_FROM_EMAIL")  # noqa: F405
+DEFAULT_FROM_EMAIL = env.str(
+    "DEFAULT_FROM_EMAIL", default="noreply@example.com"
+)  # noqa: F405
 
 
 # Static files
@@ -88,11 +94,11 @@ if env.bool("USE_S3", default=True):  # noqa: F405
 
     DEFAULT_FILE_STORAGE = "storages.backends.s3boto3.S3Boto3Storage"
 
-    AWS_ACCESS_KEY_ID = env("AWS_ACCESS_KEY_ID")  # noqa: F405
+    AWS_ACCESS_KEY_ID = env("AWS_ACCESS_KEY_ID", default="")  # noqa: F405
 
-    AWS_SECRET_ACCESS_KEY = env("AWS_SECRET_ACCESS_KEY")  # noqa: F405
+    AWS_SECRET_ACCESS_KEY = env("AWS_SECRET_ACCESS_KEY", default="")  # noqa: F405
 
-    AWS_STORAGE_BUCKET_NAME = env("AWS_STORAGE_BUCKET_NAME")  # noqa: F405
+    AWS_STORAGE_BUCKET_NAME = env("AWS_STORAGE_BUCKET_NAME", default="")  # noqa: F405
 
     AWS_S3_REGION_NAME = env("AWS_S3_REGION_NAME", default="us-east-1")  # noqa: F405
 
@@ -107,9 +113,13 @@ if env.bool("USE_S3", default=True):  # noqa: F405
 
 # Celery
 
-CELERY_BROKER_URL = env("CELERY_BROKER_URL")  # noqa: F405
+CELERY_BROKER_URL = env(
+    "CELERY_BROKER_URL", default="redis://localhost:6379/0"
+)  # noqa: F405
 
-CELERY_RESULT_BACKEND = env("CELERY_RESULT_BACKEND")  # noqa: F405
+CELERY_RESULT_BACKEND = env(
+    "CELERY_RESULT_BACKEND", default="redis://localhost:6379/0"
+)  # noqa: F405
 
 
 # Sentry
@@ -236,6 +246,7 @@ if OTEL_EXPORTER_OTLP_ENDPOINT:
 
     DjangoInstrumentor().instrument()
 
-    Psycopg2Instrumentor().instrument()
+    if Psycopg2Instrumentor is not None:
+        Psycopg2Instrumentor().instrument()
 
     RedisInstrumentor().instrument()

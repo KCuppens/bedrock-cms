@@ -2,15 +2,11 @@
 
 import os
 
-import django
-
 # Configure Django settings before any imports
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "apps.config.settings.test")
-django.setup()
-
 import tempfile
 from io import BytesIO
 
+import django
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
 from django.core.files.uploadedfile import SimpleUploadedFile
@@ -353,7 +349,7 @@ class FilesAPITests(APITestCase):
 
         try:
 
-            url = reverse("file-list")
+            url = reverse("fileupload-list")
 
             response = self.client.get(url)
 
@@ -386,7 +382,7 @@ class FilesAPITests(APITestCase):
 
         try:
 
-            url = reverse("file-upload")
+            url = reverse("fileupload-list")
 
             response = self.client.post(url, upload_data, format="multipart")
 
@@ -422,7 +418,7 @@ class FilesAPITests(APITestCase):
 
         try:
 
-            url = reverse("file-detail", kwargs={"pk": file_obj.pk})
+            url = reverse("fileupload-detail", kwargs={"pk": file_obj.pk})
 
             response = self.client.get(url)
 
@@ -452,7 +448,7 @@ class FilesAPITests(APITestCase):
 
         try:
 
-            url = reverse("file-download", kwargs={"pk": file_obj.pk})
+            url = reverse("fileupload-download", kwargs={"pk": file_obj.pk})
 
             response = self.client.get(url)
 
@@ -487,7 +483,7 @@ class FilesAPITests(APITestCase):
 
         try:
 
-            url = reverse("file-search")
+            url = reverse("fileupload-search")
 
             response = self.client.get(url, {"q": "searchable"})
 
@@ -526,7 +522,7 @@ class FilesAPITests(APITestCase):
 
         try:
 
-            url = reverse("file-bulk-delete")
+            url = reverse("fileupload-bulk-delete")
 
             response = self.client.post(url, {"ids": [file1.id, file2.id]})
 

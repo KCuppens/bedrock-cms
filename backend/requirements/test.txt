@@ -14,6 +14,9 @@ factory-boy>=3.3.0
 freezegun>=1.2.0  # Time/date mocking
 responses>=0.23.0  # HTTP request mocking
 
+# Performance Testing
+psutil>=5.9.0  # System and process monitoring
+
 # Code Quality (for CI)
 ruff>=0.1.6
 black>=23.11.0

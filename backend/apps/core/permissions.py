@@ -40,6 +40,10 @@ class IsAdminOrReadOnly(permissions.BasePermission):
 class IsOwnerOrAdmin(permissions.BasePermission):
     """Permission that allows owners or admins to access"""
 
+    def has_permission(self, request, view):
+        """Allow authenticated users to create objects"""
+        return request.user and request.user.is_authenticated
+
     def has_object_permission(self, request, view, obj):
 
         if not request.user or not request.user.is_authenticated:
@@ -49,6 +53,48 @@ class IsOwnerOrAdmin(permissions.BasePermission):
         # Admin users can access everything
 
         if request.user.is_admin():
+
+            return True
+
+        # Check if object has a user field
+
+        if hasattr(obj, "user"):
+
+            return obj.user == request.user
+
+        # Check if object has a created_by field
+
+        if hasattr(obj, "created_by"):
+
+            return obj.created_by == request.user
+
+        # Default to checking if obj is the user themselves
+
+        return obj == request.user
+
+
+class IsOwnerOrPublic(permissions.BasePermission):
+    """Permission that allows owners to access their files or anyone to access public files"""
+
+    def has_permission(self, request, view):
+        """Allow authenticated users to create files"""
+        return request.user and request.user.is_authenticated
+
+    def has_object_permission(self, request, view, obj):
+
+        if not request.user or not request.user.is_authenticated:
+
+            return False
+
+        # Admin users can access everything
+
+        if request.user.is_admin():
+
+            return True
+
+        # Check if object is public
+
+        if hasattr(obj, "is_public") and obj.is_public:
 
             return True
 

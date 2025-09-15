@@ -44,9 +44,11 @@ from apps.core.validators import JSONSizeValidator
 
 from .blocks.validation import validate_blocks
 
+# Import SEO models
+from .seo import SeoSettings  # noqa: F401
+
 # Import scheduling models
 
-# Import SEO models
 
 # Import versioning models
 
@@ -275,7 +277,16 @@ class Page(models.Model, RBACMixin):
 
         current = self.parent
 
+        visited_ids = set()  # Track visited pages to detect circular references
+
         while current is not None:
+
+            # Check for circular reference
+            if current.id in visited_ids:
+                # Circular reference detected, break the loop
+                break
+
+            visited_ids.add(current.id)
 
             if current.locale_id == self.locale_id:
 
@@ -340,20 +351,33 @@ class Page(models.Model, RBACMixin):
 
             self._update_descendant_paths()
 
-    def _update_descendant_paths(self):  # noqa: C901
+    def _update_descendant_paths(self, visited_ids=None):  # noqa: C901
         """Update the paths of all descendants when a page is moved or renamed."""
+
+        # Initialize visited set if not provided
+        if visited_ids is None:
+            visited_ids = set()
+
+        # Check for circular reference
+        if self.id in visited_ids:
+            return  # Already visited, prevent infinite recursion
+
+        visited_ids.add(self.id)
 
         # Recursively update all descendants
 
         for child in self.children.all():
 
-            child.path = child.compute_path()
+            # Skip if already visited (circular reference protection)
+            if child.id not in visited_ids:
 
-            child.save(update_fields=["path"])
+                child.path = child.compute_path()
 
-            # Recursively update child's descendants
+                child.save(update_fields=["path"])
 
-            child._update_descendant_paths()
+                # Recursively update child's descendants
+
+                child._update_descendant_paths(visited_ids)
 
     @classmethod
     def siblings_resequence(cls, parent_id=None):  # noqa: C901

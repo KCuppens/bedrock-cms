@@ -1,15 +1,16 @@
 """Comprehensive tests for accounts app - targeting 80% coverage"""
 
+import json
 import os
+from unittest.mock import MagicMock, patch
 
 import django
+from django.conf import settings
 
 # Configure Django settings before any imports
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "apps.config.settings.test_minimal")
-django.setup()
-
-import json
-from unittest.mock import MagicMock, patch
+if not settings.configured:
+    os.environ.setdefault("DJANGO_SETTINGS_MODULE", "apps.config.settings.test")
+    django.setup()
 
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Group, Permission
@@ -92,6 +93,10 @@ class AccountsViewTest(TestCase):
     """Test accounts views"""
 
     def setUp(self):
+        from django.core.cache import cache
+
+        cache.clear()  # Clear cache to reset rate limits
+
         self.client = Client()
         self.user = User.objects.create_user(
             email="test@test.com", password="TestPass123!"

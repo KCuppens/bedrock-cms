@@ -252,17 +252,17 @@ class AnalyticsAggregator:
 
         # This is a weighted score based on various metrics
 
-        views_score = min((metrics["total_views"] or 0) / 100, 1) * 30
+        views_score = min(float(metrics["total_views"] or 0) / 100, 1) * 30
 
-        engagement_score = min((metrics["avg_time_on_content"] or 0) / 300, 1) * 20
+        engagement_score = min(float(metrics["avg_time_on_content"] or 0) / 300, 1) * 20
 
-        bounce_score = (100 - (metrics["avg_bounce_rate"] or 100)) / 100 * 15
+        bounce_score = (100 - float(metrics["avg_bounce_rate"] or 100)) / 100 * 15
 
-        social_score = min((metrics["total_shares"] or 0) / 10, 1) * 15
+        social_score = min(float(metrics["total_shares"] or 0) / 10, 1) * 15
 
-        interaction_score = min((metrics["total_comments"] or 0) / 5, 1) * 10
+        interaction_score = min(float(metrics["total_comments"] or 0) / 5, 1) * 10
 
-        download_score = min((metrics["total_downloads"] or 0) / 20, 1) * 10
+        download_score = min(float(metrics["total_downloads"] or 0) / 20, 1) * 10
 
         performance_score = (
             views_score
@@ -273,8 +273,13 @@ class AnalyticsAggregator:
             + download_score
         )
 
+        # Ensure all metrics are not None
+        clean_metrics = {}
+        for key, value in metrics.items():
+            clean_metrics[key] = value if value is not None else 0
+
         return {
-            **metrics,
+            **clean_metrics,
             "performance_score": round(performance_score, 2),
             "score_breakdown": {
                 "views": round(views_score, 2),

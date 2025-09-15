@@ -544,7 +544,7 @@ class TrafficStatsSerializer(serializers.Serializer):
 
     unique_visitors = serializers.IntegerField()
 
-    bounce_rate = serializers.DecimalField(max_digits=5, decimal_places=2)
+    bounce_rate = serializers.FloatField()
 
     avg_session_duration = serializers.IntegerField()
 
@@ -578,7 +578,7 @@ class DashboardStatsSerializer(serializers.Serializer):
 
     avg_load_time = serializers.IntegerField()
 
-    uptime_percentage = serializers.DecimalField(max_digits=5, decimal_places=2)
+    uptime_percentage = serializers.FloatField()
 
     # Trend data
 

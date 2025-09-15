@@ -1,0 +1,474 @@
+"""Comprehensive tests for error handling and logging functionality."""
+
+import logging
+import os
+import time
+from unittest.mock import MagicMock, Mock, patch
+
+import django
+
+# Configure Django settings before any imports
+from django.conf import settings
+from django.core.cache import cache
+from django.http import HttpRequest, HttpResponse, HttpResponseForbidden
+from django.test import RequestFactory, TestCase, override_settings
+from django.test.utils import override_settings
+
+from apps.core.circuit_breaker import CircuitBreaker, CircuitState, circuit_breaker
+from apps.core.middleware import SecurityHeadersMiddleware
+from apps.core.throttling import (
+    BurstWriteThrottle,
+    PublishOperationThrottle,
+    WriteOperationThrottle,
+)
+
+
+class CircuitBreakerTestCase(TestCase):
+    """Test circuit breaker functionality and error handling."""
+
+    def setUp(self):
+        """Set up test data."""
+        cache.clear()
+
+    def test_circuit_breaker_closed_state_success(self):
+        """Test circuit breaker in closed state with successful calls."""
+
+        @circuit_breaker(name="test_service", failure_threshold=3)
+        def test_function():
+            return "success"
+
+        # Should work normally in closed state
+        result = test_function()
+        self.assertEqual(result, "success")
+
+    def test_circuit_breaker_failure_threshold(self):
+        """Test circuit breaker opens after failure threshold."""
+        call_count = 0
+
+        @circuit_breaker(
+            name="test_fail_service", failure_threshold=3, recovery_timeout=1
+        )
+        def failing_function():
+            nonlocal call_count
+            call_count += 1
+            raise Exception("Service unavailable")
+
+        # Should allow failures until threshold
+        for i in range(3):
+            with self.assertRaises(Exception):
+                failing_function()
+
+        # Should have been called 3 times (before circuit opened)
+        self.assertEqual(call_count, 3)
+
+    def test_circuit_breaker_specific_exception_types(self):
+        """Test circuit breaker with specific exception types."""
+
+        @circuit_breaker(
+            name="test_exception_service",
+            expected_exception=ValueError,
+            failure_threshold=2,
+        )
+        def test_function(error_type):
+            if error_type == "value":
+                raise ValueError("Value error")
+            elif error_type == "type":
+                raise TypeError("Type error")
+            return "success"
+
+        # ValueError should count towards failures
+        with self.assertRaises(ValueError):
+            test_function("value")
+
+        # TypeError should not count (not expected exception) - should pass through
+        with self.assertRaises(TypeError):
+            test_function("type")
+
+        # Should still be able to succeed after TypeError
+        result = test_function("success")
+        self.assertEqual(result, "success")
+
+    def test_storage_circuit_breaker(self):
+        """Test predefined storage circuit breaker."""
+        from apps.core.circuit_breaker import storage_circuit_breaker
+
+        @storage_circuit_breaker()
+        def storage_operation():
+            raise Exception("Storage error")
+
+        # Should use storage circuit breaker settings
+        with self.assertRaises(Exception):
+            storage_operation()
+
+
+class SecurityHeadersMiddlewareTestCase(TestCase):
+    """Test security headers middleware."""
+
+    def setUp(self):
+        """Set up test data."""
+        self.factory = RequestFactory()
+        self.middleware = SecurityHeadersMiddleware(Mock())
+
+    def test_security_headers_added(self):
+        """Test security headers are added to response."""
+        request = self.factory.get("/")
+        response = HttpResponse("Test content")
+
+        processed_response = self.middleware.process_response(request, response)
+
+        # Check for security headers
+        self.assertIn("Content-Security-Policy", processed_response)
+        self.assertIn("X-Content-Type-Options", processed_response)
+        self.assertIn("Referrer-Policy", processed_response)
+
+    def test_csp_header_content(self):
+        """Test Content Security Policy header content."""
+        request = self.factory.get("/")
+        response = HttpResponse("Test content")
+
+        processed_response = self.middleware.process_response(request, response)
+        csp_header = processed_response["Content-Security-Policy"]
+
+        # Should contain basic CSP directives
+        self.assertIn("default-src", csp_header)
+        self.assertIn("script-src", csp_header)
+        self.assertIn("style-src", csp_header)
+
+    @override_settings(DEBUG=True)
+    def test_debug_mode_csp_differences(self):
+        """Test CSP differences in debug mode."""
+        # Clear cached headers
+        SecurityHeadersMiddleware._cached_headers = None
+
+        request = self.factory.get("/")
+        response = HttpResponse("Test content")
+
+        processed_response = self.middleware.process_response(request, response)
+        csp_header = processed_response["Content-Security-Policy"]
+
+        # Debug mode should allow unsafe-eval for development
+        self.assertIn("unsafe-eval", csp_header)
+
+    @override_settings(DEBUG=False)
+    def test_production_mode_csp(self):
+        """Test CSP in production mode."""
+        # Clear cached headers
+        SecurityHeadersMiddleware._cached_headers = None
+
+        request = self.factory.get("/")
+        response = HttpResponse("Test content")
+
+        processed_response = self.middleware.process_response(request, response)
+        csp_header = processed_response["Content-Security-Policy"]
+
+        # Production should be more restrictive
+        self.assertNotIn("unsafe-eval", csp_header)
+
+    def test_header_caching(self):
+        """Test that security headers are cached for performance."""
+        # Clear cache
+        SecurityHeadersMiddleware._cached_headers = None
+
+        request = self.factory.get("/")
+        response1 = HttpResponse("Test 1")
+        response2 = HttpResponse("Test 2")
+
+        # First call should compute headers
+        self.middleware.process_response(request, response1)
+        first_cache = SecurityHeadersMiddleware._cached_headers
+
+        # Second call should use cached headers
+        self.middleware.process_response(request, response2)
+        second_cache = SecurityHeadersMiddleware._cached_headers
+
+        # Should be the same object (cached)
+        self.assertIs(first_cache, second_cache)
+
+    def test_ip_whitelist_middleware(self):
+        """Test IP whitelist functionality if implemented."""
+        # Test IP-based access control
+        request = self.factory.get("/")
+        request.META["REMOTE_ADDR"] = "192.168.1.100"
+
+        # This would test IP whitelist functionality if implemented
+        # For now, just ensure middleware doesn't break normal operation
+        response = HttpResponse("Test content")
+        processed_response = self.middleware.process_response(request, response)
+        self.assertEqual(processed_response.status_code, 200)
+
+
+class ThrottlingTestCase(TestCase):
+    """Test throttling functionality and error handling."""
+
+    def setUp(self):
+        """Set up test data."""
+        cache.clear()
+
+    def test_write_operation_throttle(self):
+        """Test write operation throttling."""
+        throttle = WriteOperationThrottle()
+
+        # Mock request
+        request = Mock()
+        request.user = Mock()
+        request.user.is_authenticated = True
+        request.user.pk = 1
+
+        # Test that throttle allows requests (with high test limits)
+        allowed = throttle.allow_request(request, None)
+        # With test settings, should allow the request
+        self.assertTrue(allowed)
+
+    def test_burst_write_throttle(self):
+        """Test burst write throttling."""
+        throttle = BurstWriteThrottle()
+
+        request = Mock()
+        request.user = Mock()
+        request.user.is_authenticated = True
+        request.user.pk = 1
+
+        # Test that throttle allows requests (with high test limits)
+        allowed = throttle.allow_request(request, None)
+        # With test settings (1000/min), should allow the request
+        self.assertTrue(allowed)
+
+    def test_publish_operation_throttle(self):
+        """Test publish operation throttling."""
+        throttle = PublishOperationThrottle()
+
+        request = Mock()
+        request.user = Mock()
+        request.user.is_authenticated = True
+        request.user.pk = 1
+
+        # Should be more restrictive than regular writes
+        allowed = throttle.allow_request(request, None)
+        self.assertTrue(allowed)  # First request should be allowed
+
+    def test_throttle_unauthenticated_user(self):
+        """Test throttling for unauthenticated users."""
+        throttle = WriteOperationThrottle()
+
+        request = Mock()
+        request.user = Mock()
+        request.user.is_authenticated = False
+        request.META = {"REMOTE_ADDR": "127.0.0.1"}
+
+        # Should use IP-based throttling for anonymous users
+        allowed = throttle.allow_request(request, None)
+        # First request should typically be allowed
+        self.assertTrue(allowed)
+
+    def test_throttle_wait_time(self):
+        """Test throttle wait time calculation."""
+        throttle = WriteOperationThrottle()
+
+        request = Mock()
+        request.user = Mock()
+        request.user.is_authenticated = True
+        request.user.pk = 1
+
+        # Exhaust rate limit
+        while throttle.allow_request(request, None):
+            pass
+
+        # Should provide wait time
+        wait_time = throttle.wait()
+        self.assertIsInstance(wait_time, (int, float))
+        self.assertGreater(wait_time, 0)
+
+
+class LoggingTestCase(TestCase):
+    """Test logging functionality and error handling."""
+
+    def setUp(self):
+        """Set up test data."""
+        self.logger = logging.getLogger("test_logger")
+
+    @patch("logging.Logger.error")
+    def test_error_logging(self, mock_error):
+        """Test error logging functionality."""
+        try:
+            raise ValueError("Test error")
+        except ValueError as e:
+            self.logger.error("An error occurred: %s", str(e), exc_info=True)
+
+        # Verify error was logged
+        mock_error.assert_called_once()
+        call_args = mock_error.call_args
+        self.assertIn("An error occurred", call_args[0][0])
+        self.assertIn("Test error", call_args[0][1])
+        self.assertTrue(call_args[1]["exc_info"])
+
+    @patch("logging.Logger.warning")
+    def test_warning_logging(self, mock_warning):
+        """Test warning logging functionality."""
+        self.logger.warning("This is a warning message: %s", "test_value")
+
+        mock_warning.assert_called_once_with(
+            "This is a warning message: %s", "test_value"
+        )
+
+    @patch("logging.Logger.info")
+    def test_info_logging(self, mock_info):
+        """Test info logging functionality."""
+        self.logger.info("Information message with data: %s", {"key": "value"})
+
+        mock_info.assert_called_once_with(
+            "Information message with data: %s", {"key": "value"}
+        )
+
+    def test_log_level_filtering(self):
+        """Test log level filtering."""
+        # Set logger to INFO level
+        self.logger.setLevel(logging.INFO)
+
+        # Test that debug messages are not processed at INFO level
+        # Note: We can't patch the actual logger methods as they call through
+        # to the real implementation. Instead, check the effective level
+        self.assertEqual(self.logger.getEffectiveLevel(), logging.INFO)
+        self.assertFalse(self.logger.isEnabledFor(logging.DEBUG))
+
+        # Info message should go through
+        with patch("logging.Logger.info") as mock_info:
+            self.logger.info("Info message")
+            mock_info.assert_called_once()
+
+    def test_structured_logging(self):
+        """Test structured logging with extra fields."""
+        with patch("logging.Logger.info") as mock_info:
+            self.logger.info(
+                "User action",
+                extra={"user_id": 123, "action": "login", "ip_address": "127.0.0.1"},
+            )
+
+            # Verify extra data was passed
+            call_args = mock_info.call_args
+            self.assertEqual(call_args[1]["extra"]["user_id"], 123)
+            self.assertEqual(call_args[1]["extra"]["action"], "login")
+
+
+class ErrorRecoveryTestCase(TestCase):
+    """Test error recovery mechanisms."""
+
+    def test_retry_mechanism(self):
+        """Test retry mechanism for transient errors."""
+        call_count = 0
+
+        def unreliable_function():
+            nonlocal call_count
+            call_count += 1
+            if call_count < 3:
+                raise Exception("Transient error")
+            return "success"
+
+        # Simple retry logic
+        max_retries = 3
+        for attempt in range(max_retries):
+            try:
+                result = unreliable_function()
+                break
+            except Exception as e:
+                if attempt == max_retries - 1:
+                    raise
+                time.sleep(0.1)  # Brief delay between retries
+
+        self.assertEqual(result, "success")
+        self.assertEqual(call_count, 3)
+
+    def test_fallback_mechanism(self):
+        """Test fallback mechanism when primary fails."""
+
+        def primary_service():
+            raise Exception("Primary service down")
+
+        def fallback_service():
+            return "fallback_result"
+
+        # Try primary, fall back on error
+        try:
+            result = primary_service()
+        except Exception:
+            result = fallback_service()
+
+        self.assertEqual(result, "fallback_result")
+
+    def test_graceful_degradation(self):
+        """Test graceful degradation when services fail."""
+
+        def enhanced_service():
+            raise Exception("Enhancement unavailable")
+
+        def basic_service():
+            return {"basic": True, "enhanced": False}
+
+        # Try enhanced service, degrade gracefully
+        try:
+            result = enhanced_service()
+        except Exception:
+            result = basic_service()
+
+        self.assertTrue(result["basic"])
+        self.assertFalse(result["enhanced"])
+
+
+class ValidationErrorHandlingTestCase(TestCase):
+    """Test validation error handling."""
+
+    def test_field_validation_errors(self):
+        """Test handling of field validation errors."""
+        from django.core.exceptions import ValidationError
+
+        def validate_email(email):
+            if "@" not in email:
+                raise ValidationError("Invalid email format")
+            return email
+
+        # Test valid email
+        result = validate_email("user@example.com")
+        self.assertEqual(result, "user@example.com")
+
+        # Test invalid email
+        with self.assertRaises(ValidationError) as cm:
+            validate_email("invalid-email")
+
+        self.assertIn("Invalid email format", str(cm.exception))
+
+    def test_model_validation_errors(self):
+        """Test handling of model validation errors."""
+        from django.core.exceptions import ValidationError
+
+        # Mock model validation
+        def mock_model_clean():
+            errors = {}
+            # Simulate multiple field errors
+            errors["title"] = ["Title is required"]
+            errors["email"] = ["Email format is invalid"]
+
+            if errors:
+                raise ValidationError(errors)
+
+        with self.assertRaises(ValidationError) as cm:
+            mock_model_clean()
+
+        # Should contain both field errors
+        error_dict = cm.exception.message_dict
+        self.assertIn("title", error_dict)
+        self.assertIn("email", error_dict)
+
+    def test_form_validation_error_handling(self):
+        """Test form validation error handling."""
+        # Mock form validation
+        errors = {
+            "username": ["Username is required"],
+            "password": ["Password too weak"],
+        }
+
+        # Simulate form error processing
+        formatted_errors = {}
+        for field, error_list in errors.items():
+            formatted_errors[field] = "; ".join(error_list)
+
+        self.assertEqual(formatted_errors["username"], "Username is required")
+        self.assertEqual(formatted_errors["password"], "Password too weak")

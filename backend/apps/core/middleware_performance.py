@@ -41,11 +41,15 @@ class PerformanceMonitoringMiddleware(MiddlewareMixin):
 
             return response
 
-        # Calculate metrics
+        try:
+            # Calculate metrics
 
-        duration = time.time() - request._start_time
+            duration = time.time() - request._start_time
 
-        num_queries = len(connection.queries) - request._start_queries
+            num_queries = len(connection.queries) - request._start_queries
+        except Exception:
+            # If there's an error calculating metrics, just return response
+            return response
 
         # Add performance headers
 
@@ -158,35 +162,39 @@ class CacheHitRateMiddleware(MiddlewareMixin):
 
             return response
 
-        cache_status = response.get("X-Cache", "MISS")
+        try:
+            cache_status = response.get("X-Cache", "MISS")
 
-        # Update hit rate statistics
+            # Update hit rate statistics
 
-        stats_key = "cache:stats:global"
+            stats_key = "cache:stats:global"
 
-        stats = cache.get(stats_key, {"hits": 0, "misses": 0})
+            stats = cache.get(stats_key, {"hits": 0, "misses": 0})
 
-        if cache_status == "HIT":
+            if cache_status == "HIT":
 
-            stats["hits"] += 1
+                stats["hits"] += 1
 
-        else:
+            else:
 
-            stats["misses"] += 1
+                stats["misses"] += 1
 
-        stats["hit_rate"] = (
-            stats["hits"] / (stats["hits"] + stats["misses"])
-            if (stats["hits"] + stats["misses"]) > 0
-            else 0
-        )
+            stats["hit_rate"] = (
+                stats["hits"] / (stats["hits"] + stats["misses"])
+                if (stats["hits"] + stats["misses"]) > 0
+                else 0
+            )
 
-        cache.set(stats_key, stats, timeout=86400)  # 24 hours
+            cache.set(stats_key, stats, timeout=86400)  # 24 hours
 
-        # Add hit rate to response headers in debug mode
+            # Add hit rate to response headers in debug mode
 
-        if settings.DEBUG:
+            if settings.DEBUG:
 
-            response["X-Cache-Hit-Rate"] = f"{stats['hit_rate']:.2%}"
+                response["X-Cache-Hit-Rate"] = f"{stats['hit_rate']:.2%}"
+        except Exception:
+            # If cache operations fail, just continue without tracking
+            pass
 
         return response
 
@@ -205,9 +213,13 @@ class DatabaseConnectionPoolMiddleware(MiddlewareMixin):
 
         except Exception:
 
-            connection.close()
+            try:
+                connection.close()
 
-            connection.ensure_connection()
+                connection.ensure_connection()
+            except Exception:
+                # If database operations fail completely, continue without them
+                pass
 
         return None
 

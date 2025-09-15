@@ -126,7 +126,7 @@ def time_since_creation(created_at) -> str:
 
         return f"{diff.days} days ago"
 
-    elif diff.seconds > 3600:
+    elif diff.seconds >= 3600:  # Use >= to include exactly 1 hour
 
         hours = diff.seconds // 3600
 
@@ -181,6 +181,9 @@ def mask_email(email: str) -> str:
         return email
 
     local, domain = email.split("@", 1)
+
+    if not local:  # Handle empty local part
+        return email  # Return original if local part is empty
 
     if len(local) <= 2:
 

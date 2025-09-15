@@ -1,6 +1,7 @@
 """Blog app tests with high coverage and real database operations."""
 
 import os
+from datetime import datetime, timedelta
 
 import django
 
@@ -8,11 +9,9 @@ import django
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "apps.config.settings.test")
 django.setup()
 
-from datetime import datetime, timedelta
-
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
-from django.test import TestCase, TransactionTestCase
+from django.test import TestCase
 from django.urls import reverse
 
 from rest_framework import status
@@ -980,7 +979,7 @@ class BlogSerializerTests(TestCase):
             pass  # User model or serializer may not exist
 
 
-class BlogIntegrationTests(TransactionTestCase):
+class BlogIntegrationTests(TestCase):
     """Integration tests for Blog app workflows."""
 
     def setUp(self):

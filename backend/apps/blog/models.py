@@ -409,31 +409,43 @@ class BlogPost(models.Model, RBACMixin):
 
     def get_related_posts(self, limit=5):  # noqa: C901
         """Get related posts based on category and tags."""
+        from django.db.models import Count, Q
 
         # Use select_related and prefetch_related to avoid N+1 queries
-
-        related = (
+        base_queryset = (
             BlogPost.objects.select_related("category", "locale", "author")
             .prefetch_related("tags")
             .filter(status="published", locale=self.locale)  # type: ignore[misc]
             .exclude(id=self.id)
         )
 
-        # Prefer posts from same category
+        related_filters = Q()
 
+        # Posts from same category get priority
         if self.category:
+            related_filters |= Q(category=self.category)
 
-            related = related.filter(category=self.category)
-
-        # If we have tags, include posts with similar tags
-
+        # Posts with similar tags get priority
         if self.tags.exists():
-
-            # Get tag IDs to avoid N+1 queries
-
             tag_ids = list(self.tags.values_list("id", flat=True))
+            related_filters |= Q(tags__id__in=tag_ids)
 
-            related = related.filter(tags__id__in=tag_ids).distinct()
+        if related_filters:
+            # Get posts that match category or tags, ordered by relevance
+            related = (
+                base_queryset.filter(related_filters)
+                .annotate(
+                    shared_tags=Count(
+                        "tags",
+                        filter=Q(tags__id__in=tag_ids) if self.tags.exists() else Q(),
+                    )
+                )
+                .distinct()
+                .order_by("-shared_tags", "-published_at")
+            )
+        else:
+            # Fallback: just get recent posts in the same locale
+            related = base_queryset.order_by("-published_at")
 
         return related[:limit]
 

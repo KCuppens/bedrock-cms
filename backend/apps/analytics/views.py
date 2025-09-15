@@ -477,9 +477,23 @@ class AnalyticsSummaryViewSet(viewsets.ReadOnlyModelViewSet):
 class AnalyticsAPIViewSet(viewsets.GenericViewSet):
     """Custom analytics endpoints for dashboard and reporting"""
 
+    queryset = PageView.objects.none()  # Required for GenericViewSet, though not used
     permission_classes = [AnalyticsPermission]
-
     throttle_classes = [UserRateThrottle]
+
+    def list(self, request):
+        """List available analytics endpoints"""
+        return Response(
+            {
+                "available_endpoints": [
+                    "traffic/",
+                    "threats/",
+                    "risks/",
+                    "assessments/",
+                    "export-data/",
+                ]
+            }
+        )
 
     @extend_schema(
         summary="Get traffic analytics",
@@ -872,14 +886,11 @@ class AnalyticsAPIViewSet(viewsets.GenericViewSet):
             OpenApiParameter("days", type=int, description="Number of days to include"),
         ],
     )
-    @action(detail=False, methods=["get"], url_path="export")
+    @action(detail=False, methods=["get"], url_path="export-data")
     def export_data(self, request):  # noqa: C901
         """Export analytics data"""
-
         # This would implement data export functionality
-
         # For now, return a placeholder response
-
         return Response(
             {
                 "message": "Export functionality would be implemented here",

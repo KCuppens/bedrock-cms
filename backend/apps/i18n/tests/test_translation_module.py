@@ -2,14 +2,10 @@
 
 import os
 
-import django
-
 # Configure Django settings before any imports
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "apps.config.settings.test")
-django.setup()
-
 from unittest.mock import Mock, patch
 
+import django
 from django.contrib.contenttypes.models import ContentType
 from django.test import TestCase
 

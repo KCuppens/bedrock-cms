@@ -1,3 +1,5 @@
+import logging
+
 from django.contrib.auth import get_user_model
 
 from allauth.account import app_settings as allauth_settings
@@ -17,6 +19,7 @@ from .serializers import (
 )
 
 User = get_user_model()
+logger = logging.getLogger(__name__)
 
 
 class AuthThrottle(AnonRateThrottle):

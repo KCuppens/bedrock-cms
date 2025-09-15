@@ -73,6 +73,10 @@ CELERY_TASK_ALWAYS_EAGER = True
 
 CELERY_TASK_EAGER_PROPAGATES = True
 
+CELERY_BROKER_URL = "memory://"
+
+CELERY_RESULT_BACKEND = "cache+memory://"
+
 
 # Disable logging during tests
 
@@ -95,6 +99,9 @@ SECRET_KEY = env(  # noqa: F405
     "SECRET_KEY", default="test-secret-key-not-for-production"
 )  # nosec B105
 
+# Add testserver to allowed hosts for Django test client
+ALLOWED_HOSTS = ["localhost", "127.0.0.1", "testserver"]  # noqa: F405
+
 
 # Disable CSRF for API tests
 
@@ -104,6 +111,19 @@ REST_FRAMEWORK = {
         "rest_framework.authentication.SessionAuthentication",
     ],
     "TEST_REQUEST_DEFAULT_FORMAT": "json",
+    # Disable throttling for tests
+    "DEFAULT_THROTTLE_RATES": {
+        "anon": None,
+        "user": None,
+        "auth": None,
+        "login": None,
+        "write": None,
+        "burst_write": None,
+        "publish": None,
+        "media_upload": None,
+        "admin": None,
+        "security_scan": None,
+    },
 }
 
 

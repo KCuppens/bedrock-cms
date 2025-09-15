@@ -5,15 +5,10 @@
 """block operations, and all remaining CMS view functionality."""
 
 import os
-
-import django
-
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "apps.config.settings.test_minimal")
-django.setup()
-
 import unittest
 from datetime import timedelta
 
+import django
 from django.contrib.auth import get_user_model
 from django.utils import timezone
 

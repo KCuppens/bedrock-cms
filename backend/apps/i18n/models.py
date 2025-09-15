@@ -37,6 +37,7 @@ class Locale(models.Model):
 
     native_name: CharField = models.CharField(
         max_length=100,
+        blank=True,
         default="",
         help_text="Native name in the language itself (e.g., 'English', 'Español', 'Français')",
     )

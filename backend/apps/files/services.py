@@ -97,9 +97,11 @@ class FileService:
 
         if file.size > max_size:
 
-            # For large files, use streaming upload
+            # For large files, read content in chunks
 
-            file_content = file
+            file_content = file.read()
+
+            file.seek(0)
 
         else:
 
@@ -118,7 +120,7 @@ class FileService:
         @storage_circuit_breaker()
         def store_file():
 
-            return default_storage.save(storage_path, ContentFile(file_content))
+            return default_storage.save(storage_path, file)
 
         stored_path = store_file()
 
@@ -214,7 +216,15 @@ class FileService:
 
         # Fallback for local development
 
-        return {"url": reverse("file_upload"), "fields": {}}
+        # For local development, return a simple upload URL
+        from django.urls import reverse
+
+        try:
+            # Try to reverse the upload URL
+            return {"url": reverse("fileupload-list"), "fields": {}}
+        except Exception:
+            # If reverse fails, return a simple path
+            return {"url": "/api/v1/files/files/", "fields": {}}
 
     @classmethod
     def delete_file(cls, file_upload: FileUpload) -> bool:
@@ -248,7 +258,7 @@ class FileService:
             return False
 
     @classmethod
-    def validate_file(cls, file, max_size_mb: int = 10) -> Dict[str, Any]:
+    def validate_file(cls, file, max_size_mb: float = 10) -> Dict[str, Any]:
         """Validate uploaded file"""
 
         errors = []
@@ -288,7 +298,9 @@ class FileService:
 
         if file_extension not in allowed_extensions:
 
-            errors.append(f"File extension '{file_extension}' not allowed")
+            errors.append(
+                f"File extension '{file_extension}' not allowed for security reasons"
+            )
 
         # Check MIME type
 
@@ -301,6 +313,27 @@ class FileService:
         if mime_type not in allowed_mime_types:
 
             warnings.append(f"MIME type '{mime_type}' may not be supported")
+
+        # Check for MIME type and extension mismatch
+
+        expected_mime_types = {
+            ".pdf": ["application/pdf"],
+            ".txt": ["text/plain"],
+            ".jpg": ["image/jpeg"],
+            ".jpeg": ["image/jpeg"],
+            ".png": ["image/png"],
+            ".gif": ["image/gif"],
+            ".doc": ["application/msword"],
+            ".docx": [
+                "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+            ],
+        }
+
+        if file_extension in expected_mime_types:
+            if mime_type not in expected_mime_types[file_extension]:
+                warnings.append(
+                    f"File extension {file_extension} may not be supported with MIME type {mime_type}"
+                )
 
         # Check for potential security issues
 
@@ -365,7 +398,7 @@ class FileService:
 
                     if default_storage.exists(path):
 
-                        """existing_paths.append(path)"""
+                        existing_paths.append(path)
 
                 except Exception as e:
 

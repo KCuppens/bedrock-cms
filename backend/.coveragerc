@@ -1,0 +1,225 @@
+# Coverage.py configuration for bedrock-cms
+# Comprehensive coverage reporting with advanced features
+
+[run]
+# Source paths to measure
+source = .
+branch = true
+parallel = true
+concurrency = thread,multiprocessing
+
+# Include patterns
+include =
+    apps/*
+    *.py
+
+# Omit patterns - exclude non-testable code
+omit =
+    # Virtual environments
+    */venv/*
+    */virtualenv/*
+    */env/*
+
+    # System/build files
+    setup.py
+    */setup.py
+    conftest.py
+    manage.py
+
+    # Migrations
+    */migrations/*
+
+    # Third-party packages
+    */site-packages/*
+
+    # Test files themselves
+    */tests/*
+    */test_*.py
+    */*_test.py
+    */*_tests.py
+    */testing/*
+
+    # Development and build files
+    */node_modules/*
+    */static/*
+    */staticfiles/*
+    */media/*
+    */build/*
+    */dist/*
+
+    # Configuration and settings that are hard to test
+    */settings/*
+    */config/settings/*
+    apps/config/settings/*
+
+    # Cache and temporary files
+    */__pycache__/*
+    */.*
+    *.pyc
+
+    # Development scripts
+    */scripts/dev_*
+    */scripts/local_*
+
+    # Deployment specific files
+    */deploy/*
+    */deployment/*
+    Dockerfile*
+    docker-compose*
+
+    # Documentation
+    */docs/*
+    README.py
+
+    # WSGI/ASGI applications (deployment specific)
+    */wsgi.py
+    */asgi.py
+
+    # Management commands that are hard to test
+    */management/commands/shell_plus.py
+    */management/commands/runserver.py
+
+# Data file location
+data_file = .coverage
+
+# Context switching for different test types
+[run:unit]
+source = .
+omit =
+    */integration/*
+    */e2e/*
+
+[run:integration]
+source = .
+omit =
+    */unit/*
+
+[run:e2e]
+source = .
+
+# Reporting configuration
+[report]
+# Show missing lines
+show_missing = true
+
+# Precision for coverage percentage
+precision = 2
+
+# Skip covered files in report
+skip_covered = false
+
+# Skip empty files
+skip_empty = false
+
+# Sort by coverage percentage
+sort = Cover
+
+# Exclude lines with these patterns
+exclude_lines =
+    # Standard pragmas
+    pragma: no cover
+    pragma: nocover
+
+    # Don't complain about missing debug-only code
+    def __repr__
+    def __str__
+    if self\.debug
+
+    # Don't complain if tests don't hit defensive assertion code
+    raise AssertionError
+    raise NotImplementedError
+    raise ValueError
+    raise TypeError
+
+    # Don't complain if non-runnable code isn't run
+    if 0:
+    if False:
+    if __name__ == .__main__.:
+
+    # Don't complain about abstract methods
+    @(abc\.)?abstractmethod
+
+    # Don't complain about type checking imports
+    if TYPE_CHECKING:
+
+    # Don't complain about platform specific code
+    if sys.platform
+
+    # Don't complain about version specific code
+    if sys.version_info
+
+    # Don't complain about development/debug code
+    if settings.DEBUG
+    if DEBUG
+
+    # Don't complain about logging statements
+    logger\.debug
+    logger\.info
+
+    # Don't complain about pass statements
+    pass
+
+    # Don't complain about ellipsis
+    \.\.\.
+
+    # Don't complain about docstrings
+    """.*"""
+    '''.*'''
+
+# Ignore errors for these patterns
+ignore_errors = false
+
+# Partial branch coverage
+partial_branches =
+    # Standard pragmas
+    pragma: no branch
+
+    # Don't complain if non-runnable code isn't run
+    if 0:
+    if False:
+
+[html]
+# HTML report directory
+directory = htmlcov
+
+# Title for HTML report
+title = Bedrock CMS Coverage Report
+
+# Show contexts (test types that hit each line)
+show_contexts = true
+
+# Skip files with 100% coverage in HTML report
+skip_covered = false
+
+# Skip empty files in HTML report
+skip_empty = true
+
+# Extra CSS file
+extra_css = htmlcov/extra.css
+
+[xml]
+# XML report file
+output = coverage.xml
+
+[json]
+# JSON report file
+output = coverage.json
+# Show contexts in JSON report
+show_contexts = true
+pretty_print = true
+
+# Paths mapping for different environments
+[paths]
+source =
+    .
+    /app
+    C:\Users\kobec\Documents\projects\bedrock-cms\backend
+    /home/runner/work/bedrock-cms/bedrock-cms/backend
+
+# Plugins configuration
+[coverage:plugins]
+# Django template coverage
+# django_coverage_plugin
+
+# Custom contexts for different test types
+# Note: contexts are set dynamically in pytest

@@ -2,12 +2,8 @@ import json
 import os
 
 import django
-
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "apps.config.settings.test_minimal")
-django.setup()
-
 from django.contrib.auth import get_user_model
-from django.test import TestCase, TransactionTestCase
+from django.test import TestCase
 
 from rest_framework import status
 from rest_framework.test import APIClient
@@ -598,7 +594,7 @@ class UiMessageTests(TestCase):
         self.assertEqual(bundle["auth.login.button"], "Entrar")
 
 
-class TranslationAPITests(TransactionTestCase):
+class TranslationAPITests(TestCase):
     """Test translation API endpoints."""
 
     def setUp(self):

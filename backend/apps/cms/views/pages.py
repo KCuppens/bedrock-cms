@@ -1,5 +1,5 @@
+import copy
 import uuid
-from copy import copy
 
 from django.conf import settings
 from django.db import transaction
@@ -1088,7 +1088,7 @@ class PagesViewSet(VersioningMixin, viewsets.ModelViewSet):
 
                 # Create audit entry before deletion
 
-                if AuditEntry:
+                if AuditEntry is not None:
                     AuditEntry.objects.create(
                         content_object=page,
                         action="delete",

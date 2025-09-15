@@ -1,14 +1,21 @@
 """Comprehensive tests to boost CMS coverage to 80%+"""
 
+import os
+
+import django
+from django.conf import settings
+
+# Configure Django settings if not already configured
+if not settings.configured:
+    os.environ.setdefault("DJANGO_SETTINGS_MODULE", "apps.config.settings.test")
+    django.setup()
+
+
 import json
 import os
 from unittest.mock import MagicMock, patch
 
 import django
-
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "apps.config.settings.test_minimal")
-django.setup()
-
 from django.contrib.auth import get_user_model
 from django.test import Client, TestCase
 from django.urls import reverse

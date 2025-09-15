@@ -1,0 +1,393 @@
+[
+  {
+    "model": "i18n.locale",
+    "pk": 1,
+    "fields": {
+      "code": "en",
+      "name": "English",
+      "native_name": "English",
+      "is_default": true,
+      "is_active": true,
+      "created_at": "2024-01-01T00:00:00Z",
+      "updated_at": "2024-01-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "i18n.locale",
+    "pk": 2,
+    "fields": {
+      "code": "es",
+      "name": "Spanish",
+      "native_name": "Español",
+      "is_default": false,
+      "is_active": true,
+      "created_at": "2024-01-01T00:00:00Z",
+      "updated_at": "2024-01-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "i18n.locale",
+    "pk": 3,
+    "fields": {
+      "code": "fr",
+      "name": "French",
+      "native_name": "Français",
+      "is_default": false,
+      "is_active": true,
+      "created_at": "2024-01-01T00:00:00Z",
+      "updated_at": "2024-01-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "accounts.user",
+    "pk": 1,
+    "fields": {
+      "email": "admin@example.com",
+      "name": "Admin User",
+      "password": "pbkdf2_sha256$260000$test$test",
+      "is_active": true,
+      "is_staff": true,
+      "is_superuser": true,
+      "date_joined": "2024-01-01T00:00:00Z",
+      "role": "admin",
+      "locale": 1
+    }
+  },
+  {
+    "model": "accounts.user",
+    "pk": 2,
+    "fields": {
+      "email": "editor@example.com",
+      "name": "Editor User",
+      "password": "pbkdf2_sha256$260000$test$test",
+      "is_active": true,
+      "is_staff": true,
+      "is_superuser": false,
+      "date_joined": "2024-01-01T00:00:00Z",
+      "role": "editor",
+      "locale": 1
+    }
+  },
+  {
+    "model": "accounts.user",
+    "pk": 3,
+    "fields": {
+      "email": "author@example.com",
+      "name": "Author User",
+      "password": "pbkdf2_sha256$260000$test$test",
+      "is_active": true,
+      "is_staff": false,
+      "is_superuser": false,
+      "date_joined": "2024-01-01T00:00:00Z",
+      "role": "author",
+      "locale": 1
+    }
+  },
+  {
+    "model": "auth.group",
+    "pk": 1,
+    "fields": {
+      "name": "Admin"
+    }
+  },
+  {
+    "model": "auth.group",
+    "pk": 2,
+    "fields": {
+      "name": "Editor"
+    }
+  },
+  {
+    "model": "auth.group",
+    "pk": 3,
+    "fields": {
+      "name": "Author"
+    }
+  },
+  {
+    "model": "auth.group",
+    "pk": 4,
+    "fields": {
+      "name": "Manager"
+    }
+  },
+  {
+    "model": "auth.group",
+    "pk": 5,
+    "fields": {
+      "name": "Member"
+    }
+  },
+  {
+    "model": "auth.group",
+    "pk": 6,
+    "fields": {
+      "name": "ReadOnly"
+    }
+  },
+  {
+    "model": "blog.category",
+    "pk": 1,
+    "fields": {
+      "name": "Technology",
+      "slug": "technology",
+      "description": "Technology related posts",
+      "is_active": true,
+      "created_at": "2024-01-01T00:00:00Z",
+      "updated_at": "2024-01-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "blog.category",
+    "pk": 2,
+    "fields": {
+      "name": "Business",
+      "slug": "business",
+      "description": "Business related posts",
+      "is_active": true,
+      "created_at": "2024-01-01T00:00:00Z",
+      "updated_at": "2024-01-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "blog.tag",
+    "pk": 1,
+    "fields": {
+      "name": "Django",
+      "slug": "django",
+      "created_at": "2024-01-01T00:00:00Z",
+      "updated_at": "2024-01-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "blog.tag",
+    "pk": 2,
+    "fields": {
+      "name": "Python",
+      "slug": "python",
+      "created_at": "2024-01-01T00:00:00Z",
+      "updated_at": "2024-01-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "blog.tag",
+    "pk": 3,
+    "fields": {
+      "name": "Testing",
+      "slug": "testing",
+      "created_at": "2024-01-01T00:00:00Z",
+      "updated_at": "2024-01-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "cms.page",
+    "pk": 1,
+    "fields": {
+      "title": "Home Page",
+      "slug": "home",
+      "content": [
+        {
+          "type": "heading",
+          "content": "Welcome to Test Site"
+        },
+        {
+          "type": "paragraph",
+          "content": "This is the home page content for testing."
+        }
+      ],
+      "locale": 1,
+      "status": "published",
+      "path": "/",
+      "meta_title": "Test Site Home",
+      "meta_description": "Test site home page for comprehensive testing",
+      "is_published": true,
+      "published_at": "2024-01-01T00:00:00Z",
+      "created_by": 1,
+      "updated_by": 1,
+      "created_at": "2024-01-01T00:00:00Z",
+      "updated_at": "2024-01-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "cms.page",
+    "pk": 2,
+    "fields": {
+      "title": "About Us",
+      "slug": "about",
+      "content": [
+        {
+          "type": "heading",
+          "content": "About Our Company"
+        },
+        {
+          "type": "paragraph",
+          "content": "We are a test company for testing purposes."
+        }
+      ],
+      "locale": 1,
+      "status": "published",
+      "path": "/about/",
+      "meta_title": "About Us - Test Site",
+      "meta_description": "Learn about our test company and our mission",
+      "is_published": true,
+      "published_at": "2024-01-01T00:00:00Z",
+      "created_by": 1,
+      "updated_by": 1,
+      "created_at": "2024-01-01T00:00:00Z",
+      "updated_at": "2024-01-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "cms.page",
+    "pk": 3,
+    "fields": {
+      "title": "Draft Page",
+      "slug": "draft-page",
+      "content": [
+        {
+          "type": "heading",
+          "content": "This is a Draft"
+        },
+        {
+          "type": "paragraph",
+          "content": "This page is in draft status for testing."
+        }
+      ],
+      "locale": 1,
+      "status": "draft",
+      "path": "/draft-page/",
+      "meta_title": "Draft Page - Test Site",
+      "meta_description": "This is a draft page for testing purposes",
+      "is_published": false,
+      "published_at": null,
+      "created_by": 2,
+      "updated_by": 2,
+      "created_at": "2024-01-01T00:00:00Z",
+      "updated_at": "2024-01-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "blog.blogpost",
+    "pk": 1,
+    "fields": {
+      "title": "Test Blog Post",
+      "slug": "test-blog-post",
+      "content": "This is a test blog post for testing purposes.",
+      "excerpt": "A test blog post for comprehensive testing",
+      "locale": 1,
+      "category": 1,
+      "status": "published",
+      "featured": false,
+      "allow_comments": true,
+      "author": 1,
+      "created_at": "2024-01-01T00:00:00Z",
+      "updated_at": "2024-01-01T00:00:00Z",
+      "published_at": "2024-01-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "blog.blogpost",
+    "pk": 2,
+    "fields": {
+      "title": "Draft Blog Post",
+      "slug": "draft-blog-post",
+      "content": "This is a draft blog post for testing.",
+      "excerpt": "A draft blog post for testing",
+      "locale": 1,
+      "category": 2,
+      "status": "draft",
+      "featured": false,
+      "allow_comments": true,
+      "author": 2,
+      "created_at": "2024-01-01T00:00:00Z",
+      "updated_at": "2024-01-01T00:00:00Z",
+      "published_at": null
+    }
+  },
+  {
+    "model": "files.fileupload",
+    "pk": 1,
+    "fields": {
+      "original_filename": "test-image.jpg",
+      "file": "uploads/test-image.jpg",
+      "file_type": "image",
+      "file_size": 1024000,
+      "mime_type": "image/jpeg",
+      "checksum": "test-checksum-123",
+      "uploaded_by": 1,
+      "created_at": "2024-01-01T00:00:00Z",
+      "updated_at": "2024-01-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "files.fileupload",
+    "pk": 2,
+    "fields": {
+      "original_filename": "test-document.pdf",
+      "file": "uploads/test-document.pdf",
+      "file_type": "document",
+      "file_size": 2048000,
+      "mime_type": "application/pdf",
+      "checksum": "test-checksum-456",
+      "uploaded_by": 1,
+      "created_at": "2024-01-01T00:00:00Z",
+      "updated_at": "2024-01-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "analytics.pageview",
+    "pk": 1,
+    "fields": {
+      "url": "http://testserver/",
+      "user": 1,
+      "ip_address": "127.0.0.1",
+      "user_agent": "Test Browser 1.0",
+      "viewed_at": "2024-01-01T10:00:00Z",
+      "session_id": "test-session-1",
+      "load_time": 150,
+      "time_on_page": 300
+    }
+  },
+  {
+    "model": "analytics.pageview",
+    "pk": 2,
+    "fields": {
+      "url": "http://testserver/about/",
+      "user": null,
+      "ip_address": "192.168.1.100",
+      "user_agent": "Test Browser 2.0",
+      "viewed_at": "2024-01-01T11:00:00Z",
+      "session_id": "test-session-2",
+      "load_time": 200,
+      "time_on_page": 450
+    }
+  },
+  {
+    "model": "search.searchindex",
+    "pk": 1,
+    "fields": {
+      "content_type": 8,
+      "object_id": "1",
+      "locale": 1,
+      "title": "Home Page",
+      "content": "Welcome to Test Site This is the home page content for testing.",
+      "url": "/",
+      "indexed_at": "2024-01-01T00:00:00Z",
+      "is_active": true
+    }
+  },
+  {
+    "model": "search.searchindex",
+    "pk": 2,
+    "fields": {
+      "content_type": 9,
+      "object_id": "1",
+      "locale": 1,
+      "title": "Test Blog Post",
+      "content": "This is a test blog post for testing purposes.",
+      "url": "/blog/test-blog-post/",
+      "indexed_at": "2024-01-01T00:00:00Z",
+      "is_active": true
+    }
+  }
+]

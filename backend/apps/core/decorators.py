@@ -142,7 +142,23 @@ def cache_method_response(timeout=300, vary_on_user=True, vary_on_headers=None):
 
                 response["X-Cache"] = "MISS"
 
-                cache.set(cache_key, response, timeout)
+                # Skip caching for responses that can't be safely pickled
+                try:
+                    # Ensure response is rendered before caching
+                    if hasattr(response, "render") and not getattr(
+                        response, "_is_rendered", False
+                    ):
+                        # Only render if response has accepted_renderer set (to avoid DRF errors)
+                        if (
+                            hasattr(response, "accepted_renderer")
+                            and response.accepted_renderer
+                        ):
+                            response.render()
+
+                    cache.set(cache_key, response, timeout)
+                except Exception:
+                    # If caching fails, don't crash - just skip caching
+                    pass
 
             return response
 

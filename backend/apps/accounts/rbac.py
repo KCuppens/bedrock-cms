@@ -141,7 +141,12 @@ class RBACMixin:
     def user_has_locale_access(self, user):
         """Check if user has access to this object's locale."""
 
-        if not hasattr(self, "locale") or not user or not user.is_authenticated:
+        if (
+            not hasattr(self, "locale")
+            or not user
+            or not user.is_authenticated
+            or not user.is_active
+        ):
 
             return False
 
@@ -171,6 +176,7 @@ class RBACMixin:
             or not self.path
             or not user
             or not user.is_authenticated
+            or not user.is_active
         ):
 
             return False

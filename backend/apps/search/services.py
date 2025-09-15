@@ -153,7 +153,14 @@ class SearchService:
 
         if query:
 
-            if HAS_POSTGRES_SEARCH:
+            # Check if we're actually using PostgreSQL database
+            from django.conf import settings
+
+            is_postgres = "postgresql" in settings.DATABASES.get("default", {}).get(
+                "ENGINE", ""
+            )
+
+            if HAS_POSTGRES_SEARCH and is_postgres:
 
                 # Use PostgreSQL full-text search
 
@@ -206,10 +213,20 @@ class SearchService:
         if "tags" in filters and filters["tags"]:
 
             # Filter by tags (JSON field contains)
+            from django.db import connection
+            from django.db.utils import NotSupportedError
 
             for tag in filters["tags"]:
+                try:
+                    # Test if JSON contains is supported by attempting a small query
+                    from apps.search.models import SearchIndex
 
-                queryset = queryset.filter(search_tags__contains=[tag])
+                    SearchIndex.objects.filter(search_tags__contains=[tag]).exists()
+                    queryset = queryset.filter(search_tags__contains=[tag])
+                except (NotSupportedError, Exception):
+                    # Fallback for databases that don't support JSON contains
+                    # Use icontains on the string representation instead
+                    queryset = queryset.filter(search_tags__icontains=f'"{tag}"')
 
         if "date_from" in filters and filters["date_from"]:
 

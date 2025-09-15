@@ -172,13 +172,13 @@ def prometheus_metrics(request):
 
             cache_start = time.time()
 
-            """cache.set("metrics_test", "ok", 10)"""
+            cache.set("metrics_test", "test_value", 10)
 
             cache_result = cache.get("metrics_test")
 
             cache_duration = time.time() - cache_start
 
-            cache_status = 1 if cache_result == "ok" else 0
+            cache_status = 1 if cache_result == "test_value" else 0
 
             metrics.extend(
                 [
