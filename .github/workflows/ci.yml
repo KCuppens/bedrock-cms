@@ -265,7 +265,7 @@ jobs:
 
     - name: Create .env file
       run: |
-        cat << EOF > .env
+        cat << EOF > backend/.env
         DJANGO_SECRET_KEY=test-secret-key-for-integration
         DEBUG=True
         DATABASE_URL=postgres://django:django@postgres:5432/django_saas
@@ -290,7 +290,7 @@ jobs:
 
     - name: Cleanup
       if: always()
-      run: docker compose -f backend/compose/docker-compose.yml down -v
+      run: docker compose -f backend/compose/docker-compose.yml down -v || true
 
   deployment-check:
     name: Deployment Check
