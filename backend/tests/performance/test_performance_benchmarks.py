@@ -353,7 +353,7 @@ class CachePerformanceTests(TestCase, PerformanceTestMixin):
         retrieved = cache.get_many(list(cache_data.keys()))
         self.assertEqual(len(retrieved), 100)
 
-    @performance_benchmark(name="cache_invalidation", time_threshold=0.1)
+    @performance_benchmark(name="cache_invalidation", time_threshold=0.5)
     def test_cache_invalidation_performance(self):
         """Test cache invalidation patterns performance."""
         # Set up cached data

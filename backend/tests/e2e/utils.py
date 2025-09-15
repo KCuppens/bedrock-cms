@@ -271,8 +271,8 @@ class E2ETestMixin:
             client.credentials(HTTP_AUTHORIZATION=f"Token {token.key}")
         except Exception:
             # Fallback for cases where Token table doesn't exist
-            # Use a mock token or skip authentication
-            client.credentials(HTTP_AUTHORIZATION=f"Token mock-token-{user.id}")
+            # Use force_authenticate for test purposes
+            client.force_authenticate(user=user)
 
         return client
 

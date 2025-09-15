@@ -2,7 +2,7 @@
 
 import os
 import tempfile
-from unittest.mock import Mock, call, patch
+from unittest.mock import MagicMock, Mock, call, patch
 
 import django
 from django.conf import settings

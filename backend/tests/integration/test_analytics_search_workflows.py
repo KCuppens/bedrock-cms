@@ -473,7 +473,9 @@ class TestAnalyticsSearchWorkflows(TestCase):
             for j in range(i + 1):  # Increasing search volume over time
                 query = SearchAnalyticsFactory.create_search_query(
                     query_text=f"search query {i}-{j}",
-                    result_count=5 - j if j < 5 else 0,  # Some searches with no results
+                    result_count=max(
+                        0, 5 - j
+                    ),  # Ensure non-negative, some searches with no results
                     execution_time_ms=100 + (j * 20),
                     user=self.user if j % 2 == 0 else None,
                 )
