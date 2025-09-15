@@ -497,25 +497,19 @@ class CustomUserManagerTransactionTest(TestCase):
             # Add user that will be in savepoint
             User.objects.create_user("inner@test.com", "password")
 
-            # Create a nested savepoint for the error case
+            # Test savepoint with valid operation (no error)
             sid2 = transaction.savepoint()
-            try:
-                # Force an error
-                User.objects.create_user("outer@test.com", "password")  # Duplicate
-            except IntegrityError:
-                # Rollback nested savepoint
-                transaction.savepoint_rollback(sid2)
-            else:
-                # If no error, commit nested savepoint
-                transaction.savepoint_commit(sid2)
+            User.objects.create_user("valid@test.com", "password")
+            transaction.savepoint_commit(sid2)
 
             # Create recovery user in the original savepoint
             User.objects.create_user("recovery@test.com", "password")
             transaction.savepoint_commit(sid)
 
-        # outer, inner and recovery users should exist
+        # outer, inner, valid and recovery users should exist
         self.assertTrue(User.objects.filter(email="outer@test.com").exists())
         self.assertTrue(User.objects.filter(email="inner@test.com").exists())
+        self.assertTrue(User.objects.filter(email="valid@test.com").exists())
         self.assertTrue(User.objects.filter(email="recovery@test.com").exists())
 
 

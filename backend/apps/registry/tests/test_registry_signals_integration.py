@@ -225,10 +225,10 @@ class RegistrySignalIntegrationTests(TestCase):
         results = []
         errors = []
 
-        def worker():
+        def worker(worker_id):
             try:
                 # Register a unique config per thread
-                thread_id = threading.current_thread().ident
+                thread_id = worker_id  # Use explicit worker ID instead of thread ident
 
                 # Create unique mock model for each thread
                 unique_model = Mock()
@@ -272,8 +272,8 @@ class RegistrySignalIntegrationTests(TestCase):
 
         # Run multiple threads
         threads = []
-        for _ in range(5):
-            thread = threading.Thread(target=worker)
+        for i in range(5):
+            thread = threading.Thread(target=worker, args=(i,))
             threads.append(thread)
             thread.start()
 

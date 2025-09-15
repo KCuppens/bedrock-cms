@@ -556,9 +556,12 @@ class APISecurityTest(TestCase):
 
                 # Check rate limiting format
                 for rate_name, rate_value in throttle_rates.items():
-                    self.assertIsInstance(rate_value, str)
-                    # Should be in format "number/period"
-                    self.assertRegex(rate_value, r"^\d+/(second|minute|min|hour|day)$")
+                    if rate_value is not None:  # Allow None values for disabled rates
+                        self.assertIsInstance(rate_value, str)
+                        # Should be in format "number/period"
+                        self.assertRegex(
+                            rate_value, r"^\d+/(second|minute|min|hour|day)$"
+                        )
 
     def test_api_versioning_security(self):
         """Test API versioning doesn't expose sensitive information."""

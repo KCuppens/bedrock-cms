@@ -346,9 +346,10 @@ class BackupTaskTestCase(TestCase):
 
     @patch("apps.ops.tasks.call_command")
     @patch("apps.ops.tasks.os.makedirs")
+    @patch("apps.ops.tasks.open", create=True)
     @patch("apps.ops.tasks.settings")
     def test_backup_database_sqlite(
-        self, mock_settings, mock_makedirs, mock_call_command
+        self, mock_settings, mock_open, mock_makedirs, mock_call_command
     ):
         """Test SQLite database backup."""
         mock_settings.BASE_DIR = "/app"
@@ -358,6 +359,10 @@ class BackupTaskTestCase(TestCase):
                 "NAME": "/app/db.sqlite3",
             }
         }
+
+        # Mock the file handle for writing
+        mock_file = MagicMock()
+        mock_open.return_value = mock_file
 
         result = tasks.backup_database()
 

@@ -30,6 +30,7 @@ from apps.registry.registry import content_registry
 try:
 
     from django.contrib.postgres.indexes import GinIndex
+    from django.contrib.postgres.search import SearchVectorField
 
     HAS_POSTGRES_SEARCH = True
 
@@ -38,6 +39,7 @@ except ImportError:
     HAS_POSTGRES_SEARCH = False
 
     GinIndex = None  # type: ignore[assignment,misc]
+    SearchVectorField = None  # type: ignore[assignment,misc]
 
 
 User = get_user_model()
@@ -102,9 +104,12 @@ class SearchIndex(models.Model):
         default=1.0, help_text="Weight for search ranking (higher = more relevant)"
     )
 
-    # Full-text search fields (PostgreSQL specific) - removed class-level definition
-
-    # search_vector field will be populated via trigger or update method
+    # Full-text search fields (PostgreSQL specific)
+    if HAS_POSTGRES_SEARCH and SearchVectorField:
+        search_vector = SearchVectorField(null=True, blank=True)
+    else:
+        # Fallback to TextField for non-PostgreSQL databases
+        search_vector = models.TextField(null=True, blank=True)
 
     # Timestamps
 
