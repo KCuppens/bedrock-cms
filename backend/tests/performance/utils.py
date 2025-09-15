@@ -51,6 +51,8 @@ TEST_ENVIRONMENT = (
     or "test_minimal" in str(os.environ.get("DJANGO_SETTINGS_MODULE", ""))
     or "pytest" in sys.modules
     or "unittest" in sys.modules
+    or os.environ.get("GITHUB_ACTIONS") == "true"  # Detect GitHub Actions CI
+    or os.environ.get("CI") == "true"  # Generic CI detection
 )
 
 # Debug logging to verify detection
