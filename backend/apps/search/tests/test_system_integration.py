@@ -8,7 +8,7 @@ import django
 from django.contrib.auth import get_user_model
 from django.contrib.contenttypes.models import ContentType
 from django.core.cache import cache
-from django.db import transaction
+from django.db import models, transaction
 from django.test import RequestFactory, TestCase, override_settings
 from django.utils import timezone
 
@@ -50,9 +50,15 @@ class SearchSystemIntegrationTests(TestCase):
     def setUp(self):
         # Clear cache and search index
         cache.clear()
-        SearchIndex.objects.all().delete()
-        SearchQuery.objects.all().delete()
-        SearchSuggestion.objects.all().delete()
+
+        # Try to clear search tables if they exist
+        try:
+            SearchIndex.objects.all().delete()
+            SearchQuery.objects.all().delete()
+            SearchSuggestion.objects.all().delete()
+        except Exception:
+            # Tables might not exist yet in test database
+            pass
 
         self.user = User.objects.create_user(
             email="search@example.com", password="testpass"
@@ -100,7 +106,8 @@ class SearchSystemIntegrationTests(TestCase):
                 object_id=obj.pk,
                 defaults={
                     "title": title,
-                    "content": f"Content for {title}",
+                    "content": f"Content for {title}. How to integrate search functionality",
+                    "excerpt": f"Learn about {title} and search integration",
                     "search_category": category,
                     "is_published": True,
                     "published_at": timezone.now(),
@@ -176,6 +183,7 @@ class SearchSystemIntegrationTests(TestCase):
                     object_id=page.pk,
                     title="Indexing Test Page",
                     content=mock_extract_content(page),
+                    excerpt="Test page for indexing pipeline verification",
                     search_category="page",
                     is_published=True,
                     published_at=timezone.now(),

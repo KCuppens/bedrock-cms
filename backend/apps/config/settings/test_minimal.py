@@ -85,6 +85,7 @@ class DisableMigrations:
             "accounts",
             "media",
             "files",
+            "search",
         ]:
             return False
         return True
@@ -101,6 +102,7 @@ class DisableMigrations:
             "accounts",
             "media",
             "files",
+            "search",
         ]:
             return None
         return None
