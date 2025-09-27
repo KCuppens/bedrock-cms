@@ -1,24 +1,24 @@
 import React from 'react';
-import { BlockProps } from '../BlockRenderer';
+import { BlockComponentProps } from './types';
 
-interface RichtextBlockProps extends BlockProps {
-  props: {
+interface RichtextBlockProps extends BlockComponentProps {
+  content: {
     content?: string;
     className?: string;
   };
 }
 
-const RichtextBlock: React.FC<RichtextBlockProps> = ({ props }) => {
-  const { content, className = '' } = props;
+const RichtextBlock: React.FC<RichtextBlockProps> = ({ content }) => {
+  const { content: richContent, className = '' } = content;
 
-  if (!content) {
+  if (!richContent) {
     return null;
   }
 
   return (
     <div
       className={`richtext-block prose prose-lg max-w-none ${className}`.trim()}
-      dangerouslySetInnerHTML={{ __html: content }}
+      dangerouslySetInnerHTML={{ __html: richContent }}
     />
   );
 };

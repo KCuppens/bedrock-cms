@@ -1,10 +1,10 @@
 import React from 'react';
-import { BlockProps } from '../BlockRenderer';
-import BlockRenderer from '../BlockRenderer';
+import { BlockComponentProps, BlockData } from './types';
+import { DynamicBlocksRenderer } from './DynamicBlocksRenderer';
 
-interface ContainerBlockProps extends BlockProps {
-  props: {
-    children?: BlockProps[];
+interface ContainerBlockProps extends BlockComponentProps {
+  content: {
+    children?: BlockData[];
     maxWidth?: 'sm' | 'md' | 'lg' | 'xl' | '2xl' | 'full';
     padding?: 'none' | 'sm' | 'md' | 'lg' | 'xl';
     backgroundColor?: string;
@@ -12,14 +12,14 @@ interface ContainerBlockProps extends BlockProps {
   };
 }
 
-const ContainerBlock: React.FC<ContainerBlockProps> = ({ props }) => {
+const ContainerBlock: React.FC<ContainerBlockProps> = ({ content }) => {
   const {
     children = [],
     maxWidth = 'xl',
     padding = 'md',
     backgroundColor,
     className = ''
-  } = props;
+  } = content;
 
   const maxWidthClasses = {
     sm: 'max-w-sm',
@@ -47,7 +47,7 @@ const ContainerBlock: React.FC<ContainerBlockProps> = ({ props }) => {
       className={`container-block mx-auto ${maxWidthClasses[maxWidth]} ${paddingClasses[padding]} ${className}`.trim()}
       style={containerStyles}
     >
-      <BlockRenderer blocks={children} />
+      <DynamicBlocksRenderer blocks={children} />
     </div>
   );
 };

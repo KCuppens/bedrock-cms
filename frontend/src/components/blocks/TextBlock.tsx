@@ -1,8 +1,8 @@
 import React, { useMemo } from 'react';
-import { BlockProps } from '../BlockRenderer';
+import { BlockComponentProps } from './types';
 
-interface TextBlockProps extends BlockProps {
-  props: {
+interface TextBlockProps extends BlockComponentProps {
+  content: {
     content?: string;
     alignment?: 'left' | 'center' | 'right';
     size?: 'sm' | 'base' | 'lg' | 'xl';
@@ -10,15 +10,15 @@ interface TextBlockProps extends BlockProps {
   };
 }
 
-const TextBlock: React.FC<TextBlockProps> = React.memo(({ props }) => {
+const TextBlock: React.FC<TextBlockProps> = React.memo(({ content }) => {
   const {
-    content,
+    content: textContent,
     alignment = 'left',
     size = 'base',
     className = ''
-  } = props;
+  } = content;
 
-  if (!content) {
+  if (!textContent) {
     return null;
   }
 
@@ -38,7 +38,7 @@ const TextBlock: React.FC<TextBlockProps> = React.memo(({ props }) => {
   return (
     <div
       className={`text-block ${alignmentClasses[alignment]} ${sizeClasses[size]} ${className}`.trim()}
-      dangerouslySetInnerHTML={{ __html: content }}
+      dangerouslySetInnerHTML={{ __html: textContent }}
     />
   );
 });

@@ -1,10 +1,10 @@
 import React, { useMemo } from 'react';
-import { BlockProps } from '../BlockRenderer';
+import { BlockComponentProps } from './types';
 import { Button } from '@/components/ui/button';
 import { useBlockTranslation } from '@/hooks/useBlockTranslation';
 
-interface HeroBlockProps extends BlockProps {
-  props: {
+interface HeroBlockProps extends BlockComponentProps {
+  content: {
     title?: string;
     subtitle?: string;
     content?: string;
@@ -16,10 +16,9 @@ interface HeroBlockProps extends BlockProps {
     alignment?: 'left' | 'center' | 'right';
     className?: string;
   };
-  isEditable?: boolean;
 }
 
-const HeroBlock: React.FC<HeroBlockProps> = React.memo(({ props, isEditable }) => {
+const HeroBlock: React.FC<HeroBlockProps> = React.memo(({ content, isEditing }) => {
   // Register and use translations
   const { t } = useBlockTranslation({
     blockType: 'hero',
@@ -34,7 +33,7 @@ const HeroBlock: React.FC<HeroBlockProps> = React.memo(({ props, isEditable }) =
   const {
     title,
     subtitle,
-    content,
+    content: heroContent,
     backgroundImage,
     backgroundColor = 'bg-gray-900',
     textColor = 'text-white',
@@ -42,7 +41,7 @@ const HeroBlock: React.FC<HeroBlockProps> = React.memo(({ props, isEditable }) =
     buttonUrl,
     alignment = 'center',
     className = ''
-  } = props;
+  } = content;
 
   const alignmentClasses = useMemo(() => ({
     left: 'text-left',
@@ -60,7 +59,7 @@ const HeroBlock: React.FC<HeroBlockProps> = React.memo(({ props, isEditable }) =
   }), [backgroundImage]);
 
   // Show loading state in edit mode if no content
-  if (isEditable && !title && !subtitle && !content) {
+  if (isEditing && !title && !subtitle && !heroContent) {
     return (
       <div className="hero-block-loading p-8 text-center bg-gray-100">
         <p className="text-gray-500">{t('loading')}</p>
@@ -79,26 +78,26 @@ const HeroBlock: React.FC<HeroBlockProps> = React.memo(({ props, isEditable }) =
       )}
 
       <div className="relative max-w-4xl mx-auto">
-        {(title || isEditable) && (
+        {(title || isEditing) && (
           <h1 className="text-4xl md:text-6xl font-bold mb-6">
-            {title || (isEditable ? t('defaultTitle') : null)}
+            {title || (isEditing ? t('defaultTitle') : null)}
           </h1>
         )}
 
-        {(subtitle || isEditable) && (
+        {(subtitle || isEditing) && (
           <h2 className="text-xl md:text-2xl font-medium mb-6 opacity-90">
-            {subtitle || (isEditable ? t('defaultSubtitle') : null)}
+            {subtitle || (isEditing ? t('defaultSubtitle') : null)}
           </h2>
         )}
 
-        {content && (
+        {heroContent && (
           <div
             className="text-lg mb-8 opacity-80 prose prose-invert max-w-none"
-            dangerouslySetInnerHTML={{ __html: content }}
+            dangerouslySetInnerHTML={{ __html: heroContent }}
           />
         )}
 
-        {(buttonText || isEditable) && buttonUrl && (
+        {(buttonText || isEditing) && buttonUrl && (
           <Button
             asChild
             size="lg"

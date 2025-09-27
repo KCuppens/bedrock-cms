@@ -1,8 +1,8 @@
 import React, { useMemo } from 'react';
-import { BlockProps } from '../BlockRenderer';
+import { BlockComponentProps } from './types';
 
-interface ImageBlockProps extends BlockProps {
-  props: {
+interface ImageBlockProps extends BlockComponentProps {
+  content: {
     src?: string;
     alt?: string;
     caption?: string;
@@ -13,7 +13,7 @@ interface ImageBlockProps extends BlockProps {
   };
 }
 
-const ImageBlock: React.FC<ImageBlockProps> = React.memo(({ props }) => {
+const ImageBlock: React.FC<ImageBlockProps> = React.memo(({ content }) => {
   const {
     src,
     alt = '',
@@ -22,7 +22,7 @@ const ImageBlock: React.FC<ImageBlockProps> = React.memo(({ props }) => {
     height,
     alignment = 'center',
     className = ''
-  } = props;
+  } = content;
 
   if (!src) {
     return null;
