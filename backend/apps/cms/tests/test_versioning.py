@@ -44,12 +44,14 @@ class PageRevisionModelTests(TestCase):
             email="test@example.com", password="testpass123"
         )
 
-        self.locale = Locale.objects.create(
+        self.locale, _ = Locale.objects.get_or_create(
             code="en",
-            name="English",
-            native_name="English",
-            is_default=True,
-            is_active=True,
+            defaults={
+                "name": "English",
+                "native_name": "English",
+                "is_default": True,
+                "is_active": True,
+            },
         )
 
         self.page = Page.objects.create(
@@ -186,12 +188,14 @@ class AuditEntryModelTests(TestCase):
             email="test@example.com", password="testpass123"
         )
 
-        self.locale = Locale.objects.create(
+        self.locale, _ = Locale.objects.get_or_create(
             code="en",
-            name="English",
-            native_name="English",
-            is_default=True,
-            is_active=True,
+            defaults={
+                "name": "English",
+                "native_name": "English",
+                "is_default": True,
+                "is_active": True,
+            },
         )
 
         self.page = Page.objects.create(
@@ -249,12 +253,14 @@ class RevisionDifferTests(TestCase):
             email="test@example.com", password="testpass123"
         )
 
-        self.locale = Locale.objects.create(
+        self.locale, _ = Locale.objects.get_or_create(
             code="en",
-            name="English",
-            native_name="English",
-            is_default=True,
-            is_active=True,
+            defaults={
+                "name": "English",
+                "native_name": "English",
+                "is_default": True,
+                "is_active": True,
+            },
         )
 
         self.page = Page.objects.create(
@@ -377,12 +383,14 @@ class VersioningAPITests(APITestCase):
             email="test@example.com", password="testpass123"
         )
 
-        self.locale = Locale.objects.create(
+        self.locale, _ = Locale.objects.get_or_create(
             code="en",
-            name="English",
-            native_name="English",
-            is_default=True,
-            is_active=True,
+            defaults={
+                "name": "English",
+                "native_name": "English",
+                "is_default": True,
+                "is_active": True,
+            },
         )
 
         # Create page with flag to skip revision creation
@@ -600,12 +608,14 @@ class VersioningSignalsTests(TestCase):
             email="test@example.com", password="testpass123"
         )
 
-        self.locale = Locale.objects.create(
+        self.locale, _ = Locale.objects.get_or_create(
             code="en",
-            name="English",
-            native_name="English",
-            is_default=True,
-            is_active=True,
+            defaults={
+                "name": "English",
+                "native_name": "English",
+                "is_default": True,
+                "is_active": True,
+            },
         )
 
     def test_revision_created_on_page_save(self):
@@ -669,12 +679,14 @@ class ComprehensiveVersionCreationTests(TestCase):
             email="editor@example.com", password="testpass123"
         )
 
-        self.locale = Locale.objects.create(
+        self.locale, _ = Locale.objects.get_or_create(
             code="en",
-            name="English",
-            native_name="English",
-            is_default=True,
-            is_active=True,
+            defaults={
+                "name": "English",
+                "native_name": "English",
+                "is_default": True,
+                "is_active": True,
+            },
         )
 
         self.page = Page.objects.create(

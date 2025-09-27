@@ -54,8 +54,9 @@ class I18nSystemIntegrationTests(TestCase):
         cache.clear()
 
         # Create locales with fallback chain
-        self.en_locale = Locale.objects.create(
-            code="en", name="English", native_name="English", is_default=True
+        self.en_locale, _ = Locale.objects.get_or_create(
+            code="en",
+            defaults={"name": "English", "native_name": "English", "is_default": True},
         )
         self.fr_locale = Locale.objects.create(
             code="fr",
@@ -384,8 +385,9 @@ class TranslationServiceIntegrationTests(TestCase):
     """Test DeepLTranslationService integration points."""
 
     def setUp(self):
-        self.en_locale = Locale.objects.create(
-            code="en", name="English", native_name="English", is_default=True
+        self.en_locale, _ = Locale.objects.get_or_create(
+            code="en",
+            defaults={"name": "English", "native_name": "English", "is_default": True},
         )
         self.fr_locale = Locale.objects.create(
             code="fr", name="French", native_name="Français", fallback=self.en_locale
@@ -436,8 +438,9 @@ class I18nSignalIntegrationTests(TestCase):
     """Test i18n signal integration."""
 
     def setUp(self):
-        self.en_locale = Locale.objects.create(
-            code="en", name="English", native_name="English", is_default=True
+        self.en_locale, _ = Locale.objects.get_or_create(
+            code="en",
+            defaults={"name": "English", "native_name": "English", "is_default": True},
         )
         self.fr_locale = Locale.objects.create(
             code="fr", name="French", native_name="Français"

@@ -72,12 +72,14 @@ class ThreadSafetyTests(TestCase):
     def setUp(self):
         """Set up test data."""
         self.registry = ContentRegistry()
-        self.locale = Locale.objects.create(
+        self.locale, _ = Locale.objects.get_or_create(
             code="en",
-            name="English",
-            native_name="English",
-            is_default=True,
-            is_active=True,
+            defaults={
+                "name": "English",
+                "native_name": "English",
+                "is_default": True,
+                "is_active": True,
+            },
         )
 
     def test_concurrent_registration(self):
@@ -326,12 +328,14 @@ class RegistryEdgeCasesTests(TestCase):
     def setUp(self):
         """Set up test data."""
         self.registry = ContentRegistry()
-        self.locale = Locale.objects.create(
+        self.locale, _ = Locale.objects.get_or_create(
             code="en",
-            name="English",
-            native_name="English",
-            is_default=True,
-            is_active=True,
+            defaults={
+                "name": "English",
+                "native_name": "English",
+                "is_default": True,
+                "is_active": True,
+            },
         )
 
     def test_registry_with_none_values(self):
@@ -648,12 +652,14 @@ class RegistryPerformanceTests(TestCase):
     def setUp(self):
         """Set up test data."""
         self.registry = ContentRegistry()
-        self.locale = Locale.objects.create(
+        self.locale, _ = Locale.objects.get_or_create(
             code="en",
-            name="English",
-            native_name="English",
-            is_default=True,
-            is_active=True,
+            defaults={
+                "name": "English",
+                "native_name": "English",
+                "is_default": True,
+                "is_active": True,
+            },
         )
 
     def test_large_registry_performance(self):
@@ -811,12 +817,14 @@ class RegistryIntegrationAdvancedTests(TestCase):
 
     def setUp(self):
         """Set up test data."""
-        self.locale = Locale.objects.create(
+        self.locale, _ = Locale.objects.get_or_create(
             code="en",
-            name="English",
-            native_name="English",
-            is_default=True,
-            is_active=True,
+            defaults={
+                "name": "English",
+                "native_name": "English",
+                "is_default": True,
+                "is_active": True,
+            },
         )
 
     def test_complete_workflow_with_custom_model(self):

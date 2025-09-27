@@ -239,19 +239,16 @@ class DatabaseOptimizationTests(TestCase, PerformanceTestMixin):
         if not Page:
             self.skipTest("Page model not available")
 
-        # Test select_related and prefetch_related optimizations
-        pages = Page.objects.select_related("parent").prefetch_related("translations")[
-            :10
-        ]
+        # Test select_related optimizations
+        pages = Page.objects.select_related("parent", "locale")[:10]
 
         # Force evaluation and access related objects
         for page in pages:
             _ = page.title
             if hasattr(page, "parent") and page.parent:
                 _ = page.parent.title
-            if hasattr(page, "translations"):
-                for translation in page.translations.all():
-                    _ = translation.title
+            if hasattr(page, "locale") and page.locale:
+                _ = page.locale.name
 
     @query_count_limit(4)
     def test_blog_post_with_relations_queries(self):

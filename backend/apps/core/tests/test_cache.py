@@ -263,12 +263,14 @@ class CacheInvalidationTests(TestCase):
             email="test@example.com", password="testpass123"
         )
 
-        self.locale = Locale.objects.create(
+        self.locale, _ = Locale.objects.get_or_create(
             code="en",
-            name="English",
-            native_name="English",
-            is_default=True,
-            is_active=True,
+            defaults={
+                "name": "English",
+                "native_name": "English",
+                "is_default": True,
+                "is_active": True,
+            },
         )
 
         # Clear cache before each test
@@ -364,12 +366,14 @@ class CacheIntegrationTests(TestCase):
             email="test@example.com", password="testpass123"
         )
 
-        self.locale = Locale.objects.create(
+        self.locale, _ = Locale.objects.get_or_create(
             code="en",
-            name="English",
-            native_name="English",
-            is_default=True,
-            is_active=True,
+            defaults={
+                "name": "English",
+                "native_name": "English",
+                "is_default": True,
+                "is_active": True,
+            },
         )
 
         cache.clear()
@@ -437,12 +441,14 @@ class CacheSignalTests(TestCase):
             email="test@example.com", password="testpass123"
         )
 
-        self.locale = Locale.objects.create(
+        self.locale, _ = Locale.objects.get_or_create(
             code="en",
-            name="English",
-            native_name="English",
-            is_default=True,
-            is_active=True,
+            defaults={
+                "name": "English",
+                "native_name": "English",
+                "is_default": True,
+                "is_active": True,
+            },
         )
 
         cache.clear()

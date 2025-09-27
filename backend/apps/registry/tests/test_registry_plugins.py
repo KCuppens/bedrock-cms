@@ -38,12 +38,14 @@ class PluginDiscoveryTests(TestCase):
 
     def setUp(self):
         """Set up test data."""
-        self.locale = Locale.objects.create(
+        self.locale, _ = Locale.objects.get_or_create(
             code="en",
-            name="English",
-            native_name="English",
-            is_default=True,
-            is_active=True,
+            defaults={
+                "name": "English",
+                "native_name": "English",
+                "is_default": True,
+                "is_active": True,
+            },
         )
 
     def test_dynamic_model_registration_from_apps(self):
@@ -389,12 +391,14 @@ class ComplexValidationTests(TestCase):
 
     def setUp(self):
         """Set up test data."""
-        self.locale = Locale.objects.create(
+        self.locale, _ = Locale.objects.get_or_create(
             code="en",
-            name="English",
-            native_name="English",
-            is_default=True,
-            is_active=True,
+            defaults={
+                "name": "English",
+                "native_name": "English",
+                "is_default": True,
+                "is_active": True,
+            },
         )
 
     def test_nested_field_validation(self):

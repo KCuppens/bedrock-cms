@@ -74,12 +74,14 @@ class ContentConfigComprehensiveTests(TestCase):
 
     def setUp(self):
         """Set up test data."""
-        self.locale = Locale.objects.create(
+        self.locale, _ = Locale.objects.get_or_create(
             code="en",
-            name="English",
-            native_name="English",
-            is_default=True,
-            is_active=True,
+            defaults={
+                "name": "English",
+                "native_name": "English",
+                "is_default": True,
+                "is_active": True,
+            },
         )
 
     def test_valid_config_all_parameters(self):
@@ -532,12 +534,14 @@ class ContentRegistryComprehensiveTests(TestCase):
     def setUp(self):
         """Set up test data."""
         self.registry = ContentRegistry()
-        self.locale = Locale.objects.create(
+        self.locale, _ = Locale.objects.get_or_create(
             code="en",
-            name="English",
-            native_name="English",
-            is_default=True,
-            is_active=True,
+            defaults={
+                "name": "English",
+                "native_name": "English",
+                "is_default": True,
+                "is_active": True,
+            },
         )
 
     def test_registry_register_basic(self):
@@ -873,12 +877,14 @@ class RegistryGlobalFunctionTests(TestCase):
 
     def setUp(self):
         """Set up test data."""
-        self.locale = Locale.objects.create(
+        self.locale, _ = Locale.objects.get_or_create(
             code="en",
-            name="English",
-            native_name="English",
-            is_default=True,
-            is_active=True,
+            defaults={
+                "name": "English",
+                "native_name": "English",
+                "is_default": True,
+                "is_active": True,
+            },
         )
         # Clear the global registry for clean tests
         content_registry.clear()
@@ -1004,12 +1010,14 @@ class RegisterCoreModelsTests(TestCase):
 
     def setUp(self):
         """Set up test data."""
-        self.locale = Locale.objects.create(
+        self.locale, _ = Locale.objects.get_or_create(
             code="en",
-            name="English",
-            native_name="English",
-            is_default=True,
-            is_active=True,
+            defaults={
+                "name": "English",
+                "native_name": "English",
+                "is_default": True,
+                "is_active": True,
+            },
         )
         # Clear the global registry for clean tests
         content_registry.clear()
@@ -1068,12 +1076,14 @@ class RegistryThreadSafetyTests(TestCase):
 
     def setUp(self):
         """Set up test data."""
-        self.locale = Locale.objects.create(
+        self.locale, _ = Locale.objects.get_or_create(
             code="en",
-            name="English",
-            native_name="English",
-            is_default=True,
-            is_active=True,
+            defaults={
+                "name": "English",
+                "native_name": "English",
+                "is_default": True,
+                "is_active": True,
+            },
         )
         # Use a separate registry instance for thread safety tests
         self.test_registry = ContentRegistry()
@@ -1262,12 +1272,14 @@ class RegistryErrorHandlingTests(TestCase):
 
     def setUp(self):
         """Set up test data."""
-        self.locale = Locale.objects.create(
+        self.locale, _ = Locale.objects.get_or_create(
             code="en",
-            name="English",
-            native_name="English",
-            is_default=True,
-            is_active=True,
+            defaults={
+                "name": "English",
+                "native_name": "English",
+                "is_default": True,
+                "is_active": True,
+            },
         )
         self.registry = ContentRegistry()
 
@@ -1380,12 +1392,14 @@ class RegistryEdgeCaseTests(TestCase):
 
     def setUp(self):
         """Set up test data."""
-        self.locale = Locale.objects.create(
+        self.locale, _ = Locale.objects.get_or_create(
             code="en",
-            name="English",
-            native_name="English",
-            is_default=True,
-            is_active=True,
+            defaults={
+                "name": "English",
+                "native_name": "English",
+                "is_default": True,
+                "is_active": True,
+            },
         )
         self.registry = ContentRegistry()
 

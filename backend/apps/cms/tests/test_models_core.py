@@ -38,8 +38,9 @@ class PageModelTestCase(TestCase):
             email="page@example.com", password="testpass123"
         )
 
-        self.locale = Locale.objects.create(
-            code="en", name="English", native_name="English", is_default=True
+        self.locale, _ = Locale.objects.get_or_create(
+            code="en",
+            defaults={"name": "English", "native_name": "English", "is_default": True},
         )
 
         self.page = Page.objects.create(
@@ -442,8 +443,9 @@ class ModelIntegrationTestCase(TestCase):
             password="testpass123",
         )
 
-        self.locale = Locale.objects.create(
-            code="en", name="English", native_name="English", is_default=True
+        self.locale, _ = Locale.objects.get_or_create(
+            code="en",
+            defaults={"name": "English", "native_name": "English", "is_default": True},
         )
 
     def test_page_block_type_relationship(self):
@@ -528,6 +530,10 @@ class ModelIntegrationTestCase(TestCase):
 
     def test_performance_with_large_dataset(self):
         """Test model performance with larger datasets."""
+        # Count initial pages (might have homepage from migration)
+        initial_count = Page.objects.filter(locale=self.locale).count()
+        initial_published = Page.objects.filter(status="published").count()
+
         # Create multiple pages
         pages = []
         for i in range(20):
@@ -541,8 +547,8 @@ class ModelIntegrationTestCase(TestCase):
 
         # Should handle queries efficiently
         published_pages = Page.objects.filter(status="published")
-        self.assertGreaterEqual(published_pages.count(), 10)
+        self.assertGreaterEqual(published_pages.count(), initial_published + 10)
 
         # Should handle ordering efficiently
         ordered_pages = Page.objects.filter(locale=self.locale).order_by("-created_at")
-        self.assertEqual(ordered_pages.count(), 20)
+        self.assertEqual(ordered_pages.count(), initial_count + 20)

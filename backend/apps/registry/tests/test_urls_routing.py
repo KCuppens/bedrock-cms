@@ -34,12 +34,14 @@ class DynamicRouterCreationTests(TestCase):
 
     def setUp(self):
         """Set up test data."""
-        self.locale = Locale.objects.create(
+        self.locale, _ = Locale.objects.get_or_create(
             code="en",
-            name="English",
-            native_name="English",
-            is_default=True,
-            is_active=True,
+            defaults={
+                "name": "English",
+                "native_name": "English",
+                "is_default": True,
+                "is_active": True,
+            },
         )
         content_registry.clear()
 
@@ -277,12 +279,14 @@ class DynamicRouterIntegrationTests(APITestCase):
             email="test@example.com", password="testpass123"
         )
 
-        self.locale = Locale.objects.create(
+        self.locale, _ = Locale.objects.get_or_create(
             code="en",
-            name="English",
-            native_name="English",
-            is_default=True,
-            is_active=True,
+            defaults={
+                "name": "English",
+                "native_name": "English",
+                "is_default": True,
+                "is_active": True,
+            },
         )
 
         content_registry.clear()
@@ -416,12 +420,14 @@ class URLPatternTests(TestCase):
 
     def setUp(self):
         """Set up test data."""
-        self.locale = Locale.objects.create(
+        self.locale, _ = Locale.objects.get_or_create(
             code="en",
-            name="English",
-            native_name="English",
-            is_default=True,
-            is_active=True,
+            defaults={
+                "name": "English",
+                "native_name": "English",
+                "is_default": True,
+                "is_active": True,
+            },
         )
 
     def test_urlpatterns_structure(self):
@@ -463,12 +469,14 @@ class RouterErrorHandlingTests(TestCase):
 
     def setUp(self):
         """Set up test data."""
-        self.locale = Locale.objects.create(
+        self.locale, _ = Locale.objects.get_or_create(
             code="en",
-            name="English",
-            native_name="English",
-            is_default=True,
-            is_active=True,
+            defaults={
+                "name": "English",
+                "native_name": "English",
+                "is_default": True,
+                "is_active": True,
+            },
         )
         content_registry.clear()
 
@@ -557,12 +565,14 @@ class RouterPerformanceTests(TestCase):
 
     def setUp(self):
         """Set up test data."""
-        self.locale = Locale.objects.create(
+        self.locale, _ = Locale.objects.get_or_create(
             code="en",
-            name="English",
-            native_name="English",
-            is_default=True,
-            is_active=True,
+            defaults={
+                "name": "English",
+                "native_name": "English",
+                "is_default": True,
+                "is_active": True,
+            },
         )
         content_registry.clear()
 
@@ -668,12 +678,14 @@ class RouterConcurrencyTests(TestCase):
 
     def setUp(self):
         """Set up test data."""
-        self.locale = Locale.objects.create(
+        self.locale, _ = Locale.objects.get_or_create(
             code="en",
-            name="English",
-            native_name="English",
-            is_default=True,
-            is_active=True,
+            defaults={
+                "name": "English",
+                "native_name": "English",
+                "is_default": True,
+                "is_active": True,
+            },
         )
 
     def test_concurrent_router_creation(self):
@@ -748,12 +760,14 @@ class RouterEdgeCaseTests(TestCase):
 
     def setUp(self):
         """Set up test data."""
-        self.locale = Locale.objects.create(
+        self.locale, _ = Locale.objects.get_or_create(
             code="en",
-            name="English",
-            native_name="English",
-            is_default=True,
-            is_active=True,
+            defaults={
+                "name": "English",
+                "native_name": "English",
+                "is_default": True,
+                "is_active": True,
+            },
         )
         content_registry.clear()
 

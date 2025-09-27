@@ -35,12 +35,14 @@ class PagesViewSetBasicTestCase(APITestCase):
 
         # Create locale
 
-        self.locale_en = Locale.objects.create(
+        self.locale_en, _ = Locale.objects.get_or_create(
             code="en",
-            name="English",
-            native_name="English",
-            is_default=True,
-            is_active=True,
+            defaults={
+                "name": "English",
+                "native_name": "English",
+                "is_default": True,
+                "is_active": True,
+            },
         )
 
         # Create users
@@ -126,12 +128,14 @@ class PageModelTestCase(TestCase):
     def setUp(self):
         """Set up test data."""
 
-        self.locale_en = Locale.objects.create(
+        self.locale_en, _ = Locale.objects.get_or_create(
             code="en",
-            name="English",
-            native_name="English",
-            is_default=True,
-            is_active=True,
+            defaults={
+                "name": "English",
+                "native_name": "English",
+                "is_default": True,
+                "is_active": True,
+            },
         )
 
     def test_page_creation(self):

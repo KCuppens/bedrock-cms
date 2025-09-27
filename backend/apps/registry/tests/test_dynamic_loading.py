@@ -45,12 +45,14 @@ class ContentSerializerFactoryTests(TestCase):
 
     def setUp(self):
         """Set up test data."""
-        self.locale = Locale.objects.create(
+        self.locale, _ = Locale.objects.get_or_create(
             code="en",
-            name="English",
-            native_name="English",
-            is_default=True,
-            is_active=True,
+            defaults={
+                "name": "English",
+                "native_name": "English",
+                "is_default": True,
+                "is_active": True,
+            },
         )
 
         self.factory = APIRequestFactory()
@@ -402,12 +404,14 @@ class SerializerHelperFunctionTests(TestCase):
 
     def setUp(self):
         """Set up test data."""
-        self.locale = Locale.objects.create(
+        self.locale, _ = Locale.objects.get_or_create(
             code="en",
-            name="English",
-            native_name="English",
-            is_default=True,
-            is_active=True,
+            defaults={
+                "name": "English",
+                "native_name": "English",
+                "is_default": True,
+                "is_active": True,
+            },
         )
         content_registry.clear()
 
@@ -551,12 +555,14 @@ class ContentViewSetFactoryTests(TestCase):
 
     def setUp(self):
         """Set up test data."""
-        self.locale = Locale.objects.create(
+        self.locale, _ = Locale.objects.get_or_create(
             code="en",
-            name="English",
-            native_name="English",
-            is_default=True,
-            is_active=True,
+            defaults={
+                "name": "English",
+                "native_name": "English",
+                "is_default": True,
+                "is_active": True,
+            },
         )
 
         self.factory = RequestFactory()
@@ -972,12 +978,14 @@ class ViewSetHelperFunctionTests(TestCase):
 
     def setUp(self):
         """Set up test data."""
-        self.locale = Locale.objects.create(
+        self.locale, _ = Locale.objects.get_or_create(
             code="en",
-            name="English",
-            native_name="English",
-            is_default=True,
-            is_active=True,
+            defaults={
+                "name": "English",
+                "native_name": "English",
+                "is_default": True,
+                "is_active": True,
+            },
         )
         content_registry.clear()
 
@@ -1035,12 +1043,14 @@ class RegistryViewSetTests(APITestCase):
             email="test@example.com", password="testpass123"
         )
 
-        self.locale = Locale.objects.create(
+        self.locale, _ = Locale.objects.get_or_create(
             code="en",
-            name="English",
-            native_name="English",
-            is_default=True,
-            is_active=True,
+            defaults={
+                "name": "English",
+                "native_name": "English",
+                "is_default": True,
+                "is_active": True,
+            },
         )
 
         content_registry.clear()
@@ -1154,12 +1164,14 @@ class DynamicLoadingIntegrationTests(TestCase):
 
     def setUp(self):
         """Set up test data."""
-        self.locale = Locale.objects.create(
+        self.locale, _ = Locale.objects.get_or_create(
             code="en",
-            name="English",
-            native_name="English",
-            is_default=True,
-            is_active=True,
+            defaults={
+                "name": "English",
+                "native_name": "English",
+                "is_default": True,
+                "is_active": True,
+            },
         )
         content_registry.clear()
 

@@ -42,8 +42,9 @@ class AnalyticsAggregatorTestCase(TestCase):
             email="test@example.com", password="testpass123"
         )
 
-        self.locale = Locale.objects.create(
-            code="en", name="English", native_name="English", is_default=True
+        self.locale, _ = Locale.objects.get_or_create(
+            code="en",
+            defaults={"name": "English", "native_name": "English", "is_default": True},
         )
 
         # Create test page views
@@ -601,8 +602,9 @@ class AnalyticsModelsIntegrationTestCase(TestCase):
             email="analyst@example.com", password="testpass123"
         )
 
-        self.locale = Locale.objects.create(
-            code="en", name="English", native_name="English", is_default=True
+        self.locale, _ = Locale.objects.get_or_create(
+            code="en",
+            defaults={"name": "English", "native_name": "English", "is_default": True},
         )
 
     def test_content_metrics_aggregation(self):
@@ -766,8 +768,9 @@ class AnalyticsSummaryGenerationTestCase(TestCase):
             email="summary@example.com", password="testpass123"
         )
 
-        self.locale = Locale.objects.create(
-            code="en", name="English", native_name="English", is_default=True
+        self.locale, _ = Locale.objects.get_or_create(
+            code="en",
+            defaults={"name": "English", "native_name": "English", "is_default": True},
         )
 
     def test_generate_daily_summary(self):

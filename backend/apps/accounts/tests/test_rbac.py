@@ -41,13 +41,15 @@ class LocaleModelTests(TestCase):
 
     def setUp(self):
 
-        self.en_locale = Locale.objects.create(
+        self.en_locale, _ = Locale.objects.get_or_create(
             code="en",
-            name="English",
-            native_name="English",
-            is_default=True,
-            is_active=True,
-            sort_order=0,
+            defaults={
+                "name": "English",
+                "native_name": "English",
+                "is_default": True,
+                "is_active": True,
+                "sort_order": 0,
+            },
         )
 
     def test_locale_creation(self):
@@ -156,8 +158,9 @@ class ScopedPermissionModelsTests(TestCase):
 
         # Create locales
 
-        self.en_locale = Locale.objects.create(
-            code="en", name="English", native_name="English", is_default=True
+        self.en_locale, _ = Locale.objects.get_or_create(
+            code="en",
+            defaults={"name": "English", "native_name": "English", "is_default": True},
         )
 
         self.es_locale = Locale.objects.create(
@@ -289,8 +292,9 @@ class ScopedPermissionBackendTests(TestCase):
 
         # Create locales
 
-        self.en_locale = Locale.objects.create(
-            code="en", name="English", native_name="English", is_default=True
+        self.en_locale, _ = Locale.objects.get_or_create(
+            code="en",
+            defaults={"name": "English", "native_name": "English", "is_default": True},
         )
 
         self.es_locale = Locale.objects.create(
@@ -527,8 +531,9 @@ class RBACMixinTests(TestCase):
             email="user@example.com", password="userpass123"
         )
 
-        self.en_locale = Locale.objects.create(
-            code="en", name="English", native_name="English", is_default=True
+        self.en_locale, _ = Locale.objects.get_or_create(
+            code="en",
+            defaults={"name": "English", "native_name": "English", "is_default": True},
         )
 
         # Create group and permissions
@@ -615,8 +620,9 @@ class IntegrationTests(TestCase):
 
         # Create locales
 
-        self.en_locale = Locale.objects.create(
-            code="en", name="English", native_name="English", is_default=True
+        self.en_locale, _ = Locale.objects.get_or_create(
+            code="en",
+            defaults={"name": "English", "native_name": "English", "is_default": True},
         )
 
         self.es_locale = Locale.objects.create(

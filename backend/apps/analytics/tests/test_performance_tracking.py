@@ -46,8 +46,9 @@ class PerformanceTrackingModelTests(TestCase):
             email="performance@example.com", password="perfpass123"
         )
 
-        self.locale = Locale.objects.create(
-            code="en", name="English", native_name="English", is_default=True
+        self.locale, _ = Locale.objects.get_or_create(
+            code="en",
+            defaults={"name": "English", "native_name": "English", "is_default": True},
         )
 
     def test_page_view_performance_metrics(self):
@@ -252,8 +253,9 @@ class PerformanceAnalyticsViewTests(TestCase):
             is_superuser=True,
         )
 
-        self.locale = Locale.objects.create(
-            code="en", name="English", native_name="English", is_default=True
+        self.locale, _ = Locale.objects.get_or_create(
+            code="en",
+            defaults={"name": "English", "native_name": "English", "is_default": True},
         )
 
         # Create test data with performance metrics

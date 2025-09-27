@@ -32,8 +32,9 @@ class PageAPITests(TestCase):
 
     def setUp(self):
         self.client = APIClient()
-        self.locale = Locale.objects.create(
-            code="en", name="English", native_name="English", is_default=True
+        self.locale, _ = Locale.objects.get_or_create(
+            code="en",
+            defaults={"name": "English", "native_name": "English", "is_default": True},
         )
         self.user = User.objects.create_user(
             email="admin@example.com", password="testpass", is_staff=True
@@ -283,8 +284,9 @@ class PagePermissionTests(TestCase):
 
     def setUp(self):
         self.client = APIClient()
-        self.locale = Locale.objects.create(
-            code="en", name="English", native_name="English", is_default=True
+        self.locale, _ = Locale.objects.get_or_create(
+            code="en",
+            defaults={"name": "English", "native_name": "English", "is_default": True},
         )
         self.admin_user = User.objects.create_user(
             email="admin@example.com", password="testpass", is_staff=True
@@ -343,8 +345,9 @@ class PageValidationTests(TestCase):
         from django.contrib.contenttypes.models import ContentType
 
         self.client = APIClient()
-        self.locale = Locale.objects.create(
-            code="en", name="English", native_name="English", is_default=True
+        self.locale, _ = Locale.objects.get_or_create(
+            code="en",
+            defaults={"name": "English", "native_name": "English", "is_default": True},
         )
         self.user = User.objects.create_user(
             email="admin@example.com",

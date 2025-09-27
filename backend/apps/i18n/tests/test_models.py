@@ -22,12 +22,14 @@ class LocaleModelTest(TestCase):
     def setUp(self):  # noqa: C901
         """Set up test data."""
 
-        self.locale_en = Locale.objects.create(
+        self.locale_en, _ = Locale.objects.get_or_create(
             code="en",
-            name="English",
-            native_name="English",
-            is_default=True,
-            is_active=True,
+            defaults={
+                "name": "English",
+                "native_name": "English",
+                "is_default": True,
+                "is_active": True,
+            },
         )
 
         self.locale_es = Locale.objects.create(
@@ -216,8 +218,9 @@ class UiMessageTranslationModelTest(TestCase):
             email="translator@test.com", password="testpass123"
         )
 
-        self.locale_en = Locale.objects.create(
-            code="en", name="English", native_name="English", is_default=True
+        self.locale_en, _ = Locale.objects.get_or_create(
+            code="en",
+            defaults={"name": "English", "native_name": "English", "is_default": True},
         )
 
         self.locale_es = Locale.objects.create(
@@ -294,8 +297,9 @@ class TranslationUnitModelTest(TestCase):
             email="translator@test.com", password="testpass123"
         )
 
-        self.locale_en = Locale.objects.create(
-            code="en", name="English", native_name="English", is_default=True
+        self.locale_en, _ = Locale.objects.get_or_create(
+            code="en",
+            defaults={"name": "English", "native_name": "English", "is_default": True},
         )
 
         self.locale_es = Locale.objects.create(
@@ -391,8 +395,8 @@ class TranslationGlossaryModelTest(TestCase):
             email="admin@test.com", password="testpass123"
         )
 
-        self.locale_en = Locale.objects.create(
-            code="en", name="English", native_name="English"
+        self.locale_en, _ = Locale.objects.get_or_create(
+            code="en", defaults={"name": "English", "native_name": "English"}
         )
 
         self.locale_es = Locale.objects.create(
@@ -465,8 +469,8 @@ class TranslationQueueModelTest(TestCase):
             email="assignee@test.com", password="testpass123"
         )
 
-        self.locale_en = Locale.objects.create(
-            code="en", name="English", native_name="English"
+        self.locale_en, _ = Locale.objects.get_or_create(
+            code="en", defaults={"name": "English", "native_name": "English"}
         )
 
         self.locale_es = Locale.objects.create(
@@ -554,8 +558,8 @@ class TranslationHistoryModelTest(TestCase):
             email="translator@test.com", password="testpass123"
         )
 
-        self.locale_en = Locale.objects.create(
-            code="en", name="English", native_name="English"
+        self.locale_en, _ = Locale.objects.get_or_create(
+            code="en", defaults={"name": "English", "native_name": "English"}
         )
 
         self.locale_es = Locale.objects.create(

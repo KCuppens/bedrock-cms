@@ -28,8 +28,9 @@ class LocaleModelTests(TestCase):
     """Test Locale model functionality."""
 
     def setUp(self):
-        self.en_locale = Locale.objects.create(
-            code="en", name="English", native_name="English", is_default=True
+        self.en_locale, _ = Locale.objects.get_or_create(
+            code="en",
+            defaults={"name": "English", "native_name": "English", "is_default": True},
         )
 
     def test_locale_str_method(self):
@@ -96,8 +97,8 @@ class TranslationUnitTests(TestCase):
     """Test TranslationUnit model."""
 
     def setUp(self):
-        self.en_locale = Locale.objects.create(
-            code="en", name="English", is_default=True
+        self.en_locale, _ = Locale.objects.get_or_create(
+            code="en", defaults={"name": "English", "is_default": True}
         )
         self.fr_locale = Locale.objects.create(
             code="fr", name="French", fallback=self.en_locale
@@ -201,8 +202,8 @@ class UiMessageTests(TestCase):
     """Test UiMessage and UiMessageTranslation models."""
 
     def setUp(self):
-        self.en_locale = Locale.objects.create(
-            code="en", name="English", is_default=True
+        self.en_locale, _ = Locale.objects.get_or_create(
+            code="en", defaults={"name": "English", "is_default": True}
         )
         self.fr_locale = Locale.objects.create(code="fr", name="French")
 
@@ -283,8 +284,8 @@ class TranslationResolverTests(TestCase):
     """Test TranslationResolver functionality."""
 
     def setUp(self):
-        self.en_locale = Locale.objects.create(
-            code="en", name="English", is_default=True
+        self.en_locale, _ = Locale.objects.get_or_create(
+            code="en", defaults={"name": "English", "is_default": True}
         )
         self.fr_locale = Locale.objects.create(
             code="fr", name="French", fallback=self.en_locale
@@ -357,8 +358,8 @@ class TranslationManagerTests(TestCase):
     """Test TranslationManager functionality."""
 
     def setUp(self):
-        self.en_locale = Locale.objects.create(
-            code="en", name="English", is_default=True
+        self.en_locale, _ = Locale.objects.get_or_create(
+            code="en", defaults={"name": "English", "is_default": True}
         )
         self.fr_locale = Locale.objects.create(code="fr", name="French")
         self.user = User.objects.create_user(
@@ -461,8 +462,8 @@ class UiMessageResolverTests(TestCase):
     """Test UiMessageResolver functionality."""
 
     def setUp(self):
-        self.en_locale = Locale.objects.create(
-            code="en", name="English", is_default=True
+        self.en_locale, _ = Locale.objects.get_or_create(
+            code="en", defaults={"name": "English", "is_default": True}
         )
         self.fr_locale = Locale.objects.create(
             code="fr", name="French", fallback=self.en_locale

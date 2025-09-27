@@ -61,8 +61,9 @@ class CustomAnalyticsQueriesTests(TestCase):
         )
 
         # Create locale
-        self.locale = Locale.objects.create(
-            code="en", name="English", native_name="English", is_default=True
+        self.locale, _ = Locale.objects.get_or_create(
+            code="en",
+            defaults={"name": "English", "native_name": "English", "is_default": True},
         )
 
         # Create comprehensive test data

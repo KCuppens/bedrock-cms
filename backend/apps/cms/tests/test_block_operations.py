@@ -41,12 +41,14 @@ class BlockOperationsTestCase(APITestCase):
         self.client = APIClient()
 
         # Create locale
-        self.locale = Locale.objects.create(
+        self.locale, _ = Locale.objects.get_or_create(
             code="en",
-            name="English",
-            native_name="English",
-            is_default=True,
-            is_active=True,
+            defaults={
+                "name": "English",
+                "native_name": "English",
+                "is_default": True,
+                "is_active": True,
+            },
         )
 
         # Create user with permissions
@@ -609,12 +611,14 @@ class BlockOperationsAuthTestCase(APITestCase):
         self.client = APIClient()
 
         # Create locale
-        self.locale = Locale.objects.create(
+        self.locale, _ = Locale.objects.get_or_create(
             code="en",
-            name="English",
-            native_name="English",
-            is_default=True,
-            is_active=True,
+            defaults={
+                "name": "English",
+                "native_name": "English",
+                "is_default": True,
+                "is_active": True,
+            },
         )
 
         # Create users with different permissions
@@ -752,12 +756,14 @@ class BlockOperationsValidationTestCase(APITestCase):
         self.client = APIClient()
 
         # Create locale
-        self.locale = Locale.objects.create(
+        self.locale, _ = Locale.objects.get_or_create(
             code="en",
-            name="English",
-            native_name="English",
-            is_default=True,
-            is_active=True,
+            defaults={
+                "name": "English",
+                "native_name": "English",
+                "is_default": True,
+                "is_active": True,
+            },
         )
 
         # Create user with permissions
@@ -945,12 +951,14 @@ class BlockOperationsIntegrationTestCase(TestCase):
     def setUp(self):
         """Set up test data."""
         # Create locale
-        self.locale = Locale.objects.create(
+        self.locale, _ = Locale.objects.get_or_create(
             code="en",
-            name="English",
-            native_name="English",
-            is_default=True,
-            is_active=True,
+            defaults={
+                "name": "English",
+                "native_name": "English",
+                "is_default": True,
+                "is_active": True,
+            },
         )
 
         # Create user

@@ -40,7 +40,9 @@ class PageSerializerTests(TestCase):
     """Test Page serializers."""
 
     def setUp(self):
-        self.locale = Locale.objects.create(code="en", name="English", is_default=True)
+        self.locale, _ = Locale.objects.get_or_create(
+            code="en", defaults={"name": "English", "is_default": True}
+        )
         self.user = User.objects.create_user(
             email="test@example.com", password="testpass"
         )
@@ -265,7 +267,9 @@ class SerializerFieldTests(TestCase):
     """Test custom serializer fields and methods."""
 
     def setUp(self):
-        self.locale = Locale.objects.create(code="en", name="English", is_default=True)
+        self.locale, _ = Locale.objects.get_or_create(
+            code="en", defaults={"name": "English", "is_default": True}
+        )
 
     def test_locale_field_serialization(self):
         """Test locale field serialization in page serializers."""
@@ -364,7 +368,9 @@ class SerializerContextTests(TestCase):
     """Test serializer context handling."""
 
     def setUp(self):
-        self.locale = Locale.objects.create(code="en", name="English", is_default=True)
+        self.locale, _ = Locale.objects.get_or_create(
+            code="en", defaults={"name": "English", "is_default": True}
+        )
         self.user = User.objects.create_user(
             email="test@example.com", password="testpass"
         )

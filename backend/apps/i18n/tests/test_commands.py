@@ -47,6 +47,11 @@ class InitLocalesCommandTest(TestCase):
     def test_init_locales_with_reset(self):
         """Test init_locales with reset option."""
 
+        # First delete any pages that might reference locales (from migrations)
+        from apps.cms.models import Page
+
+        Page.objects.all().delete()
+
         # Create a custom locale that's not in defaults
         Locale.objects.create(code="custom", name="Custom", native_name="Custom")
 
@@ -68,12 +73,14 @@ class ImportDjangoTranslationsCommandTest(TestCase):
     def setUp(self):
         """Set up test data."""
 
-        self.locale_en = Locale.objects.create(
+        self.locale_en, _ = Locale.objects.get_or_create(
             code="en",
-            name="English",
-            native_name="English",
-            is_default=True,
-            is_active=True,
+            defaults={
+                "name": "English",
+                "native_name": "English",
+                "is_default": True,
+                "is_active": True,
+            },
         )
 
         self.locale_es = Locale.objects.create(
@@ -155,8 +162,9 @@ class SyncPoFilesCommandTest(TestCase):
     def setUp(self):
         """Set up test data."""
 
-        self.locale_en = Locale.objects.create(
-            code="en", name="English", native_name="English", is_default=True
+        self.locale_en, _ = Locale.objects.get_or_create(
+            code="en",
+            defaults={"name": "English", "native_name": "English", "is_default": True},
         )
 
         self.locale_es = Locale.objects.create(

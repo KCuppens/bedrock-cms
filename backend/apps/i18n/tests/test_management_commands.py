@@ -22,8 +22,9 @@ class ImportDjangoTranslationsTestCase(TestCase):
 
     def setUp(self):
         """Set up test data."""
-        self.en_locale = Locale.objects.create(
-            code="en", name="English", native_name="English", is_default=True
+        self.en_locale, _ = Locale.objects.get_or_create(
+            code="en",
+            defaults={"name": "English", "native_name": "English", "is_default": True},
         )
         self.fr_locale = Locale.objects.create(
             code="fr",
@@ -260,8 +261,9 @@ class ManagementCommandIntegrationTestCase(TestCase):
 
     def setUp(self):
         """Set up integration test data."""
-        self.en_locale = Locale.objects.create(
-            code="en", name="English", native_name="English", is_default=True
+        self.en_locale, _ = Locale.objects.get_or_create(
+            code="en",
+            defaults={"name": "English", "native_name": "English", "is_default": True},
         )
 
     def test_command_exists(self):

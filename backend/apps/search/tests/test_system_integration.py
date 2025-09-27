@@ -68,8 +68,13 @@ class SearchSystemIntegrationTests(TestCase):
         self.search_service = get_search_service()
 
         if HAS_CMS:
-            self.locale = Locale.objects.create(
-                code="en", name="English", native_name="English", is_default=True
+            self.locale, _ = Locale.objects.get_or_create(
+                code="en",
+                defaults={
+                    "name": "English",
+                    "native_name": "English",
+                    "is_default": True,
+                },
             )
 
     def _test_cross_content_search_integration_disabled(self):
@@ -562,8 +567,13 @@ class SearchSignalIntegrationTests(TestCase):
         if HAS_CMS and Page:
             # Create locale first if needed
             if Locale:
-                locale = Locale.objects.create(
-                    code="en", name="English", native_name="English", is_default=True
+                locale, _ = Locale.objects.get_or_create(
+                    code="en",
+                    defaults={
+                        "name": "English",
+                        "native_name": "English",
+                        "is_default": True,
+                    },
                 )
 
                 page = Page.objects.create(

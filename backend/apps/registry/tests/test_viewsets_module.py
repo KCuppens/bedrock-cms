@@ -205,8 +205,9 @@ class RegistryViewSetTestCase(APITestCase):
             email="test@example.com", password="testpass123"
         )
 
-        self.locale = Locale.objects.create(
-            code="en", name="English", native_name="English", is_default=True
+        self.locale, _ = Locale.objects.get_or_create(
+            code="en",
+            defaults={"name": "English", "native_name": "English", "is_default": True},
         )
 
     def test_list_configurations_anonymous(self):
@@ -342,8 +343,9 @@ class ViewSetIntegrationTestCase(TestCase):
 
     def setUp(self):
         """Set up integration test data."""
-        self.locale = Locale.objects.create(
-            code="en", name="English", native_name="English", is_default=True
+        self.locale, _ = Locale.objects.get_or_create(
+            code="en",
+            defaults={"name": "English", "native_name": "English", "is_default": True},
         )
 
     @patch("apps.registry.viewsets.content_registry")

@@ -24,8 +24,9 @@ class TranslationResolverTest(TestCase):
 
         # Create locale chain: fr -> es -> en
 
-        self.locale_en = Locale.objects.create(
-            code="en", name="English", native_name="English", is_default=True
+        self.locale_en, _ = Locale.objects.get_or_create(
+            code="en",
+            defaults={"name": "English", "native_name": "English", "is_default": True},
         )
 
         self.locale_es = Locale.objects.create(
@@ -177,8 +178,9 @@ class TranslationManagerTest(TestCase):
             email="test@test.com", password="testpass123"
         )
 
-        self.locale_en = Locale.objects.create(
-            code="en", name="English", native_name="English", is_default=True
+        self.locale_en, _ = Locale.objects.get_or_create(
+            code="en",
+            defaults={"name": "English", "native_name": "English", "is_default": True},
         )
 
         self.locale_es = Locale.objects.create(
@@ -345,8 +347,9 @@ class UiMessageResolverTest(TestCase):
 
         # Create locale chain
 
-        self.locale_en = Locale.objects.create(
-            code="en", name="English", native_name="English", is_default=True
+        self.locale_en, _ = Locale.objects.get_or_create(
+            code="en",
+            defaults={"name": "English", "native_name": "English", "is_default": True},
         )
 
         self.locale_es = Locale.objects.create(

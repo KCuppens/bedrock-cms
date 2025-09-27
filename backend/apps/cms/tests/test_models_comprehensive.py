@@ -30,8 +30,9 @@ class PageModelTests(TestCase):
     """Test Page model methods and properties."""
 
     def setUp(self):
-        self.locale = Locale.objects.create(
-            code="en", name="English", native_name="English", is_default=True
+        self.locale, _ = Locale.objects.get_or_create(
+            code="en",
+            defaults={"name": "English", "native_name": "English", "is_default": True},
         )
         self.user = User.objects.create_user(
             email="test@example.com", password="testpass"
@@ -222,8 +223,9 @@ class RedirectModelTests(TestCase):
     """Test Redirect model functionality."""
 
     def setUp(self):
-        self.locale = Locale.objects.create(
-            code="en", name="English", native_name="English", is_default=True
+        self.locale, _ = Locale.objects.get_or_create(
+            code="en",
+            defaults={"name": "English", "native_name": "English", "is_default": True},
         )
 
     def test_redirect_creation(self):
@@ -275,8 +277,9 @@ class PageManagerTests(TestCase):
     """Test Page model manager methods."""
 
     def setUp(self):
-        self.locale = Locale.objects.create(
-            code="en", name="English", native_name="English", is_default=True
+        self.locale, _ = Locale.objects.get_or_create(
+            code="en",
+            defaults={"name": "English", "native_name": "English", "is_default": True},
         )
 
     def test_published_pages_queryset(self):

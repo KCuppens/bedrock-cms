@@ -70,12 +70,14 @@ class SeoMetadataTestCase(TestCase):
         )
 
         # Create locales
-        self.en_locale = Locale.objects.create(
+        self.en_locale, _ = Locale.objects.get_or_create(
             code="en",
-            name="English",
-            native_name="English",
-            is_default=True,
-            is_active=True,
+            defaults={
+                "name": "English",
+                "native_name": "English",
+                "is_default": True,
+                "is_active": True,
+            },
         )
 
         self.es_locale = Locale.objects.create(
@@ -309,12 +311,14 @@ class SeoValidationTestCase(TestCase):
 
     def setUp(self):
         """Set up test data."""
-        self.en_locale = Locale.objects.create(
+        self.en_locale, _ = Locale.objects.get_or_create(
             code="en",
-            name="English",
-            native_name="English",
-            is_default=True,
-            is_active=True,
+            defaults={
+                "name": "English",
+                "native_name": "English",
+                "is_default": True,
+                "is_active": True,
+            },
         )
 
     def test_title_length_validation(self):
@@ -423,12 +427,14 @@ class MultilingualSeoTestCase(TestCase):
         )
 
         # Create multiple locales
-        self.en_locale = Locale.objects.create(
+        self.en_locale, _ = Locale.objects.get_or_create(
             code="en",
-            name="English",
-            native_name="English",
-            is_default=True,
-            is_active=True,
+            defaults={
+                "name": "English",
+                "native_name": "English",
+                "is_default": True,
+                "is_active": True,
+            },
         )
         self.es_locale = Locale.objects.create(
             code="es",
@@ -594,12 +600,14 @@ class DynamicSeoGenerationTestCase(TestCase):
             email="dynamic@example.com", password="testpass123"
         )
 
-        self.locale = Locale.objects.create(
+        self.locale, _ = Locale.objects.get_or_create(
             code="en",
-            name="English",
-            native_name="English",
-            is_default=True,
-            is_active=True,
+            defaults={
+                "name": "English",
+                "native_name": "English",
+                "is_default": True,
+                "is_active": True,
+            },
         )
 
         # Create SEO settings with templates and defaults
@@ -812,12 +820,14 @@ class SeoApiIntegrationTestCase(APITestCase):
         )
         self.client = APIClient()
 
-        self.en_locale = Locale.objects.create(
+        self.en_locale, _ = Locale.objects.get_or_create(
             code="en",
-            name="English",
-            native_name="English",
-            is_default=True,
-            is_active=True,
+            defaults={
+                "name": "English",
+                "native_name": "English",
+                "is_default": True,
+                "is_active": True,
+            },
         )
 
         self.test_image = FileUpload.objects.create(
@@ -1036,12 +1046,14 @@ class SeoPerformanceTestCase(TestCase):
 
     def setUp(self):
         """Set up performance test data."""
-        self.locale = Locale.objects.create(
+        self.locale, _ = Locale.objects.get_or_create(
             code="en",
-            name="English",
-            native_name="English",
-            is_default=True,
-            is_active=True,
+            defaults={
+                "name": "English",
+                "native_name": "English",
+                "is_default": True,
+                "is_active": True,
+            },
         )
 
         self.user = User.objects.create_user(

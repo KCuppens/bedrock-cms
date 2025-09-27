@@ -185,9 +185,9 @@ class CMSModelTest(TestCase):
     """Test all CMS models for coverage"""
 
     def setUp(self):
-        self.locale = Locale.objects.get_or_create(
+        self.locale, _ = Locale.objects.get_or_create(
             code="en", defaults={"name": "English", "native_name": "English"}
-        )[0]
+        )
         self.user = User.objects.create_user(email="test@test.com", password="pass")
         self.site = Site.objects.create(
             name="Test Site", domain="test.com", is_default=True
@@ -341,9 +341,9 @@ class CMSSerializerTest(TestCase):
     """Test CMS serializers"""
 
     def setUp(self):
-        self.locale = Locale.objects.get_or_create(
+        self.locale, _ = Locale.objects.get_or_create(
             code="en", defaults={"name": "English", "native_name": "English"}
-        )[0]
+        )
         self.user = User.objects.create_user(email="test@test.com", password="pass")
 
     def test_page_serializer(self):
@@ -451,13 +451,16 @@ class CMSViewTest(TestCase):
 
     def setUp(self):
         self.client = Client()
-        self.locale = Locale.objects.get_or_create(
+        self.locale, _ = Locale.objects.get_or_create(
             code="en", defaults={"name": "English", "native_name": "English"}
-        )[0]
+        )
         self.user = User.objects.create_user(email="test@test.com", password="pass")
 
     def test_page_list_view(self):
         """Test page list view"""
+        # Count initial pages (might have homepage from migration)
+        initial_count = Page.objects.count()
+
         Page.objects.create(
             title="Page 1",
             slug="page-1",
@@ -476,7 +479,7 @@ class CMSViewTest(TestCase):
         # self.assertEqual(response.status_code, 200)
 
         # For now, just test that pages were created
-        self.assertEqual(Page.objects.count(), 2)
+        self.assertEqual(Page.objects.count(), initial_count + 2)
 
     def test_page_detail_view(self):
         """Test page detail view"""
@@ -521,14 +524,17 @@ class CMSManagerTest(TestCase):
     """Test CMS model managers"""
 
     def setUp(self):
-        self.locale = Locale.objects.get_or_create(
+        self.locale, _ = Locale.objects.get_or_create(
             code="en", defaults={"name": "English", "native_name": "English"}
-        )[0]
+        )
         self.user = User.objects.create_user(email="test@test.com", password="pass")
 
     def test_published_pages_manager(self):
         """Test published pages manager"""
-        Page.objects.create(
+        # Count initial published pages (might have homepage from migration)
+        initial_published = Page.objects.filter(status="published").count()
+
+        page = Page.objects.create(
             title="Published",
             slug="published",
             locale=self.locale,
@@ -542,8 +548,9 @@ class CMSManagerTest(TestCase):
         )
 
         published = Page.objects.filter(status="published")
-        self.assertEqual(published.count(), 1)
-        self.assertEqual(published.first().title, "Published")
+        self.assertEqual(published.count(), initial_published + 1)
+        # Check that our created page is in the published pages
+        self.assertIn(page, published)
 
     def test_draft_pages_manager(self):
         """Test draft pages manager"""

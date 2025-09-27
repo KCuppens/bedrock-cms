@@ -32,12 +32,14 @@ class LocaleViewSetTest(TestCase):
 
         self.client.force_authenticate(user=self.user)
 
-        self.locale_en = Locale.objects.create(
+        self.locale_en, _ = Locale.objects.get_or_create(
             code="en",
-            name="English",
-            native_name="English",
-            is_default=True,
-            is_active=True,
+            defaults={
+                "name": "English",
+                "native_name": "English",
+                "is_default": True,
+                "is_active": True,
+            },
         )
 
         self.locale_es = Locale.objects.create(
@@ -341,8 +343,8 @@ class UiMessageTranslationViewSetTest(TestCase):
 
         self.client.force_authenticate(user=self.user)
 
-        self.locale_en = Locale.objects.create(
-            code="en", name="English", native_name="English"
+        self.locale_en, _ = Locale.objects.get_or_create(
+            code="en", defaults={"name": "English", "native_name": "English"}
         )
 
         self.locale_es = Locale.objects.create(
@@ -488,8 +490,8 @@ class TranslationUnitViewSetTest(TestCase):
 
         self.client.force_authenticate(user=self.user)
 
-        self.locale_en = Locale.objects.create(
-            code="en", name="English", native_name="English"
+        self.locale_en, _ = Locale.objects.get_or_create(
+            code="en", defaults={"name": "English", "native_name": "English"}
         )
 
         self.locale_es = Locale.objects.create(
@@ -614,8 +616,8 @@ class TranslationGlossaryViewSetTest(TestCase):
 
         self.client.force_authenticate(user=self.user)
 
-        self.locale_en = Locale.objects.create(
-            code="en", name="English", native_name="English"
+        self.locale_en, _ = Locale.objects.get_or_create(
+            code="en", defaults={"name": "English", "native_name": "English"}
         )
 
         self.locale_es = Locale.objects.create(

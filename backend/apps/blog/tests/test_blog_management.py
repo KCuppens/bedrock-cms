@@ -57,12 +57,14 @@ class BlogPostLifecycleTests(TestCase):
             first_name="Test",
             last_name="Author",
         )
-        self.locale = Locale.objects.create(
+        self.locale, _ = Locale.objects.get_or_create(
             code="en",
-            name="English",
-            native_name="English",
-            is_default=True,
-            is_active=True,
+            defaults={
+                "name": "English",
+                "native_name": "English",
+                "is_default": True,
+                "is_active": True,
+            },
         )
         self.category = Category.objects.create(
             name="Technology",
@@ -325,12 +327,14 @@ class BlogContentTests(TestCase):
         self.user = User.objects.create_user(
             email="content@example.com", password="testpass123"
         )
-        self.locale = Locale.objects.create(
+        self.locale, _ = Locale.objects.get_or_create(
             code="en",
-            name="English",
-            native_name="English",
-            is_default=True,
-            is_active=True,
+            defaults={
+                "name": "English",
+                "native_name": "English",
+                "is_default": True,
+                "is_active": True,
+            },
         )
 
     def test_rich_content_blocks(self):
@@ -506,12 +510,14 @@ class BlogOrganizationTests(TestCase):
         self.user = User.objects.create_user(
             email="org@example.com", password="testpass123"
         )
-        self.locale = Locale.objects.create(
+        self.locale, _ = Locale.objects.get_or_create(
             code="en",
-            name="English",
-            native_name="English",
-            is_default=True,
-            is_active=True,
+            defaults={
+                "name": "English",
+                "native_name": "English",
+                "is_default": True,
+                "is_active": True,
+            },
         )
 
     def test_category_creation_and_validation(self):
@@ -709,12 +715,14 @@ class BlogAPITests(APITestCase):
         all_blog_permissions = Permission.objects.filter(content_type__app_label="blog")
         self.admin_user.user_permissions.add(*all_blog_permissions)
 
-        self.locale = Locale.objects.create(
+        self.locale, _ = Locale.objects.get_or_create(
             code="en",
-            name="English",
-            native_name="English",
-            is_default=True,
-            is_active=True,
+            defaults={
+                "name": "English",
+                "native_name": "English",
+                "is_default": True,
+                "is_active": True,
+            },
         )
         self.category = Category.objects.create(name="API Test", slug="api-test")
         self.tag = Tag.objects.create(name="Testing", slug="testing")
@@ -1016,12 +1024,14 @@ class BlogPublishingTests(TestCase):
         self.editor = User.objects.create_user(
             email="editor@example.com", password="testpass123", is_staff=True
         )
-        self.locale = Locale.objects.create(
+        self.locale, _ = Locale.objects.get_or_create(
             code="en",
-            name="English",
-            native_name="English",
-            is_default=True,
-            is_active=True,
+            defaults={
+                "name": "English",
+                "native_name": "English",
+                "is_default": True,
+                "is_active": True,
+            },
         )
 
     def test_publication_scheduling(self):
@@ -1134,12 +1144,14 @@ class BlogSEOTests(TestCase):
         self.user = User.objects.create_user(
             email="seo@example.com", password="testpass123"
         )
-        self.locale = Locale.objects.create(
+        self.locale, _ = Locale.objects.get_or_create(
             code="en",
-            name="English",
-            native_name="English",
-            is_default=True,
-            is_active=True,
+            defaults={
+                "name": "English",
+                "native_name": "English",
+                "is_default": True,
+                "is_active": True,
+            },
         )
         self.category = Category.objects.create(
             name="SEO Category",
@@ -1341,12 +1353,14 @@ class BlogRevisionTests(TestCase):
         self.user = User.objects.create_user(
             email="revision@example.com", password="testpass123"
         )
-        self.locale = Locale.objects.create(
+        self.locale, _ = Locale.objects.get_or_create(
             code="en",
-            name="English",
-            native_name="English",
-            is_default=True,
-            is_active=True,
+            defaults={
+                "name": "English",
+                "native_name": "English",
+                "is_default": True,
+                "is_active": True,
+            },
         )
         self.post = BlogPost.objects.create(
             title="Revisioned Post",
@@ -1455,12 +1469,14 @@ class BlogSettingsTests(TestCase):
 
     def setUp(self):
         """Set up test data."""
-        self.locale = Locale.objects.create(
+        self.locale, _ = Locale.objects.get_or_create(
             code="en",
-            name="English",
-            native_name="English",
-            is_default=True,
-            is_active=True,
+            defaults={
+                "name": "English",
+                "native_name": "English",
+                "is_default": True,
+                "is_active": True,
+            },
         )
 
     def test_blog_settings_creation(self):
@@ -1534,12 +1550,14 @@ class BlogIntegrationTests(TestCase):
         self.author = User.objects.create_user(
             email="integration@example.com", password="testpass123"
         )
-        self.locale = Locale.objects.create(
+        self.locale, _ = Locale.objects.get_or_create(
             code="en",
-            name="English",
-            native_name="English",
-            is_default=True,
-            is_active=True,
+            defaults={
+                "name": "English",
+                "native_name": "English",
+                "is_default": True,
+                "is_active": True,
+            },
         )
         self.category = Category.objects.create(name="Integration", slug="integration")
 

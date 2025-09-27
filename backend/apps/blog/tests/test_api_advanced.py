@@ -44,12 +44,14 @@ class BlogAPIAdvancedTestCase(APITestCase):
     def setUp(self):
         """Set up test data and authentication."""
         # Create locale
-        self.locale = Locale.objects.create(
+        self.locale, _ = Locale.objects.get_or_create(
             code="en",
-            name="English",
-            native_name="English",
-            is_active=True,
-            is_default=True,
+            defaults={
+                "name": "English",
+                "native_name": "English",
+                "is_active": True,
+                "is_default": True,
+            },
         )
 
         # Create user groups with different permissions

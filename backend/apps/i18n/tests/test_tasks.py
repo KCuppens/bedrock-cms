@@ -26,8 +26,9 @@ class I18nTasksTest(TestCase):
             email="test@example.com", password="testpass123"
         )
 
-        self.locale_en = Locale.objects.create(
-            code="en", name="English", native_name="English", is_default=True
+        self.locale_en, _ = Locale.objects.get_or_create(
+            code="en",
+            defaults={"name": "English", "native_name": "English", "is_default": True},
         )
 
         self.locale_es = Locale.objects.create(

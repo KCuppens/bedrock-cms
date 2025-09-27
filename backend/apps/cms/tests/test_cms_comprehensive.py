@@ -138,8 +138,9 @@ class CMSModelTests(TestCase):
             email="test@example.com", password="testpass123"
         )
 
-        self.locale = Locale.objects.create(
-            code="en", name="English", native_name="English", is_default=True
+        self.locale, _ = Locale.objects.get_or_create(
+            code="en",
+            defaults={"name": "English", "native_name": "English", "is_default": True},
         )
 
         self.category = Category.objects.create(
@@ -345,8 +346,9 @@ class CMSVersioningTests(TestCase):
             email="test@example.com", password="testpass123"
         )
 
-        self.locale = Locale.objects.create(
-            code="en", name="English", native_name="English", is_default=True
+        self.locale, _ = Locale.objects.get_or_create(
+            code="en",
+            defaults={"name": "English", "native_name": "English", "is_default": True},
         )
 
         self.page = Page.objects.create(
@@ -432,8 +434,9 @@ class CMSAPITests(APITestCase):
 
         self.client.force_authenticate(user=self.user)
 
-        self.locale = Locale.objects.create(
-            code="en", name="English", native_name="English", is_default=True
+        self.locale, _ = Locale.objects.get_or_create(
+            code="en",
+            defaults={"name": "English", "native_name": "English", "is_default": True},
         )
 
         self.category = Category.objects.create(
@@ -603,8 +606,9 @@ class CMSSerializerTests(TestCase):
             email="test@example.com", password="testpass123"
         )
 
-        self.locale = Locale.objects.create(
-            code="en", name="English", native_name="English", is_default=True
+        self.locale, _ = Locale.objects.get_or_create(
+            code="en",
+            defaults={"name": "English", "native_name": "English", "is_default": True},
         )
 
     def test_page_serializer(self):
@@ -664,8 +668,9 @@ class CMSTaskTests(TestCase):
             email="test@example.com", password="testpass123"
         )
 
-        self.locale = Locale.objects.create(
-            code="en", name="English", native_name="English", is_default=True
+        self.locale, _ = Locale.objects.get_or_create(
+            code="en",
+            defaults={"name": "English", "native_name": "English", "is_default": True},
         )
 
     def test_publish_scheduled_pages(self):
@@ -746,8 +751,9 @@ class CMSSecurityTests(TestCase):
             email="admin@example.com", password="adminpass123"
         )
 
-        self.locale = Locale.objects.create(
-            code="en", name="English", native_name="English", is_default=True
+        self.locale, _ = Locale.objects.get_or_create(
+            code="en",
+            defaults={"name": "English", "native_name": "English", "is_default": True},
         )
 
     def test_page_security_manager(self):
@@ -798,8 +804,9 @@ class CMSSEOTests(TestCase):
             email="test@example.com", password="testpass123"
         )
 
-        self.locale = Locale.objects.create(
-            code="en", name="English", native_name="English", is_default=True
+        self.locale, _ = Locale.objects.get_or_create(
+            code="en",
+            defaults={"name": "English", "native_name": "English", "is_default": True},
         )
 
     def test_seo_manager(self):
@@ -862,8 +869,9 @@ class CMSIntegrationTests(TestCase):
             email="test@example.com", password="testpass123"
         )
 
-        self.locale = Locale.objects.create(
-            code="en", name="English", native_name="English", is_default=True
+        self.locale, _ = Locale.objects.get_or_create(
+            code="en",
+            defaults={"name": "English", "native_name": "English", "is_default": True},
         )
 
     def test_complete_page_workflow(self):

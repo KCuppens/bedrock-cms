@@ -29,8 +29,8 @@ class ScopedLocaleModelTest(TestCase):
 
     def setUp(self):
         self.group = Group.objects.create(name="Test Editors")
-        self.locale = Locale.objects.create(
-            code="en", name="English", native_name="English"
+        self.locale, _ = Locale.objects.get_or_create(
+            code="en", defaults={"name": "English", "native_name": "English"}
         )
 
     def test_scoped_locale_creation(self):
@@ -235,8 +235,8 @@ class RBACMixinTest(TestCase):
         self.regular_user.groups.add(self.blog_editors)
 
         # Create locales
-        self.en_locale = Locale.objects.create(
-            code="en", name="English", native_name="English"
+        self.en_locale, _ = Locale.objects.get_or_create(
+            code="en", defaults={"name": "English", "native_name": "English"}
         )
         self.fr_locale = Locale.objects.create(
             code="fr", name="French", native_name="Français"
@@ -356,8 +356,8 @@ class RBACIntegrationTest(TestCase):
         self.blog_editor.groups.add(self.bloggers)
 
         # Create locales
-        self.en = Locale.objects.create(
-            code="en", name="English", native_name="English"
+        self.en, _ = Locale.objects.get_or_create(
+            code="en", defaults={"name": "English", "native_name": "English"}
         )
         self.es = Locale.objects.create(
             code="es", name="Spanish", native_name="Español"

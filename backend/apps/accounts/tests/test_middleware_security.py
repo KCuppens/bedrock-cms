@@ -190,8 +190,8 @@ class ScopedPermissionBackendTests(TestCase):
             email="admin@example.com", password="adminpass123"
         )
 
-        self.locale_en = Locale.objects.create(
-            code="en", name="English", native_name="English"
+        self.locale_en, _ = Locale.objects.get_or_create(
+            code="en", defaults={"name": "English", "native_name": "English"}
         )
 
         self.group = Group.objects.create(name="Test Group")

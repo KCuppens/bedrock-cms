@@ -27,12 +27,14 @@ class PageSignalsTest(TestCase):
             email="test@example.com", password="testpass123"
         )
 
-        self.locale_en = Locale.objects.create(
+        self.locale_en, _ = Locale.objects.get_or_create(
             code="en",
-            name="English",
-            native_name="English",
-            is_default=True,
-            is_active=True,
+            defaults={
+                "name": "English",
+                "native_name": "English",
+                "is_default": True,
+                "is_active": True,
+            },
         )
 
         self.locale_es = Locale.objects.create(
@@ -160,12 +162,14 @@ class GenericSignalsTest(TestCase):
             email="test@example.com", password="testpass123"
         )
 
-        self.locale_en = Locale.objects.create(
+        self.locale_en, _ = Locale.objects.get_or_create(
             code="en",
-            name="English",
-            native_name="English",
-            is_default=True,
-            is_active=True,
+            defaults={
+                "name": "English",
+                "native_name": "English",
+                "is_default": True,
+                "is_active": True,
+            },
         )
 
         self.locale_es = Locale.objects.create(
@@ -325,12 +329,14 @@ class SignalIntegrationTest(TestCase):
             email="test@example.com", password="testpass123"
         )
 
-        self.locale_en = Locale.objects.create(
+        self.locale_en, _ = Locale.objects.get_or_create(
             code="en",
-            name="English",
-            native_name="English",
-            is_default=True,
-            is_active=True,
+            defaults={
+                "name": "English",
+                "native_name": "English",
+                "is_default": True,
+                "is_active": True,
+            },
         )
 
         self.locale_es = Locale.objects.create(

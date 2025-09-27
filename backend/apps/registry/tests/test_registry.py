@@ -36,12 +36,14 @@ class ContentConfigTests(TestCase):
     def setUp(self):
         """Set up test data."""
 
-        self.locale = Locale.objects.create(
+        self.locale, _ = Locale.objects.get_or_create(
             code="en",
-            name="English",
-            native_name="English",
-            is_default=True,
-            is_active=True,
+            defaults={
+                "name": "English",
+                "native_name": "English",
+                "is_default": True,
+                "is_active": True,
+            },
         )
 
     def test_valid_config_creation(self):
@@ -159,12 +161,14 @@ class ContentRegistryTests(TestCase):
 
         self.registry = ContentRegistry()
 
-        self.locale = Locale.objects.create(
+        self.locale, _ = Locale.objects.get_or_create(
             code="en",
-            name="English",
-            native_name="English",
-            is_default=True,
-            is_active=True,
+            defaults={
+                "name": "English",
+                "native_name": "English",
+                "is_default": True,
+                "is_active": True,
+            },
         )
 
     def test_register_config(self):
@@ -300,12 +304,14 @@ class ContentSerializerFactoryTests(TestCase):
     def setUp(self):
         """Set up test data."""
 
-        self.locale = Locale.objects.create(
+        self.locale, _ = Locale.objects.get_or_create(
             code="en",
-            name="English",
-            native_name="English",
-            is_default=True,
-            is_active=True,
+            defaults={
+                "name": "English",
+                "native_name": "English",
+                "is_default": True,
+                "is_active": True,
+            },
         )
 
         self.config = ContentConfig(
@@ -364,12 +370,14 @@ class ContentViewSetFactoryTests(TestCase):
     def setUp(self):
         """Set up test data."""
 
-        self.locale = Locale.objects.create(
+        self.locale, _ = Locale.objects.get_or_create(
             code="en",
-            name="English",
-            native_name="English",
-            is_default=True,
-            is_active=True,
+            defaults={
+                "name": "English",
+                "native_name": "English",
+                "is_default": True,
+                "is_active": True,
+            },
         )
 
         self.config = ContentConfig(
@@ -432,12 +440,14 @@ class RegistryAPITests(APITestCase):
             email="test@example.com", password="testpass123"
         )
 
-        self.locale = Locale.objects.create(
+        self.locale, _ = Locale.objects.get_or_create(
             code="en",
-            name="English",
-            native_name="English",
-            is_default=True,
-            is_active=True,
+            defaults={
+                "name": "English",
+                "native_name": "English",
+                "is_default": True,
+                "is_active": True,
+            },
         )
 
         # Manually register Page model for tests since auto-registration doesn't run
@@ -532,12 +542,14 @@ class RegistryIntegrationTests(TestCase):
     def setUp(self):
         """Set up test data."""
 
-        self.locale = Locale.objects.create(
+        self.locale, _ = Locale.objects.get_or_create(
             code="en",
-            name="English",
-            native_name="English",
-            is_default=True,
-            is_active=True,
+            defaults={
+                "name": "English",
+                "native_name": "English",
+                "is_default": True,
+                "is_active": True,
+            },
         )
 
         # Manually register Page model for tests since auto-registration doesn't run
@@ -581,6 +593,9 @@ class RegistryIntegrationTests(TestCase):
 
         # Test that ViewSet works with actual data
 
+        # Count existing pages (might have homepage from migration)
+        initial_count = Page.objects.count()
+
         page = Page.objects.create(
             title="Test Page",
             slug="test-page",
@@ -594,6 +609,7 @@ class RegistryIntegrationTests(TestCase):
 
         queryset = viewset.get_queryset()
 
-        self.assertEqual(queryset.count(), 1)
+        self.assertEqual(queryset.count(), initial_count + 1)
 
-        self.assertEqual(queryset.first(), page)
+        # Check that our created page is in the queryset
+        self.assertIn(page, queryset)

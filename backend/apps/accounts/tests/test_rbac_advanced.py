@@ -50,8 +50,8 @@ class RBACPermissionInheritanceTests(TestCase):
 
     def setUp(self):
         # Create locales
-        self.locale_en = Locale.objects.create(
-            code="en", name="English", native_name="English"
+        self.locale_en, _ = Locale.objects.get_or_create(
+            code="en", defaults={"name": "English", "native_name": "English"}
         )
         self.locale_fr = Locale.objects.create(
             code="fr", name="French", native_name="Français"
@@ -298,8 +298,8 @@ class GroupManagementTests(TestCase):
     """Test group management and hierarchy."""
 
     def setUp(self):
-        self.locale_en = Locale.objects.create(
-            code="en", name="English", native_name="English"
+        self.locale_en, _ = Locale.objects.get_or_create(
+            code="en", defaults={"name": "English", "native_name": "English"}
         )
 
         self.user = User.objects.create_user(
@@ -432,8 +432,8 @@ class RBACIntegrationTests(TestCase):
     """Integration tests for RBAC system."""
 
     def setUp(self):
-        self.locale_en = Locale.objects.create(
-            code="en", name="English", native_name="English"
+        self.locale_en, _ = Locale.objects.get_or_create(
+            code="en", defaults={"name": "English", "native_name": "English"}
         )
         self.locale_fr = Locale.objects.create(
             code="fr", name="French", native_name="Français"

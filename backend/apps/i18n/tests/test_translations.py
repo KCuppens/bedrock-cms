@@ -26,12 +26,14 @@ class LocaleModelTests(TestCase):
     def setUp(self):
         """Set up test data."""
 
-        self.locale_en = Locale.objects.create(
+        self.locale_en, _ = Locale.objects.get_or_create(
             code="en",
-            name="English",
-            native_name="English",
-            is_default=True,
-            is_active=True,
+            defaults={
+                "name": "English",
+                "native_name": "English",
+                "is_default": True,
+                "is_active": True,
+            },
         )
 
         self.locale_es = Locale.objects.create(
@@ -104,9 +106,12 @@ class TranslationUnitModelTests(TestCase):
 
         TranslationUnit.objects.all().delete()
 
-        Locale.objects.all().delete()
+        Page.objects.all().delete()  # Delete pages before locales
 
-        Page.objects.all().delete()
+        try:
+            Locale.objects.all().delete()
+        except Exception:
+            pass
 
         User.objects.filter(email="test@example.com").delete()
 
@@ -114,12 +119,14 @@ class TranslationUnitModelTests(TestCase):
             email="test@example.com", password="testpass123"
         )
 
-        self.locale_en = Locale.objects.create(
+        self.locale_en, _ = Locale.objects.get_or_create(
             code="en",
-            name="English",
-            native_name="English",
-            is_default=True,
-            is_active=True,
+            defaults={
+                "name": "English",
+                "native_name": "English",
+                "is_default": True,
+                "is_active": True,
+            },
         )
 
         self.locale_es = Locale.objects.create(
@@ -279,9 +286,12 @@ class TranslationManagerTests(TestCase):
 
         TranslationUnit.objects.all().delete()
 
-        Locale.objects.all().delete()
+        Page.objects.all().delete()  # Delete pages before locales
 
-        Page.objects.all().delete()
+        try:
+            Locale.objects.all().delete()
+        except Exception:
+            pass
 
         User.objects.filter(email="test@example.com").delete()
 
@@ -289,12 +299,14 @@ class TranslationManagerTests(TestCase):
             email="test@example.com", password="testpass123"
         )
 
-        self.locale_en = Locale.objects.create(
+        self.locale_en, _ = Locale.objects.get_or_create(
             code="en",
-            name="English",
-            native_name="English",
-            is_default=True,
-            is_active=True,
+            defaults={
+                "name": "English",
+                "native_name": "English",
+                "is_default": True,
+                "is_active": True,
+            },
         )
 
         self.locale_es = Locale.objects.create(
@@ -318,7 +330,10 @@ class TranslationManagerTests(TestCase):
 
         Page.objects.all().delete()  # Delete pages before locales
 
-        Locale.objects.all().delete()
+        try:
+            Locale.objects.all().delete()
+        except Exception:
+            pass
 
         try:
             User.objects.filter(email="test@example.com").delete()
@@ -380,12 +395,14 @@ class TranslationResolverTests(TestCase):
             email="test@example.com", password="testpass123"
         )
 
-        self.locale_en = Locale.objects.create(
+        self.locale_en, _ = Locale.objects.get_or_create(
             code="en",
-            name="English",
-            native_name="English",
-            is_default=True,
-            is_active=True,
+            defaults={
+                "name": "English",
+                "native_name": "English",
+                "is_default": True,
+                "is_active": True,
+            },
         )
 
         self.locale_es = Locale.objects.create(
@@ -482,12 +499,14 @@ class UiMessageTests(TestCase):
             email="test@example.com", password="testpass123"
         )
 
-        self.locale_en = Locale.objects.create(
+        self.locale_en, _ = Locale.objects.get_or_create(
             code="en",
-            name="English",
-            native_name="English",
-            is_default=True,
-            is_active=True,
+            defaults={
+                "name": "English",
+                "native_name": "English",
+                "is_default": True,
+                "is_active": True,
+            },
         )
 
         self.locale_es = Locale.objects.create(
@@ -608,7 +627,10 @@ class TranslationAPITests(TestCase):
 
         Page.objects.all().delete()  # Delete pages before locales
 
-        Locale.objects.all().delete()
+        try:
+            Locale.objects.all().delete()
+        except Exception:
+            pass
 
         User = get_user_model()
 
@@ -622,12 +644,14 @@ class TranslationAPITests(TestCase):
             email="test@example.com", password="testpass123"
         )
 
-        self.locale_en = Locale.objects.create(
+        self.locale_en, _ = Locale.objects.get_or_create(
             code="en",
-            name="English",
-            native_name="English",
-            is_default=True,
-            is_active=True,
+            defaults={
+                "name": "English",
+                "native_name": "English",
+                "is_default": True,
+                "is_active": True,
+            },
         )
 
         self.locale_es = Locale.objects.create(
@@ -858,9 +882,12 @@ class TranslationSignalTests(TestCase):
 
         TranslationUnit.objects.all().delete()
 
-        Locale.objects.all().delete()
+        Page.objects.all().delete()  # Delete pages before locales
 
-        Page.objects.all().delete()
+        try:
+            Locale.objects.all().delete()
+        except Exception:
+            pass
 
         User.objects.filter(email="test@example.com").delete()
 
@@ -868,12 +895,14 @@ class TranslationSignalTests(TestCase):
             email="test@example.com", password="testpass123"
         )
 
-        self.locale_en = Locale.objects.create(
+        self.locale_en, _ = Locale.objects.get_or_create(
             code="en",
-            name="English",
-            native_name="English",
-            is_default=True,
-            is_active=True,
+            defaults={
+                "name": "English",
+                "native_name": "English",
+                "is_default": True,
+                "is_active": True,
+            },
         )
 
         self.locale_es = Locale.objects.create(

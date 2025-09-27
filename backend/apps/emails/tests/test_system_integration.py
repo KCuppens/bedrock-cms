@@ -81,8 +81,13 @@ class EmailSystemIntegrationTests(TestCase):
             self.email_service = None
 
         if HAS_I18N:
-            self.en_locale = Locale.objects.create(
-                code="en", name="English", native_name="English", is_default=True
+            self.en_locale, _ = Locale.objects.get_or_create(
+                code="en",
+                defaults={
+                    "name": "English",
+                    "native_name": "English",
+                    "is_default": True,
+                },
             )
             self.fr_locale = Locale.objects.create(
                 code="fr", name="French", native_name="Français"

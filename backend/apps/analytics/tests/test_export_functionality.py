@@ -49,8 +49,9 @@ class DataExportUtilityTests(TestCase):
             email="export@example.com", password="exportpass123"
         )
 
-        self.locale = Locale.objects.create(
-            code="en", name="English", native_name="English", is_default=True
+        self.locale, _ = Locale.objects.get_or_create(
+            code="en",
+            defaults={"name": "English", "native_name": "English", "is_default": True},
         )
 
         # Create test data for export
@@ -421,8 +422,9 @@ class AnalyticsExportAPITests(APITestCase):
             email="regular@example.com", password="regularpass123"
         )
 
-        self.locale = Locale.objects.create(
-            code="en", name="English", native_name="English", is_default=True
+        self.locale, _ = Locale.objects.get_or_create(
+            code="en",
+            defaults={"name": "English", "native_name": "English", "is_default": True},
         )
 
         # Create minimal test data

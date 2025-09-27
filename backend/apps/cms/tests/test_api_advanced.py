@@ -64,12 +64,14 @@ class BaseAPITestCase(TestCase):
         self.client = APIClient()
 
         # Create locales
-        self.locale_en = Locale.objects.create(
+        self.locale_en, _ = Locale.objects.get_or_create(
             code="en",
-            name="English",
-            native_name="English",
-            is_default=True,
-            is_active=True,
+            defaults={
+                "name": "English",
+                "native_name": "English",
+                "is_default": True,
+                "is_active": True,
+            },
         )
         self.locale_fr = Locale.objects.create(
             code="fr",

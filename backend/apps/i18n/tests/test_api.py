@@ -76,13 +76,15 @@ class I18nAPITestCase(TestCase):
         )
 
         # Create test locales
-        self.locale_en = Locale.objects.create(
+        self.locale_en, _ = Locale.objects.get_or_create(
             code="en",
-            name="English",
-            native_name="English",
-            is_default=True,
-            is_active=True,
-            sort_order=1,
+            defaults={
+                "name": "English",
+                "native_name": "English",
+                "is_default": True,
+                "is_active": True,
+                "sort_order": 1,
+            },
         )
 
         self.locale_es = Locale.objects.create(
