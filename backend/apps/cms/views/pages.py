@@ -55,12 +55,22 @@ class PagesViewSet(VersioningMixin, viewsets.ModelViewSet):
     pagination_class = StandardResultsSetPagination
 
     def get_queryset(self):
-
-        return (
+        queryset = (
             models.Page.objects.select_related("locale", "parent")
             .annotate(_children_count=Count("children"))
             .order_by("id")
         )
+
+        # Filter by status based on permissions
+        if self.action == "list":
+            # For list action, only show published pages to anonymous users
+            # or users without view permissions
+            if not self.request.user.is_authenticated:
+                queryset = queryset.filter(status="published")
+            elif not self.request.user.has_perm("cms.view_page"):
+                queryset = queryset.filter(status="published")
+
+        return queryset
 
     def get_serializer_class(self):
 

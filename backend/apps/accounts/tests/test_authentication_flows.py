@@ -209,10 +209,10 @@ class AuthenticationBackendTests(TestCase):
         """Test user group checking methods."""
         from django.contrib.auth.models import Group
 
-        # Create groups
-        admin_group = Group.objects.create(name="Admin")
-        manager_group = Group.objects.create(name="Manager")
-        member_group = Group.objects.create(name="Member")
+        # Create or get existing groups
+        admin_group, _ = Group.objects.get_or_create(name="Admin")
+        manager_group, _ = Group.objects.get_or_create(name="Manager")
+        member_group, _ = Group.objects.get_or_create(name="Member")
 
         # Add user to groups
         self.user.groups.add(member_group)

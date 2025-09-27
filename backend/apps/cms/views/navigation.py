@@ -115,7 +115,7 @@ class NavigationView(views.APIView):
 
                 if not page.parent_id:
 
-                    """menu_items.append(item)"""
+                    menu_items.append(item)
 
             # Second pass: organize children
 
@@ -125,7 +125,7 @@ class NavigationView(views.APIView):
 
                     parent_item = page_map[page.parent_id]
 
-                    """parent_item["children"].append(page_map[page.id])"""
+                    parent_item["children"].append(page_map[page.id])
 
             # Remove items that became children from root level
 
@@ -362,7 +362,7 @@ class SiteSettingsView(views.APIView):
 
                 if not page.parent_id:
 
-                    """navigation.append(item)"""
+                    navigation.append(item)
 
             for page in nav_pages:
 
@@ -370,7 +370,7 @@ class SiteSettingsView(views.APIView):
 
                     parent_item = page_map[page.parent_id]
 
-                    """parent_item["children"].append(page_map[page.id])"""
+                    parent_item["children"].append(page_map[page.id])
 
             navigation = [item for item in navigation if not item["parent"]]
 
