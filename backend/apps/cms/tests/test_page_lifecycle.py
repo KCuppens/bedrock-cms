@@ -8,6 +8,13 @@ from datetime import datetime, timedelta
 from unittest.mock import patch
 
 # Configure Django settings before any Django imports
+import django
+from django.conf import settings
+
+if not settings.configured:
+    os.environ.setdefault("DJANGO_SETTINGS_MODULE", "apps.config.settings.test")
+    django.setup()
+
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
 from django.test import TestCase, override_settings
@@ -74,10 +81,15 @@ class PageLifecycleTestCase(TestCase):
 
     def create_page(self, **kwargs):
         """Helper method to create a page with default values."""
+        # Generate unique slug if not provided
+        import uuid
+
+        unique_suffix = str(uuid.uuid4())[:8]
+
         defaults = {
             "locale": self.locale,
             "title": "Test Page",
-            "slug": "test-page",
+            "slug": kwargs.get("slug", f"test-page-{unique_suffix}"),
             "status": "draft",
             "blocks": [],  # Start with empty blocks to avoid validation issues
             "seo": {"title": "Test Page", "description": "Test description"},
@@ -495,17 +507,27 @@ class PageCreationManagementTests(APITestCase, PageLifecycleTestCase):
         # Create first page
         page1 = self.create_page(title="Test Page", slug="test-page")
 
-        # Try to create second page with same slug and parent/locale
-        # Note: Slug must be unique when used with empty string instead of None
-        # Create with empty slug to trigger automatic generation
+        # Try to create second page with different slug
+        # Due to unique path constraint, we need unique slugs
         page2 = Page(
             title="Another Test Page",
-            slug="",  # Empty slug should be allowed for auto-generation
+            slug="another-test-page",  # Unique slug to avoid path conflict
             locale=self.locale,
             parent=page1.parent,
             status="draft",
         )
-        page2.save()  # This should work with empty slug
+        page2.save()  # This should work with unique slug
+
+        # Now test that same slug in same locale/parent would fail
+        with self.assertRaises(ValidationError):
+            page3 = Page(
+                title="Third Test Page",
+                slug="test-page",  # Same slug as page1
+                locale=self.locale,
+                parent=page1.parent,
+                status="draft",
+            )
+            page3.full_clean()  # Validation should catch duplicate
 
     def test_parent_child_relationships_during_status_changes(self):
         """Test parent-child relationships are maintained during status changes."""

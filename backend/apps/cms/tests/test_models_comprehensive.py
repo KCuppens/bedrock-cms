@@ -92,6 +92,7 @@ class PageModelTests(TestCase):
         """Test is_published property."""
         page = Page.objects.create(
             title="Test Page",
+            slug="test-page-published",
             status="published",
             locale=self.locale,
         )
@@ -107,6 +108,7 @@ class PageModelTests(TestCase):
         """Test publish method."""
         page = Page.objects.create(
             title="Draft Page",
+            slug="draft-page-test",
             status="draft",
             locale=self.locale,
         )
@@ -121,6 +123,7 @@ class PageModelTests(TestCase):
         """Test unpublish method."""
         page = Page.objects.create(
             title="Published Page",
+            slug="published-page-test",
             status="published",
             published_at=timezone.now(),
             locale=self.locale,
@@ -135,6 +138,7 @@ class PageModelTests(TestCase):
         """Test blocks field validation."""
         page = Page.objects.create(
             title="Blocks Page",
+            slug="blocks-page-test",
             blocks=[
                 {"type": "richtext", "props": {"content": "Test content"}},
                 {
@@ -156,6 +160,7 @@ class PageModelTests(TestCase):
         }
         page = Page.objects.create(
             title="SEO Page",
+            slug="seo-page-test",
             seo=seo_data,
             locale=self.locale,
         )
@@ -186,7 +191,9 @@ class PageModelTests(TestCase):
 
     def test_page_position_handling(self):
         """Test page position in hierarchy."""
-        parent = Page.objects.create(title="Parent", locale=self.locale)
+        parent = Page.objects.create(
+            title="Parent", slug="parent-position-test", locale=self.locale
+        )
 
         child1 = Page.objects.create(
             title="Child 1",
@@ -213,6 +220,7 @@ class PageModelTests(TestCase):
         for status in valid_statuses:
             page = Page.objects.create(
                 title=f"Page {status}",
+                slug=f"page-{status}",
                 status=status,
                 locale=self.locale,
             )
@@ -286,11 +294,13 @@ class PageManagerTests(TestCase):
         """Test published pages manager method."""
         published = Page.objects.create(
             title="Published",
+            slug="published-manager-test",
             status="published",
             locale=self.locale,
         )
         draft = Page.objects.create(
             title="Draft",
+            slug="draft-manager-test",
             status="draft",
             locale=self.locale,
         )
@@ -304,12 +314,14 @@ class PageManagerTests(TestCase):
         """Test filtering by locale."""
         en_page = Page.objects.create(
             title="English Page",
+            slug="english-page-test",
             locale=self.locale,
         )
 
         fr_locale = Locale.objects.create(code="fr", name="French")
         fr_page = Page.objects.create(
             title="French Page",
+            slug="french-page-test",
             locale=fr_locale,
         )
 

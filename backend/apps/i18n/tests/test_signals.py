@@ -72,7 +72,9 @@ class PageSignalsTest(TestCase):
     def test_create_page_translation_units_skip_flag(self):
         """Test that translation units are skipped when _skip_translation_units flag is set."""
 
-        page = Page.objects.create(title="Test Page", locale=self.locale_en)
+        page = Page.objects.create(
+            title="Test Page", slug="test-page-skip-units", locale=self.locale_en
+        )
 
         page._skip_translation_units = True
 
@@ -89,7 +91,11 @@ class PageSignalsTest(TestCase):
     def test_create_page_translation_units_exception_handling(self):
         """Test that exceptions in translation unit creation don't break page saving."""
 
-        page = Page.objects.create(title="Test Page", locale=self.locale_en)
+        page = Page.objects.create(
+            title="Test Page",
+            slug="test-page-exception-handling",
+            locale=self.locale_en,
+        )
 
         with patch(
             "apps.i18n.signals.TranslationManager.create_translation_units"
@@ -129,6 +135,7 @@ class PageSignalsTest(TestCase):
 
         page = Page.objects.create(
             title="Original Title",
+            slug="original-title-page",
             blocks=[{"type": "text", "value": "Original content"}],
             locale=self.locale_en,
         )
@@ -229,7 +236,9 @@ class GenericSignalsTest(TestCase):
     def test_create_translation_units_handler_exception_handling(self):
         """Test that exceptions in generic handler don't break saving."""
 
-        page = Page.objects.create(title="Test Page", locale=self.locale_en)
+        page = Page.objects.create(
+            title="Test Page", slug="test-page-generic-handler", locale=self.locale_en
+        )
 
         with patch(
             "apps.i18n.signals.TranslationManager.create_translation_units"
@@ -354,6 +363,7 @@ class SignalIntegrationTest(TestCase):
 
         page = Page.objects.create(
             title="Test Page",
+            slug="test-page-integration",
             blocks=[{"type": "text", "value": "Hello World"}],
             locale=self.locale_en,
         )

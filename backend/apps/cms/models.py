@@ -162,7 +162,10 @@ class Page(models.Model, RBACMixin):
         constraints = [
             models.UniqueConstraint(
                 fields=["locale", "parent", "slug"], name="uq_page_slug_parent_locale"
-            )
+            ),
+            models.UniqueConstraint(
+                fields=["locale", "path"], name="uq_page_locale_path"
+            ),
         ]
 
         indexes = [

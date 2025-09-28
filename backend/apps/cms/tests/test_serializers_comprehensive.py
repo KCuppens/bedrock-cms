@@ -275,6 +275,7 @@ class SerializerFieldTests(TestCase):
         """Test locale field serialization in page serializers."""
         page = Page.objects.create(
             title="Test Page",
+            slug="test-page-locale-field",
             locale=self.locale,
         )
 
@@ -327,6 +328,7 @@ class SerializerFieldTests(TestCase):
         """Test blocks field serialization."""
         page = Page.objects.create(
             title="Blocks Page",
+            slug="blocks-page-serialization",
             blocks=[
                 {"type": "richtext", "props": {"content": "Content"}},
                 {"type": "hero", "props": {"title": "Hero", "subtitle": "Sub"}},
@@ -347,6 +349,7 @@ class SerializerFieldTests(TestCase):
         """Test resolved SEO data serialization."""
         page = Page.objects.create(
             title="SEO Page",
+            slug="seo-page-serialization",
             seo={
                 "title": "Custom SEO Title",
                 "description": "Custom description",
@@ -379,6 +382,7 @@ class SerializerContextTests(TestCase):
         """Test serializer behavior with request context."""
         page = Page.objects.create(
             title="Context Page",
+            slug="context-page",
             locale=self.locale,
         )
 
@@ -401,6 +405,7 @@ class SerializerContextTests(TestCase):
         """Test serializer behavior without context."""
         page = Page.objects.create(
             title="No Context Page",
+            slug="no-context-page",
             locale=self.locale,
         )
 

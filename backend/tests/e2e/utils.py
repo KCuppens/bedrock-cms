@@ -387,66 +387,77 @@ class E2ETestMixin:
 
     def create_sample_pages(self):
         """Create sample pages for testing."""
-        # Homepage
-        self.homepage = Page.objects.create(
-            title="Homepage",
-            slug="",
-            locale=self.en_locale,
-            status="published",
-            is_homepage=True,
-            blocks=[
-                {
-                    "type": "hero",
-                    "id": "hero-1",
-                    "props": {
-                        "title": "Welcome to Bedrock CMS",
-                        "subtitle": "The modern content management system",
-                        "cta_text": "Get Started",
-                        "cta_url": "/about/",
-                    },
-                }
-            ],
-            published_at=timezone.now(),
-        )
+        # Homepage - check for migration-created homepage first, then create if needed
+        self.homepage = Page.objects.filter(locale=self.en_locale, path="/").first()
+
+        if not self.homepage:
+            self.homepage = Page.objects.create(
+                title="Homepage",
+                slug="",
+                locale=self.en_locale,
+                status="published",
+                is_homepage=True,
+                blocks=[
+                    {
+                        "type": "hero",
+                        "id": "hero-1",
+                        "props": {
+                            "title": "Welcome to Bedrock CMS",
+                            "subtitle": "The modern content management system",
+                            "cta_text": "Get Started",
+                            "cta_url": "/about/",
+                        },
+                    }
+                ],
+                published_at=timezone.now(),
+            )
 
         # About page
-        self.about_page = Page.objects.create(
-            title="About Us",
-            slug="about",
-            locale=self.en_locale,
-            status="published",
-            blocks=[
-                {
-                    "type": "richtext",
-                    "id": "content-1",
-                    "props": {
-                        "content": "<h1>About Us</h1><p>We are a modern CMS provider.</p>"
-                    },
-                }
-            ],
-            published_at=timezone.now(),
-        )
+        self.about_page = Page.objects.filter(
+            slug="about", locale=self.en_locale
+        ).first()
+
+        if not self.about_page:
+            self.about_page = Page.objects.create(
+                title="About Us",
+                slug="about",
+                locale=self.en_locale,
+                status="published",
+                blocks=[
+                    {
+                        "type": "richtext",
+                        "id": "content-1",
+                        "props": {
+                            "content": "<h1>About Us</h1><p>We are a modern CMS provider.</p>"
+                        },
+                    }
+                ],
+                published_at=timezone.now(),
+            )
 
         # Blog presentation page
-        self.blog_page = Page.objects.create(
-            title="Blog",
-            slug="blog",
-            locale=self.en_locale,
-            status="published",
-            blocks=[
-                {
-                    "type": "content_detail",
-                    "id": "blog-posts-1",
-                    "props": {
-                        "content_type": "blog.blogpost",
-                        "query": {"status": "published"},
-                        "limit": 10,
-                        "ordering": "-published_at",
-                    },
-                }
-            ],
-            published_at=timezone.now(),
-        )
+        self.blog_page = Page.objects.filter(slug="blog", locale=self.en_locale).first()
+
+        if not self.blog_page:
+            self.blog_page = Page.objects.create(
+                title="Blog",
+                slug="blog",
+                locale=self.en_locale,
+                status="published",
+                blocks=[
+                    {
+                        "type": "content_detail",
+                        "id": "blog-posts-1",
+                        "props": {
+                            "content_type": "blog.blogpost",
+                            "query": {"status": "published"},
+                            "limit": 10,
+                            "ordering": "-published_at",
+                        },
+                    }
+                ],
+                published_at=timezone.now(),
+            )
 
         # Update blog settings to use this page
         self.blog_settings.default_presentation_page = self.blog_page

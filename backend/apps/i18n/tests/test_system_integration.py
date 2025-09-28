@@ -451,7 +451,10 @@ class I18nSignalIntegrationTests(TestCase):
         if HAS_CMS and Page:
             # Create a page - should trigger indexing signal
             page = Page.objects.create(
-                title="Test Page", locale=self.en_locale, status="published"
+                title="Test Page",
+                slug="test-page-signal-integration",
+                locale=self.en_locale,
+                status="published",
             )
 
             # Verify signal was processed

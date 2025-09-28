@@ -79,7 +79,9 @@ class CMSRealModelTests(TestCase):
     def test_page_str_representation(self):
         """Test page string representation."""
 
-        page = Page.objects.create(title="String Test Page", locale=self.locale)
+        page = Page.objects.create(
+            title="String Test Page", slug="string-test-page", locale=self.locale
+        )
 
         """self.assertIn("String Test Page", str(page))"""
 
@@ -98,7 +100,10 @@ class CMSRealModelTests(TestCase):
         for status in statuses:
 
             page = Page.objects.create(
-                title=f"Page {status}", locale=self.locale, status=status
+                title=f"Page {status}",
+                slug=f"page-{status}",
+                locale=self.locale,
+                status=status,
             )
 
             self.assertEqual(page.status, status)
@@ -106,10 +111,16 @@ class CMSRealModelTests(TestCase):
     def test_page_hierarchy(self):
         """Test page parent-child relationships."""
 
-        parent_page = Page.objects.create(title="Parent Page", locale=self.locale)
+        parent_page = Page.objects.create(
+            title="Parent Page", slug="parent-page", locale=self.locale
+        )
 
         child_page = Page.objects.create(
-            title="Child Page", locale=self.locale, parent=parent_page, position=1
+            title="Child Page",
+            slug="child-page",
+            locale=self.locale,
+            parent=parent_page,
+            position=1,
         )
 
         self.assertEqual(child_page.parent, parent_page)
@@ -129,6 +140,7 @@ class CMSRealModelTests(TestCase):
 
         page = Page.objects.create(
             title="Blocks Test",
+            slug="blocks-test",
             locale=self.locale,
             blocks=[
                 {
@@ -156,6 +168,7 @@ class CMSRealModelTests(TestCase):
 
         page = Page.objects.create(
             title="SEO Test",
+            slug="seo-test",
             locale=self.locale,
             seo={
                 "meta_title": "Custom SEO Title",
@@ -203,7 +216,9 @@ class CMSRealModelTests(TestCase):
     def test_page_locale_relationship(self):
         """Test page-locale foreign key relationship."""
 
-        page = Page.objects.create(title="Locale Test", locale=self.locale)
+        page = Page.objects.create(
+            title="Locale Test", slug="locale-test", locale=self.locale
+        )
 
         self.assertEqual(page.locale, self.locale)
 
@@ -240,7 +255,9 @@ class CMSRealModelTests(TestCase):
     def test_page_group_id_field(self):
         """Test page group_id UUID field."""
 
-        page = Page.objects.create(title="Group ID Test", locale=self.locale)
+        page = Page.objects.create(
+            title="Group ID Test", slug="group-id-test", locale=self.locale
+        )
 
         self.assertIsNotNone(page.group_id)
 
@@ -282,7 +299,10 @@ class CMSRealModelMethodTests(TestCase):
         """Test page publish method if it exists."""
 
         page = Page.objects.create(
-            title="Publish Test", status="draft", locale=self.locale
+            title="Publish Test",
+            slug="publish-test",
+            status="draft",
+            locale=self.locale,
         )
 
         if hasattr(page, "publish"):
@@ -297,7 +317,10 @@ class CMSRealModelMethodTests(TestCase):
         """Test page schedule method if it exists."""
 
         page = Page.objects.create(
-            title="Schedule Test", status="draft", locale=self.locale
+            title="Schedule Test",
+            slug="schedule-test",
+            status="draft",
+            locale=self.locale,
         )
 
         future_time = timezone.now() + timedelta(days=1)
@@ -313,7 +336,9 @@ class CMSRealModelMethodTests(TestCase):
     def test_page_rbac_methods(self):
         """Test page RBAC methods from RBACMixin."""
 
-        page = Page.objects.create(title="RBAC Test", locale=self.locale)
+        page = Page.objects.create(
+            title="RBAC Test", slug="rbac-test", locale=self.locale
+        )
 
         # Test RBAC methods if they exist
 
@@ -338,7 +363,9 @@ class CMSRealModelMethodTests(TestCase):
     def test_page_versioning_relationship(self):
         """Test page versioning relationship if it exists."""
 
-        page = Page.objects.create(title="Versioning Test", locale=self.locale)
+        page = Page.objects.create(
+            title="Versioning Test", slug="versioning-test", locale=self.locale
+        )
 
         # Test if versioning relationships exist
 
@@ -407,7 +434,9 @@ class CMSRealAPITests(APITestCase):
 
         # Test page filtering
 
-        Page.objects.create(title="Draft Page", locale=self.locale, status="draft")
+        Page.objects.create(
+            title="Draft Page", slug="draft-page", locale=self.locale, status="draft"
+        )
 
         published_pages = Page.objects.filter(status="published")
 

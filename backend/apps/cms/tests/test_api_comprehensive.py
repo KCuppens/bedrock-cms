@@ -45,11 +45,13 @@ class PageAPITests(TestCase):
         """Test GET /api/v1/cms/pages/."""
         Page.objects.create(
             title="Published Page",
+            slug="published-page",
             status="published",
             locale=self.locale,
         )
         Page.objects.create(
             title="Draft Page",
+            slug="draft-page",
             status="draft",
             locale=self.locale,
         )
@@ -86,6 +88,7 @@ class PageAPITests(TestCase):
         """Test GET /api/v1/cms/pages/{id}/."""
         page = Page.objects.create(
             title="Detail Page",
+            slug="detail-page",
             locale=self.locale,
         )
 
@@ -101,6 +104,7 @@ class PageAPITests(TestCase):
         """Test PUT/PATCH /api/v1/cms/pages/{id}/."""
         page = Page.objects.create(
             title="Original Title",
+            slug="original-title",
             locale=self.locale,
         )
 
@@ -119,6 +123,7 @@ class PageAPITests(TestCase):
         """Test DELETE /api/v1/cms/pages/{id}/."""
         page = Page.objects.create(
             title="To Delete",
+            slug="to-delete",
             locale=self.locale,
         )
 
@@ -132,6 +137,7 @@ class PageAPITests(TestCase):
         """Test POST /api/v1/cms/pages/{id}/publish/."""
         page = Page.objects.create(
             title="Draft Page",
+            slug="draft-page-publish",
             status="draft",
             locale=self.locale,
         )
@@ -149,6 +155,7 @@ class PageAPITests(TestCase):
         """Test POST /api/v1/cms/pages/{id}/unpublish/."""
         page = Page.objects.create(
             title="Published Page",
+            slug="published-page-unpublish",
             status="published",
             locale=self.locale,
         )
@@ -165,6 +172,7 @@ class PageAPITests(TestCase):
         """Test POST /api/v1/cms/pages/{id}/duplicate/."""
         page = Page.objects.create(
             title="Original Page",
+            slug="original-page",
             locale=self.locale,
         )
 
@@ -178,8 +186,8 @@ class PageAPITests(TestCase):
 
     def test_page_move_action(self):
         """Test POST /api/v1/cms/pages/{id}/move/."""
-        parent = Page.objects.create(title="Parent", locale=self.locale)
-        child = Page.objects.create(title="Child", locale=self.locale)
+        parent = Page.objects.create(title="Parent", slug="parent", locale=self.locale)
+        child = Page.objects.create(title="Child", slug="child", locale=self.locale)
 
         move_data = {"new_parent_id": parent.id, "position": 0}
 
@@ -197,6 +205,7 @@ class PageAPITests(TestCase):
         """Test POST /api/v1/cms/pages/{id}/blocks/insert/."""
         page = Page.objects.create(
             title="Blocks Page",
+            slug="blocks-page-insert",
             blocks=[{"type": "richtext", "props": {"content": "Original"}}],
             locale=self.locale,
         )
@@ -220,6 +229,7 @@ class PageAPITests(TestCase):
         """Test POST /api/v1/cms/pages/{id}/blocks/reorder/."""
         page = Page.objects.create(
             title="Blocks Page",
+            slug="blocks-page-reorder",
             blocks=[
                 {"type": "richtext", "props": {"content": "First"}},
                 {"type": "hero", "props": {"title": "Second"}},
@@ -243,6 +253,7 @@ class PageAPITests(TestCase):
         """Test PATCH /api/v1/cms/pages/{id}/blocks/{index}/."""
         page = Page.objects.create(
             title="Blocks Page",
+            slug="blocks-page-update",
             blocks=[{"type": "richtext", "props": {"content": "Original"}}],
             locale=self.locale,
         )
@@ -263,6 +274,7 @@ class PageAPITests(TestCase):
         """Test DELETE /api/v1/cms/pages/{id}/blocks/{index}/."""
         page = Page.objects.create(
             title="Blocks Page",
+            slug="blocks-page-delete",
             blocks=[
                 {"type": "richtext", "props": {"content": "First"}},
                 {"type": "hero", "props": {"title": "Second"}},
@@ -297,7 +309,9 @@ class PagePermissionTests(TestCase):
 
     def test_unauthenticated_access(self):
         """Test API access without authentication."""
-        page = Page.objects.create(title="Public Page", locale=self.locale)
+        page = Page.objects.create(
+            title="Public Page", slug="public-page", locale=self.locale
+        )
 
         # Test read access (should be allowed)
         response = self.client.get(f"/api/v1/cms/pages/{page.id}/")
@@ -389,7 +403,7 @@ class PageValidationTests(TestCase):
         """Test validation for duplicate paths."""
         Page.objects.create(
             title="Original",
-            path="/duplicate/",
+            slug="duplicate",
             locale=self.locale,
         )
 
@@ -406,7 +420,7 @@ class PageValidationTests(TestCase):
 
     def test_invalid_block_data(self):
         """Test validation with invalid block data."""
-        page = Page.objects.create(title="Test", locale=self.locale)
+        page = Page.objects.create(title="Test", slug="test-page", locale=self.locale)
 
         invalid_block = {
             "block": {"type": "invalid_type", "props": {}},
