@@ -209,6 +209,7 @@ const PageEditor = () => {
   const [addBlockModalOpen, setAddBlockModalOpen] = useState(false);
   const [addBlockPosition, setAddBlockPosition] = useState<number>(0);
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
+  const [blockToDelete, setBlockToDelete] = useState<string | null>(null);
   const [tempBlockSettings, setTempBlockSettings] = useState<Block | null>(null);
   const [isSavingBlockSettings, setIsSavingBlockSettings] = useState(false);
 
@@ -446,7 +447,6 @@ const PageEditor = () => {
       setIsLoading(false);
     }
   }, [id, loadPageData]);
-  const [blockToDelete, setBlockToDelete] = useState<string | null>(null);
 
   // Sample blog posts for presentation preview
   const samplePosts = [
@@ -546,7 +546,7 @@ const PageEditor = () => {
 
       // Return the full updated page data with transformed blocks
       if (response.data) {
-        return transformPageData(response.data);
+        return mapApiPageToPageData(response.data);
       }
       return null;
     } catch (error: any) {
@@ -558,7 +558,7 @@ const PageEditor = () => {
       });
       return null;
     }
-  }, [id, api, toast]);
+  }, [id, api, toast, mapApiPageToPageData]);
 
   const updateBlockOnServer = useCallback(async (block: Block) => {
     if (!id || !page) return null;
@@ -580,7 +580,7 @@ const PageEditor = () => {
 
       // Return the full updated page data with transformed blocks
       if (response.data) {
-        return transformPageData(response.data);
+        return mapApiPageToPageData(response.data);
       }
       return null;
     } catch (error: any) {
@@ -592,7 +592,7 @@ const PageEditor = () => {
       });
       return null;
     }
-  }, [id, page, api, toast]);
+  }, [id, page, api, toast, mapApiPageToPageData]);
 
   const deleteBlockOnServer = useCallback(async (blockId: string) => {
     if (!id || !page) return;
@@ -806,7 +806,7 @@ const PageEditor = () => {
 
       // Update the page with the transformed server response
       if (response.data) {
-        const updatedPageData = transformPageData(response.data);
+        const updatedPageData = mapApiPageToPageData(response.data);
         setPage(updatedPageData);
         setHasUnsavedChanges(false); // Server is now in sync
 

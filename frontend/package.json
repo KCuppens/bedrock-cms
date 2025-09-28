@@ -11,7 +11,10 @@
     "preview": "vite preview",
     "extract-translations": "vite build --mode translations",
     "sync-translations": "node scripts/sync-translations.js",
-    "translations": "npm run build && npm run sync-translations"
+    "translations": "npm run build && npm run sync-translations",
+    "lighthouse:ci": "lhci autorun",
+    "lighthouse:local": "npm run build && npm run lighthouse:ci",
+    "performance:audit": "npm run build && npm run preview & sleep 5 && lighthouse --only-categories=performance,accessibility,best-practices,seo --output=json,html --output-path=./lighthouse-results --chrome-flags=\"--headless\" http://localhost:4173"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",
@@ -78,6 +81,7 @@
     "@babel/parser": "^7.28.4",
     "@babel/traverse": "^7.28.4",
     "@eslint/js": "^9.32.0",
+    "@lhci/cli": "^0.12.0",
     "@tailwindcss/typography": "^0.5.16",
     "@types/node": "^22.16.5",
     "@types/react": "^18.3.23",
@@ -89,6 +93,7 @@
     "eslint-plugin-react-hooks": "^5.2.0",
     "eslint-plugin-react-refresh": "^0.4.20",
     "globals": "^15.15.0",
+    "lighthouse": "^12.0.0",
     "lovable-tagger": "^1.1.9",
     "postcss": "^8.5.6",
     "tailwindcss": "^3.4.17",

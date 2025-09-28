@@ -3,6 +3,7 @@ import react from "@vitejs/plugin-react-swc";
 import path from "path";
 import { componentTagger } from "lovable-tagger";
 import { translationExtractionPlugin } from "./vite-plugin-translations";
+import { criticalCSSPlugin } from "./vite-plugin-critical-css";
 
 // Custom plugin to handle malformed URIs
 const malformedUriHandler = (): Plugin => ({
@@ -35,7 +36,7 @@ const seoRedirectHandler = (): Plugin => ({
       // Check if it's a sitemap or robots.txt request
       if (url?.match(/^\/sitemap(-.*)?\.xml$/) || url === '/robots.txt') {
         // Proxy these requests directly to the backend
-        const backendUrl = `http://localhost:8000${url}`;
+        const backendUrl = `http://localhost:8082${url}`;
 
         fetch(backendUrl)
           .then(backendRes => {
@@ -67,37 +68,38 @@ export default defineConfig(({ mode }) => ({
     proxy: {
       // Proxy API requests to backend
       '/api': {
-        target: 'http://localhost:8000',
+        target: 'http://localhost:8082',
         changeOrigin: true,
         secure: false,
       },
       // Proxy auth requests to backend
       '/auth': {
-        target: 'http://localhost:8000',
+        target: 'http://localhost:8082',
         changeOrigin: true,
         secure: false,
       },
       // Proxy admin requests to backend
       '/admin': {
-        target: 'http://localhost:8000',
+        target: 'http://localhost:8082',
         changeOrigin: true,
         secure: false,
       },
       // Proxy sitemap requests to backend
       '/sitemap*.xml': {
-        target: 'http://localhost:8000',
+        target: 'http://localhost:8082',
         changeOrigin: true,
         secure: false,
       },
       // Proxy robots.txt to backend
       '/robots.txt': {
-        target: 'http://localhost:8000',
+        target: 'http://localhost:8082',
         changeOrigin: true,
         secure: false,
       },
     },
   },
   plugins: [
+    criticalCSSPlugin(), // Add critical CSS extraction
     malformedUriHandler(),
     seoRedirectHandler(),
     react(),
@@ -117,80 +119,138 @@ export default defineConfig(({ mode }) => ({
       compress: {
         drop_console: mode === 'production',
         drop_debugger: true,
-        pure_funcs: mode === 'production' ? ['console.log', 'console.info'] : [],
-        passes: 2,
+        pure_funcs: mode === 'production' ? ['console.log', 'console.info', 'console.debug'] : [],
+        passes: 3, // More passes for better optimization
         dead_code: true,
         unused: true,
+        reduce_vars: true,
+        collapse_vars: true,
+        inline: 2,
+        toplevel: true,
+        unsafe_math: true,
+        unsafe_comps: true,
+        unsafe_proto: true,
+        unsafe_regexp: true,
       },
       mangle: {
         safari10: true,
+        properties: {
+          regex: /^_/ // Mangle private properties
+        }
       },
       format: {
         comments: false,
+        ecma: 2015,
       },
     },
     rollupOptions: {
       output: {
         manualChunks(id) {
-          // Core vendor chunk
+          // More aggressive chunking for better caching
           if (id.includes('node_modules')) {
-            if (id.includes('react') || id.includes('react-dom') || id.includes('react-router')) {
-              return 'react-vendor';
+            // React core - minimal bundle
+            if (id.includes('react-dom')) {
+              return 'react-dom';
             }
-            // Radix UI components - split into smaller chunks
-            if (id.includes('@radix-ui/react-dialog') || id.includes('@radix-ui/react-alert-dialog')) {
-              return 'radix-dialogs';
+            if (id.includes('react') && !id.includes('react-')) {
+              return 'react-core';
             }
-            if (id.includes('@radix-ui/react-dropdown-menu') || id.includes('@radix-ui/react-context-menu')) {
-              return 'radix-menus';
+            if (id.includes('react-router')) {
+              return 'react-router';
             }
-            if (id.includes('@radix-ui/react-select') || id.includes('@radix-ui/react-combobox')) {
-              return 'radix-inputs';
+
+            // Split each Radix UI component into its own chunk for better tree shaking
+            const radixMatch = id.match(/@radix-ui\/react-([^\/]+)/);
+            if (radixMatch) {
+              return `radix-${radixMatch[1]}`;
             }
-            if (id.includes('@radix-ui')) {
-              return 'radix-ui';
+
+            // DND Kit - lazy loaded only when needed
+            if (id.includes('@dnd-kit/sortable')) {
+              return 'dnd-sortable';
             }
-            // DND Kit (only loaded when PageEditor is used)
+            if (id.includes('@dnd-kit/core')) {
+              return 'dnd-core';
+            }
             if (id.includes('@dnd-kit')) {
-              return 'dnd-kit';
+              return 'dnd-utils';
             }
-            // Heavy charting library (removed - using lightweight alternative)
+
+            // Heavy charting library - should be dynamically imported
             if (id.includes('recharts')) {
-              return 'charts-legacy';
+              return 'charts';
             }
+            if (id.includes('d3')) {
+              return 'd3-utils';
+            }
+
             // Form libraries
-            if (id.includes('react-hook-form') || id.includes('@hookform')) {
-              return 'forms';
+            if (id.includes('react-hook-form')) {
+              return 'react-hook-form';
             }
-            // Date utilities
+            if (id.includes('@hookform')) {
+              return 'hookform-resolvers';
+            }
+            if (id.includes('zod')) {
+              return 'zod-validation';
+            }
+
+            // Date utilities - split by functionality
+            if (id.includes('date-fns/locale')) {
+              return 'date-locales';
+            }
             if (id.includes('date-fns')) {
               return 'date-utils';
             }
-            // React Query
+
+            // React Query and related
+            if (id.includes('@tanstack/react-query-devtools')) {
+              return 'query-devtools';
+            }
             if (id.includes('@tanstack/react-query')) {
-              return 'query';
+              return 'react-query';
             }
-            // Split other heavy libraries
+
+            // Icons - split into smaller chunks
             if (id.includes('lucide-react')) {
-              return 'icons';
+              return 'icons-lucide';
             }
+
+            // Animation libraries
             if (id.includes('framer-motion')) {
-              return 'animation';
+              return 'framer-motion';
             }
-            // React window for virtualization
+
+            // Virtualization
             if (id.includes('react-window')) {
-              return 'virtualization';
+              return 'react-window';
             }
-            // Helmet for SEO
+
+            // SEO utilities
             if (id.includes('react-helmet')) {
-              return 'helmet';
+              return 'react-helmet';
             }
-            // Axios for HTTP
+
+            // HTTP client
             if (id.includes('axios')) {
-              return 'http';
+              return 'axios';
             }
-            // All other vendor code
-            return 'vendor';
+
+            // UI utilities
+            if (id.includes('class-variance-authority')) {
+              return 'cva';
+            }
+            if (id.includes('clsx') || id.includes('tailwind-merge')) {
+              return 'style-utils';
+            }
+
+            // Editor utilities
+            if (id.includes('cmdk')) {
+              return 'command';
+            }
+
+            // All other small vendor code
+            return 'vendor-misc';
           }
 
           // Split large pages into separate chunks
@@ -236,14 +296,22 @@ export default defineConfig(({ mode }) => ({
         assetFileNames: 'assets/[ext]/[name]-[hash].[ext]',
       },
     },
-    chunkSizeWarningLimit: 300, // Stricter limit for better performance
+    chunkSizeWarningLimit: 200, // Stricter limit for better performance
     // Improve build performance
     reportCompressedSize: false,
-    sourcemap: mode === 'development',
+    sourcemap: mode === 'development' ? 'inline' : false,
     // Enable CSS code splitting
     cssCodeSplit: true,
-    // Inline assets smaller than 4kb
-    assetsInlineLimit: 4096,
+    // Inline assets smaller than 10kb for fewer requests
+    assetsInlineLimit: 10240,
+    // Enable module preloading
+    modulePreload: {
+      polyfill: true,
+    },
+    // Advanced optimizations
+    commonjsOptions: {
+      transformMixedEsModules: true,
+    },
   },
   optimizeDeps: {
     include: [

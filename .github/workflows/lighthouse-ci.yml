@@ -1,0 +1,274 @@
+name: Lighthouse CI
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main]
+    paths:
+      - 'frontend/**'
+      - '.github/workflows/lighthouse-ci.yml'
+
+jobs:
+  lighthouse-ci:
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:13
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: bedrock_cms_test
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Cache Python dependencies
+        uses: actions/cache@v3
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('backend/requirements/**/*.txt') }}
+
+      - name: Install backend dependencies
+        run: |
+          cd backend
+          pip install -r requirements/base.txt
+
+      - name: Install frontend dependencies
+        run: |
+          cd frontend
+          npm ci
+
+      - name: Setup backend database
+        run: |
+          cd backend
+          python manage.py migrate --settings=apps.config.settings.test_minimal
+        env:
+          DATABASE_URL: postgresql://postgres:postgres@localhost/bedrock_cms_test
+          SECRET_KEY: 'test-secret-key-for-ci'
+          DEBUG: 'False'
+
+      - name: Create test data
+        run: |
+          cd backend
+          python manage.py shell --settings=apps.config.settings.test_minimal << EOF
+          from apps.accounts.models import User
+          from apps.cms.models import Page
+          from django.contrib.sites.models import Site
+          import os
+
+          # Create superuser
+          if not User.objects.filter(email='admin@test.com').exists():
+              User.objects.create_superuser(
+                  email='admin@test.com',
+                  password='admin123',
+                  first_name='Test',
+                  last_name='Admin'
+              )
+
+          # Create default site if not exists
+          site, created = Site.objects.get_or_create(
+              domain='localhost:8080',
+              defaults={'name': 'Test Site'}
+          )
+
+          # Create test pages for Lighthouse to audit
+          if not Page.objects.filter(slug='home').exists():
+              Page.objects.create(
+                  title='Home',
+                  slug='home',
+                  content=[{
+                      'type': 'text',
+                      'value': 'Welcome to our test site!'
+                  }],
+                  is_published=True,
+                  site=site
+              )
+
+          if not Page.objects.filter(slug='about').exists():
+              Page.objects.create(
+                  title='About Us',
+                  slug='about',
+                  content=[{
+                      'type': 'text',
+                      'value': 'About our company and mission.'
+                  }],
+                  is_published=True,
+                  site=site
+              )
+          EOF
+        env:
+          DATABASE_URL: postgresql://postgres:postgres@localhost/bedrock_cms_test
+          SECRET_KEY: 'test-secret-key-for-ci'
+          DEBUG: 'False'
+
+      - name: Build frontend
+        run: |
+          cd frontend
+          npm run build
+        env:
+          NODE_ENV: production
+
+      - name: Start backend server
+        run: |
+          cd backend
+          python manage.py runserver 8082 --settings=apps.config.settings.test_minimal &
+          echo $! > backend_pid.txt
+        env:
+          DATABASE_URL: postgresql://postgres:postgres@localhost/bedrock_cms_test
+          SECRET_KEY: 'test-secret-key-for-ci'
+          DEBUG: 'False'
+
+      - name: Start frontend server
+        run: |
+          cd frontend
+          npm run preview -- --port 8080 --host 0.0.0.0 &
+          echo $! > frontend_pid.txt
+
+      - name: Wait for servers
+        run: |
+          # Wait for backend
+          for i in {1..30}; do
+            if curl -f http://localhost:8082/api/health/ >/dev/null 2>&1; then
+              echo "Backend server is ready"
+              break
+            fi
+            echo "Waiting for backend server... ($i/30)"
+            sleep 2
+          done
+
+          # Wait for frontend
+          for i in {1..30}; do
+            if curl -f http://localhost:8080/ >/dev/null 2>&1; then
+              echo "Frontend server is ready"
+              break
+            fi
+            echo "Waiting for frontend server... ($i/30)"
+            sleep 2
+          done
+
+      - name: Install Lighthouse CI
+        run: npm install -g @lhci/cli@0.12.x
+
+      - name: Run Lighthouse CI
+        run: lhci autorun
+        env:
+          LHCI_GITHUB_APP_TOKEN: ${{ secrets.LHCI_GITHUB_APP_TOKEN }}
+          LHCI_TOKEN: ${{ secrets.LHCI_TOKEN }}
+
+      - name: Upload Lighthouse results
+        uses: actions/upload-artifact@v3
+        if: always()
+        with:
+          name: lighthouse-results
+          path: |
+            .lighthouseci/
+            lighthouse-results.json
+          retention-days: 30
+
+      - name: Comment PR with Lighthouse scores
+        if: github.event_name == 'pull_request' && always()
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const fs = require('fs');
+            const path = require('path');
+
+            try {
+              // Read Lighthouse results
+              const resultsPath = path.join('.lighthouseci', 'lhr-*.json');
+              const glob = require('glob');
+              const resultFiles = glob.sync(resultsPath);
+
+              if (resultFiles.length === 0) {
+                console.log('No Lighthouse results found');
+                return;
+              }
+
+              const results = resultFiles.map(file => JSON.parse(fs.readFileSync(file, 'utf8')));
+
+              // Calculate average scores
+              const avgScores = {
+                performance: 0,
+                accessibility: 0,
+                'best-practices': 0,
+                seo: 0
+              };
+
+              results.forEach(result => {
+                Object.keys(avgScores).forEach(category => {
+                  avgScores[category] += (result.categories[category]?.score || 0) * 100;
+                });
+              });
+
+              Object.keys(avgScores).forEach(category => {
+                avgScores[category] = Math.round(avgScores[category] / results.length);
+              });
+
+              // Create comment body
+              const scoreEmoji = (score) => {
+                if (score >= 90) return '🟢';
+                if (score >= 70) return '🟡';
+                return '🔴';
+              };
+
+              const comment = `
+              ## 🔦 Lighthouse Performance Report
+
+              | Category | Score | Status |
+              |----------|-------|--------|
+              | Performance | ${avgScores.performance}% | ${scoreEmoji(avgScores.performance)} |
+              | Accessibility | ${avgScores.accessibility}% | ${scoreEmoji(avgScores.accessibility)} |
+              | Best Practices | ${avgScores['best-practices']}% | ${scoreEmoji(avgScores['best-practices'])} |
+              | SEO | ${avgScores.seo}% | ${scoreEmoji(avgScores.seo)} |
+
+              **Overall Performance Score: ${avgScores.performance}%**
+
+              ${avgScores.performance >= 90 ? '✅ Excellent performance!' :
+                avgScores.performance >= 70 ? '⚠️ Performance needs improvement' :
+                '❌ Poor performance detected'}
+
+              ---
+              📊 View detailed report in the [artifacts](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})
+              `;
+
+              // Post comment
+              await github.rest.issues.createComment({
+                issue_number: context.issue.number,
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                body: comment
+              });
+            } catch (error) {
+              console.error('Failed to post comment:', error);
+            }
+
+      - name: Cleanup
+        if: always()
+        run: |
+          if [ -f backend_pid.txt ]; then
+            kill $(cat backend_pid.txt) || true
+          fi
+          if [ -f frontend_pid.txt ]; then
+            kill $(cat frontend_pid.txt) || true
+          fi

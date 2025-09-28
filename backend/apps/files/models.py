@@ -79,6 +79,36 @@ class FileUpload(TimestampMixin, UserTrackingMixin):
 
     tags: CharField = models.CharField("Tags", max_length=500, blank=True)
 
+    # Image-specific fields for thumbnail generation
+
+    width: PositiveIntegerField = models.PositiveIntegerField(
+        "Image width", null=True, blank=True, help_text="Image width in pixels"
+    )
+
+    height: PositiveIntegerField = models.PositiveIntegerField(
+        "Image height", null=True, blank=True, help_text="Image height in pixels"
+    )
+
+    blurhash: CharField = models.CharField(
+        "BlurHash",
+        max_length=100,
+        blank=True,
+        help_text="BlurHash for ultra-fast image placeholders",
+    )
+
+    dominant_color: CharField = models.CharField(
+        "Dominant color",
+        max_length=7,
+        blank=True,
+        help_text="Dominant color as hex value (e.g., #FF5733)",
+    )
+
+    thumbnails: models.JSONField = models.JSONField(
+        "Thumbnails",
+        default=dict,
+        help_text="Generated thumbnail configurations and URLs",
+    )
+
     # Access control
 
     expires_at: DateTimeField = models.DateTimeField(
@@ -184,3 +214,33 @@ class FileUpload(TimestampMixin, UserTrackingMixin):
         from apps.files.services import FileService
 
         return FileService.get_upload_url(self.storage_path, expires_in)
+
+    @property
+    def aspect_ratio(self):  # noqa: C901
+        """Calculate image aspect ratio"""
+        if self.width and self.height:
+            return self.width / self.height
+        return None
+
+    def get_thumbnails_for_config(self, config_hash):  # noqa: C901
+        """Get thumbnail URLs for a specific configuration hash"""
+        return self.thumbnails.get("config_hashes", {}).get(config_hash, {})
+
+    def add_thumbnails_for_config(self, config_hash, thumbnail_urls):  # noqa: C901
+        """Add thumbnail URLs for a specific configuration"""
+        if "config_hashes" not in self.thumbnails:
+            self.thumbnails["config_hashes"] = {}
+
+        self.thumbnails["config_hashes"][config_hash] = thumbnail_urls
+        self.save(update_fields=["thumbnails"])
+
+    def has_thumbnails_for_config(self, config_hash):  # noqa: C901
+        """Check if thumbnails exist for a configuration"""
+        return config_hash in self.thumbnails.get("config_hashes", {})
+
+    def get_all_thumbnail_urls(self):  # noqa: C901
+        """Get all thumbnail URLs across all configurations"""
+        all_urls = []
+        for config_thumbnails in self.thumbnails.get("config_hashes", {}).values():
+            all_urls.extend(config_thumbnails.values())
+        return all_urls

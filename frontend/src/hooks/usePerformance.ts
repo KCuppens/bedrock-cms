@@ -353,3 +353,226 @@ export const useMemoryMonitor = () => {
     isHighMemoryUsage,
   };
 };
+
+/**
+ * Hook to debounce values for better performance
+ */
+export const useDebounce = <T>(value: T, delay: number): T => {
+  const [debouncedValue, setDebouncedValue] = useState<T>(value);
+
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedValue(value);
+    }, delay);
+
+    return () => {
+      clearTimeout(handler);
+    };
+  }, [value, delay]);
+
+  return debouncedValue;
+};
+
+/**
+ * Hook to throttle function calls for better performance
+ */
+export const useThrottle = <T extends (...args: any[]) => void>(
+  fn: T,
+  limit: number
+): T => {
+  const inThrottle = useRef(false);
+
+  return useCallback(
+    ((...args: Parameters<T>) => {
+      if (!inThrottle.current) {
+        fn(...args);
+        inThrottle.current = true;
+        setTimeout(() => {
+          inThrottle.current = false;
+        }, limit);
+      }
+    }) as T,
+    [fn, limit]
+  );
+};
+
+/**
+ * Hook to defer rendering until next tick for better performance
+ */
+export const useDeferredValue = <T>(value: T): T => {
+  const [deferredValue, setDeferredValue] = useState(value);
+
+  useEffect(() => {
+    const handle = setTimeout(() => {
+      setDeferredValue(value);
+    }, 0);
+
+    return () => clearTimeout(handle);
+  }, [value]);
+
+  return deferredValue;
+};
+
+/**
+ * Hook for memoized calculations with dependency tracking
+ */
+export const useMemoizedValue = <T>(
+  factory: () => T,
+  deps: React.DependencyList
+): T => {
+  const memoRef = useRef<{ value: T; deps: React.DependencyList }>();
+
+  if (
+    !memoRef.current ||
+    deps.some((dep, i) => dep !== memoRef.current!.deps[i])
+  ) {
+    memoRef.current = {
+      value: factory(),
+      deps,
+    };
+  }
+
+  return memoRef.current.value;
+};
+
+/**
+ * Hook for component visibility tracking
+ */
+export const useVisibility = () => {
+  const [isVisible, setIsVisible] = useState(true);
+
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      setIsVisible(!document.hidden);
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
+  }, []);
+
+  return isVisible;
+};
+
+/**
+ * Hook for focus management and performance
+ */
+export const useFocusWithin = () => {
+  const [isFocused, setIsFocused] = useState(false);
+  const ref = useRef<HTMLElement>(null);
+
+  useEffect(() => {
+    const element = ref.current;
+    if (!element) return;
+
+    const handleFocusIn = () => setIsFocused(true);
+    const handleFocusOut = (e: FocusEvent) => {
+      if (!element.contains(e.relatedTarget as Node)) {
+        setIsFocused(false);
+      }
+    };
+
+    element.addEventListener('focusin', handleFocusIn);
+    element.addEventListener('focusout', handleFocusOut);
+
+    return () => {
+      element.removeEventListener('focusin', handleFocusIn);
+      element.removeEventListener('focusout', handleFocusOut);
+    };
+  }, []);
+
+  return { ref, isFocused };
+};
+
+/**
+ * Hook for lazy loading images with placeholder support
+ */
+export const useLazyImage = (src: string, placeholder?: string) => {
+  const [imageSrc, setImageSrc] = useState(placeholder || '');
+  const [isLoaded, setIsLoaded] = useState(false);
+  const [isError, setIsError] = useState(false);
+  const imgRef = useRef<HTMLImageElement>(null);
+
+  const { observe } = useIntersectionObserver({
+    threshold: 0.1,
+    rootMargin: '50px',
+  });
+
+  useEffect(() => {
+    if (imgRef.current) {
+      observe(imgRef.current);
+    }
+  }, [observe]);
+
+  const { isIntersecting } = useIntersectionObserver();
+
+  useEffect(() => {
+    if (isIntersecting && src && !isLoaded && !isError) {
+      const img = new Image();
+
+      img.onload = () => {
+        setImageSrc(src);
+        setIsLoaded(true);
+      };
+
+      img.onerror = () => {
+        setIsError(true);
+      };
+
+      img.src = src;
+    }
+  }, [isIntersecting, src, isLoaded, isError]);
+
+  return {
+    imgRef,
+    src: imageSrc,
+    isLoaded,
+    isError,
+  };
+};
+
+/**
+ * Hook for tracking scroll performance
+ */
+export const useScrollPerformance = () => {
+  const [scrollMetrics, setScrollMetrics] = useState({
+    scrollY: 0,
+    scrollDirection: 'up' as 'up' | 'down',
+    scrollSpeed: 0,
+    isScrolling: false,
+  });
+
+  const lastScrollY = useRef(0);
+  const scrollTimeout = useRef<NodeJS.Timeout>();
+
+  const handleScroll = useThrottle(() => {
+    const currentScrollY = window.scrollY;
+    const direction = currentScrollY > lastScrollY.current ? 'down' : 'up';
+    const speed = Math.abs(currentScrollY - lastScrollY.current);
+
+    setScrollMetrics({
+      scrollY: currentScrollY,
+      scrollDirection: direction,
+      scrollSpeed: speed,
+      isScrolling: true,
+    });
+
+    lastScrollY.current = currentScrollY;
+
+    // Clear existing timeout
+    if (scrollTimeout.current) {
+      clearTimeout(scrollTimeout.current);
+    }
+
+    // Set scrolling to false after scroll ends
+    scrollTimeout.current = setTimeout(() => {
+      setScrollMetrics(prev => ({ ...prev, isScrolling: false }));
+    }, 150);
+  }, 16); // ~60fps
+
+  useEffect(() => {
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [handleScroll]);
+
+  return scrollMetrics;
+};

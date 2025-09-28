@@ -16,13 +16,18 @@ from rest_framework.response import Response
 from apps.core.pagination import StandardResultsSetPagination
 from apps.core.permissions import IsOwnerOrAdmin, IsOwnerOrPublic
 
+from .image_processing import ImageProcessor
 from .models import FileUpload
 from .serializers import (
     FileUploadCreateSerializer,
     FileUploadSerializer,
     SignedUrlSerializer,
+    ThumbnailConfigSerializer,
+    ThumbnailGenerationResponseSerializer,
+    ThumbnailStatusSerializer,
 )
 from .services import FileService
+from .tasks import get_thumbnail_generation_status, queue_thumbnail_generation
 
 logger = logging.getLogger(__name__)
 
@@ -423,6 +428,204 @@ class FileUploadViewSet(viewsets.ModelViewSet):
         serializer = self.get_serializer(queryset, many=True)
 
         return Response(serializer.data)
+
+    @extend_schema(
+        summary="Generate thumbnails",
+        description="Generate thumbnails for an image file based on block configuration.",
+        request=ThumbnailConfigSerializer,
+        responses={
+            200: ThumbnailGenerationResponseSerializer,
+            400: "Bad Request",
+            403: "Forbidden",
+            404: "Not Found",
+        },
+    )
+    @action(
+        detail=True,
+        methods=["post"],
+        url_path="generate-thumbnails",
+    )
+    def generate_thumbnails(self, request, pk=None):
+        """Generate thumbnails for an image based on block configuration"""
+        file_upload = self.get_object()
+
+        # Check access permissions
+        if not self._can_access_file(request.user, file_upload):
+            return Response(
+                {"error": "Access denied"}, status=status.HTTP_403_FORBIDDEN
+            )
+
+        # Validate that it's an image file
+        if not file_upload.is_image:
+            return Response(
+                {"error": "File is not an image"}, status=status.HTTP_400_BAD_REQUEST
+            )
+
+        # Validate request data
+        serializer = ThumbnailConfigSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        config = serializer.validated_data
+        processor = ImageProcessor()
+        config_hash = processor.generate_config_hash(config)
+
+        # Check if thumbnails already exist
+        if file_upload.has_thumbnails_for_config(config_hash):
+            existing_urls = file_upload.get_thumbnails_for_config(config_hash)
+            return Response(
+                {
+                    "status": "completed",
+                    "config_hash": config_hash,
+                    "urls": existing_urls,
+                }
+            )
+
+        # Check if generation is in progress
+        generation_status = get_thumbnail_generation_status(
+            str(file_upload.id), config_hash
+        )
+        if generation_status and generation_status.get("status") == "processing":
+            return Response(
+                {
+                    "status": "processing",
+                    "config_hash": config_hash,
+                    "message": "Thumbnail generation is already in progress",
+                }
+            )
+
+        # Queue thumbnail generation
+        try:
+            task_id = queue_thumbnail_generation(
+                str(file_upload.id), config, priority=config.get("priority", False)
+            )
+
+            return Response(
+                {
+                    "status": "processing",
+                    "config_hash": config_hash,
+                    "task_id": task_id,
+                    "message": "Thumbnail generation queued",
+                }
+            )
+
+        except Exception as e:
+            logger.error(
+                f"Failed to queue thumbnail generation for file {file_upload.id}: {e}"
+            )
+            return Response(
+                {"error": "Failed to queue thumbnail generation"},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            )
+
+    @extend_schema(
+        summary="Get thumbnail status",
+        description="Get the status of thumbnail generation for a specific configuration.",
+        responses={
+            200: ThumbnailStatusSerializer,
+            404: "Not Found",
+        },
+    )
+    @action(
+        detail=True,
+        methods=["get"],
+        url_path="thumbnail-status/(?P<config_hash>[a-f0-9]{8})",
+    )
+    def thumbnail_status(self, request, pk=None, config_hash=None):
+        """Get thumbnail generation status for a specific configuration"""
+        file_upload = self.get_object()
+
+        # Check access permissions
+        if not self._can_access_file(request.user, file_upload):
+            return Response(
+                {"error": "Access denied"}, status=status.HTTP_403_FORBIDDEN
+            )
+
+        # Check if thumbnails exist in database
+        if file_upload.has_thumbnails_for_config(config_hash):
+            urls = file_upload.get_thumbnails_for_config(config_hash)
+            return Response(
+                {
+                    "file_id": str(file_upload.id),
+                    "config_hash": config_hash,
+                    "status": "completed",
+                    "urls": urls,
+                }
+            )
+
+        # Check generation status from cache
+        generation_status = get_thumbnail_generation_status(
+            str(file_upload.id), config_hash
+        )
+
+        if generation_status:
+            response_data = {
+                "file_id": str(file_upload.id),
+                "config_hash": config_hash,
+                "status": generation_status.get("status", "unknown"),
+            }
+
+            if "urls" in generation_status:
+                response_data["urls"] = generation_status["urls"]
+
+            if "error" in generation_status:
+                response_data["error"] = generation_status["error"]
+
+            return Response(response_data)
+
+        # No status found
+        return Response(
+            {
+                "file_id": str(file_upload.id),
+                "config_hash": config_hash,
+                "status": "not_found",
+                "message": "No thumbnail generation found for this configuration",
+            }
+        )
+
+    @extend_schema(
+        summary="Get thumbnail URL",
+        description="Get the URL for a specific thumbnail size.",
+    )
+    @action(
+        detail=True,
+        methods=["get"],
+        url_path="thumbnail/(?P<config_hash>[a-f0-9]{8})/(?P<size_name>[^/]+)",
+    )
+    def thumbnail_url(self, request, pk=None, config_hash=None, size_name=None):
+        """Get URL for a specific thumbnail"""
+        file_upload = self.get_object()
+
+        # Check access permissions
+        if not self._can_access_file(request.user, file_upload):
+            return Response(
+                {"error": "Access denied"}, status=status.HTTP_403_FORBIDDEN
+            )
+
+        # Get thumbnails for the configuration
+        thumbnails = file_upload.get_thumbnails_for_config(config_hash)
+
+        if not thumbnails:
+            return Response(
+                {"error": "Thumbnails not found for this configuration"},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+
+        # Look for the specific size
+        thumbnail_url = None
+        for key, url in thumbnails.items():
+            if key == size_name or key.startswith(f"{size_name}_"):
+                thumbnail_url = url
+                break
+
+        if not thumbnail_url:
+            return Response(
+                {"error": f"Thumbnail size '{size_name}' not found"},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+
+        return Response(
+            {"url": thumbnail_url, "size_name": size_name, "config_hash": config_hash}
+        )
 
     @extend_schema(
         summary="Bulk upload files",

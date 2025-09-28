@@ -48,6 +48,12 @@ class FileUploadSerializer(serializers.ModelSerializer):
             "updated_by",
             "updated_by_name",
             "download_url",
+            # Image-specific fields
+            "width",
+            "height",
+            "blurhash",
+            "dominant_color",
+            "thumbnails",
         ]
 
         read_only_fields = [
@@ -67,6 +73,12 @@ class FileUploadSerializer(serializers.ModelSerializer):
             "updated_by",
             "updated_by_name",
             "is_expired",
+            # Image fields (auto-generated)
+            "width",
+            "height",
+            "blurhash",
+            "dominant_color",
+            "thumbnails",
         ]
 
     def get_download_url(self, obj):  # noqa: C901
@@ -145,3 +157,75 @@ class FileStatsSerializer(serializers.Serializer):
     file_types = serializers.DictField()
 
     recent_uploads = serializers.ListField()
+
+
+class ThumbnailSizeSerializer(serializers.Serializer):
+    """Serializer for individual thumbnail size configuration"""
+
+    width = serializers.IntegerField(min_value=1, max_value=3840)
+    height = serializers.IntegerField(min_value=1, max_value=3840, required=False)
+    quality = serializers.IntegerField(min_value=1, max_value=100, default=85)
+
+
+class ThumbnailConfigSerializer(serializers.Serializer):
+    """Serializer for thumbnail generation configuration"""
+
+    sizes = serializers.DictField(
+        child=ThumbnailSizeSerializer(),
+        help_text="Dictionary of size configurations (e.g., {'mobile': {'width': 375, 'quality': 80}})",
+    )
+
+    formats = serializers.ListField(
+        child=serializers.ChoiceField(choices=["webp", "jpeg", "avif"]),
+        default=["webp", "jpeg"],
+        help_text="List of formats to generate",
+    )
+
+    placeholder = serializers.ChoiceField(
+        choices=["blurhash", "dominant-color", "blur"],
+        default="blurhash",
+        required=False,
+        help_text="Type of placeholder to generate",
+    )
+
+    priority = serializers.BooleanField(
+        default=False, help_text="Whether to process with high priority"
+    )
+
+    def validate_sizes(self, value):
+        """Validate thumbnail sizes configuration"""
+        if not value:
+            raise serializers.ValidationError(
+                "At least one size configuration is required"
+            )
+
+        if len(value) > 10:
+            raise serializers.ValidationError("Maximum 10 thumbnail sizes allowed")
+
+        for size_name, size_config in value.items():
+            if not isinstance(size_name, str) or len(size_name) > 50:
+                raise serializers.ValidationError(f"Invalid size name: {size_name}")
+
+        return value
+
+
+class ThumbnailGenerationResponseSerializer(serializers.Serializer):
+    """Serializer for thumbnail generation response"""
+
+    status = serializers.ChoiceField(choices=["processing", "completed", "failed"])
+    config_hash = serializers.CharField(max_length=8)
+    task_id = serializers.CharField(required=False)
+    urls = serializers.DictField(required=False)
+    error = serializers.CharField(required=False)
+
+
+class ThumbnailStatusSerializer(serializers.Serializer):
+    """Serializer for thumbnail generation status"""
+
+    file_id = serializers.UUIDField()
+    config_hash = serializers.CharField(max_length=8)
+    status = serializers.ChoiceField(
+        choices=["processing", "completed", "failed", "not_found"]
+    )
+    urls = serializers.DictField(required=False)
+    error = serializers.CharField(required=False)
