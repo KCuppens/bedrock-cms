@@ -1228,26 +1228,27 @@ class UiMessageViewSet(viewsets.ModelViewSet):
                 status=status.HTTP_404_NOT_FOUND,
             )
 
-        # Get all messages with translations for this locale
+        # Optimized query to get all messages and translations in 2 queries total
+        # First, get all UI messages
+        ui_messages = {msg.id: msg for msg in UiMessage.objects.all()}
 
+        # Then get all approved translations for this locale
+        translations = UiMessageTranslation.objects.filter(
+            locale=locale, status="approved"
+        ).select_related("message")
+
+        # Build the messages dictionary
         messages = {}
+        translated_ids = set()
 
-        for ui_message in UiMessage.objects.all():
+        # Add all translated messages
+        for translation in translations:
+            messages[translation.message.key] = translation.value
+            translated_ids.add(translation.message_id)
 
-            # Try to get translation for this locale
-
-            try:
-
-                translation = UiMessageTranslation.objects.get(
-                    message=ui_message, locale=locale, status="approved"
-                )
-
-                messages[ui_message.key] = translation.value
-
-            except UiMessageTranslation.DoesNotExist:
-
-                # Fall back to default value
-
+        # Add default values for untranslated messages
+        for msg_id, ui_message in ui_messages.items():
+            if msg_id not in translated_ids:
                 messages[ui_message.key] = ui_message.default_value
 
         return Response(messages)

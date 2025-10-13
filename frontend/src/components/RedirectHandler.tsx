@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { useLocation, Navigate } from 'react-router-dom';
 import { api } from '@/lib/api';
 
@@ -6,50 +6,96 @@ interface RedirectHandlerProps {
   children: React.ReactNode;
 }
 
+// Cache for redirect lookups to prevent repeated API calls
+const redirectCache = new Map<string, { redirect: string | null; timestamp: number }>();
+const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
+
+// Pending requests map to prevent duplicate concurrent requests
+const pendingRequests = new Map<string, Promise<any>>();
+
 const RedirectHandler: React.FC<RedirectHandlerProps> = ({ children }) => {
   const location = useLocation();
   const [redirect, setRedirect] = useState<string | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
+  const isMountedRef = useRef(true);
+
+  useEffect(() => {
+    isMountedRef.current = true;
+    return () => {
+      isMountedRef.current = false;
+    };
+  }, []);
 
   useEffect(() => {
     const checkForRedirect = async () => {
+      // Skip dashboard routes entirely
+      if (location.pathname.startsWith('/dashboard')) {
+        return;
+      }
+
+      // Check cache first
+      const cached = redirectCache.get(location.pathname);
+      if (cached && Date.now() - cached.timestamp < CACHE_DURATION) {
+        setRedirect(cached.redirect);
+        return;
+      }
+
+      // Check if there's already a pending request for this path
+      const pendingRequest = pendingRequests.get(location.pathname);
+      if (pendingRequest) {
+        try {
+          const response = await pendingRequest;
+          if (isMountedRef.current) {
+            processRedirectResponse(response);
+          }
+        } catch (error) {
+          // Error already handled by original request
+        }
+        return;
+      }
+
       try {
         setLoading(true);
 
-        // Check if there's a redirect for the current path
-        const response = await api.redirects.list({
-          search: location.pathname
-        });
+        // Create the request promise and store it - use the new public lookup endpoint
+        const requestPromise = api.redirects.lookup(location.pathname);
+        pendingRequests.set(location.pathname, requestPromise);
 
-        if (response.results?.length > 0) {
-          const redirectRule = response.results[0];
+        const response = await requestPromise;
 
-          // Find exact match for source path
-          const exactMatch = response.results.find((rule: any) =>
-            rule.from_path === location.pathname && rule.is_active
-          );
-
-          if (exactMatch && exactMatch.to_path) {
-            setRedirect(exactMatch.to_path);
-            return;
-          }
+        if (isMountedRef.current) {
+          processRedirectResponse(response);
         }
-
-        setRedirect(null);
       } catch (error) {
-        console.error('Failed to check for redirects:', error);
-        setRedirect(null);
+        // Silently fail - redirects are not critical
+        if (isMountedRef.current) {
+          setRedirect(null);
+          // Cache the null result to prevent repeated failed requests
+          redirectCache.set(location.pathname, { redirect: null, timestamp: Date.now() });
+        }
       } finally {
-        setLoading(false);
+        // Clean up pending request
+        pendingRequests.delete(location.pathname);
+        if (isMountedRef.current) {
+          setLoading(false);
+        }
       }
     };
 
-    // Only check for redirects on public routes (not dashboard)
-    if (!location.pathname.startsWith('/dashboard')) {
-      checkForRedirect();
-    } else {
-      setLoading(false);
-    }
+    const processRedirectResponse = (response: { from_path: string; to_path: string; status: number } | null) => {
+      let foundRedirect: string | null = null;
+
+      // New lookup endpoint returns null if no redirect found, or the redirect object
+      if (response && response.to_path) {
+        foundRedirect = response.to_path;
+      }
+
+      setRedirect(foundRedirect);
+      // Cache the result
+      redirectCache.set(location.pathname, { redirect: foundRedirect, timestamp: Date.now() });
+    };
+
+    checkForRedirect();
   }, [location.pathname]);
 
   if (loading) {

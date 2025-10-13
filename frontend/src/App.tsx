@@ -13,6 +13,8 @@ import { TranslationProvider } from "@/contexts/TranslationContext";
 import { ErrorBoundary } from "react-error-boundary";
 import { initPerformanceMonitoring } from "@/utils/performance-monitor";
 import { initMemoryGuard } from "@/utils/memory-guard";
+import { speculationManager } from "@/utils/speculation-rules";
+import { routePreloader } from "@/utils/route-preloader";
 
 // Eager load critical pages
 import Index from "./pages/Index";
@@ -80,8 +82,8 @@ const queryClient = new QueryClient({
   },
 });
 
-// Loading component for lazy loaded routes
-const LoadingSpinner = lazy(() => import("@/components/LoadingSpinner").then(module => ({ default: module.LoadingSpinner })));
+// Import LoadingSpinner normally since it's a simple component
+import { LoadingSpinner } from "@/components/LoadingSpinner";
 
 const AppContent = () => {
   // Initialize memory guard
@@ -109,7 +111,7 @@ const AppContent = () => {
     };
   }, []);
 
-  // Initialize performance monitoring only in development
+  // Initialize performance monitoring and prefetch strategies
   useEffect(() => {
     if (import.meta.env.DEV) {
       const monitor = initPerformanceMonitoring({
@@ -121,6 +123,18 @@ const AppContent = () => {
         monitor.destroy();
       };
     }
+  }, []);
+
+  // Initialize prefetch strategies for better navigation performance
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      // Initialize speculation manager if supported
+      if (speculationManager) {
+        speculationManager.initialize();
+      }
+    }, 2000); // Delay to avoid interfering with initial page load
+
+    return () => clearTimeout(timer);
   }, []);
 
   // Global keyboard shortcuts
@@ -220,12 +234,12 @@ const App = () => (
           <TooltipProvider>
             <Toaster />
             <Sonner />
-            <BrowserRouter>
+            <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
               <AuthProvider>
                 <LocaleProvider>
                   <TranslationProvider
-                    enableAutoSync={import.meta.env.DEV}
-                    reportMissing={true}
+                    enableAutoSync={false}
+                    reportMissing={false}
                     syncInterval={30000}
                   >
                     <AppContent />

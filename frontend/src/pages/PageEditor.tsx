@@ -4,6 +4,7 @@ import { useAutosave } from "@/hooks/useAutosave";
 import { useParams, useNavigate } from "react-router-dom";
 import { api } from '@/lib/api';
 import { useToast } from "@/hooks/use-toast";
+import { usePublishPage, useUnpublishPage } from "@/hooks/queries/use-pages";
 import { DynamicBlockRenderer } from "@/components/blocks/DynamicBlockRenderer";
 import { Page, Block as ApiBlock } from "@/types/api";
 import { Button } from "@/components/ui/button";
@@ -212,6 +213,10 @@ const PageEditor = () => {
   const [blockToDelete, setBlockToDelete] = useState<string | null>(null);
   const [tempBlockSettings, setTempBlockSettings] = useState<Block | null>(null);
   const [isSavingBlockSettings, setIsSavingBlockSettings] = useState(false);
+
+  // React Query mutations
+  const publishMutation = usePublishPage();
+  const unpublishMutation = useUnpublishPage();
 
   // Create autosave function
   const autosaveFunction = useCallback(async (data: PageData) => {
@@ -551,11 +556,36 @@ const PageEditor = () => {
       return null;
     } catch (error: any) {
       console.error('Failed to create block:', error);
-      toast({
-        title: "Block creation failed",
-        description: error?.response?.data?.detail || "Failed to create block",
-        variant: "destructive",
-      });
+
+      // The error is an APIError from our api client
+      if (error.name === 'APIError' || error.name === 'AuthenticationError') {
+        console.error('API Error details:', {
+          status: error.status,
+          data: error.data,
+          message: error.message
+        });
+
+        // Check if it's an authentication error
+        if (error.status === 401) {
+          console.error('Authentication error - user is not logged in or session expired');
+        } else if (error.status === 403) {
+          console.error('Permission error - user lacks required permissions');
+        }
+
+        toast({
+          title: "Block creation failed",
+          description: error.data?.detail || error.message || "Failed to create block",
+          variant: "destructive",
+        });
+      } else {
+        // Fallback for other errors
+        console.error('Unknown error:', error);
+        toast({
+          title: "Block creation failed",
+          description: error?.message || "Failed to create block",
+          variant: "destructive",
+        });
+      }
       return null;
     }
   }, [id, api, toast, mapApiPageToPageData]);
@@ -860,50 +890,50 @@ const PageEditor = () => {
   const handlePublishPage = async () => {
     if (!page || !id) return;
 
-    try {
-      const pageId = parseInt(id);
-      await api.cms.pages.publish(pageId);
-
-      // Update page status locally
-      setPage(prev => prev ? { ...prev, status: 'published' } : null);
-
-      toast({
-        title: "Page published",
-        description: `"${page.title}" has been published successfully.`,
-      });
-    } catch (error: any) {
-      console.error('Failed to publish page:', error);
-      toast({
-        title: "Publish failed",
-        description: error?.response?.data?.detail || "Failed to publish page",
-        variant: "destructive",
-      });
-    }
+    const pageId = parseInt(id);
+    publishMutation.mutate(pageId, {
+      onSuccess: () => {
+        // Update page status locally
+        setPage(prev => prev ? { ...prev, status: 'published' } : null);
+        toast({
+          title: "Page published",
+          description: `"${page.title}" has been published successfully.`,
+        });
+      },
+      onError: (error: any) => {
+        console.error('Failed to publish page:', error);
+        toast({
+          title: "Publish failed",
+          description: error?.response?.data?.detail || "Failed to publish page",
+          variant: "destructive",
+        });
+      }
+    });
   };
 
   // Handle unpublishing a page (set to draft)
   const handleUnpublishPage = async () => {
     if (!page || !id) return;
 
-    try {
-      const pageId = parseInt(id);
-      await api.cms.pages.unpublish(pageId);
-
-      // Update page status locally
-      setPage(prev => prev ? { ...prev, status: 'draft' } : null);
-
-      toast({
-        title: "Page unpublished",
-        description: `"${page.title}" has been set to draft.`,
-      });
-    } catch (error: any) {
-      console.error('Failed to unpublish page:', error);
-      toast({
-        title: "Unpublish failed",
-        description: error?.response?.data?.detail || "Failed to unpublish page",
-        variant: "destructive",
-      });
-    }
+    const pageId = parseInt(id);
+    unpublishMutation.mutate(pageId, {
+      onSuccess: () => {
+        // Update page status locally
+        setPage(prev => prev ? { ...prev, status: 'draft' } : null);
+        toast({
+          title: "Page unpublished",
+          description: `"${page.title}" has been set to draft.`,
+        });
+      },
+      onError: (error: any) => {
+        console.error('Failed to unpublish page:', error);
+        toast({
+          title: "Unpublish failed",
+          description: error?.response?.data?.detail || "Failed to unpublish page",
+          variant: "destructive",
+        });
+      }
+    });
   };
 
   // Handle exporting page as JSON

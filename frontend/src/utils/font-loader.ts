@@ -207,14 +207,15 @@ class FontLoader {
 export const fontLoader = new FontLoader();
 
 // Auto-initialize on page load
-if (typeof window !== 'undefined') {
-  // Use requestIdleCallback for non-critical font loading
-  const loadFonts = () => fontLoader.loadFontsForViewport();
+// DISABLED: Font files don't exist yet
+// if (typeof window !== 'undefined') {
+//   // Use requestIdleCallback for non-critical font loading
+//   const loadFonts = () => fontLoader.loadFontsForViewport();
 
-  if ('requestIdleCallback' in window) {
-    requestIdleCallback(loadFonts, { timeout: 2000 });
-  } else {
-    // Fallback for Safari
-    setTimeout(loadFonts, 100);
-  }
-}
+//   if ('requestIdleCallback' in window) {
+//     requestIdleCallback(loadFonts, { timeout: 2000 });
+//   } else {
+//     // Fallback for Safari
+//     setTimeout(loadFonts, 100);
+//   }
+// }

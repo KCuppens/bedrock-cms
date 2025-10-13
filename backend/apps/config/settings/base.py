@@ -124,7 +124,6 @@ MIDDLEWARE = [
     "waffle.middleware.WaffleMiddleware",
     # Database optimization
     "apps.core.middleware_performance.DatabaseConnectionPoolMiddleware",
-    "apps.core.middleware_performance.QueryCountLimitMiddleware",
     # Heavy middleware at the end
     # Imports that were malformed - commented out
     #     """"apps.accounts.middleware.LastSeenMiddleware","""

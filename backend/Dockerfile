@@ -11,7 +11,11 @@ RUN apt-get update \
     && apt-get install -y --no-install-recommends \
         build-essential \
         libpq-dev \
+        git \
         curl \
+        netcat-traditional \
+        pkg-config \
+        default-libmysqlclient-dev \
     && rm -rf /var/lib/apt/lists/*
 
 # Create app user
@@ -33,8 +37,13 @@ RUN pip install --upgrade pip \
 # Copy project files
 COPY --chown=app:app . .
 
-# Collect static files (can be overridden in docker-compose)
-RUN python manage.py collectstatic --noinput --settings=apps.config.settings.prod || true
+# Create necessary directories and set permissions
+RUN mkdir -p /app/staticfiles /app/mediafiles /app/logs \
+    && chown -R app:app /app/staticfiles /app/mediafiles /app/logs
+
+# Create entrypoint script
+COPY --chown=app:app docker-entrypoint.sh /app/docker-entrypoint.sh
+RUN chmod +x /app/docker-entrypoint.sh
 
 # Switch to non-root user
 USER app
@@ -44,7 +53,10 @@ EXPOSE 8000
 
 # Health check
 HEALTHCHECK --interval=30s --timeout=30s --start-period=5s --retries=3 \
-    CMD curl -f http://localhost:8000/healthz || exit 1
+    CMD curl -f http://localhost:8000/health/ || exit 1
+
+# Set entrypoint
+ENTRYPOINT ["/app/docker-entrypoint.sh"]
 
 # Default command
-CMD ["gunicorn", "--bind", "0.0.0.0:8000", "--workers", "4", "apps.config.wsgi:application"]
+CMD ["gunicorn", "--bind", "0.0.0.0:8000", "--workers", "4", "--worker-class", "sync", "--max-requests", "1000", "--max-requests-jitter", "100", "--preload", "--access-logfile", "-", "--error-logfile", "-", "apps.config.wsgi:application"]

@@ -103,53 +103,6 @@ class PerformanceMonitoringMiddleware(MiddlewareMixin):
         return response
 
 
-class QueryCountLimitMiddleware(MiddlewareMixin):
-    """Middleware to prevent N+1 queries by limiting query count."""
-
-    MAX_QUERIES = 15  # Maximum queries per request - reduced for better performance
-
-    def process_request(self, request):
-        """Reset query count."""
-
-        request._query_count_start = len(connection.queries)
-
-        return None
-
-    def process_response(self, request, response):
-        """Check query count."""
-
-        if not hasattr(request, "_query_count_start"):
-
-            return response
-
-        query_count = len(connection.queries) - request._query_count_start
-
-        # Log excessive queries
-
-        if query_count > self.MAX_QUERIES:
-
-            logger.error(
-                f"Excessive queries: {request.method} {request.path} "
-                f"executed {query_count} queries (limit: {self.MAX_QUERIES})"
-            )
-
-            # In debug mode, return error response
-
-            if settings.DEBUG:
-
-                return JsonResponse(
-                    {
-                        "error": "Query limit exceeded",
-                        "query_count": query_count,
-                        "limit": self.MAX_QUERIES,
-                        "path": request.path,
-                    },
-                    status=500,
-                )
-
-        return response
-
-
 class CacheHitRateMiddleware(MiddlewareMixin):
     """Middleware to track cache hit rates."""
 

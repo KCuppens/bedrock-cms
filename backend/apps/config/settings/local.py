@@ -49,6 +49,12 @@ CORS_ALLOWED_ORIGINS = [
     "http://127.0.0.1:8082",
     "http://localhost:8084",  # Alternative Vite port
     "http://127.0.0.1:8084",
+    "http://localhost:8085",  # Alternative Vite port
+    "http://127.0.0.1:8085",
+    "http://localhost:8086",  # Alternative Vite port
+    "http://127.0.0.1:8086",
+    "http://localhost:8087",  # Alternative Vite port
+    "http://127.0.0.1:8087",
     "http://localhost:8088",  # Current Vite port
     "http://127.0.0.1:8088",
 ]
@@ -64,6 +70,7 @@ CORS_ALLOW_HEADERS = [
     "content-type",
     "x-csrftoken",
     "x-requested-with",
+    "x-request-id",  # Request tracking header
     # Custom permission context headers
     "x-locale",
     "x-user-scopes",
@@ -86,13 +93,23 @@ CSRF_TRUSTED_ORIGINS = [
     "http://127.0.0.1:8082",
     "http://localhost:8084",
     "http://127.0.0.1:8084",
+    "http://localhost:8085",
+    "http://127.0.0.1:8085",
+    "http://localhost:8086",
+    "http://127.0.0.1:8086",
+    "http://localhost:8087",
+    "http://127.0.0.1:8087",
     "http://localhost:8088",
     "http://127.0.0.1:8088",
 ]
 
 CSRF_COOKIE_SAMESITE = "Lax"
-
 CSRF_COOKIE_HTTPONLY = False  # Allow JavaScript to read the cookie
+
+# Session cookie settings for development
+SESSION_COOKIE_SAMESITE = "Lax"
+SESSION_COOKIE_HTTPONLY = True  # Keep session cookies secure
+SESSION_COOKIE_DOMAIN = None  # Allow cookies to work across localhost ports
 
 
 # Static files (CSS, JavaScript, Images)
@@ -157,8 +174,16 @@ SESSION_ENGINE = "django.contrib.sessions.backends.db"
 
 # Frontend URL for redirects
 
-FRONTEND_URL = env.str("FRONTEND_URL", default="http://localhost:8082")  # noqa: F405
+FRONTEND_URL = env.str("FRONTEND_URL", default="http://localhost:8087")  # noqa: F405
 
+# Django authentication redirects
+LOGIN_URL = (
+    f"{env.str('FRONTEND_URL', default='http://localhost:8087')}/sign-in"  # noqa: F405
+)
+LOGIN_REDIRECT_URL = f"{env.str('FRONTEND_URL', default='http://localhost:8087')}/dashboard"  # noqa: F405
+LOGOUT_REDIRECT_URL = (
+    f"{env.str('FRONTEND_URL', default='http://localhost:8087')}/sign-in"  # noqa: F405
+)
 
 # Override Allauth to send password reset emails to frontend
 

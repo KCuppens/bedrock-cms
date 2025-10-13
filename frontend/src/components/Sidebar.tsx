@@ -180,7 +180,7 @@ const Sidebar = memo(() => {
   useEffect(() => {
     const fetchVersionInfo = async () => {
       try {
-        const response = await fetch('http://localhost:8000/api/v1/system/version/');
+        const response = await fetch(`${window.location.origin}/api/v1/system/version/`);
         if (response.ok) {
           const data = await response.json();
           setVersionInfo(data);

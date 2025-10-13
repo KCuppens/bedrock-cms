@@ -23,7 +23,7 @@ export interface AuthContextType {
 }
 
 // Secure session management - no localStorage for sensitive data
-const SESSION_CHECK_INTERVAL = 60000; // Check session every minute
+const SESSION_CHECK_INTERVAL = 300000; // Check session every 5 minutes
 
 export const useAuthState = (): AuthContextType => {
   const [user, setUser] = useState<User | null>(null);

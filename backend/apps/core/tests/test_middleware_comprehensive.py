@@ -6,7 +6,6 @@ Tests all middleware in apps.core.middleware and apps.core.middleware_performanc
 - AdminIPAllowlistMiddleware IP filtering and CIDR support
 - DemoModeMiddleware HTML injection
 - PerformanceMonitoringMiddleware request timing and query tracking
-- QueryCountLimitMiddleware N+1 query prevention
 - CacheHitRateMiddleware cache statistics
 - DatabaseConnectionPoolMiddleware connection management
 - RequestThrottlingMiddleware rate limiting
@@ -62,7 +61,6 @@ from apps.core.middleware_performance import (
     CompressionMiddleware,
     DatabaseConnectionPoolMiddleware,
     PerformanceMonitoringMiddleware,
-    QueryCountLimitMiddleware,
     RequestThrottlingMiddleware,
 )
 
@@ -655,106 +653,6 @@ class PerformanceMonitoringMiddlewareTests(MiddlewareTestBase):
             self.assertAlmostEqual(second_call[0][1]["avg_time"], 0.75, places=2)
 
 
-class QueryCountLimitMiddlewareTests(MiddlewareTestBase):
-    """Tests for QueryCountLimitMiddleware."""
-
-    def setUp(self):
-        super().setUp()
-        self.middleware = QueryCountLimitMiddleware(self.get_response)
-
-    def test_normal_query_count(self):
-        """Test normal query count within limits."""
-        request = self.create_request()
-
-        # Mock normal query count
-        mock_connection = Mock()
-        mock_connection.queries = [{"sql": "SELECT 1"} for _ in range(5)]
-
-        with patch("apps.core.middleware_performance.connection", mock_connection):
-            request._query_count_start = 0
-            response = self.middleware.process_response(request, HttpResponse("OK"))
-
-        # Should not interfere
-        self.assertEqual(response.status_code, 200)
-
-    def test_excessive_query_count_production(self):
-        """Test excessive query count in production."""
-        request = self.create_request()
-
-        # Mock excessive queries (more than MAX_QUERIES)
-        excessive_queries = [{"sql": "SELECT 1"} for _ in range(20)]
-        mock_connection = Mock()
-        mock_connection.queries = excessive_queries
-
-        with (
-            patch("apps.core.middleware_performance.connection", mock_connection),
-            patch("apps.core.middleware_performance.logger") as mock_logger,
-            override_settings(DEBUG=False),
-        ):
-
-            request._query_count_start = 0
-            response = self.middleware.process_response(request, HttpResponse("OK"))
-
-            # Should log error but not return error response
-            mock_logger.error.assert_called_once()
-            self.assertEqual(response.status_code, 200)
-
-    @override_settings(DEBUG=True)
-    def test_excessive_query_count_debug(self):
-        """Test excessive query count in debug mode."""
-        request = self.create_request("/debug-page/")
-
-        # Mock excessive queries
-        excessive_queries = [{"sql": "SELECT 1"} for _ in range(20)]
-        mock_connection = Mock()
-        mock_connection.queries = excessive_queries
-
-        with (
-            patch("apps.core.middleware_performance.connection", mock_connection),
-            patch("apps.core.middleware_performance.logger") as mock_logger,
-        ):
-
-            request._query_count_start = 0
-            response = self.middleware.process_response(request, HttpResponse("OK"))
-
-            # Should return error response in debug mode
-            self.assertIsInstance(response, JsonResponse)
-            self.assertEqual(response.status_code, 500)
-
-            # Check error response content
-            data = json.loads(response.content)
-            self.assertEqual(data["error"], "Query limit exceeded")
-            self.assertEqual(data["query_count"], 20)
-            self.assertEqual(data["limit"], 15)
-            self.assertEqual(data["path"], "/debug-page/")
-
-    def test_no_start_count_handling(self):
-        """Test handling when request has no query count start."""
-        request = self.create_request()
-        # Don't set _query_count_start
-
-        response = self.middleware.process_response(request, HttpResponse("OK"))
-
-        # Should not interfere
-        self.assertEqual(response.status_code, 200)
-
-    def test_query_limit_boundary(self):
-        """Test query count at exact limit."""
-        request = self.create_request()
-
-        # Mock exactly MAX_QUERIES queries
-        exact_limit_queries = [{"sql": "SELECT 1"} for _ in range(15)]
-        mock_connection = Mock()
-        mock_connection.queries = exact_limit_queries
-
-        with patch("apps.core.middleware_performance.connection", mock_connection):
-            request._query_count_start = 0
-            response = self.middleware.process_response(request, HttpResponse("OK"))
-
-        # Should not trigger limit
-        self.assertEqual(response.status_code, 200)
-
-
 class CacheHitRateMiddlewareTests(MiddlewareTestBase):
     """Tests for CacheHitRateMiddleware."""
 
@@ -1331,21 +1229,18 @@ class MiddlewareOrderingTests(MiddlewareTestBase):
     def test_performance_monitoring_order(self):
         """Test PerformanceMonitoringMiddleware timing accuracy."""
         middleware1 = PerformanceMonitoringMiddleware(self.get_response)
-        middleware2 = QueryCountLimitMiddleware(self.get_response)
 
         request = self.create_request()
 
-        # Process request through both middlewares
+        # Process request through middleware
         middleware1.process_request(request)
-        middleware2.process_request(request)
 
         with patch("time.time", side_effect=[1.0]):
-            # Process response back through middlewares (reverse order)
+            # Process response back through middleware
             response = HttpResponse("OK")
-            response = middleware2.process_response(request, response)
             response = middleware1.process_response(request, response)
 
-        # Should have performance headers from first middleware
+        # Should have performance headers from middleware
         self.assertIn("X-Response-Time", response)
 
     def test_throttling_before_processing(self):

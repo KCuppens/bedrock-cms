@@ -22,10 +22,7 @@ from django.db import connection
 from django.http import HttpResponse, JsonResponse
 from django.test import RequestFactory, TestCase, override_settings
 
-from apps.core.middleware_performance import (
-    PerformanceMonitoringMiddleware,
-    QueryCountLimitMiddleware,
-)
+from apps.core.middleware_performance import PerformanceMonitoringMiddleware
 
 
 class FixedMiddlewareTests(TestCase):

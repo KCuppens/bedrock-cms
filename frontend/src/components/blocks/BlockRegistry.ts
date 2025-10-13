@@ -57,12 +57,39 @@ export class BlockRegistry {
   async getComponent(componentName: string): Promise<ComponentType<BlockComponentProps> | null> {
     console.log(`[BlockRegistry] Getting component: ${componentName}`);
 
-    if (!this.components.has(componentName)) {
-      console.warn(`[BlockRegistry] Component ${componentName} not in registry`);
-      console.log('[BlockRegistry] Available components:', Array.from(this.components.keys()));
-      return null;
+    // First try exact match
+    if (this.components.has(componentName)) {
+      return this.loadComponent(componentName);
     }
 
+    // Try case-insensitive match
+    const lowercaseName = componentName.toLowerCase();
+    const matchingKey = Array.from(this.components.keys()).find(key => key.toLowerCase() === lowercaseName);
+
+    if (matchingKey) {
+      console.log(`[BlockRegistry] Found case-insensitive match: ${componentName} -> ${matchingKey}`);
+      return this.loadComponent(matchingKey);
+    }
+
+    // Try common camelCase to lowercase transformations
+    const transformedNames = [
+      componentName.replace(/([A-Z])/g, (match, p1) => p1.toLowerCase()), // richText -> richtext
+      componentName.replace(/([a-z])([A-Z])/g, '$1_$2').toLowerCase(), // richText -> rich_text
+    ];
+
+    for (const transformedName of transformedNames) {
+      if (this.components.has(transformedName)) {
+        console.log(`[BlockRegistry] Found transformed match: ${componentName} -> ${transformedName}`);
+        return this.loadComponent(transformedName);
+      }
+    }
+
+    console.warn(`[BlockRegistry] Component ${componentName} not found in registry`);
+    console.log('[BlockRegistry] Available components:', Array.from(this.components.keys()));
+    return null;
+  }
+
+  private async loadComponent(componentName: string): Promise<ComponentType<BlockComponentProps> | null> {
     // Return cached component if already loaded
     if (this.loadedComponents.has(componentName)) {
       console.log(`[BlockRegistry] Returning cached component: ${componentName}`);

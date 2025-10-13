@@ -1,3 +1,6 @@
+// Import request deduplication utilities
+import { optimizedFetch } from '@/utils/request-deduplication';
+
 // Custom error classes for better error handling
 export class APIError extends Error {
   constructor(
@@ -217,8 +220,8 @@ class ApiClient {
     }
 
     try {
-      // Use the full URL with the backend base URL
-      const response = await fetch('http://localhost:8000/auth/csrf/', {
+      // Use the correct backend base URL
+      const response = await fetch(`${this.baseURL}/auth/csrf/`, {
         method: 'GET',
         credentials: 'include',
       });
@@ -308,7 +311,10 @@ class ApiClient {
     }
 
     try {
-      const response = await fetch(fullUrl.toString(), config);
+      // Use optimized fetch with deduplication for GET requests
+      const response = method === 'GET'
+        ? await optimizedFetch(fullUrl.toString(), config)
+        : await fetch(fullUrl.toString(), config);
 
       if (!response.ok) {
         // Handle different error types
@@ -844,6 +850,46 @@ class ApiClient {
 
     validate: (): Promise<ApiResponse<{ total_redirects: number; issues_found: number; issues: any[] }>> =>
       this.request({ method: 'POST', url: '/api/v1/redirects/validate/' }),
+
+    /**
+     * Public endpoint to lookup a redirect by path.
+     * This endpoint does NOT send authentication headers and is heavily cached.
+     * Optimized for performance with minimal overhead.
+     */
+    lookup: async (path: string): Promise<{ from_path: string; to_path: string; status: number } | null> => {
+      try {
+        // Build URL without baseURL to use Vite proxy or relative path
+        const fullUrl = this.baseURL
+          ? new URL(`/api/v1/redirects/lookup/?path=${encodeURIComponent(path)}`, this.baseURL)
+          : new URL(`/api/v1/redirects/lookup/?path=${encodeURIComponent(path)}`, window.location.origin);
+
+        // Make request WITHOUT authentication headers for truly public access
+        const response = await fetch(fullUrl.toString(), {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          // No credentials to avoid CORS preflight and authentication overhead
+          credentials: 'omit',
+        });
+
+        if (response.status === 404) {
+          // No redirect found
+          return null;
+        }
+
+        if (!response.ok) {
+          console.error('Redirect lookup failed:', response.status, response.statusText);
+          return null;
+        }
+
+        return await response.json();
+      } catch (error) {
+        // Silently fail - redirects are not critical
+        console.error('Redirect lookup error:', error);
+        return null;
+      }
+    },
   };
 
   // Analytics API

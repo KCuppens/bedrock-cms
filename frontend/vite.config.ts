@@ -36,7 +36,7 @@ const seoRedirectHandler = (): Plugin => ({
       // Check if it's a sitemap or robots.txt request
       if (url?.match(/^\/sitemap(-.*)?\.xml$/) || url === '/robots.txt') {
         // Proxy these requests directly to the backend
-        const backendUrl = `http://localhost:8082${url}`;
+        const backendUrl = `http://localhost:8001${url}`;
 
         fetch(backendUrl)
           .then(backendRes => {
@@ -68,31 +68,31 @@ export default defineConfig(({ mode }) => ({
     proxy: {
       // Proxy API requests to backend
       '/api': {
-        target: 'http://localhost:8082',
+        target: 'http://localhost:8001',
         changeOrigin: true,
         secure: false,
       },
       // Proxy auth requests to backend
       '/auth': {
-        target: 'http://localhost:8082',
+        target: 'http://localhost:8001',
         changeOrigin: true,
         secure: false,
       },
       // Proxy admin requests to backend
       '/admin': {
-        target: 'http://localhost:8082',
+        target: 'http://localhost:8001',
         changeOrigin: true,
         secure: false,
       },
       // Proxy sitemap requests to backend
       '/sitemap*.xml': {
-        target: 'http://localhost:8082',
+        target: 'http://localhost:8001',
         changeOrigin: true,
         secure: false,
       },
       // Proxy robots.txt to backend
       '/robots.txt': {
-        target: 'http://localhost:8082',
+        target: 'http://localhost:8001',
         changeOrigin: true,
         secure: false,
       },

@@ -38,7 +38,7 @@ export const TranslationProvider: React.FC<TranslationProviderProps> = ({
   // Fetch translation bundle for current locale
   const fetchTranslations = useCallback(async () => {
     const abortController = new AbortController();
-    const timeoutId = setTimeout(() => abortController.abort(), 5000); // 5 second timeout
+    const timeoutId = setTimeout(() => abortController.abort(), 15000); // 15 second timeout for slower connections
 
     try {
       setIsLoading(true);

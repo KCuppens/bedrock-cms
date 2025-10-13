@@ -77,20 +77,6 @@ class MiddlewareConfigurationTests(TestCase):
                 "DatabaseConnectionPool should be later in the stack",
             )
 
-        # Query count limit should be near the end
-        query_limit_idx = None
-        for i, middleware in enumerate(middleware_list):
-            if "QueryCountLimitMiddleware" in middleware:
-                query_limit_idx = i
-                break
-
-        if query_limit_idx is not None:
-            self.assertGreater(
-                query_limit_idx,
-                len(middleware_list) // 2,
-                "QueryCountLimitMiddleware should be later in the stack",
-            )
-
     def test_middleware_dependencies(self):
         """Test middleware dependency requirements."""
         from apps.config.settings import base
@@ -176,7 +162,6 @@ class MiddlewareConfigurationTests(TestCase):
         self.assertIn("PerformanceMonitoringMiddleware", middleware_str)
         self.assertIn("CacheHitRateMiddleware", middleware_str)
         self.assertIn("DatabaseConnectionPoolMiddleware", middleware_str)
-        self.assertIn("QueryCountLimitMiddleware", middleware_str)
 
     def test_security_middleware_configuration(self):
         """Test security middleware configuration."""

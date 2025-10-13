@@ -14,6 +14,15 @@
     <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
     <link rel="manifest" href="/site.webmanifest" />
 
+    <!-- Performance Resource Hints -->
+    <link rel="preconnect" href="http://localhost:8082" crossorigin>
+    <link rel="dns-prefetch" href="//localhost">
+    <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
+    <link rel="dns-prefetch" href="//fonts.gstatic.com">
+
+    <!-- Only preload the main entry point -->
+    <link rel="modulepreload" href="/src/main.tsx">
+
     <!-- Theme Color for mobile browsers -->
     <meta name="theme-color" content="#0f172a" />
     <meta name="msapplication-TileColor" content="#0f172a" />

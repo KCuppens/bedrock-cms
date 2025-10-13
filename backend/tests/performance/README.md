@@ -387,9 +387,9 @@ Add performance tests to your CI pipeline:
 The framework integrates with Django's existing performance monitoring:
 
 - Uses `PerformanceMonitoringMiddleware` for request tracking
-- Leverages `QueryCountLimitMiddleware` for database monitoring
 - Integrates with cache hit rate tracking
 - Provides memory usage monitoring
+- Database connection pool management
 
 ## Troubleshooting
 

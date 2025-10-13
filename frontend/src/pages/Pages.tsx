@@ -8,6 +8,15 @@ import { Page as ApiPage, PageCreateRequest, Locale, PageRevision } from "@/type
 import { toast } from "sonner";
 import { useTranslation } from "@/contexts/TranslationContext";
 import { useLocale } from "@/contexts/LocaleContext";
+import {
+  usePages,
+  usePublishPage,
+  useUnpublishPage,
+  useDeletePage,
+  useDuplicatePage,
+  useCreatePage,
+  useUpdatePage
+} from "@/hooks/queries/use-pages";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -270,7 +279,10 @@ const SortableRow = memo<SortableRowProps>(({ page, isSelected, onSelect, onOpen
               <Eye className="w-4 h-4 mr-2" />
               Preview
             </DropdownMenuItem>
-            <DropdownMenuItem onClick={handleNavigate}>
+            <DropdownMenuItem onClick={(e) => {
+              e.stopPropagation();
+              onNavigate(page.id);
+            }}>
               <ExternalLink className="w-4 h-4 mr-2" />
               Inline Edit
             </DropdownMenuItem>
@@ -514,9 +526,7 @@ const Pages = memo(() => {
   const navigate = useNavigate();
   const { t } = useTranslation();
   const { currentLocale } = useLocale();
-  const [pages, setPages] = useState<Page[]>([]);
   const [locales, setLocales] = useState<Locale[]>([]);
-  const [loading, setLoading] = useState(true);
 
   // Component-level memory management
   const abortControllerRef = useRef<AbortController>(new AbortController());
@@ -532,10 +542,44 @@ const Pages = memo(() => {
     };
   }, []);
 
+  // Filters
   const [selectedPages, setSelectedPages] = useState<string[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [localeFilter, setLocaleFilter] = useState<string>(currentLocale?.code || "all");
+
+  // React Query hooks for pages
+  const { data: pagesData = [], isLoading: loading } = usePages({
+    locale: localeFilter !== "all" ? localeFilter : undefined,
+    status: statusFilter !== "all" ? statusFilter : undefined,
+    search: searchQuery || undefined,
+  });
+
+  // Mutations
+  const publishMutation = usePublishPage();
+  const unpublishMutation = useUnpublishPage();
+  const deleteMutation = useDeletePage();
+  const duplicateMutation = useDuplicatePage();
+  const createMutation = useCreatePage();
+  const updateMutation = useUpdatePage();
+
+  // Transform API pages to include display fields
+  const pages = useMemo(() => {
+    return pagesData.map((page: ApiPage) => ({
+      ...page,
+      id: page.id.toString(), // Convert to string for consistency
+      parentId: page.parent ? page.parent.toString() : undefined, // Map backend 'parent' to frontend 'parentId'
+      locale: typeof page.locale === 'object' ? page.locale.code : page.locale,
+      updatedBy: (page as any).updated_by_name || (page as any).updated_by || '',
+      internalLinks: 0, // TODO: Get from API
+      incomingLinks: 0, // TODO: Get from API
+      level: 0, // Will be calculated in hierarchy
+      inMainMenu: (page as any).in_main_menu || (page as any).inMainMenu || false,
+      inFooter: (page as any).in_footer || (page as any).inFooter || false,
+      isHomepage: (page as any).is_homepage || page.path === '/' || page.slug === ''
+    }));
+  }, [pagesData]);
+
   const [selectedPage, setSelectedPage] = useState<Page | null>(null);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [expandedPages, setExpandedPages] = useState<string[]>([]);
@@ -636,71 +680,6 @@ const Pages = memo(() => {
     loadLocales();
   }, [loadLocales]);
 
-  // Load pages when filters change or on mount
-  useEffect(() => {
-    const abortController = new AbortController();
-
-    const fetchPages = async () => {
-      if (!isMountedRef.current) return;
-
-      try {
-        safeSetState(setLoading)(true);
-        const filters: any = {};
-
-        if (searchQuery) {
-          filters.q = searchQuery;
-        }
-        if (statusFilter !== 'all') {
-          filters.status = statusFilter;
-        }
-        if (localeFilter !== 'all') {
-          filters.locale = localeFilter;
-        }
-
-        const response = await api.request({
-          method: 'GET',
-          url: '/api/v1/cms/pages/',
-          params: filters,
-          signal: abortController.signal
-        });
-
-        if (!isMountedRef.current || abortController.signal.aborted) return;
-
-        const pagesData = response.results || [];
-
-        // Transform API pages to include display fields
-        const transformedPages: Page[] = pagesData.map((page: ApiPage) => ({
-          ...page,
-          id: page.id.toString(), // Convert to string for consistency
-          parentId: page.parent ? page.parent.toString() : undefined, // Map backend 'parent' to frontend 'parentId'
-          locale: typeof page.locale === 'object' ? page.locale.code : page.locale,
-          updatedBy: (page as any).updated_by_name || (page as any).updated_by || '',
-          internalLinks: 0, // TODO: Get from API
-          incomingLinks: 0, // TODO: Get from API
-          level: 0, // Will be calculated in hierarchy
-          inMainMenu: (page as any).in_main_menu || (page as any).inMainMenu || false,
-          inFooter: (page as any).in_footer || (page as any).inFooter || false,
-          isHomepage: (page as any).is_homepage || page.path === '/' || page.slug === ''
-        }));
-
-        safeSetState(setPages)(transformedPages);
-      } catch (error: any) {
-        if (error.name === 'AbortError' || !isMountedRef.current) return;
-        toast.error(t('pages.errors.load_failed', 'Failed to load pages'));
-        console.error(error);
-      } finally {
-        if (!abortController.signal.aborted && isMountedRef.current) {
-          safeSetState(setLoading)(false);
-        }
-      }
-    };
-
-    fetchPages();
-
-    return () => {
-      abortController.abort();
-    };
-  }, [searchQuery, statusFilter, localeFilter, safeSetState, t]);
 
   // Update locale filter when current locale changes
   useEffect(() => {
@@ -717,79 +696,6 @@ const Pages = memo(() => {
     }
   }, [locales]); // Removed newPageForm.locale to prevent infinite loop
 
-  // Define loadPages function for manual refresh
-  const loadPages = useCallback(async () => {
-    try {
-      setLoading(true);
-      const filters: any = {};
-
-      if (searchQuery) {
-        filters.q = searchQuery;
-      }
-      if (statusFilter !== 'all') {
-        filters.status = statusFilter;
-      }
-      if (localeFilter !== 'all') {
-        filters.locale = localeFilter;
-      }
-
-      const response = await api.cms.pages.list(filters);
-      const pagesData = response.results || [];
-
-      // Transform API pages to include display fields
-      const transformedPages: Page[] = pagesData.map((page: ApiPage) => ({
-        ...page,
-        id: page.id.toString(), // Convert to string for consistency
-        parentId: page.parent ? page.parent.toString() : undefined, // Map backend 'parent' to frontend 'parentId'
-        locale: typeof page.locale === 'object' ? page.locale.code : page.locale,
-        updatedBy: (page as any).updated_by_name || (page as any).updated_by || '',
-        internalLinks: 0, // TODO: Get from API
-        incomingLinks: 0, // TODO: Get from API
-        level: 0, // Will be calculated in hierarchy
-        inMainMenu: (page as any).in_main_menu || (page as any).inMainMenu || false,
-        inFooter: (page as any).in_footer || (page as any).inFooter || false,
-        isHomepage: (page as any).is_homepage || page.path === '/' || page.slug === ''
-      }));
-
-      // Group pages by parent and sort each group by position
-      const pagesByParent = new Map<string | undefined, Page[]>();
-
-      // Group pages by parent
-      transformedPages.forEach(page => {
-        const parentKey = page.parentId || 'ROOT';
-        if (!pagesByParent.has(parentKey)) {
-          pagesByParent.set(parentKey, []);
-        }
-        pagesByParent.get(parentKey)!.push(page);
-      });
-
-      // Sort each group by position
-      pagesByParent.forEach((pages, parentKey) => {
-        pages.sort((a, b) => (a.position || 0) - (b.position || 0));
-      });
-
-      // Build final sorted array: ROOT pages first, then child pages
-      const sortedPages: Page[] = [];
-
-      // Add root pages first (sorted by position)
-      const rootPages = pagesByParent.get('ROOT') || [];
-      sortedPages.push(...rootPages);
-
-      // Add child pages (sorted by position within each parent)
-      pagesByParent.forEach((pages, parentKey) => {
-        if (parentKey !== 'ROOT') {
-          sortedPages.push(...pages);
-        }
-      });
-
-      setPages(sortedPages);
-    } catch (error) {
-      toast.error('Failed to load pages');
-      console.error(error);
-    } finally {
-      setLoading(false);
-    }
-  }, [searchQuery, statusFilter, localeFilter])
 
   const sensors = useSensors(
     useSensor(PointerSensor),
@@ -897,29 +803,30 @@ const Pages = memo(() => {
         is_homepage: newPageForm.isHomepage
       };
 
-      await api.cms.pages.create(createRequest);
-      toast.success(t('pages.success.created', 'Page created successfully'));
-
-      // Defer state updates to next tick to avoid React batching issues
-      setTimeout(() => {
-        setNewPageModalOpen(false);
-        setNewPageForm({
-          title: "",
-          slug: "",
-          parentId: "none",
-          locale: locales.find(l => l.is_default)?.code || "",
-          status: "draft",
-          inMainMenu: false,
-          inFooter: false,
-          isHomepage: false
-        });
-        setIsCreatingPage(false);
-      }, 0);
-
-      // Load pages after a slight delay to ensure dialog closes smoothly
-      setTimeout(() => {
-        loadPages();
-      }, 100);
+      createMutation.mutate(createRequest, {
+        onSuccess: () => {
+          // Defer state updates to next tick to avoid React batching issues
+          setTimeout(() => {
+            setNewPageModalOpen(false);
+            setNewPageForm({
+              title: "",
+              slug: "",
+              parentId: "none",
+              locale: locales.find(l => l.is_default)?.code || "",
+              status: "draft",
+              scheduledPublishAt: "",
+              scheduledUnpublishAt: "",
+              inMainMenu: false,
+              inFooter: false,
+              isHomepage: false
+            });
+            setIsCreatingPage(false);
+          }, 0);
+        },
+        onError: () => {
+          setIsCreatingPage(false);
+        }
+      });
     } catch (error) {
       toast.error(t('pages.errors.create_failed', 'Failed to create page'));
       console.error(error);
@@ -928,23 +835,16 @@ const Pages = memo(() => {
   }, [newPageForm, locales]);
 
   const handleDuplicatePage = useCallback(async (page: Page) => {
-    try {
-      const duplicatedPage = await api.cms.pages.duplicate(page.id);
-
-      // The API returns the page object directly
-      if (duplicatedPage && duplicatedPage.title) {
-        toast.success(t('pages.success.duplicated_as', `Page duplicated as "${duplicatedPage.title}"`));
-      } else {
-        toast.success(t('pages.success.duplicated', 'Page duplicated successfully'));
+    duplicateMutation.mutate(page.id, {
+      onSuccess: (duplicatedPage) => {
+        if (duplicatedPage?.title) {
+          toast.success(t('pages.success.duplicated_as', `Page duplicated as "${duplicatedPage.title}"`));
+        } else {
+          toast.success(t('pages.success.duplicated', 'Page duplicated successfully'));
+        }
       }
-
-      // Reload pages to show the new duplicate
-      loadPages();
-    } catch (error) {
-      toast.error(t('pages.errors.duplicate_failed', 'Failed to duplicate page'));
-      console.error(error);
-    }
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+    });
+  }, [duplicateMutation, t]);
 
   // Memoized preview handler to prevent function recreation
   const handlePreviewPage = useCallback((page: Page) => {
@@ -956,41 +856,34 @@ const Pages = memo(() => {
 
   // Handle publishing a page
   const handlePublishPage = useCallback(async (page: Page) => {
-    try {
-      await api.cms.pages.publish(parseInt(page.id));
-      toast.success(t('pages.success.published', `Page "${page.title}" published successfully`));
-      loadPages(); // Reload to show updated status
-    } catch (error) {
-      toast.error(t('pages.errors.publish_failed', 'Failed to publish page'));
-      console.error(error);
-    }
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+    publishMutation.mutate(parseInt(page.id), {
+      onSuccess: () => {
+        toast.success(t('pages.success.published', `Page "${page.title}" published successfully`));
+      }
+    });
+  }, [publishMutation, t]);
 
   // Handle unpublishing a page
   const handleUnpublishPage = useCallback(async (page: Page) => {
-    try {
-      await api.cms.pages.unpublish(parseInt(page.id));
-      toast.success(t('pages.success.unpublished', `Page "${page.title}" unpublished successfully`));
-      loadPages(); // Reload to show updated status
-    } catch (error) {
-      toast.error(t('pages.errors.unpublish_failed', 'Failed to unpublish page'));
-      console.error(error);
-    }
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+    unpublishMutation.mutate(parseInt(page.id), {
+      onSuccess: () => {
+        toast.success(t('pages.success.unpublished', `Page "${page.title}" unpublished successfully`));
+      }
+    });
+  }, [unpublishMutation, t]);
 
   // Handle deleting a page
   const handleDeletePage = useCallback(async () => {
     if (!pageToDelete) return;
 
-    try {
-      setIsDeletingPage(true);
+    setIsDeletingPage(true);
 
-      // Check if page has children and pass cascade parameter
-      const hasChildPages = hasChildren(pageToDelete.id);
-      if (hasChildPages) {
-        // For pages with children, we need to pass cascade=true
-        // The API client's delete method needs to be updated to support this
-        // Use fetch directly for cascade parameter support
+    // Check if page has children and pass cascade parameter
+    const hasChildPages = hasChildren(pageToDelete.id);
+    if (hasChildPages) {
+      // For pages with children, we need to pass cascade=true
+      // Use fetch directly for cascade parameter support
+      try {
         const response = await fetch(`/api/v1/cms/pages/${pageToDelete.id}/?cascade=true`, {
           method: 'DELETE',
           headers: {
@@ -999,25 +892,30 @@ const Pages = memo(() => {
           }
         });
         if (!response.ok) throw new Error('Delete failed');
-      } else {
-        await api.cms.pages.delete(parseInt(pageToDelete.id));
+
+        toast.success(t('pages.success.deleted', `Page "${pageToDelete.title}" has been deleted`));
+        setDeleteModalOpen(false);
+        setPageToDelete(null);
+        setIsDeletingPage(false);
+        // React Query will auto-refresh due to invalidation
+      } catch (error) {
+        toast.error(t('pages.errors.delete_failed', 'Failed to delete page'));
+        console.error(error);
+        setIsDeletingPage(false);
       }
-
-      toast.success(t('pages.success.deleted', `Page "${pageToDelete.title}" has been deleted`));
-
-      // Close modal and reset state
-      setDeleteModalOpen(false);
-      setPageToDelete(null);
-
-      // Reload pages
-      loadPages();
-    } catch (error) {
-      toast.error(t('pages.errors.delete_failed', 'Failed to delete page'));
-      console.error(error);
-    } finally {
-      setIsDeletingPage(false);
+    } else {
+      deleteMutation.mutate(parseInt(pageToDelete.id), {
+        onSuccess: () => {
+          setDeleteModalOpen(false);
+          setPageToDelete(null);
+          setIsDeletingPage(false);
+        },
+        onError: () => {
+          setIsDeletingPage(false);
+        }
+      });
     }
-  }, [pageToDelete]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [pageToDelete, hasChildren, deleteMutation, t]);
 
   // Open delete confirmation modal
   const openDeleteModal = useCallback((page: Page) => {
@@ -1029,20 +927,19 @@ const Pages = memo(() => {
   const handleBulkDelete = useCallback(async () => {
     try {
       const deletePromises = selectedPages.map(pageId =>
-        api.cms.pages.delete(parseInt(pageId))
+        deleteMutation.mutateAsync(parseInt(pageId))
       );
 
       await Promise.all(deletePromises);
       toast.success(t('pages.success.bulk_deleted', `Successfully deleted ${selectedPages.length} page(s)`));
 
-      // Clear selection and reload
+      // Clear selection - React Query will auto-refresh
       setSelectedPages([]);
-      loadPages();
     } catch (error) {
       toast.error(t('pages.errors.bulk_delete_failed', 'Failed to delete some pages'));
       console.error(error);
     }
-  }, [selectedPages]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [selectedPages, deleteMutation, t]);
 
   // Handle editing an existing page
   const handleEditPage = useCallback(async () => {
@@ -1084,32 +981,31 @@ const Pages = memo(() => {
         is_homepage: newPageForm.isHomepage
       };
 
-      await api.cms.pages.update(parseInt(editingPage.id), updateRequest);
-      toast.success(t('pages.success.updated', 'Page updated successfully'));
-
-      // Defer state updates to next tick to avoid React batching issues
-      setTimeout(() => {
-        setEditPageModalOpen(false);
-        setEditingPage(null);
-        setNewPageForm({
-          title: "",
-          slug: "",
-          parentId: "none",
-          locale: locales.find(l => l.is_default)?.code || "",
-          status: "draft",
-          scheduledPublishAt: "",
-          scheduledUnpublishAt: "",
-          inMainMenu: false,
-          inFooter: false,
-          isHomepage: false
-        });
-        setIsUpdatingPage(false);
-      }, 0);
-
-      // Load pages after a slight delay to ensure dialog closes smoothly
-      setTimeout(() => {
-        loadPages();
-      }, 100);
+      updateMutation.mutate({ id: parseInt(editingPage.id), ...updateRequest }, {
+        onSuccess: () => {
+          // Defer state updates to next tick to avoid React batching issues
+          setTimeout(() => {
+            setEditPageModalOpen(false);
+            setEditingPage(null);
+            setNewPageForm({
+              title: "",
+              slug: "",
+              parentId: "none",
+              locale: locales.find(l => l.is_default)?.code || "",
+              status: "draft",
+              scheduledPublishAt: "",
+              scheduledUnpublishAt: "",
+              inMainMenu: false,
+              inFooter: false,
+              isHomepage: false
+            });
+            setIsUpdatingPage(false);
+          }, 0);
+        },
+        onError: () => {
+          setIsUpdatingPage(false);
+        }
+      });
     } catch (error) {
       toast.error(t('pages.errors.update_failed', 'Failed to update page'));
       console.error(error);
@@ -1212,15 +1108,12 @@ const Pages = memo(() => {
 
       const draggedPage = pages[oldIndex];
 
-      // Optimistic update
-      const newPages = arrayMove(pages, oldIndex, newIndex);
-      setPages(newPages);
-
       try {
         // Get the parent group for the dragged page
         const parentId = draggedPage.parentId || null;
 
         // Get the ordered list of page IDs for this parent group
+        const newPages = arrayMove(pages, oldIndex, newIndex);
         const pageIds = newPages
           .filter(p => {
             // Filter pages by same parent
@@ -1237,16 +1130,14 @@ const Pages = memo(() => {
           pageIds
         );
 
-        // Refresh data to ensure consistency
-        await loadPages();
+        // React Query will auto-refresh due to cache invalidation
       } catch (error) {
         console.error('Failed to reorder pages:', error);
-        // Revert optimistic update
-        setPages(pages);
+        // React Query will revert automatically since no cache invalidation happens on error
         toast.error(t('pages.errors.reorder_failed', 'Failed to reorder pages'));
       }
     }
-  }, [pages, loadPages]);
+  }, [pages, t]);
 
   const copyToClipboard = useCallback((text: string) => {
     navigator.clipboard.writeText(text);

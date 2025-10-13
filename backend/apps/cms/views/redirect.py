@@ -3,11 +3,13 @@ import io
 
 from django.db.models import Q
 from django.http import HttpResponse
+from django.utils.decorators import method_decorator
+from django.views.decorators.cache import cache_page
 
 from drf_spectacular.utils import extend_schema, extend_schema_view
 from rest_framework import status, viewsets
 from rest_framework.decorators import action
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 
 from apps.cms.models import Redirect
@@ -31,7 +33,27 @@ class RedirectViewSet(viewsets.ModelViewSet):
 
     serializer_class = RedirectSerializer
 
+    # Default permission for write operations
     permission_classes = [IsAuthenticated]
+
+    def get_permissions(self):
+        """
+        Return appropriate permissions based on action.
+        Allow public read access, require auth for write operations.
+        """
+        if self.action in ["list", "retrieve"]:
+            return [AllowAny()]
+        return [IsAuthenticated()]
+
+    @method_decorator(cache_page(60 * 5))  # Cache for 5 minutes
+    def list(self, request, *args, **kwargs):
+        """List redirects with caching"""
+        return super().list(request, *args, **kwargs)
+
+    @method_decorator(cache_page(60 * 5))  # Cache for 5 minutes
+    def retrieve(self, request, *args, **kwargs):
+        """Retrieve redirect with caching"""
+        return super().retrieve(request, *args, **kwargs)
 
     def get_queryset(self):
         """Filter redirects based on query parameters"""
@@ -62,6 +84,83 @@ class RedirectViewSet(viewsets.ModelViewSet):
         """Create redirect instance"""
 
         serializer.save()
+
+    @extend_schema(
+        summary="Lookup redirect by path",
+        description="Public endpoint to lookup a redirect for a given path. Heavily cached for performance.",
+        parameters=[
+            {
+                "name": "path",
+                "in": "query",
+                "description": "The path to lookup (e.g., /old-page)",
+                "required": True,
+                "schema": {"type": "string"},
+            }
+        ],
+        responses={
+            200: {
+                "description": "Redirect found",
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "from_path": {"type": "string"},
+                                "to_path": {"type": "string"},
+                                "status": {"type": "integer"},
+                            },
+                        }
+                    }
+                },
+            },
+            404: {"description": "No redirect found for this path"},
+        },
+    )
+    @action(detail=False, methods=["get"], permission_classes=[AllowAny])
+    @method_decorator(cache_page(60 * 30))  # Cache for 30 minutes
+    def lookup(self, request):
+        """
+        Public endpoint to lookup redirects by path.
+        Optimized for performance with heavy caching and minimal database queries.
+        """
+        path = request.query_params.get("path")
+
+        if not path:
+            return Response(
+                {"error": "path parameter is required"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        # Optimize query: only fetch necessary fields and filter for active redirects
+        redirect = (
+            Redirect.objects.only("from_path", "to_path", "status")
+            .filter(from_path=path, is_active=True)
+            .first()
+        )
+
+        if not redirect:
+            # Return 404 but with cache headers so 404s are also cached
+            response = Response(
+                {"error": "No redirect found"},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+            # Cache 404s for a shorter duration (5 minutes)
+            response["Cache-Control"] = "public, max-age=300"
+            return response
+
+        # Return minimal response
+        response = Response(
+            {
+                "from_path": redirect.from_path,
+                "to_path": redirect.to_path,
+                "status": redirect.status,
+            }
+        )
+
+        # Add CDN-friendly cache headers
+        response["Cache-Control"] = "public, max-age=1800"  # 30 minutes
+
+        return response
 
     @extend_schema(
         summary="Test redirect",
