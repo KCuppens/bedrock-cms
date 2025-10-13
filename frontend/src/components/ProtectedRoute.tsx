@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { Navigate, Outlet, useLocation } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { usePermissions } from "@/hooks/usePermissions";
@@ -94,16 +95,38 @@ const checkRouteAccess = (
 };
 
 export const ProtectedRoute = () => {
-  const { user, isLoading } = useAuth();
+  const { user, isLoading, signOut } = useAuth();
   const location = useLocation();
   const permissions = usePermissions();
+
+  // Effect to handle unauthorized users (not staff or superuser)
+  useEffect(() => {
+    if (!isLoading && user) {
+      // Check if user has staff or superuser permissions
+      const isStaffOrSuperuser = user.is_staff || user.is_superuser;
+
+      if (!isStaffOrSuperuser) {
+        // User is not authorized to access dashboard - log them out
+        console.warn('User does not have staff or superuser permissions. Logging out...');
+        signOut().then(() => {
+          // Redirect will happen via the !user check below
+        });
+      }
+    }
+  }, [user, isLoading, signOut]);
 
   if (isLoading) {
     return <LoadingSpinner />;
   }
 
   if (!user) {
-    return <Navigate to="/sign-in" replace />;
+    return <Navigate to="/sign-in" replace state={{ from: location }} />;
+  }
+
+  // Check if user has staff or superuser permissions for dashboard access
+  if (!user.is_staff && !user.is_superuser) {
+    // User is being logged out, show loading spinner briefly
+    return <LoadingSpinner />;
   }
 
   // Check route-specific permissions

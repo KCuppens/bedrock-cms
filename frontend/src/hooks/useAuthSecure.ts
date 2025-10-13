@@ -9,6 +9,8 @@ export interface User {
   last_name?: string;
   role?: string;
   is_active?: boolean;
+  is_staff?: boolean;
+  is_superuser?: boolean;
   date_joined?: string;
 }
 
