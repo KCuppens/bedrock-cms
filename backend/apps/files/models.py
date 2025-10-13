@@ -103,6 +103,12 @@ class FileUpload(TimestampMixin, UserTrackingMixin):
         help_text="Dominant color as hex value (e.g., #FF5733)",
     )
 
+    base64_micro: TextField = models.TextField(
+        "Base64 micro thumbnail",
+        blank=True,
+        help_text="Ultra-small base64-encoded thumbnail (~500 bytes) for inline embedding",
+    )
+
     thumbnails: models.JSONField = models.JSONField(
         "Thumbnails",
         default=dict,

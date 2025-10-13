@@ -188,6 +188,47 @@ class ImageProcessor:
             logger.warning(f"Failed to generate BlurHash: {e}")
             return ""
 
+    def generate_base64_micro_thumbnail(self, image: Image.Image) -> str:
+        """
+        Generate ultra-small base64-encoded thumbnail for inline embedding.
+
+        Args:
+            image: PIL Image object
+
+        Returns:
+            Base64 data URL string (~500 bytes)
+        """
+        try:
+            # Create tiny thumbnail
+            micro = image.copy()
+            micro.thumbnail((20, 20), Image.Resampling.LANCZOS)
+
+            # Convert to RGB if necessary
+            if micro.mode in ("RGBA", "LA", "P"):
+                background = Image.new("RGB", micro.size, (255, 255, 255))
+                if micro.mode == "P":
+                    micro = micro.convert("RGBA")
+                if micro.mode in ("RGBA", "LA"):
+                    background.paste(
+                        micro,
+                        mask=micro.split()[-1] if len(micro.split()) > 3 else None,
+                    )
+                micro = background
+
+            # Convert to base64
+            import base64
+
+            output = BytesIO()
+            micro.save(output, format="JPEG", quality=40, optimize=True)
+            output.seek(0)
+
+            base64_data = base64.b64encode(output.getvalue()).decode("utf-8")
+            return f"data:image/jpeg;base64,{base64_data}"
+
+        except Exception as e:
+            logger.warning(f"Failed to generate base64 micro thumbnail: {e}")
+            return ""
+
     def generate_thumbnails_for_file(
         self, file_upload, thumbnail_config: Dict
     ) -> Tuple[str, Dict[str, str]]:
@@ -226,6 +267,13 @@ class ImageProcessor:
             if not file_upload.blurhash:
                 file_upload.blurhash = self.generate_blurhash(original_image)
                 file_upload.save(update_fields=["blurhash"])
+
+            # Generate base64 micro thumbnail if configured and not set
+            if thumbnail_config.get("generate_micro") and not file_upload.base64_micro:
+                file_upload.base64_micro = self.generate_base64_micro_thumbnail(
+                    original_image
+                )
+                file_upload.save(update_fields=["base64_micro"])
 
             thumbnail_urls = {}
             sizes_config = thumbnail_config.get("sizes", {})

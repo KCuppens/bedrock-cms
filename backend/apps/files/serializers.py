@@ -53,6 +53,7 @@ class FileUploadSerializer(serializers.ModelSerializer):
             "height",
             "blurhash",
             "dominant_color",
+            "base64_micro",
             "thumbnails",
         ]
 
@@ -78,6 +79,7 @@ class FileUploadSerializer(serializers.ModelSerializer):
             "height",
             "blurhash",
             "dominant_color",
+            "base64_micro",
             "thumbnails",
         ]
 

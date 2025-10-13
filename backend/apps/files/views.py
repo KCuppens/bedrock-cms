@@ -684,6 +684,107 @@ class FileUploadViewSet(viewsets.ModelViewSet):
             status=status.HTTP_201_CREATED if results else status.HTTP_400_BAD_REQUEST,
         )
 
+    @extend_schema(
+        summary="Get responsive image data",
+        description="Get comprehensive responsive image data including srcset, sizes, placeholders, and thumbnails.",
+    )
+    @action(
+        detail=True,
+        methods=["get"],
+        url_path="responsive",
+        permission_classes=[permissions.AllowAny],
+    )
+    def responsive(self, request, pk=None):
+        """Get responsive image data for efficient frontend rendering"""
+        try:
+            file_upload = FileUpload.objects.get(pk=pk)
+        except FileUpload.DoesNotExist:
+            raise Http404("File not found")
+
+        # Check access permissions
+        if not self._can_access_file(request.user, file_upload):
+            raise Http404("File not found")
+
+        # Validate that it's an image file
+        if not file_upload.is_image:
+            return Response(
+                {"error": "File is not an image"}, status=status.HTTP_400_BAD_REQUEST
+            )
+
+        # Import thumbnail presets
+        from .thumbnail_presets import get_sizes_attribute, get_srcset_widths
+
+        # Collect all thumbnails from all configurations
+        all_thumbnails = {}
+        for config_hash, thumbs in file_upload.thumbnails.get(
+            "config_hashes", {}
+        ).items():
+            all_thumbnails.update(thumbs)
+
+        # Build srcset for each format
+        srcsets = {"webp": [], "jpeg": [], "avif": []}
+
+        for size_name, url in all_thumbnails.items():
+            # Extract format and size from key (e.g., "mobile_sm_webp")
+            if "_webp" in size_name:
+                format_type = "webp"
+                base_name = size_name.replace("_webp", "")
+            elif "_jpeg" in size_name or "_jpg" in size_name:
+                format_type = "jpeg"
+                base_name = size_name.replace("_jpeg", "").replace("_jpg", "")
+            elif "_avif" in size_name:
+                format_type = "avif"
+                base_name = size_name.replace("_avif", "")
+            else:
+                # Default format
+                format_type = "jpeg"
+                base_name = size_name
+
+            # Try to get width from thumbnail presets
+            from .thumbnail_presets import THUMBNAIL_PRESETS
+
+            if base_name in THUMBNAIL_PRESETS:
+                width = THUMBNAIL_PRESETS[base_name].get("width")
+                if width and format_type in srcsets:
+                    srcsets[format_type].append({"url": url, "width": width})
+
+        # Sort srcsets by width
+        for format_type in srcsets:
+            srcsets[format_type].sort(key=lambda x: x["width"])
+
+        # Build srcset strings
+        srcset_strings = {}
+        for format_type, items in srcsets.items():
+            if items:
+                srcset_strings[format_type] = ", ".join(
+                    [f"{item['url']} {item['width']}w" for item in items]
+                )
+
+        # Generate sizes attribute
+        sizes = get_sizes_attribute()
+
+        # Response data
+        response_data = {
+            "id": str(file_upload.id),
+            "original_url": request.build_absolute_uri(
+                f"/api/v1/files/{file_upload.id}/download/"
+            ),
+            "width": file_upload.width,
+            "height": file_upload.height,
+            "aspect_ratio": file_upload.aspect_ratio,
+            "srcsets": srcset_strings,
+            "sizes": sizes,
+            "thumbnails": all_thumbnails,
+            "placeholders": {
+                "blurhash": file_upload.blurhash,
+                "base64": file_upload.base64_micro,
+                "dominant_color": file_upload.dominant_color,
+            },
+            "alt": file_upload.description or file_upload.original_filename,
+        }
+
+        return Response(response_data)
+
 
 # Standalone view for direct file downloads (used in fallback URLs)
 
