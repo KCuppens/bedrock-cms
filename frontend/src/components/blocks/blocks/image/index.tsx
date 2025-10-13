@@ -1,5 +1,7 @@
 import React from 'react';
 import type { BlockComponentProps } from '../../types';
+import { ResponsiveImage } from '@/components/ResponsiveImage';
+import type { FileUploadImage } from '@/types/image';
 
 interface ImageContent {
   src?: string;
@@ -8,6 +10,8 @@ interface ImageContent {
   width?: number;
   height?: number;
   alignment?: 'left' | 'center' | 'right';
+  fileId?: string;
+  file?: FileUploadImage;
 }
 
 const ImageBlock: React.FC<BlockComponentProps<ImageContent>> = ({
@@ -18,7 +22,11 @@ const ImageBlock: React.FC<BlockComponentProps<ImageContent>> = ({
     src,
     alt = '',
     caption,
-    alignment = 'center'
+    alignment = 'center',
+    width,
+    height,
+    fileId,
+    file
   } = content;
 
   const alignmentClass = {
@@ -27,7 +35,7 @@ const ImageBlock: React.FC<BlockComponentProps<ImageContent>> = ({
     right: 'text-right ml-auto'
   }[alignment];
 
-  if (!src && isEditing) {
+  if (!src && !fileId && !file && isEditing) {
     return (
       <div className="p-8 border-2 border-dashed border-gray-300 rounded-lg bg-gray-50">
         <div className="text-center">
@@ -42,11 +50,17 @@ const ImageBlock: React.FC<BlockComponentProps<ImageContent>> = ({
 
   return (
     <div className={`my-8 ${alignmentClass}`}>
-      {src && (
-        <img
+      {(src || fileId || file) && (
+        <ResponsiveImage
           src={src}
           alt={alt}
+          fileId={fileId}
+          file={file}
+          width={width}
+          height={height}
           className="max-w-full h-auto rounded-lg shadow-lg"
+          objectFit="cover"
+          loading="lazy"
         />
       )}
       {caption && (

@@ -1,5 +1,7 @@
 import React from 'react';
 import type { BlockComponentProps } from '../../types';
+import { ResponsiveImage } from '@/components/ResponsiveImage';
+import type { FileUploadImage } from '@/types/image';
 
 export const HeroBlock: React.FC<BlockComponentProps> = ({
   content,
@@ -9,7 +11,23 @@ export const HeroBlock: React.FC<BlockComponentProps> = ({
   onSelect,
   className = ''
 }) => {
-  const { title = '', subtitle = '', buttonText = '', buttonUrl = '', backgroundImage = '' } = content;
+  const {
+    title = '',
+    subtitle = '',
+    buttonText = '',
+    buttonUrl = '',
+    backgroundImage = '',
+    backgroundImageFileId,
+    backgroundImageFile
+  } = content as {
+    title?: string;
+    subtitle?: string;
+    buttonText?: string;
+    buttonUrl?: string;
+    backgroundImage?: string;
+    backgroundImageFileId?: string;
+    backgroundImageFile?: FileUploadImage;
+  };
 
   const handleChange = (field: string, value: string) => {
     if (onChange) {
@@ -20,19 +38,33 @@ export const HeroBlock: React.FC<BlockComponentProps> = ({
     }
   };
 
+  const hasBackgroundImage = !!(backgroundImage || backgroundImageFileId || backgroundImageFile);
+
   return (
     <div
       className={`relative overflow-hidden bg-gray-900 ${className}`}
       onClick={onSelect}
       style={{
-        backgroundImage: backgroundImage ? `url(${backgroundImage})` : undefined,
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
         minHeight: '400px'
       }}
     >
-      {backgroundImage && (
-        <div className="absolute inset-0 bg-black bg-opacity-40" />
+      {/* Responsive background image */}
+      {hasBackgroundImage && (
+        <>
+          <div className="absolute inset-0">
+            <ResponsiveImage
+              src={backgroundImage}
+              fileId={backgroundImageFileId}
+              file={backgroundImageFile}
+              alt={title || 'Hero background'}
+              className="w-full h-full"
+              objectFit="cover"
+              priority={true}
+              loading="eager"
+            />
+          </div>
+          <div className="absolute inset-0 bg-black bg-opacity-40" />
+        </>
       )}
 
       <div className="relative px-6 py-24 sm:px-12 sm:py-32 lg:px-16">
