@@ -7,6 +7,8 @@ import { useToast } from "@/hooks/use-toast";
 import { usePublishPage, useUnpublishPage } from "@/hooks/queries/use-pages";
 import { DynamicBlockRenderer } from "@/components/blocks/DynamicBlockRenderer";
 import { Page, Block as ApiBlock } from "@/types/api";
+import { SchemaBuilder } from "@/components/seo/SchemaBuilder";
+import { SchemaObject } from "@/types/schema";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -138,6 +140,7 @@ export interface PageData {
     noindex: boolean;
     nofollow: boolean;
     jsonLd?: string;
+    schemas?: SchemaObject[];
   };
   schedule?: {
     publishAt?: string;
@@ -349,7 +352,8 @@ const PageEditor = () => {
         canonical: apiPage.seo?.canonical || '',
         noindex: apiPage.seo?.noindex || false,
         nofollow: apiPage.seo?.nofollow || false,
-        jsonLd: apiPage.seo?.jsonLd || ''
+        jsonLd: apiPage.seo?.jsonLd || '',
+        schemas: apiPage.seo?.schemas || []
       }
     };
   }, []);
@@ -2760,24 +2764,29 @@ const PageEditor = () => {
                   </div>
                 </div>
                 <div>
-                  <Label>JSON-LD Schema</Label>
-                  <Textarea
-                    value={page?.seo?.jsonLd || ''}
-                    onChange={(e) => {
+                  <Label>Structured Data (Schema.org)</Label>
+                  <SchemaBuilder
+                    schemas={page?.seo?.schemas || []}
+                    pageData={{
+                      title: page?.title || '',
+                      description: page?.seo?.description || '',
+                      image: page?.seo?.ogImage || '',
+                      datePublished: (page as any)?.published_at,
+                      dateModified: (page as any)?.updated_at,
+                      url: (page as any)?.path
+                    }}
+                    onChange={(schemas) => {
                       if (page) {
                         setPage(prev => prev ? ({
                           ...prev,
-                          seo: { ...prev.seo, jsonLd: e.target.value }
+                          seo: { ...prev.seo, schemas }
                         }) : null);
                         setHasUnsavedChanges(true);
                       }
                     }}
-                    placeholder='{"@context": "https://schema.org", ...}'
-                    rows={4}
+                    autoGenerate={false}
+                    pageId={page?.id ? parseInt(page.id) : undefined}
                   />
-                  <div className="text-xs text-muted-foreground mt-1">
-                    Enter valid JSON-LD structured data
-                  </div>
                 </div>
               </CardContent>
             </Card>
