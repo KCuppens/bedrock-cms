@@ -1,0 +1,16 @@
+{
+  "@context": "https://schema.org",
+  "@type": "HowTo",
+  "name": "",
+  "description": "",
+  "image": "",
+  "totalTime": "",
+  "step": [
+    {
+      "@type": "HowToStep",
+      "name": "",
+      "text": "",
+      "image": ""
+    }
+  ]
+}

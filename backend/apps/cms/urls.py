@@ -10,6 +10,7 @@ from .views.category import CategoryViewSet, CollectionViewSet, TagViewSet
 from .views.navigation import FooterView, NavigationView, SiteSettingsView
 from .views.pages import PagesViewSet
 from .views.redirect import RedirectViewSet
+from .views.schema import BlogPostSchemaView, PageSchemaView, SchemaViewSet
 from .views.seo import PublicSeoSettingsView, SeoSettingsViewSet
 
 router = DefaultRouter()
@@ -32,6 +33,8 @@ router.register(r"seo-settings", SeoSettingsViewSet, basename="seo-settings")
 
 router.register(r"block-types", BlockTypeViewSet, basename="block-types")
 
+router.register(r"schema", SchemaViewSet, basename="schema")
+
 
 urlpatterns = [
     path("", include(router.urls)),
@@ -50,4 +53,11 @@ urlpatterns = [
         name="public-seo-settings",
     ),
     path("sitemap-<str:locale_code>.xml", sitemap_view, name="sitemap"),
+    # Schema.org structured data endpoints
+    path("pages/<int:id>/schema/", PageSchemaView.as_view(), name="page-schema"),
+    path(
+        "blog/posts/<int:id>/schema/",
+        BlogPostSchemaView.as_view(),
+        name="blogpost-schema",
+    ),
 ]

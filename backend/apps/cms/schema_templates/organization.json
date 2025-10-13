@@ -1,0 +1,16 @@
+{
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  "name": "",
+  "url": "",
+  "logo": {
+    "@type": "ImageObject",
+    "url": ""
+  },
+  "contactPoint": {
+    "@type": "ContactPoint",
+    "telephone": "",
+    "contactType": "customer service"
+  },
+  "sameAs": []
+}
