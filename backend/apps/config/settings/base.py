@@ -206,7 +206,7 @@ CACHE_MIDDLEWARE_ALIAS = "default"
 
 CACHE_MIDDLEWARE_SECONDS = 600  # 10 minutes
 
-CACHE_MIDDLEWARE_KEY_PREFIX = "bedrock"
+CACHE_MIDDLEWARE_KEY_PREFIX = env("CACHE_KEY_PREFIX", default="bedrock_dev")
 
 
 # Session cache
@@ -214,6 +214,20 @@ CACHE_MIDDLEWARE_KEY_PREFIX = "bedrock"
 SESSION_ENGINE = "django.contrib.sessions.backends.cache"
 
 SESSION_CACHE_ALIAS = "default"
+
+# Session Security Settings
+SESSION_COOKIE_SECURE = env.bool("SESSION_COOKIE_SECURE", default=not DEBUG)  # HTTPS only in production
+SESSION_COOKIE_HTTPONLY = True  # No JavaScript access
+SESSION_COOKIE_SAMESITE = 'Strict'  # CSRF protection
+SESSION_COOKIE_AGE = 3600  # 1 hour
+SESSION_SAVE_EVERY_REQUEST = False  # Don't update session on every request
+
+# CSRF Security
+CSRF_COOKIE_SECURE = env.bool("CSRF_COOKIE_SECURE", default=not DEBUG)  # HTTPS only in production
+CSRF_COOKIE_HTTPONLY = True  # No JavaScript access
+CSRF_COOKIE_SAMESITE = 'Strict'
+
+
 
 
 # Password validation
@@ -224,6 +238,9 @@ AUTH_PASSWORD_VALIDATORS = [
     },
     {
         "NAME": "django.contrib.auth.password_validation.MinimumLengthValidator",
+        "OPTIONS": {
+            "min_length": 10,
+        },
     },
     {
         "NAME": "django.contrib.auth.password_validation.CommonPasswordValidator",
@@ -498,6 +515,15 @@ CELERY_TIMEZONE = TIME_ZONE
 
 CELERY_ENABLE_UTC = True
 
+# Celery Security Settings
+CELERY_TASK_ACKS_LATE = True  # Acknowledge tasks after completion
+CELERY_TASK_REJECT_ON_WORKER_LOST = True  # Reject lost tasks
+CELERY_WORKER_PREFETCH_MULTIPLIER = 1  # Reduce prefetch for better distribution
+CELERY_TASK_TIME_LIMIT = 300  # 5 minutes max per task
+CELERY_TASK_SOFT_TIME_LIMIT = 270  # 4.5 minutes soft limit
+
+
+
 
 # Celery Beat Schedule (Periodic Tasks)
 
@@ -578,6 +604,15 @@ SECURE_CONTENT_TYPE_NOSNIFF = True
 
 X_FRAME_OPTIONS = "DENY"
 
+# Additional Security Headers
+SECURE_HSTS_SECONDS = env.int("SECURE_HSTS_SECONDS", default=31536000)  # 1 year
+SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+SECURE_HSTS_PRELOAD = True
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+SECURE_REFERRER_POLICY = 'same-origin'
+
+
+
 
 # CORS
 
@@ -606,6 +641,11 @@ CORS_ALLOW_HEADERS = [
 FILE_UPLOAD_MAX_MEMORY_SIZE = 5 * 1024 * 1024  # 5MB
 
 DATA_UPLOAD_MAX_MEMORY_SIZE = FILE_UPLOAD_MAX_MEMORY_SIZE
+
+# File Upload Security
+FILE_UPLOAD_PERMISSIONS = 0o644  # Restrict file permissions
+FILE_UPLOAD_DIRECTORY_PERMISSIONS = 0o755  # Restrict directory permissions
+
 
 
 # Demo mode
@@ -704,7 +744,7 @@ if USE_S3_STORAGE:
 
     AWS_S3_CUSTOM_DOMAIN = env("AWS_S3_CUSTOM_DOMAIN", default=None)
 
-    AWS_DEFAULT_ACL = env("AWS_DEFAULT_ACL", default="public-read")
+    AWS_DEFAULT_ACL = env("AWS_DEFAULT_ACL", default="private")
 
     AWS_S3_OBJECT_PARAMETERS = {
         "CacheControl": "max-age=86400",

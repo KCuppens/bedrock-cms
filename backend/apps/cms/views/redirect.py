@@ -200,10 +200,26 @@ class RedirectViewSet(viewsets.ModelViewSet):
 
         file = request.FILES["file"]
 
+        # Security: Validate file extension
         if not file.name.endswith(".csv"):
 
             return Response(
                 {"error": "File must be a CSV"}, status=status.HTTP_400_BAD_REQUEST
+            )
+
+        # Security: Validate MIME type
+        if file.content_type not in ['text/csv', 'application/csv', 'text/plain']:
+            return Response(
+                {"error": "Invalid file type. Must be a CSV file."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        # Security: Validate file size (max 5MB for CSV)
+        MAX_CSV_SIZE = 5 * 1024 * 1024  # 5MB
+        if file.size > MAX_CSV_SIZE:
+            return Response(
+                {"error": f"File too large. Maximum size is {MAX_CSV_SIZE / (1024*1024)}MB"},
+                status=status.HTTP_400_BAD_REQUEST,
             )
 
         try:
@@ -247,17 +263,36 @@ class RedirectViewSet(viewsets.ModelViewSet):
 
                 try:
 
+                    # Security: Validate and sanitize paths
+                    from_path = row.get("from_path", row.get("source_path", "")).strip()
+                    to_path = row.get("to_path", row.get("destination_url", "")).strip()
+
+                    # Security: Validate paths are not empty
+                    if not from_path or not to_path:
+                        failed_imports += 1
+                        errors.append(f"Row {row_num}: Empty path values not allowed")
+                        continue
+
+                    # Security: Validate status code is in allowed range
+                    ALLOWED_STATUS_CODES = [301, 302, 303, 307, 308]
+                    try:
+                        status_code = int(row.get("status", row.get("redirect_type", 301)))
+                        if status_code not in ALLOWED_STATUS_CODES:
+                            failed_imports += 1
+                            errors.append(f"Row {row_num}: Invalid status code {status_code}. Must be one of {ALLOWED_STATUS_CODES}")
+                            continue
+                    except (ValueError, TypeError):
+                        failed_imports += 1
+                        errors.append(f"Row {row_num}: Invalid status code format")
+                        continue
+
                     # Create redirect from CSV row
 
                     redirect_data = {
-                        "from_path": row.get(
-                            "from_path", row.get("source_path", "")
-                        ).strip(),
-                        "to_path": row.get(
-                            "to_path", row.get("destination_url", "")
-                        ).strip(),
-                        "status": int(row.get("status", row.get("redirect_type", 301))),
-                        "notes": row.get("notes", ""),
+                        "from_path": from_path,
+                        "to_path": to_path,
+                        "status": status_code,
+                        "notes": row.get("notes", "")[:500],  # Limit notes length
                         "is_active": row.get("is_active", "true").lower() == "true",
                     }
 
@@ -275,13 +310,13 @@ class RedirectViewSet(viewsets.ModelViewSet):
 
                         failed_imports += 1
 
-                        """errors.append(f"Row {row_num}: {serializer.errors}")"""
+                        errors.append(f"Row {row_num}: {serializer.errors}")
 
                 except Exception as e:
 
                     failed_imports += 1
 
-                    """errors.append(f"Row {row_num}: {str(e)}")"""
+                    errors.append(f"Row {row_num}: {str(e)}")
 
             # Import completed
 

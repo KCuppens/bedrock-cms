@@ -439,6 +439,12 @@ class BlockTypeViewSet(viewsets.ModelViewSet):
                 queryset = model_class.objects.all()
 
             # Apply filters from query parameters
+            # Security: Whitelist allowed filter fields to prevent unauthorized data access
+            ALLOWED_FILTER_FIELDS = {
+                'id', 'pk', 'title', 'slug', 'status', 'category', 'category_id',
+                'published', 'is_active', 'created_at', 'updated_at',
+                'locale', 'locale_id', 'tags'
+            }
 
             filters_str = request.query_params.get("filters")
 
@@ -448,12 +454,31 @@ class BlockTypeViewSet(viewsets.ModelViewSet):
 
                     filters = json.loads(filters_str)
 
-                    queryset = queryset.filter(**filters)
+                    # Security: Only allow whitelisted fields
+                    safe_filters = {}
+                    for key, value in filters.items():
+                        # Extract base field name (before __ lookups)
+                        base_field = key.split('__')[0]
+                        if base_field in ALLOWED_FILTER_FIELDS:
+                            safe_filters[key] = value
+                        else:
+                            return Response(
+                                {"error": f"Filter field '{base_field}' is not allowed"},
+                                status=status.HTTP_400_BAD_REQUEST,
+                            )
+
+                    queryset = queryset.filter(**safe_filters)
 
                 except (json.JSONDecodeError, TypeError) as e:
 
                     return Response(
                         {"error": f"Invalid filters format: {str(e)}"},
+                        status=status.HTTP_400_BAD_REQUEST,
+                    )
+                except Exception as e:
+                    # Catch any database/ORM errors from malicious filter attempts
+                    return Response(
+                        {"error": "Invalid filter parameters"},
                         status=status.HTTP_400_BAD_REQUEST,
                     )
 
@@ -532,7 +557,23 @@ class BlockTypeViewSet(viewsets.ModelViewSet):
 
         # Try to find a registered serializer for this model
 
-        # For now, create a dynamic serializer
+        # Security: Create a dynamic serializer with safe field whitelist
+        # Exclude sensitive internal fields
+        EXCLUDED_FIELDS = {
+            'password', 'token', 'secret', 'api_key', 'private_key',
+            'auth_token', 'session_id', 'csrf_token', 'preview_token',
+            'internal_id', 'encrypted_', 'hashed_'
+        }
+
+        # Get all model field names
+        all_fields = [f.name for f in model_class._meta.get_fields()
+                     if hasattr(f, 'name')]
+
+        # Filter out sensitive fields
+        safe_fields = [
+            field for field in all_fields
+            if not any(excluded in field.lower() for excluded in EXCLUDED_FIELDS)
+        ]
 
         class DynamicModelSerializer(serializers.ModelSerializer):
 
@@ -540,7 +581,8 @@ class BlockTypeViewSet(viewsets.ModelViewSet):
 
                 model = model_class
 
-                fields = "__all__"
+                # Security: Use explicit field list instead of "__all__"
+                fields = safe_fields if safe_fields else ['id', 'title']
 
         return DynamicModelSerializer(instance, many=many)
 

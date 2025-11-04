@@ -167,8 +167,17 @@ class PagesViewSet(VersioningMixin, viewsets.ModelViewSet):
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
-        # Normalize path (ensure leading slash, no trailing slash except for root)
+        # Security: Normalize and sanitize path
+        import urllib.parse
+        import os
 
+        # Decode URL-encoded characters (handle double-encoding attacks)
+        path = urllib.parse.unquote(urllib.parse.unquote(path))
+
+        # Normalize path to remove .., ./, etc.
+        path = os.path.normpath(path)
+
+        # Ensure leading slash, no trailing slash except for root
         if not path.startswith("/"):
 
             path = f"/{path}"
@@ -176,6 +185,13 @@ class PagesViewSet(VersioningMixin, viewsets.ModelViewSet):
         if len(path) > 1 and path.endswith("/"):
 
             path = path.rstrip("/")
+
+        # Security: Block path traversal attempts
+        if ".." in path or path.startswith("//"):
+            return Response(
+                {"error": "Invalid path"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
 
         try:
 
@@ -191,6 +207,23 @@ class PagesViewSet(VersioningMixin, viewsets.ModelViewSet):
                 {"error": f'Locale "{locale_code}" not found or inactive'},
                 status=status.HTTP_400_BAD_REQUEST,
             )
+
+        # Security: Check if user has locale access (for authenticated users)
+        # Anonymous users can only access published pages in any locale
+        # Authenticated users need locale permission for non-public access
+        if request.user.is_authenticated and not request.user.is_superuser:
+            from apps.accounts.rbac import ScopedLocale
+
+            has_locale_access = ScopedLocale.objects.filter(
+                group__in=request.user.groups.all(),
+                locale=locale
+            ).exists()
+
+            if not has_locale_access:
+                return Response(
+                    {"error": "You don't have permission to access content in this locale"},
+                    status=status.HTTP_403_FORBIDDEN,
+                )
 
         # Get page with optimized query using select_related for locale
 
