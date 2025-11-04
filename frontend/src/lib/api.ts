@@ -129,17 +129,21 @@ class ApiClient {
 
   constructor(baseURL: string) {
     this.baseURL = baseURL;
-    // Get token from localStorage if available
-    this.token = localStorage.getItem('api_token');
+    // Security: DO NOT store tokens in localStorage - use httpOnly cookies only
+    // this.token = localStorage.getItem('api_token');  // REMOVED FOR SECURITY
   }
 
   setToken(token: string | null) {
+    // Security: Removed token storage in localStorage
+    // Tokens are now handled exclusively via httpOnly cookies
+    // This prevents XSS attacks from stealing authentication tokens
     this.token = token;
-    if (token) {
-      localStorage.setItem('api_token', token);
-    } else {
-      localStorage.removeItem('api_token');
-    }
+    // DO NOT store tokens in localStorage or sessionStorage
+    // if (token) {
+    //   localStorage.setItem('api_token', token);  // REMOVED FOR SECURITY
+    // } else {
+    //   localStorage.removeItem('api_token');  // REMOVED FOR SECURITY
+    // }
   }
 
   private addPermissionHeaders(headers: HeadersInit): void {
@@ -149,17 +153,19 @@ class ApiClient {
       // Ensure ASCII-only characters for HTTP headers
       headers['X-Locale'] = this.encodeHeaderValue(currentLocale);
 
-      // Get user scopes from localStorage (set by auth context)
-      const userScopes = localStorage.getItem('user_scopes');
-      if (userScopes) {
-        headers['X-User-Scopes'] = this.encodeHeaderValue(userScopes);
-      }
+      // Security: User scopes should come from API, not localStorage
+      // const userScopes = localStorage.getItem('user_scopes');  // REMOVED
+      // Removed: X-User-Scopes header (data should come from server session)
+      // if (userScopes) {
+      //   headers['X-User-Scopes'] = this.encodeHeaderValue(userScopes);
+      // }
 
-      // Add user role for quick backend checks
-      const userRole = localStorage.getItem('user_role');
-      if (userRole) {
-        headers['X-User-Role'] = this.encodeHeaderValue(userRole);
-      }
+      // Security: User role should come from API, not localStorage
+      // const userRole = localStorage.getItem('user_role');  // REMOVED
+      // Removed: X-User-Role header (data should come from server session)
+      // if (userRole) {
+      //   headers['X-User-Role'] = this.encodeHeaderValue(userRole);
+      // }
     } catch (error) {
       // Fail silently - headers are optional enhancements
       console.debug('Failed to add permission headers:', error);
@@ -205,8 +211,9 @@ class ApiClient {
 
     // Clear stored tokens
     this.setToken(null);
-    localStorage.removeItem('user_scopes');
-    localStorage.removeItem('user_role');
+    // Security: No longer storing sensitive auth data in localStorage
+    // localStorage.removeItem('user_scopes');  // REMOVED
+    // localStorage.removeItem('user_role');  // REMOVED
 
     // Dispatch auth error event
     if (typeof window !== 'undefined') {

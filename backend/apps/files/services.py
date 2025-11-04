@@ -15,6 +15,7 @@ from apps.core.circuit_breaker import storage_circuit_breaker
 from apps.core.enums import FileType
 
 from .models import FileUpload
+from .magic_validation import MagicBytesValidator
 
 logger = logging.getLogger(__name__)
 
@@ -314,7 +315,7 @@ class FileService:
 
             warnings.append(f"MIME type '{mime_type}' may not be supported")
 
-        # Check for MIME type and extension mismatch
+        # Security: Check for MIME type and extension mismatch (ERROR not warning)
 
         expected_mime_types = {
             ".pdf": ["application/pdf"],
@@ -323,16 +324,29 @@ class FileService:
             ".jpeg": ["image/jpeg"],
             ".png": ["image/png"],
             ".gif": ["image/gif"],
+            ".webp": ["image/webp"],
             ".doc": ["application/msword"],
             ".docx": [
                 "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
             ],
+            ".csv": ["text/csv", "text/plain", "application/csv"],
         }
 
         if file_extension in expected_mime_types:
             if mime_type not in expected_mime_types[file_extension]:
-                warnings.append(
-                    f"File extension {file_extension} may not be supported with MIME type {mime_type}"
+                # Security: Changed from warning to error
+                errors.append(
+                    f"File extension {file_extension} does not match MIME type {mime_type}. Possible file type spoofing."
+                )
+
+        # Security: Validate file content using magic bytes
+        if file_extension in expected_mime_types:
+            expected_mime = expected_mime_types[file_extension][0]  # Use first as primary
+            magic_result = MagicBytesValidator.validate_magic_bytes(file, expected_mime)
+
+            if not magic_result['valid']:
+                errors.append(
+                    f"File content validation failed: {magic_result['error']}"
                 )
 
         # Check for potential security issues
